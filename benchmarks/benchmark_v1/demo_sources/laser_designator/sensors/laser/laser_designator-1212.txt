@@ -1,0 +1,28 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+sensor LASER_DESIGNATOR-1212 WSF_LASER_DESIGNATOR
+      azimuth_field_of_view   -0.25 deg 0.25 deg
+      elevation_field_of_view -0.25 deg 0.25 deg
+      on
+      maximum_transmission_range 10 km
+      terrain_float_distance     10 m
+      target_association_staleout_interval 10 sec
+      maximum_target_association_distance 200 m
+      frame_time          0.1 s
+      cue_mode            both
+      slew_mode           both
+      laser_code          1212
+      azimuth_slew_rate   20 deg/s
+      elevation_slew_rate 20 deg/s
+      reports_location
+      transmitter
+         wavelength 1.06E-6 microns
+         power 1 mw
+      end_transmitter
+end_sensor

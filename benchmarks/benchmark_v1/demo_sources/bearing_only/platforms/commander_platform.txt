@@ -1,0 +1,75 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+filter KALMAN_Point5deg WSF_KALMAN_FILTER
+   range_measurement_sigma       500. m
+   bearing_measurement_sigma     0.5 deg
+   elevation_measurement_sigma   0.5 deg
+
+   # values for maneuvering targets (per Erik)
+   process_noise_sigmas_XYZ  30 30 30
+end_filter
+platform_type COMMANDER_PLATFORM WSF_PLATFORM
+  icon mig-21
+
+  infrared_signature    VEHICLE_INFRARED_SIGNATURE
+  optical_signature     VEHICLE_OPTICAL_SIGNATURE
+  radar_signature       VEHICLE_RADAR_SIGNATURE
+   mover WSF_AIR_MOVER
+     maximum_radial_acceleration 1.1 g  # make smooth transitions
+     maximum_linear_acceleration 1.5 g
+     maximum_climb_rate           10 ft/sec
+   end_mover
+
+  comm sub_net RED_DATALINK
+     network_name <local:master>
+     internal_link data_mgr
+     internal_link task_mgr
+  end_comm
+
+       track_manager
+        #filter KALMAN_Point5deg end_filter
+        correlation_method nearest_neighbor
+   #        precise_mode true  #NOT DOCUMENTED - EVENTUALLY WILL BE DEFAULT
+           tracking_sigma 1   # multiplier applied to sensor sigma
+                              #( 5 gives 99.99% correlation if ellipsoid boundaries intersected
+                              #( 3 gives 99.73% correlation if ellipsoid boundaries intersected
+                              #( 1 gives 68.27% correlation if ellipsoid boundaries intersected
+                              #(.5 gives 38.29% correlation if ellipsoid boundaries intersected
+           turning_sigma  1   # KEEP THE SAME AS tracking_sigma!!!
+        end_correlation_method
+        fusion_method replacement end_fusion_method
+        #fusion_method weighted_average
+     end_track_manager
+
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+    purge_interval       60 sec
+    update_interval 5 secs
+  end_processor
+
+  processor task_mgr WSF_TASK_PROCESSOR
+      on_message
+         type WSF_TRACK_MESSAGE
+            script
+               WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+               WsfTrack        track    = trackMsg.Track();
+               WsfTrackId      trackId  = track.TrackId();
+               double     targetLat     = track.Latitude();
+               double     targetLon     = track.Longitude();
+               double     targetAlt     = track.Altitude();
+               #writeln(TIME_NOW, " Received track message from ", trackId.OwningPlatform());
+               #writeln("Track is located ", targetLat , " " , targetLon );
+               PLATFORM.GoToSpeed(300);
+               PLATFORM.GoToLocation(targetLat, targetLon, targetAlt);
+            end_script
+      end_on_message
+  end_processor
+
+
+end_platform_type

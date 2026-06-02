@@ -1,0 +1,221 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# this processor defines a task manager implementing AAA shooting
+
+processor GUN_BATTERY_TACTICS WSF_TASK_PROCESSOR
+
+   #show_state_transitions
+   #show_task_messages
+
+   script_variables           # These variables are overwritten by the platform.
+      string TRACK_SENSOR_NAME               = "";
+      string ACQ_SENSOR_NAME               = "";
+      string SENSOR_TRACK_MODE         = "TRACK"; # could be "default" if using a modeless sensor if used
+	   string SENSOR_ACQUIRE_MODE       = "ACQUIRE";  # if used...
+      string WEAPON_NAME               = ""; # Supplied by the gun platform
+      double REQUIRED_TRACK_QUALITY    = .98; # Must have a high quality track
+      int SALVO_SIZE                   = 1;  # Overwritten by platform using this processor
+      double LAUNCH_DELAY              = 0;
+      double MAX_RANGE                 = 0; # MUST BE SUPPLIED BY LAUNCHING PLATFORM!!!
+      # the following are used internally and should not be modified by the user
+      string mTrackTaskStr      = "Track";
+      string mShootTaskStr      = "Shoot";
+   end_script_variables
+
+   # returns true if weapon is still active for given track
+   script bool FiringNow()
+      return (WeaponsActiveFor(TRACK.TrackId()) > 0);
+   end_script
+
+   # return true if intercept results are known
+   # (i.e. weapons have terminated for this TRACK)
+   script bool InterceptResultsKnown()
+      return (TimeSinceWeaponLastTerminatedFor(TRACK.TrackId()) > 0.0);
+   end_script
+
+   # return true if TRACK is inside the intercept envelope AND flying toward us
+   script bool InInterceptEnvelopeOf(WsfWeapon aWeapon)
+      bool CanIntercept = 0;
+      double targetRelativeHeading = PLATFORM.RelativeHeadingOf(TRACK);
+      if((PLATFORM.GroundRangeTo(TRACK) > MAX_RANGE) || 
+          !aWeapon.IsValid() || 
+          !aWeapon.LaunchComputer().IsValid() ||
+          MATH.Fabs(targetRelativeHeading) > 90)
+
+      {
+         return CanIntercept;
+      }
+      WsfLaunchComputer computer = aWeapon.LaunchComputer();
+      #writeln(TIME_NOW, " Launch Computer Name is = ", computer );
+      #writeln(TIME_NOW, " computer.Intercept point is ", computer.InterceptPoint());
+	   CanIntercept = computer.CanIntercept(TRACK, LAUNCH_DELAY) &&
+                     computer.InterceptPointIsValid();
+      if( ! computer.InterceptPointIsValid())
+      {
+         writeln_d("ERROR - ", aWeapon.Name(), " does not have a valid intercept point!!!");
+      }
+      writeln_d(TIME_NOW, "CanIntercept = ",   CanIntercept);
+      return CanIntercept;
+   end_script
+
+   # returns true if acq_radar is tracking
+   script bool HasAcquired()
+      return (TRACK.TrackQuality() > 0.75);
+   end_script
+
+   # returns true if any TTR is tracking (external sensor not defined)
+   script bool TrackingNow()
+      if (!TRACK.IsValid())
+      {
+         return false;
+      }
+
+
+      if (TRACK_SENSOR_NAME == "")
+      {
+         return (TRACK.TrackQuality() > REQUIRED_TRACK_QUALITY);
+      }
+      else
+      {
+         return (TRACK.TrackQuality() > 0.95);
+      }
+   end_script
+
+   # select a weapon and launch it
+   # the selected weapon must be available, have sufficient rounds and not busy
+   script bool LaunchWeapon()
+      WsfWeapon   weapon;
+      weapon = PLATFORM.Weapon(WEAPON_NAME);
+      bool canInterceptNow = false;
+      if (weapon.IsTurnedOn() &&  (weapon.QuantityRemaining() >= SALVO_SIZE))
+      {
+         canInterceptNow = InInterceptEnvelopeOf(weapon);
+      }
+      bool launched = false;
+      if (canInterceptNow)
+      {
+            canInterceptNow = InInterceptEnvelopeOf(weapon);
+            weapon.CueToTarget(TRACK);
+            launched = FireAt(TRACK, mShootTaskStr, weapon, SALVO_SIZE);
+            #launched = FireAt(TRACK, mShootTaskStr, weapon,    1       );
+
+         if (launched)
+         {
+            writeln_d("*** T=", TIME_NOW, " ", PLATFORM.Name(), " ",
+                      TRACK.TargetName(), " R=", PLATFORM.SlantRangeTo(TRACK),
+                      " FIRE!!!!");
+         }
+      }
+      return launched;
+   end_script
+
+   # returns true if the TRACK has been assigned or the system has
+   # local engage authority
+   script bool IsEngageable()
+      return (((PLATFORM == PLATFORM.Commander()) ||
+               (TasksReceivedFor(TRACK.TrackId()) > 0) ||
+               (OperatingLevelFor("ENGAGE") > 0))) ;
+   end_script
+
+   # determine the number of available weapons
+   script int WeaponsAvailable()
+      int quantity = 0;
+      WsfWeapon weapon = PLATFORM.Weapon(WEAPON_NAME);
+      if (weapon.IsTurnedOn())
+      {
+         quantity = weapon.QuantityRemaining();
+      }
+      return quantity;
+   end_script
+
+   # begin tracking the current target
+
+
+# ------------------------------------------------------------------
+# START OF THE STATE MACHINE
+   evaluation_interval DETECTED 0.5 sec
+   state DETECTED
+      next_state DETECTED
+         if (TRACK.IFF_Friend())
+         {
+            # cancel any tasks assigned against this track
+            CancelTask(TRACK.TrackId());
+            return true;
+         }
+         return false;
+      end_next_state
+
+      next_state ENGAGEABLE
+         return (TRACK.BelievedAlive() &&
+                 (! TRACK.IFF_Friend()) &&
+                 IsEngageable());
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGEABLE 2.0 sec
+   state ENGAGEABLE
+      next_state DETECTED
+         return (TRACK.BelievedDead() || TRACK.IFF_Friend() || (! IsEngageable()));
+      end_next_state
+
+      next_state ENGAGE
+
+         # wait until tracking target
+         if (TRACK_SENSOR_NAME == "")
+         {
+            writeln_d(TIME_NOW, " In intercept of the gun = ", InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)));
+            return (TRACK.BelievedAlive() &&
+                    InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)) &&
+                    (TRACK.TrackQuality() > REQUIRED_TRACK_QUALITY));
+         }
+         else
+         {
+            return (TrackingNow() && InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)) &&
+                    ((TasksAssignedFor(TRACK.TrackId(), mTrackTaskStr) > 0) ||
+                    (PLATFORM.Commander() == PLATFORM)));
+         }
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGE 0.005 sec
+   state ENGAGE
+      next_state ENGAGEABLE
+         return (TRACK.BelievedDead() || ! TrackingNow());
+      end_next_state
+
+      next_state FIRING
+         bool launched = false;
+
+         if (TRACK.BelievedAlive() &&
+             TrackingNow() &&            
+             InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)))
+         {
+            launched = LaunchWeapon();
+         }
+         return launched;
+      end_next_state
+   end_state
+
+   evaluation_interval FIRING .005 sec
+   state FIRING
+      next_state ENGAGE
+         if (TRACK.BelievedDead() ||
+             ! InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)) ||             
+             (TasksAssignedFor(TRACK.TrackId(), mShootTaskStr) < 1) ||
+             (WeaponsAvailable() < 1) ||
+             ! TrackingNow())
+         {
+            CancelTask(TRACK.TrackId());
+            return true;
+         }
+         return false;
+      end_next_state
+   end_state
+
+end_processor

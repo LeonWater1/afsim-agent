@@ -1,0 +1,376 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# UNCLASSIFIED
+# This processor examines a TRACK of a ballistic missile and determines its trajectory.
+# It creates a future launch time for the interceptor to hit the ballistic missile when the interceptor is able to
+# cross trajectories.
+
+# This script can be used on the firing platform (if it has its own weapon) or on the
+# commander (battalion or battery) of the weapon launcher.
+# No explicit sensor is defined. It only checks to see if the TRACK quality is above 0.98.
+
+//This external script Map variable is used to deconflict engagements when
+//multiple anti ballistic batteries are being used in the sim and to count the number of assignments
+script_variables
+   //The first string is target name, second string is the platform engaging the target
+   Map<string, string> AssignedTrackNames = Map<string,string>();
+end_script_variables
+
+processor ANTI_BALLISTIC_MISSILE_PROCESSOR WSF_TASK_PROCESSOR
+   # show_state_transitions
+   # show_task_messages
+   # script_debug_writes on
+   number_of_servers 50
+   script_variables
+      string WEAPON_NAME          = "sam" ; # Change in scenario or platform
+      double LAUNCH_DELAY         = 0;
+      double SALVO_SIZE           = 1;     # 1 or 2 (2 limited by this processor)
+      double SALVO_DELAY          = 1.0;   # 1 sec default salvo delay
+      double REQUIRED_TRACK_QUALITY = 0.98;
+      bool   SUBS_HAVE_WEAPONS    = true;  # Subordinates have weapons (separate launchers).
+      int    MAX_ENGAGEMENTS      = 2;     # How many simultaneous engagements at one time.
+      Map<WsfTrackId, double> LaunchFutureTimeMap = Map<WsfTrackId, double>(); # Saves out the time of the launch
+      Map<WsfTrackId, WsfPlatform> SubordinateLauncherMap = Map<WsfTrackId, WsfPlatform>(); # Only used if SUBS_HAVE_WEAPONS
+   end_script_variables
+
+
+   script int GetMyAssignments()
+      int myAssignments = 0;
+      foreach ( string targetName : string assigneeName in AssignedTrackNames)
+      {
+        if ( assigneeName == PLATFORM.Name() )
+        myAssignments +=1;
+      }
+      return myAssignments;
+   end_script
+
+   on_track_drop
+     // Get rid of the time to launch since we dont have a track anymore.
+     LaunchFutureTimeMap.Erase(TRACK.TrackId());
+     //Clean up the global Map variable AssignedTrackNames
+     if(AssignedTrackNames.Exists(TRACK.TargetName()) && AssignedTrackNames.Get(TRACK.TargetName()) == PLATFORM.Name())
+     {
+        AssignedTrackNames.Remove(TRACK.TargetName());
+     }
+   end_on_track_drop
+
+   script bool Engageable()
+      bool engageable = false;
+      if ((PLATFORM == PLATFORM.Commander())   ||  # SELF Commanded ?
+          (OperatingLevelFor("ENGAGE") > 0)    ||  # Processor set to ENGAGE?
+          (TRACK.BelievedAlive())              ||  # Not believed dead...
+          (TasksReceivedFor(TRACK.TrackId())))     # Been tasked to go after the TRACK?
+      {
+         engageable = true;
+      }
+      return engageable;
+   end_script
+
+   script bool WeaponQualityTrack()
+      bool weaponQualityTrack = false;
+      if (TRACK.TrackQuality() > REQUIRED_TRACK_QUALITY)
+      {
+         weaponQualityTrack = true;
+      }
+      return weaponQualityTrack;
+   end_script
+
+   script bool WeaponActive()
+     return (WeaponsActiveFor(TRACK.TrackId()) > 0); # Already got one in the air against it
+   end_script
+
+
+
+   // Find a weapon and check its launch computer to see if it will work.
+   script bool Find_Launch_Solution()
+      bool LaunchSolutionFound = false;
+      # Am I at my max engagement level?
+      int myAssignments = GetMyAssignments();
+      if (myAssignments >= MAX_ENGAGEMENTS)
+      {
+        return false;
+      }
+      // Check to see if another battery is engaging the target
+      if (AssignedTrackNames.Exists(TRACK.TargetName()) && AssignedTrackNames.Get(TRACK.TargetName()) != PLATFORM.Name())
+      {
+         return false;
+      }
+
+      // Loop over the subordinates first.  If no weapons found, then look at yourself.
+      if (SUBS_HAVE_WEAPONS)
+      {
+         foreach (WsfPlatform sub in PLATFORM.Subordinates())
+         {
+            #writeln("The subordinate name is ", sub.Name());
+            WsfWeapon weap = sub.Weapon(WEAPON_NAME);
+
+            if (!weap.IsValid())
+            {
+               #writeln("Going to next sub because the sub name is ", sub.Name());
+               continue; # Not a valid weapon...
+            }
+            if (weap.IsTurnedOn() && TRACK.IsValid()  &&
+                weap.QuantityRemaining() >= 1 && #SALVO_SIZE  &&  # Removed SALVO_SIZE because if I have less than salvo size, I will still shoot.
+                TasksAssignedTo(sub, "", weap.Name()) == 0)
+            {
+                WsfLaunchComputer computer = weap.LaunchComputer();
+                computer.ComputeLaunchWindows();  # determine if the computer can find a solution
+
+                #writeln("The missile can intercept value is ", computer.CanIntercept(TRACK));
+                // Now check to see if any LaunchWindow can intercept
+                #writeln("The sub name is ", sub.Name());
+                #writeln("The launch computer is ", computer);
+#                if(computer.FirstLaunchTime(0) > TIME_NOW)
+#                {
+#                    #writeln(TIME_NOW, " First launch time is ", computer.FirstLaunchTime(0));
+#                    #writeln(TIME_NOW, " Number available solutions is ", computer.LaunchWindowCount());
+#
+#                    #writeln(TIME_NOW, " Last launch time is ", computer.LastLaunchTime());
+#
+#                }
+                #writeln("The time to launch is ", computer.LaunchTime());
+                #writeln("The TRACK is ", TRACK);
+                if (! computer.CanIntercept(TRACK, LAUNCH_DELAY))
+                {
+                   #writeln("Made it to here - No launch Windows Found!");
+                   continue;
+                }
+                LaunchFutureTimeMap[TRACK.TrackId()] = computer.LaunchTime();
+                SubordinateLauncherMap[TRACK.TrackId()] = sub;
+                LaunchSolutionFound = true;
+                break;
+            }
+         }
+      }
+      else
+      {
+         WsfWeapon weap = PLATFORM.Weapon(WEAPON_NAME);
+         if (!weap.IsValid())
+            {
+               return LaunchSolutionFound; # Not a valid weapon...
+            }
+         if (weap.IsTurnedOn() &&
+                TRACK.IsValid()  &&
+                #weap.QuantityRemaining() >= SALVO_SIZE  &&
+                TasksAssignedTo(PLATFORM, "", weap.Name()) == 0)
+            {
+                WsfLaunchComputer computer = weap.LaunchComputer();
+                computer.ComputeLaunchWindows();
+                // Now check to see if any LaunchWindow can intercept
+                if (computer.CanIntercept(TRACK, LAUNCH_DELAY))
+                {
+                   LaunchFutureTimeMap[TRACK.TrackId()] = computer.LaunchTime();
+                   LaunchSolutionFound = true;
+                }
+            }
+      }
+      return LaunchSolutionFound;
+   end_script
+
+
+   script bool ScheduleTheLaunch()
+      bool LaunchScheduled = false;
+      // Am I at my max engagement level?
+      int myAssignments = GetMyAssignments();
+      if (myAssignments >= MAX_ENGAGEMENTS)
+      {
+        return false;
+      }
+      // Check to see if another battery is engaging the target
+      if (AssignedTrackNames.Exists(TRACK.TargetName()) && AssignedTrackNames.Get(TRACK.TargetName()) != PLATFORM.Name())
+      {
+         return false;
+      }
+
+         if ((TRACK.IsValid()) && (LaunchFutureTimeMap[TRACK.TrackId()] - TIME_NOW < (LAUNCH_DELAY + 5)))
+         {
+             if(SUBS_HAVE_WEAPONS)
+             {
+             WsfPlatform       sub = SubordinateLauncherMap[TRACK.TrackId()]; # Get the subordinate that we found
+             WsfLaunchComputer computer = sub.Weapon(WEAPON_NAME).LaunchComputer();
+             #computer.ComputeEndPoint();  # This is only needed to see where I will land if i miss...
+                if (computer.CanIntercept(TRACK, LAUNCH_DELAY))
+                {
+                   LaunchFutureTimeMap[TRACK.TrackId()] = computer.LaunchTime();
+                   ExecuteAtTime(computer.LaunchTime(),  "Launch", {TRACK.TrackId(), SALVO_SIZE});
+                   LaunchScheduled = true;
+                   #return LaunchScheduled;
+                }
+             }
+             else
+             {
+                WsfLaunchComputer computer = PLATFORM.Weapon(WEAPON_NAME).LaunchComputer();
+                #computer.ComputeEndPoint();
+                if (computer.CanIntercept(TRACK, LAUNCH_DELAY) )
+                {
+                   LaunchFutureTimeMap[TRACK.TrackId()] = computer.LaunchTime();
+                   ExecuteAtTime(computer.LaunchTime(),  "Launch", {TRACK.TrackId(), SALVO_SIZE});
+                   LaunchScheduled = true;
+                   #return LaunchScheduled;
+                }
+             }
+         }
+         //Update the map and put my assignment in it.
+         if (LaunchScheduled && !AssignedTrackNames.Exists(TRACK.TargetName()))
+         {
+            AssignedTrackNames[TRACK.TargetName()] = PLATFORM.Name();
+         }
+      return  LaunchScheduled;
+   end_script
+
+   script void Launch(WsfTrackId aTrackId, int aSalvoSize)
+      WsfLocalTrack LocalTrack = PLATFORM.MasterTrackList().Find(aTrackId);
+      if (LocalTrack.BelievedAlive() && LocalTrack.IsValid() && (PROCESSOR.CountInState("FIRED") < MAX_ENGAGEMENTS))
+      {
+         if (SUBS_HAVE_WEAPONS)
+         {
+            WsfPlatform sub = SubordinateLauncherMap[LocalTrack.TrackId()];
+            WsfWeapon weap = sub.Weapon(WEAPON_NAME);
+            #writeln(TIME_NOW, " Fired first weapon for salvo");
+            bool Launched = Fire(LocalTrack, "FIRE", weap.Name(), 1, sub);
+            if ((SALVO_SIZE > 1) && (weap.QuantityRemaining() > 0))
+            {
+               if (SALVO_DELAY > 0.25)
+               {
+                  #writeln(TIME_NOW, " Scheduling the LaunchSalvo for time ", TIME_NOW + SALVO_DELAY );
+                  ExecuteAtTime(TIME_NOW + SALVO_DELAY, "LaunchSalvo", {LocalTrack.TrackId(),  1 });
+               }
+               else
+               {
+                  #writeln(TIME_NOW, " Scheduling the LaunchSalvo for time ", TIME_NOW + 0.25);
+                  ExecuteAtTime(TIME_NOW + 0.25, "LaunchSalvo", {LocalTrack.TrackId(),  1 });
+               }
+            }
+         }
+         else
+         {
+            WsfWeapon weap = PLATFORM.Weapon(WEAPON_NAME);
+            bool Launched = Fire(LocalTrack, "FIRE", weap.Name(), 1, PLATFORM);
+            if ((SALVO_SIZE > 1) && (weap.QuantityRemaining() > 0))
+            {
+               if (SALVO_DELAY > 0.25)
+               {
+                  ExecuteAtTime(TIME_NOW + SALVO_DELAY , "LaunchSalvo", {LocalTrack.TrackId(), 1 });
+               }
+               else
+               {
+                  ExecuteAtTime(TIME_NOW + 0.25, "LaunchSalvo", {LocalTrack.TrackId(), 1});
+               }
+            }
+         }
+      }
+   end_script
+
+
+
+ script void LaunchSalvo(WsfTrackId aTrackId, int aSalvoSize)
+      WsfLocalTrack LocalTrack = PLATFORM.MasterTrackList().Find(aTrackId);
+      if (LocalTrack.BelievedAlive() && LocalTrack.IsValid())
+      {
+         if (SUBS_HAVE_WEAPONS)
+         {
+            WsfPlatform sub = SubordinateLauncherMap[LocalTrack.TrackId()];
+            WsfWeapon weap = sub.Weapon(WEAPON_NAME);
+            #writeln(TIME_NOW, " Fired second weapon for salvo");
+            bool Launched = Fire(LocalTrack, "FIRE", weap.Name(), 1, sub);
+         }
+         else
+         {
+            WsfWeapon weap = PLATFORM.Weapon(WEAPON_NAME);
+            bool Launched = Fire(LocalTrack, "FIRE", weap.Name(), 1, PLATFORM);
+         }
+      }
+   end_script
+
+
+
+#######################################################################################
+##START OF STATE MACHINE
+#######################################################################################
+   evaluation_interval DETECTED 4 sec
+   time_to_evaluate    DETECTED 4 sec
+   state DETECTED
+      next_state  ENGAGING
+        return (Engageable() && (! TRACK.IFF_Friend()));
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGING 4 sec
+   time_to_evaluate    ENGAGING 4 sec
+   state ENGAGING
+      next_state DETECTED
+         return (TRACK.BelievedDead()) || (WeaponActive());
+      end_next_state
+
+      next_state FIND_LAUNCH_SOLUTION # Looks for a weapon that can hit it if we have a good track
+         return WeaponQualityTrack();  # Track quality of weapons grade
+      end_next_state
+   end_state
+
+   evaluation_interval FIND_LAUNCH_SOLUTION 10 sec
+   time_to_evaluate    FIND_LAUNCH_SOLUTION  5 sec
+   state  FIND_LAUNCH_SOLUTION
+      next_state ENGAGING
+         return (!Find_Launch_Solution());
+      end_next_state
+      next_state  SCHEDULE_LAUNCH
+         return Find_Launch_Solution();
+      end_next_state
+   end_state
+
+   evaluation_interval SCHEDULE_LAUNCH 1 sec
+   state  SCHEDULE_LAUNCH
+      next_state FIND_LAUNCH_SOLUTION
+          return (TIME_NOW > (LaunchFutureTimeMap[TRACK.TrackId()] + 5.0 )); # Way past the time of scheduled launch...
+      end_next_state
+      next_state WAIT
+          return ScheduleTheLaunch();
+      end_next_state
+   end_state
+
+   evaluation_interval WAIT 1 sec
+   state WAIT
+      next_state WAIT
+         return TIME_NOW < LaunchFutureTimeMap[TRACK.TrackId()]; # Still havent fired.
+      end_next_state
+
+
+      next_state FIRED
+         return WeaponsActiveFor(TRACK.TrackId()) == 1;
+      end_next_state
+
+   end_state
+
+
+   evaluation_interval FIRED 1 sec
+   state FIRED
+      next_state FIRED
+      if  (WeaponsActiveFor(TRACK.TrackId()) == 1)
+      {
+         return true;
+      }
+      if (AssignedTrackNames.Exists(TRACK.TargetName()) && AssignedTrackNames.Get(TRACK.TargetName()) == PLATFORM.Name())
+      {
+         AssignedTrackNames.Remove(TRACK.TargetName());
+      }
+      return false;
+      end_next_state
+      next_state DETECTED
+         return (WeaponsActiveFor(TRACK.TrackId()) == 0);
+      end_next_state
+   end_state
+end_processor
+
+
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 10_iads_cmdr IADS_CMDR
+  side red
+
+  commander SELF
+  position 38:04:06n  117:14:00w  altitude 0.0 m agl
+end_platform
+
+platform 100_radar_company RADAR_COMPANY
+  side red
+
+  commander 10_iads_cmdr
+  position 38:41:35n  117:05:57w  altitude 0.0 m agl
+end_platform
+
+platform 200_ew_radar EW_RADAR
+  side red
+
+  commander 100_radar_company
+  position 39:22:36n  117:33:25w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+  end_sensor
+end_platform

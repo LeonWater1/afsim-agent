@@ -1,0 +1,118 @@
+{
+  "version": "error_taxonomy_v1",
+  "description": "AFSIM scenario generation error taxonomy for static checking, mission execution analysis, and baseline reporting.",
+  "severity_levels": ["blocking", "major", "minor"],
+  "detection_levels": ["static", "execution", "semantic"],
+  "categories": [
+    {
+      "id": "E001",
+      "name": "missing_or_invalid_unit",
+      "zh_name": "缺少单位",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["Mover", "Route", "Sensor", "Weapon", "Processor", "Scenario"],
+      "signals": ["numeric command argument has no physical unit", "unsupported unit such as microsec"],
+      "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit."
+    },
+    {
+      "id": "E002",
+      "name": "missing_or_mismatched_end_tag",
+      "zh_name": "缺少 end_xxx",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["FileStructure"],
+      "signals": ["unclosed block", "end tag does not match current block"],
+      "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block."
+    },
+    {
+      "id": "E003",
+      "name": "undefined_reference",
+      "zh_name": "引用不存在对象",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["Platform", "Sensor", "Weapon", "Processor", "AntennaPattern", "ScriptAPI"],
+      "signals": ["platform type not defined", "component name not found", "string API reference does not match a mounted component"],
+      "repair_hint": "Build symbol tables for definitions and references; rename to an existing grounded object or add the missing grounded definition."
+    },
+    {
+      "id": "E004",
+      "name": "invalid_coordinate_format",
+      "zh_name": "坐标格式错误",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["Platform", "Route", "GeoPoint", "Scenario"],
+      "signals": ["latitude or longitude has no hemisphere suffix", "invalid DMS format", "altitude has no unit or reference"],
+      "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines."
+    },
+    {
+      "id": "E005",
+      "name": "hallucinated_entity_or_type",
+      "zh_name": "幻觉实体",
+      "level": "semantic",
+      "default_severity": "major",
+      "components": ["Grounding", "Platform", "Sensor", "Weapon", "Mover"],
+      "signals": ["AFSIM type not in references", "domain entity not mapped to a known template", "invented command or component"],
+      "repair_hint": "Reject ungrounded entities; map user concepts to known templates or mark grounding_missing."
+    },
+    {
+      "id": "E006",
+      "name": "missing_required_field",
+      "zh_name": "必填项缺失",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["Platform", "Mover", "Sensor", "Weapon", "Processor", "Scenario"],
+      "signals": ["component block lacks required parameters", "scenario has no end_time", "platform lacks position or route"],
+      "repair_hint": "Fill minimal required fields from IR or nearest demo template; route semantic gaps back to IR repair."
+    },
+    {
+      "id": "E007",
+      "name": "component_syntax_mismatch",
+      "zh_name": "组件语法错配",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["AntennaPattern", "Mover", "Sensor", "Weapon", "Route"],
+      "signals": ["parameter appears in unsupported component block", "required sub-block missing", "command not allowed for component type"],
+      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks when possible."
+    },
+    {
+      "id": "E008",
+      "name": "script_api_or_language_error",
+      "zh_name": "脚本 API 或语言错误",
+      "level": "static",
+      "default_severity": "blocking",
+      "components": ["Processor", "ScriptAPI"],
+      "signals": ["cout or endl", "event handler wrapped by script/end_script", "unsupported fmod, percent operator, ternary operator, cast", "unknown API method"],
+      "repair_hint": "Use print(), direct on_initialize/on_update bodies, time-delta checks, and only API methods found in the script API reference or demos."
+    },
+    {
+      "id": "E009",
+      "name": "file_or_execution_environment_error",
+      "zh_name": "文件与执行环境错误",
+      "level": "execution",
+      "default_severity": "blocking",
+      "components": ["Execution", "FilePath", "Output"],
+      "signals": ["output file cannot be opened", "terrain or dependency path missing", "mission.exe not found", "permission denied"],
+      "repair_hint": "Run from a writable mirrored directory, create output folders, set cwd to script directory, and separate environment errors from generation errors."
+    },
+    {
+      "id": "E010",
+      "name": "task_semantic_mismatch",
+      "zh_name": "任务语义偏差",
+      "level": "semantic",
+      "default_severity": "major",
+      "components": ["Intent", "IR", "Scenario"],
+      "signals": ["wrong quantity", "wrong side", "wrong mission", "missing requested capability", "script executable but does not match expected_ir_focus"],
+      "repair_hint": "Compare extracted script IR with requested IR and regenerate the mismatched layer."
+    }
+  ],
+  "annotation_schema": {
+    "sample_id": "string",
+    "stage": "direct_prompt | rag_prompt | ir_generation | repair",
+    "mission_status": "PASS | FAIL | TIMEOUT | NOT_RUN",
+    "primary_error": "E001-E010",
+    "secondary_errors": ["E001-E010"],
+    "evidence": "string",
+    "repair_action": "string",
+    "repair_status": "pending | repaired | failed | not_applicable"
+  }
+}

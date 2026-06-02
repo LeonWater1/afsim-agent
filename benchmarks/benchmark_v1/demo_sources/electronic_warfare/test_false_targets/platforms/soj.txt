@@ -1,0 +1,289 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once signatures/fighter_sigs.txt
+include_once sensors/esm_rwr/ucav_esm.txt
+include_once weapons/jammer/soj_vhf_jammer.txt
+include_once weapons/jammer/soj_sband_jammer.txt
+include_once weapons/jammer/soj_xband_jammer.txt
+
+# -------------------------------------------------------------------------
+
+processor SOJ_TASK_MGR WSF_TASK_PROCESSOR
+
+   script_debug_writes on
+   #show_state_transitions
+   #show_task_messages
+
+   # Script to determine the appropriate jammer type based on frequency
+   script string JammerType(double aFrequency)
+      string jammerType = "";
+      if (TRACK.FrequencyValid())
+      {
+         if (aFrequency < 500.e6)
+         {
+            jammerType = "SOJ_VHF_JAMMER";
+         }
+         if ((aFrequency > 2000.e6) &&
+             (aFrequency < 4000.e6))
+         {
+            jammerType = "SOJ_SBAND_JAMMER";
+         }
+         else if (aFrequency > 8000.e6)
+         {
+            jammerType = "SOJ_XBAND_JAMMER";
+         }
+      }
+      return jammerType;
+   end_script
+
+   # Script to determine the appropriate technique to use based on target type
+   script string TechniqueType()
+      #string techniqueType = "noise_jamming";  // default technique
+      string techniqueType = "false_target_jamming";
+      if (TRACK.IsValid())
+      {
+         if (TRACK.TargetType() == "EW_RADAR")
+         {
+            techniqueType = "false_target_jamming";
+         }
+         else if (TRACK.TargetType() == "ACQ_RADAR")
+         {
+            #techniqueType = "random_pulse_jamming";
+            techniqueType = "false_target_jamming";
+         }
+         else if (TRACK.TargetType() == "TTR_RADAR")
+         {
+            #techniqueType = "track_error";
+            techniqueType = "false_target_jamming";
+            #techniqueType = "false_targets_constrained";
+            #techniqueType = "noise_jamming";
+
+         }
+      }
+      return techniqueType ;
+   end_script
+
+   # Script to determine the appropriate bandwidth to use based on technique
+   # Note: Could also add in the target type if required
+   script double Bandwidth(double aPulsewidth)
+      double bandwidth = 5.e6;  // default bandwidth
+      if (TechniqueType() == "false_targets")
+      {
+         bandwidth = 1.0; # creates a bandwdth ratio of 1.0
+         if (aPulsewidth > 0.0)
+         {
+            bandwidth = 1 / aPulsewidth;
+         }
+      }
+      else if (TechniqueType() == "random_pulse_jamming")
+      {
+         bandwidth = 1.5e6;
+      }
+      return bandwidth;
+   end_script
+
+   # Script to select a jammer and add a spot
+   script bool AddSpot()
+      bool startedJamming = false;
+      WsfWeapon   jammer;
+      string requiredType = "";
+      string jammerType = "";
+      int signalCount = TRACK.SignalCount();
+      for (int signalIndex = 0; signalIndex  < signalCount; signalIndex = signalIndex  + 1)
+      {
+         double freq = TRACK.SignalFrequency(signalIndex);
+         requiredType = JammerType(freq);
+         for (int i=0; i < PLATFORM.WeaponCount(); i = i + 1)
+         {
+            jammer = PLATFORM.WeaponEntry(i);
+            jammerType = jammer.Type();
+            if (jammerType == requiredType)
+            {
+               if(PLATFORM.WithinFieldOfView(TRACK, jammer.Name()))
+               {
+                  # check to see if any maximum spots have been allocated
+                  if ((jammer.QuantityRemaining() > 0) || (jammer.MaximumRequestCount() == 1))
+                  {
+                     string jamStr = write_str("Jam", signalIndex);
+                     double pulsewidth = TRACK.SignalPW(signalIndex);
+                     if (StartJamming(TRACK, jamStr , jammer, freq, Bandwidth(pulsewidth), TechniqueType()))
+                     {
+                        writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", jammer.Name(), " started jamming ",
+                                  TRACK.TargetName(), ", task=", jamStr, " freq=", freq, " BW=", Bandwidth(pulsewidth),
+                                  " Technique=", TechniqueType());
+                        startedJamming = true;
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return startedJamming;
+   end_script
+
+   # script to determine if platform can still jam emitter with current
+   # jammer
+   script bool HadToStopJamming()
+      bool stoppedJamming = false;
+      bool cancelledTasks = true;
+      WsfTaskList taskList = AssignedTaskList(TRACK.TrackId(),"");
+      foreach(WsfTask task in taskList)
+      {
+         if (task.ResourceIsJammer())
+         {
+            string reason = "UNKNOWN";
+            bool needToStopJamming = true;
+            if (PLATFORM.WithinFieldOfView(TRACK, task.ResourceName()))
+            {
+               int signalCount = TRACK.SignalCount();
+               for (int signalIndex = 0; signalIndex  < signalCount; signalIndex = signalIndex  + 1)
+               {
+                  if (task.ResourceFrequency() == TRACK.SignalFrequency(signalIndex))
+                  {
+                     needToStopJamming = false;
+                     break;
+                  }
+               }
+
+               if (needToStopJamming)
+               {
+                  reason = "frequency change";
+               }
+            }
+            else
+            {
+              reason = "FOV limits";
+            }
+
+            if (needToStopJamming)
+            {
+               writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", task.ResourceName(), " stopped jamming ",
+                         TRACK.TargetName(), ", task=", task.TaskType()," freq=", task.ResourceFrequency(),
+                         " due to ", reason);
+               cancelledTasks = (cancelledTasks && CancelTask(task.TrackId(), task.TaskType()));
+               stoppedJamming = true;
+            }
+         }
+      }
+      return (stoppedJamming && cancelledTasks);
+   end_script
+
+# -------------------------------------------------------------------------
+
+   evaluation_interval DETECTED 5.0 sec
+   state DETECTED
+      next_state CAN_JAM
+         return (TRACK.TimeSinceUpdated() < 10.0);
+      end_next_state
+   end_state
+
+   evaluation_interval CAN_JAM 5.0 sec
+   state CAN_JAM
+      next_state DETECTED
+         return (TRACK.TimeSinceUpdated() >= 10.0);
+      end_next_state
+
+      next_state IS_JAMMING
+         return AddSpot();
+      end_next_state
+   end_state
+
+   evaluation_interval IS_JAMMING 5.0 sec
+   state IS_JAMMING
+      next_state CAN_JAM
+         return HadToStopJamming();
+      end_next_state
+   end_state
+
+end_processor
+
+# -------------------------------------------------------------------------
+
+platform_type SOJ WSF_PLATFORM
+  icon weasel
+
+  infrared_signature FIGHTER_INFRARED_SIG
+  optical_signature  FIGHTER_OPTICAL_SIG
+  radar_signature    FIGHTER_RADAR_SIG
+
+  sensor esm UCAV_ESM
+     on
+     internal_link data_mgr
+     ignore_same_side
+  end_sensor
+
+  mover WSF_AIR_MOVER
+    default_radial_acceleration 2.0 g
+    at_end_of_path remove
+  end_mover
+
+  weapon vhf_jammer SOJ_VHF_JAMMER
+     off
+     ignore_same_side
+  end_weapon
+
+  weapon fwd_sband_jammer SOJ_SBAND_JAMMER
+     off
+     yaw 0.0 deg
+     ignore_same_side
+  end_weapon
+
+  weapon aft_sband_jammer SOJ_SBAND_JAMMER
+     off
+     yaw 180.0 deg
+
+     # Field of view limits are slew limits + 1/2 the beamwidth
+     azimuth_field_of_view       -100.0 deg 100.0 deg
+
+     ignore_same_side
+  end_weapon
+
+  weapon fwd_xband_jammer SOJ_XBAND_JAMMER
+     off
+     yaw 0.0 deg
+     ignore_same_side
+  end_weapon
+
+  weapon aft_xband_jammer SOJ_XBAND_JAMMER
+     off
+     yaw 180.0 deg
+
+     # Field of view limits are slew limits + 1/2 the beamwidth
+     azimuth_field_of_view       -115.0 deg 115.0 deg
+
+     ignore_same_side
+  end_weapon
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+     purge_interval   60.0 sec
+  end_processor
+
+  processor task_mgr SOJ_TASK_MGR
+  end_processor
+end_platform_type
+
+route soj_orbit
+  label start
+     offset  20   0 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  20   5 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  0    5 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  0    0 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+   goto start
+end_route
+

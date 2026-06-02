@@ -1,0 +1,121 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once weapons/jammer/false_target.txt
+
+antenna_pattern SOJ_XBAND_ANTENNA
+  //complex_esa_pattern
+  esa_pattern
+    minimum_gain                -80.0 db
+    amplitude_quantization_bits   8
+    phase_quantization_bits       8
+    element_spacing_x             0.015 m
+    number_elements_x            10
+    //edge_angle_x                  0.0 degrees  # rectangular array if 0.0 degrees
+    //element_spacing_y             0.015 m
+    //number_elements_y            10
+    //edge_angle_y                 90.0 degrees # rectangular array if 90.0 degrees
+    distribution_type taylor
+       sidelobe_level_x         25 dB
+       sidelobe_level_y         25 dB
+       n_bar_x                    5
+       n_bar_y                    5
+end_antenna_pattern
+
+weapon SOJ_XBAND_JAMMER WSF_RF_JAMMER
+
+  maximum_number_of_beams      2
+  beam_power_distribution      average
+
+  maximum_spots_per_beam       2
+  spot_power_distribution      average
+
+  # Field of view limits are slew limits + 1/2 the beamwidth
+  azimuth_field_of_view       -65.0 deg 65.0 deg    # beamwidth estimate is 10 deg
+  elevation_field_of_view     -65.0 deg 65.0 deg    # beamwidth estimate is 10 deg
+
+  maximum_range                200 km
+
+  slew_mode                    azimuth_and_elevation
+  azimuth_slew_limits          -60.0 deg 60.0 deg
+  elevation_slew_limits        -60.0 deg 60.0 deg
+
+  electronic_beam_steering               azimuth_and_elevation
+  electronic_beam_steering_loss_exponent 1.2
+
+  transmitter
+    antenna_pattern            SOJ_XBAND_ANTENNA
+    frequency_band             8 ghz 12 ghz
+    power                      1.5 kw
+    internal_loss              0.0 db
+     electronic_attack WSF_ELECTRONIC_ATTACK
+        technique noise_jamming
+           effect noise_effect WSF_JAMMER_POWER_EFFECT
+              jamming_delta_gain 0 dB
+           end_effect
+         end_technique
+         technique false_targets
+            effect ft_effect WSF_FALSE_TARGET_EFFECT
+            debug
+               //jamming_pulse_density 0.01
+               false_target_technique FALSE_TARGET_1
+            end_effect
+        end_technique
+
+        technique false_targets_constrained
+           effect ft_effect WSF_FALSE_TARGET_EFFECT
+           debug
+              jamming_pulse_density 0.01
+              range_constrained true
+              //false_target_technique FALSE_TARGET_1
+           end_effect
+        end_technique
+
+        technique random_pulse_jamming
+           effect rpj_effect WSF_RPJ_EFFECT
+              system_type_data default
+                 jamming_pulse_density 0.01
+                 samples_per_detection 32
+                 minimum_jammer_to_noise_threshold 0.0 dB
+                 jammer_gain_table
+                    jammer_to_noise_ratio 10.0 dB
+                       pulse_density_to_jamming_gain 0.05 30.0 dB
+                       pulse_density_to_jamming_gain 0.2  15.0 dB
+                       pulse_density_to_jamming_gain 0.30  0.0 dB
+                    jammer_to_noise_ratio 5.0 dB
+                       pulse_density_to_jamming_gain 0.05 20.0 dB
+                       pulse_density_to_jamming_gain 0.2  10.0 dB
+                       pulse_density_to_jamming_gain 0.30  0.0 dB
+                    jammer_to_noise_ratio 0.0 dB
+                       pulse_density_to_jamming_gain 0.05 10.0 dB
+                       pulse_density_to_jamming_gain 0.2   5.0 dB
+                       pulse_density_to_jamming_gain 0.30  0.0 dB
+                 end_jammer_gain_table
+              end_system_type_data
+           end_effect
+        end_technique
+
+        technique track_error
+           effect RANGE_ERROR WSF_TRACK_EFFECT
+              track_behavior distort
+              range_error 200 m
+              //azimuth_error <angle-value>
+              //elevation_error <angle-value>
+              //range_drift_rate <speed-value>
+           end_effect
+        end_technique
+     end_electronic_attack
+  end_transmitter
+end_weapon
+

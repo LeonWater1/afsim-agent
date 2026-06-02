@@ -1,0 +1,30 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+sensor STRIKER_RADAR WSF_RADAR_SENSOR
+   off
+   azimuth_field_of_view    -20.0 deg   20.0 deg
+   elevation_field_of_view   -15.0 deg    15.0 deg
+   one_m2_detect_range 60 nm
+   frame_time 2 sec
+   reports_location
+   reports_velocity
+   reports_iff
+   track_quality 1.0
+   internal_link data_mgr
+   internal_link task_mgr
+   ignore_same_side
+   ignore_domain land
+   transmitter
+      frequency 9.6 ghz
+      power 10.0 kw
+   end_transmitter
+   receiver
+   end_receiver
+end_sensor

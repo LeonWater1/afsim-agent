@@ -1,0 +1,287 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+define_path_variable CASE close_targets_ttr
+log_file output/$(CASE).log
+
+radar_signature BLUE_AIRLIFTER_JET_RADAR_SIG_1
+   constant 10 m2
+end_radar_signature
+
+radar_signature BLUE_AIRLIFTER_JET_RADAR_SIG_2
+   constant 100 m2
+end_radar_signature
+
+platform_type BLUE_AIRLIFTER_JET WSF_PLATFORM
+   icon C-17
+   
+   radar_signature BLUE_AIRLIFTER_JET_RADAR_SIG_1
+
+   mover WSF_AIR_MOVER end_mover
+end_platform_type
+
+##############################################################
+
+platform blue_airlifter_jet_1 BLUE_AIRLIFTER_JET
+   side blue
+
+   position 39:31:42.42n 91:38:35.111w
+
+   route
+      position 47:31:42n 120:42:35w altitude 30000 ft speed 200 kts
+   end_route
+end_platform
+
+platform blue_airlifter_jet_2 BLUE_AIRLIFTER_JET
+   side blue
+
+   radar_signature BLUE_AIRLIFTER_JET_RADAR_SIG_2
+
+   position 39:31:42.42n 91:38:35.111w
+
+   route
+      position 47:31:42n 120:42:35w altitude 30000 ft speed 180 kts
+   end_route
+end_platform
+
+# ****************************************************************************
+#                     Target Tracking Radar
+# ****************************************************************************
+
+antenna_pattern TTR_RADAR_ANTENNA
+  sine_pattern
+    peak_gain            35 dB
+    minimum_gain         -10.0 db
+    azimuth_beamwidth    1 deg
+    elevation_beamwidth  1 deg
+  end_sine_pattern
+end_antenna_pattern
+
+sensor TTR_RADAR WSF_RADAR_SENSOR
+   #debug_tracker
+   #debug_scheduler
+   #debug
+
+   selection_mode                 multiple
+
+   slew_mode                      azimuth_and_elevation
+   azimuth_slew_limits            -180 deg 180 deg
+   elevation_slew_limits          0.0 deg 80.0 deg
+
+   mode_template
+      one_m2_detect_range            35.0 nm
+
+      antenna_height                 4.0 m
+
+      transmitter
+         antenna_pattern             TTR_RADAR_ANTENNA
+         power                       1000.0 kw
+         frequency                   9500 mhz
+         internal_loss               2 db
+         pulse_repetition_interval   225 usec
+         pulse_width                  25 usec
+      end_transmitter
+
+      receiver
+         antenna_pattern             TTR_RADAR_ANTENNA
+         bandwidth                   500.0 khz
+         noise_power                 -160 dBw  # will be calibrated for 1 m^2
+         internal_loss               7 dB
+      end_receiver
+
+      probability_of_false_alarm     1.0e-6
+      required_pd                    0.5
+      swerling_case                  1
+
+      reports_range
+      reports_bearing
+      reports_elevation
+      reports_velocity
+   end_mode_template
+
+   mode ACQUIRE
+      maximum_request_count          1
+
+      scan_mode                      azimuth_and_elevation
+      azimuth_scan_limits            -10 deg 10 deg
+      elevation_scan_limits          -10 deg 10 deg
+
+      frame_time                     2.0 sec
+
+      hits_to_establish_track        3 5
+      hits_to_maintain_track         1 3
+
+      track_quality                  0.8   // near 'weapons' grade
+   end_mode
+
+   mode TRACK   
+      scan_mode                      azimuth_and_elevation
+      azimuth_scan_limits            -.1 deg .1 deg
+      elevation_scan_limits          -.1 deg .1 deg
+
+      maximum_request_count          6
+
+      frame_time                     1 sec
+
+      hits_to_establish_track        3 5
+      hits_to_maintain_track         1 3
+
+      track_quality                  1.0   // 'weapons' grade
+
+      #search_while_track
+      
+      close_target_detection
+         #debug
+         acquire_deltas
+            azimuth_delta       0.2 deg
+            elevation_delta     0.2 deg
+            range_delta         5 m
+         end_acquire_deltas
+
+         reacquire_deltas
+            azimuth_delta       0.25 deg
+            elevation_delta     0.25 deg
+            range_delta         1000 m
+         end_reacquire_deltas
+      end_close_target_detection
+   end_mode
+end_sensor
+
+platform_type TTR_RADAR_SITE WSF_PLATFORM
+   icon Ground_Radar
+
+   mover WSF_GROUND_MOVER end_mover
+
+   sensor ttr_radar TTR_RADAR
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+   
+   # ---------------------------------------------
+   # Draw track to false targets and real targets
+   # ---------------------------------------------
+   script_variables
+      // Create a WsfDraw object.
+      WsfDraw draw = WsfDraw();
+      bool mAllowTracking = true;
+   end_script_variables
+
+   script void AllowTracking()
+      mAllowTracking = true;
+   end_script
+
+   execute at_interval_of 1 s
+      WsfSensor sensor = PLATFORM.Sensor("ttr_radar");
+      foreach (WsfLocalTrack track in MasterTrackList())
+      {
+         if (mAllowTracking &&
+             (!sensor.HaveRequestFor(track.TrackId()) ||
+              sensor.IsTurnedOff()))
+         {
+            if (track.Target().Name() == "blue_airlifter_jet_1")
+            {
+               writeln(TIME_NOW, " Turned on sensor");
+               track.SetLocation(track.Target().Location());
+               sensor.TurnOn();
+               sensor.StartTracking(track, "TRACK");
+               mAllowTracking = false;
+            }
+         }
+         
+         if (track.IsValid())
+         {
+            #sensor.CueToTrack(track);
+
+            // use the track ID as a unique draw ID
+            // a track icon and a line to the track icon
+            // is drawn at each track update
+            string trackId = track.TrackId().ToString();
+            draw.SetId(trackId);
+            draw.SetDuration(1); // this is faster than calling erase every time
+
+            draw.SetColor(0,0,1);
+            draw.BeginIcons(track.Heading(), "Wedge");
+            draw.Vertex(track.CurrentLocation());
+            draw.End();
+
+            // Draw a line to the track
+            draw.SetLineStyle("dashed");
+            draw.BeginLines();
+            draw.Vertex(PLATFORM);
+            draw.Vertex(track.CurrentLocation());
+            draw.End();
+         }
+      }
+   end_execute
+end_platform_type
+
+platform ttr-radar-site TTR_RADAR_SITE
+   side red
+
+   position 47:55:06.64n 120:07:57.54w
+   altitude 0.0 ft agl
+   heading   270 deg
+
+   sensor ttr_radar
+   end_sensor
+   
+   track 
+      platform blue_airlifter_jet_1
+   end_track
+end_platform
+
+event_pipe
+   file output/$(CASE).aer
+   use_preset default
+end_event_pipe
+
+event_output
+   file output/$(CASE).evt
+   disable all
+   #enable  PLATFORM_ADDED
+   #enable  PLATFORM_DELETED
+   #enable  TASK_ASSIGNED
+   #enable  TASK_CANCELED
+   #enable  TASK_COMPLETED
+   enable  SENSOR_TRACK_INITIATED
+   enable  SENSOR_TRACK_UPDATED
+   enable  SENSOR_TRACK_DROPPED
+   enable  WEAPON_FIRE_ABORTED
+   enable  WEAPON_FIRE_REQUESTED
+   enable  WEAPON_FIRED
+   enable  WEAPON_HIT
+   enable  WEAPON_MISSED
+   enable  WEAPON_TERMINATED
+   enable  WEAPON_RELOAD_STARTED
+   enable  WEAPON_RELOAD_ENDED
+end_event_output
+
+script void SensorTrackDropped(WsfPlatform aPlatform,
+                               WsfSensor   aSensor,
+                               WsfTrack    aTrack)
+   if (aPlatform.Name() == "ttr-radar-site" &&
+       aTrack.TargetName() == "blue_airlifter_jet")
+   {
+      aSensor.StopTracking(aTrack.TrackId());
+      aSensor.TurnOff();
+      aPlatform.ExecuteAtTime(TIME_NOW + 15.0, "AllowTracking");
+   }
+end_script
+
+observer
+   enable SENSOR_TRACK_DROPPED
+end_observer
+
+#terrain
+#   raw_dted 0  \\sllabl1\data\dted\dted0\dted00\dted -90 -180 90 180
+#end_terrain
+
+end_time 400 sec

@@ -1,0 +1,245 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+platform 100_ucav UCAV
+   side blue
+   commander SELF
+   route
+      navigation
+         position 38:16:25.4n 116:15:15.6w altitude 35000 ft msl speed 460 kts
+         position 38:16:32.0n 116:21:36.1w altitude 35000 ft msl speed 400 kts
+         position 38:16:38.4n 116:27:56.7w altitude 35000 ft msl speed 400 kts
+         position 38:16:44.4n 116:34:17.2w altitude 35000 ft msl speed 400 kts
+         position 38:16:50.1n 116:40:37.9w altitude 35000 ft msl speed 400 kts
+         position 38:16:55.4n 116:46:58.6w altitude 35000 ft msl speed 400 kts
+         position 38:17:00.4n 116:53:19.3w altitude 35000 ft msl speed 400 kts
+         position 38:17:05.0n 116:59:40.0w altitude 35000 ft msl speed 400 kts
+         position 38:17:09.3n 117:06:00.8w altitude 35000 ft msl speed 400 kts
+         position 38:12:09.2n 117:06:05.9w altitude 35000 ft msl speed 400 kts
+         position 38:12:13.1n 117:12:26.3w altitude 35000 ft msl speed 400 kts
+         position 38:17:13.3n 117:12:21.7w altitude 35000 ft msl speed 400 kts
+         position 38:17:16.9n 117:18:42.5w altitude 35000 ft msl speed 400 kts
+         position 38:17:20.1n 117:25:03.4w altitude 35000 ft msl speed 400 kts
+         position 38:17:23.0n 117:31:24.3w altitude 35000 ft msl speed 400 kts
+         position 38:17:25.6n 117:37:45.2w altitude 35000 ft msl speed 400 kts
+         position 38:12:25.4n 117:37:48.2w altitude 35000 ft msl speed 400 kts
+         position 38:12:27.7n 117:44:08.7w altitude 35000 ft msl speed 400 kts
+         position 38:17:27.9n 117:44:06.1w altitude 35000 ft msl speed 400 kts
+         position 38:17:25.6n 117:37:45.2w altitude 35000 ft msl speed 400 kts
+      end_navigation
+   end_route
+
+end_platform
+
+platform 200_ucav UCAV
+   side blue
+   commander SELF
+   route
+      navigation
+         position 38:11:11.0n 116:02:44.1w altitude 35000 ft msl speed 460 kts # at 1.000
+         position 38:11:18.3n 116:09:04.1w altitude 35000 ft msl speed 400 kts # at 46.000
+         position 38:11:25.3n 116:15:24.1w altitude 35000 ft msl speed 400 kts # at 91.000
+         position 38:11:32.0n 116:21:44.2w altitude 35000 ft msl speed 400 kts # at 136.000
+         position 38:11:38.3n 116:28:04.3w altitude 35000 ft msl speed 400 kts # at 181.000
+         position 38:11:44.3n 116:34:24.5w altitude 35000 ft msl speed 400 kts # at 226.000
+         position 38:06:44.2n 116:34:31.7w altitude 35000 ft msl speed 400 kts # at 271.000
+   #T=287.177 200_ucav weapon waypoint 7 grid 292 38:06:46.7n 116:38:53.5w speed 205.778
+   #T=287.177 200_ucav release blue_gps_bomb_1 target 38:04:31.0n 116:49:54.0w plantime 317.000 early 29.823
+   #T=287.177 200_ucav release blue_gps_bomb_1 target 38:04:31.0n 116:49:54.0w plantime 317.000 early 29.823
+   #T=287.177 200_ucav release blue_glide_bomb_1 target 38:04:31.0n 116:49:54.0w plantime 317.000 early 29.823
+   #T=287.177 200_ucav release blue_glide_bomb_1 target 38:04:31.0n 116:49:54.0w plantime 317.000 early 29.823
+
+         position 38:06:49.9n 116:40:51.5w altitude 35000 ft msl speed 400 kts # at 316.000
+         position 38:11:50.0n 116:40:44.7w altitude 35000 ft msl speed 400 kts # at 361.000
+         position 38:11:44.3n 116:34:24.5w altitude 35000 ft msl speed 400 kts # at 406.000
+         position 38:11:38.3n 116:28:04.3w altitude 35000 ft msl speed 400 kts # at 451.000
+         position 38:16:38.4n 116:27:56.7w altitude 35000 ft msl speed 400 kts # at 496.000
+         position 38:21:38.4n 116:27:49.0w altitude 35000 ft msl speed 400 kts # at 541.000
+   		# loiter at 585.000
+   		# loiter at 630.000
+   		# loiter at 676.000
+   #      position 38:21:38.4n 116:27:49.0w altitude 35000 ft msl speed 400 kts # at 721.000
+   		# loiter at 765.000
+   		# loiter at 811.000
+   #      position 38:21:38.4n 116:27:49.0w altitude 35000 ft msl speed 400 kts # at 856.000
+         position 38:16:38.4n 116:27:56.7w altitude 35000 ft msl speed 400 kts # at 901.000
+         position 38:11:38.3n 116:28:04.3w altitude 35000 ft msl speed 400 kts # at 946.000
+         position 38:11:32.0n 116:21:44.2w altitude 35000 ft msl speed 400 kts # at 991.000
+         position 38:11:25.3n 116:15:24.1w altitude 35000 ft msl speed 400 kts # at 1036.000
+         position 38:11:18.3n 116:09:04.1w altitude 35000 ft msl speed 400 kts # at 1081.000
+         position 38:11:11.0n 116:02:44.1w altitude 35000 ft msl speed 400 kts
+      end_navigation
+   end_route
+
+   track
+      platform 300_target
+      side     red
+      position 38:04:31.0n 116:49:54.0w
+   end_track
+
+   track
+      platform 400_target
+      side     red
+      position 38:04:31.0n 116:49:54.0w
+   end_track
+
+   track
+      platform 500_target
+      side     red
+      position 38:04:31.0n 116:49:54.0w
+   end_track
+
+   track
+      platform 600_target
+      side     red
+      position 38:04:31.0n 116:49:54.0w
+   end_track
+
+   execute at_time 287.177 secs absolute
+      # blue_gps_bomb_1 at 300_target
+      # blue_gps_bomb_1 at 400_target
+      # blue_glide_bomb_1 at 500_target
+      # blue_glide_bomb_1 at 600_target
+      Weapon("blue_gps_bomb_1").Fire(MasterTrackList().TrackEntry(0));
+      Weapon("blue_gps_bomb_1").Fire(MasterTrackList().TrackEntry(1));
+      Weapon("blue_glide_bomb_1").Fire(MasterTrackList().TrackEntry(2));
+      Weapon("blue_glide_bomb_1").Fire(MasterTrackList().TrackEntry(3));
+   end_execute
+
+end_platform
+
+platform 300_ucav UCAV
+   side blue
+   commander SELF
+   route
+      navigation
+         position 38:06:03.3n 115:56:33.9w altitude 35000 ft msl speed 460 kts # at 1.000
+         position 38:06:11.0n 116:02:53.4w altitude 35000 ft msl speed 400 kts # at 46.000
+         position 38:06:18.3n 116:09:13.0w altitude 35000 ft msl speed 400 kts # at 91.000
+         position 38:06:25.3n 116:15:32.6w altitude 35000 ft msl speed 400 kts # at 136.000
+   #T=164.037 300_ucav weapon waypoint 4 grid 295 38:06:29.9n 116:19:54.3w speed 205.778
+   #T=164.037 300_ucav release blue_gps_bomb_2 target 38:04:31.0n 116:49:54.0w plantime 182.000 early 17.963
+   #T=164.037 300_ucav release blue_glide_bomb_1 target 38:12:24.0n 117:27:36.0w plantime 182.000 early 17.963
+         position 38:06:31.9n 116:21:52.2w altitude 35000 ft msl speed 400 kts # at 181.000
+   		# loiter at 225.000
+   		# loiter at 271.000
+         position 38:06:44.2n 116:34:31.7w altitude 35000 ft msl speed 400 kts # at 316.000
+   		# loiter at 360.000
+   		# loiter at 406.000
+         position 38:11:50.0n 116:40:44.7w altitude 35000 ft msl speed 400 kts # at 451.000
+         position 38:16:50.1n 116:40:37.9w altitude 35000 ft msl speed 400 kts # at 496.000
+   		# loiter at 540.000
+   		# loiter at 585.000
+   		# loiter at 631.000
+   		# loiter at 675.000
+   		# loiter at 721.000
+         position 38:16:44.4n 116:34:17.2w altitude 35000 ft msl speed 400 kts # at 766.000
+         position 38:11:44.3n 116:34:24.5w altitude 35000 ft msl speed 400 kts # at 811.000
+   		# loiter at 855.000
+   		# loiter at 901.000
+         position 38:06:38.3n 116:28:11.9w altitude 35000 ft msl speed 400 kts # at 946.000
+         position 38:06:31.9n 116:21:52.2w altitude 35000 ft msl speed 400 kts # at 991.000
+         position 38:06:25.3n 116:15:32.6w altitude 35000 ft msl speed 400 kts # at 1036.000
+         position 38:06:18.3n 116:09:13.0w altitude 35000 ft msl speed 400 kts # at 1081.000
+         position 38:06:11.0n 116:02:53.4w altitude 35000 ft msl speed 400 kts #
+      end_navigation
+   end_route
+
+   track
+      platform 200_target
+      side     red
+      position 38:04:31.0n 116:49:54.0w
+   end_track
+
+   track
+      platform 1200_target
+      side     red
+      position 38:12:24.0n 117:27:36.0w
+   end_track
+
+   execute at_time 164.037 secs absolute
+      # Fire blue_gps_bomb_2 at 200_target
+      # Fire blue_glide_bomb_1 at 1200_target
+      Weapon("blue_gps_bomb_2").Fire(MasterTrackList().TrackEntry(0));
+      Weapon("blue_glide_bomb_1").Fire(MasterTrackList().TrackEntry(1));
+   end_execute
+
+end_platform
+
+platform 400_ucav UCAV
+   side blue
+   commander SELF
+   route
+      navigation
+         position 37:55:55.3n 115:50:34.7w altitude 35000 ft msl speed 460 kts # at 1.000
+         position 37:56:03.3n 115:56:53.3w altitude 35000 ft msl speed 400 kts # at 46.000
+         position 37:56:10.9n 116:03:12.0w altitude 35000 ft msl speed 400 kts # at 91.000
+         position 37:56:18.2n 116:09:30.7w altitude 35000 ft msl speed 400 kts # at 136.000
+         position 38:01:18.3n 116:09:21.8w altitude 35000 ft msl speed 400 kts # at 181.000
+         position 38:01:25.2n 116:15:41.0w altitude 35000 ft msl speed 400 kts # at 226.000
+         position 38:06:25.3n 116:15:32.6w altitude 35000 ft msl speed 400 kts # at 271.000
+         position 38:06:31.9n 116:21:52.2w altitude 35000 ft msl speed 400 kts # at 316.000
+         position 38:06:38.3n 116:28:11.9w altitude 35000 ft msl speed 400 kts # at 361.000
+         position 38:06:44.2n 116:34:31.7w altitude 35000 ft msl speed 400 kts # at 406.000
+
+   #T=410.254 400_ucav weapon waypoint 10 grid 292 38:06:48.2n 116:38:53.5w speed 205.778
+   #T=410.254 400_ucav release blue_gps_bomb_2 target 38:06:53.0n 116:52:58.0w plantime 452.000 early 41.746
+   #T=410.254 400_ucav release blue_glide_bomb_1 target 38:10:12.0n 117:13:36.0w plantime 452.000 early 41.746
+         position 38:06:49.9n 116:40:51.5w altitude 35000 ft msl speed 400 kts # at 451.000
+   		# loiter at 495.000
+   		# loiter at 540.000
+   		# loiter at 585.000
+   		# loiter at 631.000
+   #      position 38:06:49.9n 116:40:51.5w altitude 35000 ft msl speed 400 kts # at 676.000
+         position 38:01:49.7n 116:40:58.2w altitude 35000 ft msl speed 400 kts # at 721.000
+         position 38:01:44.1n 116:34:38.9w altitude 35000 ft msl speed 400 kts # at 766.000
+         position 37:56:44.0n 116:34:46.0w altitude 35000 ft msl speed 400 kts # at 811.000
+         position 37:56:38.0n 116:28:27.1w altitude 35000 ft msl speed 400 kts # at 856.000
+         position 37:56:31.8n 116:22:08.3w altitude 35000 ft msl speed 400 kts # at 901.000
+         position 37:56:25.2n 116:15:49.5w altitude 35000 ft msl speed 400 kts # at 946.000
+         position 37:56:18.2n 116:09:30.7w altitude 35000 ft msl speed 400 kts # at 991.000
+         position 37:56:10.9n 116:03:12.0w altitude 35000 ft msl speed 400 kts # at 1036.000
+         position 37:56:03.3n 115:56:53.3w altitude 35000 ft msl speed 400 kts # at 1081.000
+         position 37:55:55.3n 115:50:34.7w altitude 35000 ft msl speed 400 kts #
+      end_navigation
+   end_route
+
+   track
+      platform 100_target
+      side     red
+      position 38:06:53.0n 116:52:58.0w
+   end_track
+
+   track
+      platform 1600_target
+      side     red
+      position 38:10:12.0n 117:13:36.0w
+   end_track
+
+   execute at_time 410.254 secs absolute
+      # blue_gps_bomb_2 at 100_target
+      # blue_glide_bomb_1 at 1600_target
+      Weapon("blue_gps_bomb_2").Fire(MasterTrackList().TrackEntry(0));
+      Weapon("blue_glide_bomb_1").Fire(MasterTrackList().TrackEntry(1));
+   end_execute
+end_platform
+
+# Extra targets
+
+platform 1200_target TARGET
+  side red
+
+  position 38:12:24n  117:27:36w  altitude 0.0 m agl
+end_platform
+
+
+platform 1600_target TARGET
+  side red
+
+  position 38:10:12n  117:13:36w  altitude 0.0 m agl
+end_platform

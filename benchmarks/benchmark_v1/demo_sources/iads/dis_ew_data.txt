@@ -1,0 +1,16 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+dis_interface
+   ew_technique_type noise_jamming               0
+   ew_technique_type random_pulse_jamming        132
+   ew_technique_type jtos_gain_jamming           136
+   ew_technique_type false_target_jamming        148
+   ew_technique_type simple_false_target_jamming 152
+end_dis_interface
+

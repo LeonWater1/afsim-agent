@@ -1,0 +1,30 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# New file created by Wizard
+
+platform blue_naval_sam_battery_01 BLUE_NAVAL_SAM_BATTERY
+  commander SELF
+  side blue
+  icon command_truck
+  position 39:42:01.23n 76:41:49.89w
+end_platform
+
+platform blue_naval_sam_launcher01 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:44:02.86n 76:31:44.28w
+end_platform
+
+platform blue_abm_ttr_01 BLUE_ABM_TTR
+  commander blue_naval_sam_battery_01
+  side blue
+  position 39:44:02.86n 76:31:44.28w
+  heading 340 deg
+end_platform

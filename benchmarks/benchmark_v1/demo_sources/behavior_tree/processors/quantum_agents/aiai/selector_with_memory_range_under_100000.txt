@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+condition range_under_100000
+   precondition
+      if(PLATFORM.GroundRangeTo(WsfSimulation.FindPlatform("Blue_target")) < 100000)
+      {
+         return Success("Range to Blue_target under 100000");
+      }
+      else
+      {
+         return Failure("Out of range!");
+      }
+   end_precondition
+end_condition

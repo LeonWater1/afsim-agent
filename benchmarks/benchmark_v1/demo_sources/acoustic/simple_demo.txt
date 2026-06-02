@@ -1,0 +1,64 @@
+# File: simple_demo.txt
+################################################################################
+# Simple AFSIM Demo - Minimal Working Example
+################################################################################
+
+script_interface
+   debug
+end_script_interface
+
+################################################################################
+# Define a simple air platform
+
+platform_type basic_aircraft WSF_PLATFORM
+   icon aircraft
+
+   mover WSF_AIR_MOVER
+      maximum_speed 200 m/sec
+      minimum_speed 50 m/sec
+      default_radial_acceleration 3.0 g
+   end_mover
+
+   # Simple status printer
+   processor simple_status WSF_SCRIPT_PROCESSOR
+      update_interval 5.0 sec
+
+      on_initialize
+         print("Simulation started!");
+      end_on_initialize
+
+      on_update
+         print("Time: ", TIME_NOW, " sec");
+         print("  Position: ", PLATFORM.Latitude(), ", ", PLATFORM.Longitude());
+         print("  Altitude: ", PLATFORM.Altitude(), " m");
+      end_on_update
+   end_processor
+
+end_platform_type
+
+################################################################################
+# Create platform instance
+
+platform demo_plane basic_aircraft
+   side blue
+
+   route
+      position 30.0n 104.0e altitude 3000 m msl speed 100 m/sec
+      position 30.1n 104.0e altitude 3000 m msl speed 100 m/sec
+      position 30.1n 104.1e altitude 3000 m msl speed 100 m/sec
+      position 30.0n 104.1e altitude 3000 m msl speed 100 m/sec
+   end_route
+
+   processor simple_status
+      on
+   end_processor
+
+end_platform
+
+event_pipe
+   file output/simple_demo.aer
+end_event_pipe
+################################################################################
+# Simulation end time
+
+end_time 600 sec

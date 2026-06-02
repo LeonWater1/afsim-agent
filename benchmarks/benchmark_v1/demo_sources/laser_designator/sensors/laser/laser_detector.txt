@@ -1,0 +1,28 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# Just an ESM sensor set to very high freqs...
+antenna_pattern LASER_ANTENNA
+   constant 80 db
+end_antenna_pattern
+   sensor LASER_DETECTOR WSF_ESM_SENSOR
+      on
+      frame_time 1 sec
+      receiver
+      antenna_pattern      LASER_ANTENNA
+      detection_threshold  1 db
+      noise_power          -230 dbw
+      internal_loss        0 db
+      end_receiver
+      #wavelength 1.06E-6 microns = 1.06E-12 meters
+      frequency_band 100000000000 ghz 1000000000000 ghz    #cover the laser band (gross example)
+      reports_location
+      reports_frequency  
+      reports_bearing
+   end_sensor

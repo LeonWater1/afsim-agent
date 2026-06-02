@@ -1,0 +1,98 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+define_path_variable CASE selector
+
+file_path .
+file_path ../..
+include_once platforms/common.txt
+include_once platforms/selector_striker.txt
+include_once platforms/flight_lead.txt
+
+event_pipe
+enable BEHAVIOR_TOOL
+file output/$(CASE).aer
+end_event_pipe
+
+random_seed 731165679
+
+end_time  40.0 min
+
+
+##### BLUE SIDE #####
+platform  flight_lead_1  FLIGHT_LEAD
+   side blue
+   #commander gci
+   commander SELF
+   position 00:08:00.00n 05:43:00.00e altitude 0 ft agl
+
+end_platform
+
+
+platform  Blue_1  STRIKER
+   icon        F-22
+   side        blue
+   commander   flight_lead_1
+   route
+      position 00:08:18.00n 04:15:12.00e altitude 30000 ft msl speed 450 kts
+      position 00:08:38.82n 00:06:12.26w altitude 30000 ft msl speed 450 kts
+   end_route
+   heading 270 deg
+end_platform
+
+
+platform  Blue_2  STRIKER
+   icon        F-22
+   side        blue
+   commander   flight_lead_1
+   route
+      position 00:00:23.96n 04:16:31.72e altitude 30000 ft msl speed 450 kts
+      position 00:00:53.41s 00:02:23.58w altitude 30000 ft msl speed 450 kts
+   end_route
+   heading 270 deg
+end_platform
+
+
+
+##### RED SIDE #####
+
+platform  Red_1  STRIKER
+   side red
+   icon SU-27
+   heading 90 deg
+   commander   SELF
+   route
+      position 00:00:52.00n 02:09:34.00w altitude 30000 ft speed 450 kts
+      position 00:00:52.00n 02:16:38.46e altitude 30000 ft speed 450 kts
+   end_route
+end_platform
+
+platform  Red_2  STRIKER
+   icon        SU-27
+   side        red
+   commander   SELF
+   route
+      position 00:13:56.00n 02:04:58.00w altitude 30000 ft msl speed 450 kts  #mach 0.9
+      position 00:13:56.00n 02:23:47.59e altitude 30000 ft msl speed 450 kts  #mach 0.9
+   end_route
+   heading 90 deg
+end_platform
+
+
+platform  Red_3  STRIKER
+   icon        SU-27
+   side        red
+   commander   SELF
+   route
+    position 00:13:18.00n 02:25:34.00w altitude 30000.00 ft speed 450 kts
+    position 00:13:18.00n 02:06:30.76e altitude 30000.00 ft
+   end_route
+   heading 90 deg
+end_platform
+

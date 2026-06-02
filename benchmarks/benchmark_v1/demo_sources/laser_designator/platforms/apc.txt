@@ -1,0 +1,54 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include sensors/laser/laser_detector.txt
+optical_signature apc_optical_signature
+   constant 4 m^2
+end_optical_signature
+
+radar_signature apc_radar_signature
+   constant 20 dbsm
+end_radar_signature
+
+platform_type APC WSF_PLATFORM  # armored personnel carrier
+   icon apc
+   height 2.5 meters
+   width 2.5 meters
+   length 4.0 meters
+   optical_signature apc_optical_signature
+   radar_signature   apc_radar_signature
+   mover WSF_GROUND_MOVER end_mover
+   sensor laser_detector LASER_DETECTOR
+      on
+      internal_link laser_proc
+      internal_link task_proc
+   end_sensor
+   processor laser_proc WSF_TRACK_PROCESSOR
+       purge_interval 15 sec
+   end_processor
+   processor task_proc WSF_TASK_PROCESSOR
+       update_interval 10 sec
+       on_update
+           WsfLocalTrackList localtracklist = PLATFORM.MasterTrackList();
+           WsfTrackList        rawtracklist =  PLATFORM.MasterRawTrackList();
+           if (localtracklist.Count() > 0)
+       {          
+          foreach (WsfTrack rawtrack in rawtracklist)
+          {
+            if (rawtrack.IsValid())
+            {
+               #writeln(TIME_NOW, " ", PLATFORM.Name()," WE ARE BEING LASED!!!");
+               PLATFORM.Comment("I'm being lased!!!");
+            }
+          }
+       }
+       end_on_update
+   end_processor
+   
+end_platform_type

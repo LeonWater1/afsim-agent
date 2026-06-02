@@ -1,0 +1,70 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+advanced_behavior choose_tree
+   
+   script_variables 
+      bool taskRtb = false;
+   end_script_variables
+   
+   on_init
+      if (!SharedBlackboardExists("task"))
+      {
+         CreateSharedBlackboard("task");
+         # Set the default task to engage
+         if (!SharedBlackboardVarExists("task", "tree_to_run"))
+         {
+            SetSharedBlackboardVar("task", "tree_to_run", "engage");
+         }
+      }
+   end_on_init
+   
+   precondition
+      return Success();
+   end_precondition
+   
+   execute
+      if (SharedBlackboardVarExists("task", "tree_to_run"))
+      {
+         if (!taskRtb)
+         {
+            # If we hit bingo, return to base.
+            # Estimate the distance to base
+            double distToBase = PLATFORM.GroundRangeTo(WsfSimulation.FindPlatform("Blue_Base"));
+            # Estimate the fuel required to fly that distance
+            double fuelReq = PLATFORM.Fuel().QuantityRequired(distToBase);
+            PLATFORM.Fuel().SetBingoQuantity(fuelReq);
+         
+            # If we've reached BINGO, run the rtb tree
+            if (PLATFORM.FuelRemaining() <= PLATFORM.FuelBingoQuantity())
+            {
+               SetSharedBlackboardVar("task", "tree_to_run", "rtb");
+               taskRtb = true;
+            }
+         }
+         
+         string task = (string)GetSharedBlackboardVar("task", "tree_to_run");
+         # if we are currently running the engage tree
+         if (task == "engage")
+         {
+            # if we are out of rockets, switch tasks
+            if(PLATFORM.Weapon("mrm").QuantityRemaining() == 0)
+            {
+               SetSharedBlackboardVar("task", "tree_to_run", "checkpoints");
+            }
+         }
+         return Success("Running tree '" + task + "'");
+      }
+      else
+      {
+         return Failure("No tree task set!");
+      }
+   end_execute
+   
+end_advanced_behavior

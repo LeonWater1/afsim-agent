@@ -1,0 +1,52 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform red_light_armor-1 APC
+  side red
+  #icon mil_MechanizedInfantryVeh
+  position 45.039n 121.83228w altitude 2 m agl
+    heading 84 deg
+  route
+    position 45.039n 121.83228w altitude 2 m  agl
+    speed 5 mph
+    position 45.03936n 121.82710w
+    position 45:02:25.94n 121:48:36.23w
+  end_route
+end_platform
+
+platform red_light_armor-2 APC
+  side red
+  #icon mil_MechanizedInfantryVeh
+  position 45:02:20.17n 121:50:00.78w altitude 2 m agl
+  route
+    position 45:02:20.17n 121:50:00.78w altitude 2 m agl
+    speed 4.5 mph
+    position 45.03927n 121.82763w
+    position 45:02:24.99n 121:48:41.87w
+  end_route
+  heading 85 deg
+end_platform
+
+
+platform red_light_armor-3 APC
+  side red
+  #icon mil_MechanizedInfantryVeh
+  position 45:02:19.57n 121:50:04.60w altitude 2 m agl
+  route
+    position 45.03877n 121.83461w altitude 2 m agl
+    speed 4 mph
+    position 45.03916n 121.82763w
+    position 45:02:24.18n 121:48:43.78w
+
+  end_route
+
+  heading 85 deg
+end_platform
+
+

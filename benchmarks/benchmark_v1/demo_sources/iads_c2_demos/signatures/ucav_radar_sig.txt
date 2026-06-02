@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+# generic UCAV radar signature
+
+radar_signature UCAV_RADAR_SIG
+   state default
+      inline_table dbsm 20 2
+                -90.0  90.0
+        -180.0    0.0   0.0
+        -137.5    0.0   0.0
+        -135.0   20.0  20.0
+        -132.5    0.0   0.0
+         -92.5    0.0   0.0
+         -90.0   20.0  20.0
+         -87.5    0.0   0.0
+         -47.5    0.0   0.0
+         -45.0   20.0  20.0
+         -42.5    0.0   0.0
+          42.5    0.0   0.0
+          45.0   20.0  20.0
+          47.5    0.0   0.0
+          87.5    0.0   0.0
+          90.0   20.0  20.0
+          92.5    0.0   0.0
+         132.5    0.0   0.0
+         135.0   20.0  20.0
+         137.5    0.0   0.0
+         180.0    0.0   0.0
+      end_inline_table
+end_radar_signature
+

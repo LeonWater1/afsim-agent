@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+sensor EYEBALL WSF_GEOMETRIC_SENSOR 
+
+   maximum_range        10 nm
+   
+   antenna_height         2 m
+   
+   frame_time            1 sec
+   
+   scan_mode             azimuth_and_elevation
+   azimuth_scan_limits   -180 deg 180 deg
+   elevation_scan_limits    0 deg  90 deg
+
+   required_pd                  0.5
+   
+   hits_to_establish_track      3  5
+   hits_to_maintain_track       1  5
+   
+   track_quality                0.8
+   
+   reports_range 
+   reports_bearing 
+   reports_elevation 
+   reports_iff 
+   
+end_sensor

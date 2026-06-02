@@ -1,0 +1,189 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#    * * ************************************** * *
+#    *   ****** Demonstration input file ******   *
+#    *   ******      UNCLASSIFIED        ******   *
+#    * * ************************************** * *
+#    ----------------------------------------------------------------
+#                             Penetrating UCAVs
+#    ----------------------------------------------------------------
+platform 100_ucav UCAV
+   side blue
+   commander SELF
+   creation_time 10.0 min
+   position 32:56:00.000n 121:55:36.000w altitude 5.76 nm msl
+   edit weapon blue_gps_bomb_2
+      quantity 0
+   end_weapon
+   route
+      navigation
+         position 32:56:00.000n 121:55:36.000w altitude 5.76 nm msl
+            speed 460 kts
+         position 34:34:36.193n 120:54:04.079w altitude 5.76 nm msl
+            speed 460 kts
+         position 35:45:23.917n 120:34:01.295w altitude 5.76 nm msl
+            speed 460 kts
+         position 35:43:12.000n 120:28:00.000w altitude 5.76 nm msl
+            speed 460 kts
+        position 33:09:12.000n 121:36:00.000w altitude 5.76 nm msl
+          speed 460 kts
+      end_navigation
+   end_route
+   heading 8 deg
+end_platform
+
+platform 200_ucav UCAV
+   side blue
+   commander SELF
+   creation_time 10.0 min
+   position 33:03:36.000n 122:08:00.000w altitude 5.76 nm msl
+   edit weapon blue_gps_bomb_2
+      quantity 0
+   end_weapon
+   route
+      navigation
+      position 33:03:36.000n 122:08:00.000w altitude 5.76 nm msl
+         speed 460 kts
+      position 34:27:24.076n 121:00:56.411w altitude 5.76 nm msl
+         speed 460 kts
+      position 35:46:11.936n 120:38:50.636w altitude 5.76 nm msl
+         speed 460 kts
+      position 35:48:48.000n 120:25:36.000w altitude 5.76 nm msl
+         speed 460 kts
+     position 33:06:00.000n 121:32:00.000w altitude 5.76 nm msl
+       speed 460 kts
+      end_navigation
+   end_route
+   heading 10 deg
+end_platform
+
+platform 300_ucav UCAV
+   side blue
+   commander SELF
+   creation_time 10.0 min
+   position 33:14:24.000n 122:20:48.000w altitude 5.76 nm msl
+   edit weapon blue_gps_bomb_1
+      quantity 0
+   end_weapon
+   route
+      navigation
+      position 33:14:24.000n 122:20:48.000w altitude 5.76 nm msl
+         speed 460 kts
+      position 34:41:36.000n 121:14:48.646w altitude 5.76 nm msl
+         speed 460 kts
+      position 35:49:23.953n 120:43:39.965w altitude 5.76 nm msl
+         speed 460 kts
+      position 35:54:00.000n 120:26:48.000w altitude 5.76 nm msl
+         speed 460 kts
+     position 33:02:48.000n 121:26:24.000w altitude 5.76 nm msl
+       speed 460 kts
+      end_navigation
+   end_route
+   heading 7 deg
+end_platform
+
+platform 400_ucav UCAV
+   side blue
+   commander SELF
+   creation_time 10.0 min
+   position 33:20:48.000n 122:36:00.000w altitude 5.76 nm msl
+   edit weapon blue_gps_bomb_1
+      quantity 0
+   end_weapon
+   route
+      navigation
+         position 33:20:48.000n 122:36:00.000w altitude 5.76 nm msl
+            speed 460 kts
+         position 34:52:47.985n 121:28:28.340w altitude 5.76 nm msl
+            speed 460 kts
+         position 35:51:11.964n 120:47:04.913w altitude 5.76 nm msl
+            speed 460 kts
+         position 35:58:48.000n 120:26:24.000w altitude 5.76 nm msl
+            speed 460 kts
+        position 32:57:12.000n 121:20:24.000w altitude 5.76 nm msl
+          speed 460 kts
+      end_navigation
+   end_route
+   heading 6 deg
+end_platform
+
+#    ----------------------------------------------------------------
+#                             SOJ Jammers
+#    ----------------------------------------------------------------
+platform 100_soj SOJ
+   side blue
+   commander SELF
+   route
+      navigation
+         position 33:43:58.639n 123:47:28.097w altitude 5.76 nm msl
+            speed 450 kts
+         position 35:42:11.988n 120:57:43.917w altitude 5.76 nm msl
+         insert_route soj_orbit reference_heading -135.0 deg
+         position 34:52:47.947n 121:42:56.246w altitude 5.76 nm msl
+      end_navigation
+   end_route
+   heading 49 deg
+end_platform
+
+platform 200_soj SOJ
+   side blue
+   commander SELF
+   route
+      navigation
+         position 31:52:48.000n 121:14:48.581w altitude 5.76 nm msl
+            speed 450 kts
+         position 35:10:24.000n 120:39:36.000w altitude 5.76 nm msl
+         insert_route soj_orbit reference_heading -135.0 deg
+         position 34:10:59.918n 120:34:13.959w altitude 5.76 nm msl
+      end_navigation
+   end_route
+   heading 8 deg
+end_platform
+
+end_time 36000.00 sec
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 100_target TARGET
+  side red
+
+  position 35:51:59.932n 120:37:50.321w  altitude 0.00 nm agl
+end_platform
+
+platform 200_target TARGET
+  side red
+
+  position 35:49:37.923n 120:34:51.687w  altitude 0.00 nm agl
+end_platform
+
+platform 300_target TARGET
+  side red
+
+  position 35:49:37.923n 120:34:51.687w  altitude 0.00 nm agl
+end_platform
+
+platform 400_target TARGET
+  side red
+
+  position 35:49:37.923n 120:34:51.687w  altitude 0.00 nm agl
+end_platform
+
+platform 500_target TARGET
+  side red
+
+  position 35:49:37.923n 120:34:51.687w  altitude 0.00 nm agl
+end_platform
+
+platform 600_target TARGET
+  side red
+
+  position 35:49:37.923n 120:34:51.687w  altitude 0.00 nm agl
+end_platform

@@ -1,0 +1,49 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 100_target TARGET
+  side red
+
+  position 38:06:53n  116:52:58w  altitude 0.0 m agl
+end_platform
+
+platform 200_target TARGET
+  side red
+
+  position 38:04:31n  116:49:54w  altitude 0.0 m agl
+end_platform
+
+platform 300_target TARGET
+  side red
+
+  position 38:04:31n  116:49:54w  altitude 0.0 m agl
+end_platform
+
+platform 400_target TARGET
+  side red
+
+  position 38:04:31n  116:49:54w  altitude 0.0 m agl
+end_platform
+
+platform 500_target TARGET
+  side red
+
+  position 38:04:31n  116:49:54w  altitude 0.0 m agl
+end_platform
+
+platform 600_target TARGET
+  side red
+
+  position 38:04:31n  116:49:54w  altitude 0.0 m agl
+end_platform
+

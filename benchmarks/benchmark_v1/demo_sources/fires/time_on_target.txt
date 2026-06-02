@@ -1,0 +1,265 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// Time on target test.
+// Five launchers are all commanded to attack a target with "time on target," set to 2 minutes sim time.
+
+include_once ./types/fires_all_indirect_fire.txt
+
+platform_type TARGET WSF_PLATFORM
+  side blue
+  icon Tower
+end_platform_type
+
+comm PERFECT WSF_COMM_TRANSCEIVER
+end_comm
+
+processor CMDR_TASK_PROC WSF_TASK_PROCESSOR
+
+   script void SetTask(WsfPlatform aPlatform,
+                       WsfTrack    aTrack)
+      string weaponName = aPlatform.WeaponEntry(0).Name();
+      WsfWeaponTask task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName);
+      task.SetQuantity(1);
+      task.SetCommDevice("perfect");
+      task.SetAssignee(aPlatform.Name());
+      AssignTask(aTrack, task);
+   end_script
+
+   execute at_time 1.0 sec absolute
+      WsfPlatform target = WsfSimulation.FindPlatform("target-1");
+      WsfTrack targetTrack = target.MakeTrack();
+      targetTrack.SetAuxData("IMPACT_TIME", 120.0);  // sim time of two minutes.
+      PLATFORM.SetCurrentTarget(targetTrack);
+      foreach(WsfPlatform subordinate in PLATFORM.Subordinates())
+      {
+         SetTask(subordinate, targetTrack);
+      }
+   end_execute
+
+   script void on_task_complete(WsfTask aTask)
+      writeln("Task ", aTask.TaskId(), " , assigned to ", aTask.Assignee(), " complete.");
+   end_script
+
+end_processor
+
+processor SUB_TASK_PROC WSF_TASK_PROCESSOR
+
+   script_variables
+      WsfLaunchComputer mLaunchComputer;
+   end_script_variables
+
+   on_initialize
+      writeln(PLATFORM.WeaponEntry(0).Name());
+      mLaunchComputer = PLATFORM.WeaponEntry(0).LaunchComputer();
+      if (! mLaunchComputer.IsValid())
+      {
+         writeln("Not Valid!!");
+      }
+   end_on_initialize
+
+   show_state_transitions
+   evaluation_interval assess 0.5 seconds
+
+   state assess
+
+      next_state wait
+         return (mLaunchComputer.CanIntercept(TRACK));
+      end_next_state
+
+      next_state done
+         return true;  // if we can't intercept
+      end_next_state
+
+   end_state
+
+   evaluation_interval wait 5.0 seconds
+   state wait
+
+      on_entry
+         PLATFORM.SetCurrentTarget(TRACK);
+         double impactTime = TRACK.AuxDataDouble("IMPACT_TIME");
+         double timeToImpact = mLaunchComputer.TimeOfFlight();
+         writeln(PLATFORM.Name(), ": Time of flight ", timeToImpact);
+         double launchTime = impactTime - timeToImpact;
+         writeln(PLATFORM.Name(), ": Launch time ", launchTime);
+         TRACK.SetAuxData("LAUNCH_TIME", launchTime);
+      end_on_entry
+
+      next_state firing
+         double timeToLaunch = (TIME_NOW - TRACK.AuxDataDouble("LAUNCH_TIME"));
+         writeln("Time to launch ", timeToLaunch);
+         return (timeToLaunch < 5.0);
+      end_next_state
+
+   end_state
+
+   evaluation_interval firing 0.01 sec
+   state firing
+      next_state done
+         if ((TIME_NOW - TRACK.AuxDataDouble("LAUNCH_TIME")) > 0.0)
+         {
+            WsfWeapon weapon = PLATFORM.WeaponEntry(0);
+            if (weapon.CanIntercept(TRACK))
+            {
+               writeln(PLATFORM.Name(), " ", TIME_NOW, ": launching.");
+               weapon.TurnOn();
+               weapon.Fire(TRACK);
+            }
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      end_next_state
+   end_state
+
+   evaluation_interval done 500 sec
+   state done
+      on_entry
+         TaskComplete(TRACK.TrackId(), "TIME_ON_TARGET");
+      end_on_entry
+   end_state
+
+end_processor
+
+event_output
+   enable WEAPON_HIT
+   file time_on_target.evt
+end_event_output
+
+platform 155mm_artillery-1 FIRES_155MM_ARTILLERY_M107_HE_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:31:37.933n 00:26:08.630e
+   commander cmdr
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      processor sub_task_proc
+   end_comm
+   track_manager
+      uncorrelated_track_drops off
+   end_track_manager
+   edit weapon fires_155MM_ARTILLERY_M107_HE
+      off
+   end_weapon
+end_platform
+
+platform 60mm_rocket-1 FIRES_60MM_ROCKET_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:29:05.730n 00:19:46.143e
+   commander cmdr
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      processor sub_task_proc
+   end_comm
+   track_manager
+      uncorrelated_track_drops off
+   end_track_manager
+   edit weapon fires_60mm_rocket
+      off
+   end_weapon
+end_platform
+
+platform 122mm_rocket-1 FIRES_122MM_ROCKET_SHORT_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:30:01.711n 00:16:29.499e
+   commander cmdr
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      processor sub_task_proc
+   end_comm
+   track_manager
+      uncorrelated_track_drops off
+   end_track_manager
+   edit weapon fires_122mm_rocket_short
+      off
+   end_weapon
+end_platform
+
+platform 160mm_rocket-1 FIRES_160MM_ROCKET_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:36:17.442n 00:12:10.861e
+   commander cmdr
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      processor sub_task_proc
+   end_comm
+   track_manager
+      uncorrelated_track_drops off
+   end_track_manager
+   edit weapon fires_160mm_rocket
+      off
+   end_weapon
+end_platform
+
+platform 120mm_mortar-1 FIRES_120MM_MORTAR_M934_HE_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:29:34.873n 00:22:07.019e
+   commander cmdr
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      processor sub_task_proc
+   end_comm
+   track_manager
+      uncorrelated_track_drops off
+   end_track_manager
+   edit weapon fires_120mm_mortar_m934_he
+      off
+   end_weapon
+end_platform
+
+platform 240mm_rocket-1 FIRES_240MM_ROCKET_EXPLICIT_LAUNCHER
+   icon sa-10_launcher
+   position 51:32:25.853n 00:19:54.361e
+   add processor sub_task_proc SUB_TASK_PROC
+   end_processor
+   add comm perfect PERFECT
+      internal_link sub_task_proc
+   end_comm
+   commander cmdr
+   edit weapon fires_240mm_rocket
+      off
+   end_weapon
+end_platform
+
+platform target-1 TARGET
+  position 51:28:29.21n 00:20:56.94e
+end_platform
+
+platform cmdr WSF_PLATFORM
+  side red
+  icon command_truck
+   position 51:34:59.936n 00:18:39.311e
+  commander SELF
+  add processor cmdr_task_proc CMDR_TASK_PROC
+  end_processor
+  add comm perfect PERFECT
+     processor cmdr_task_proc
+  end_comm
+  track_manager uncorrelated_track_drops off end_track_manager
+end_platform
+
+event_pipe
+   file time_on_target.aer
+end_event_pipe
+
+end_time 10 minutes
+
+platform_availability
+   name 60mm_rocket-1 availability 1.0
+   name 160mm_rocket-1 availability 1.0
+   name 120mm_mortar-1 availability 1.0
+   name 155mm_artillery-1 availability 1.0
+   name 122mm_rocket-1 availability 1.0
+end_platform_availability

@@ -1,0 +1,28 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+# Launch/engagement computer
+
+include_once weapons/sam/sr_sam_launch_computer.txt
+
+script bool SAM_LaunchComputer(WsfTrack aTrack, WsfPlatform aAssignee, string aEnvelopeName, double aLaunchDelay)
+
+   bool canIntercept = false;
+   string subType = aAssignee.Type();
+      if ((subType == "SR_SAM_BATTERY") || (subType == "SR_SAM_TELAR"))
+   {
+      extern bool SR_SAM_LaunchComputer(WsfTrack, WsfPlatform, string, double);
+      canIntercept = SR_SAM_LaunchComputer(aTrack, aAssignee, aEnvelopeName, aLaunchDelay);
+   }
+   return canIntercept;
+end_script

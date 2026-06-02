@@ -1,0 +1,43 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# New file created by Wizard
+
+platform commander_platform COMMANDER_PLATFORM
+  #position 48:07:52.31n 127:15:36.09w altitude 3.28 ft agl
+  route
+      label Loiter_Cap
+      position 47:40:04.97n 127:07:36.37w altitude 15000.00 ft msl speed 250 kts
+      position 47:44:53.52n 128:10:43.62w altitude 15000.00 ft speed 400 kts
+      position 47:46:58.99n 126:11:23.42w altitude 11000.00 ft speed 250 kts
+      position 47:41:27.50n 126:41:37.15w altitude 11000.00 ft agl speed 120 kts
+      goto Loiter_Cap
+   end_route
+  heading 277 deg
+end_platform
+
+platform fuser_platform_01 FUSER_PLATFORM
+   position 48:10:00.00n 127:59:58.00w altitude 3.28 ft agl
+   commander commander_platform
+end_platform
+
+platform bearing_sensor_01 GEOMETRIC_BEARING_ONLY_SENSOR_PLATFORM
+   position 48:10:00.00n 128:00:00.00w altitude 3.28 ft agl
+   commander fuser_platform_01
+   sensor geometric_bearing_only_sensor
+       azimuth_field_of_view 0 deg 90 deg
+   end_sensor
+end_platform
+
+platform bearing_sensor_02 GEOMETRIC_BEARING_ONLY_SENSOR_PLATFORM
+   position 48:10:00.00n 126:40:00.00w altitude 3.28 ft agl
+   commander fuser_platform_01
+   sensor geometric_bearing_only_sensor
+       azimuth_field_of_view -90 deg 0 deg
+   end_sensor
+end_platform

@@ -1,0 +1,113 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# SOURCE https://en.wikipedia.org/wiki/Type_347_radar
+# D. Schueths 8/22/2019
+/*
+Other reported names: TR47C
+Type 347 radar is frequently but erroneously referred by many as either Type 349 or Type 348, because externally, 
+all three radars look very similar, and all three are developed as fire control radar for small caliber guns. 
+In reality, the three radars are different and they can be easily distinguished by the following features: When 
+electro-optics (EO) are integrated with radar, EO is installed on the portside of Type 347 radar antenna, 
+but for Type 348 and Type 349, EO is installed on the starboard side of the radar antenna. 
+Furthermore, when incorporated as part of CIWS, Type 349 is slaved to Type 730 CIWS gun and thus does not rotate, 
+because the gun rotates when searching/tracking. In contrast, Type 348 is not slaved to the Type 76 37mm twin guns, 
+but instead, installed separately from the gun mounts, and thus Type 348 rotates when searching/tracking. 
+The shape of antenna is also an important visual cue to distinguish three radars. 
+The tip of Type 349 radar is a conical, which is missing on Type 347. Instead, the tip of Type 347 radar antenna 
+is a small circular flat surface, missing the tip of the cone. The antenna of Type 348 radar differs from both 
+Type 347 and Type 349 radars in that most of the cone is missing, only the base remains, so the antenna of Type 348 
+radar has a very large circular flat surface, resulting in Type 348 radar resembles a scaled down version of another 
+larger fire control radar for larger caliber guns (76 mm or greater), Type 344.
+
+Specifications
+System Band: X band - 10 GHz
+Range: 30 km against 2 m² RCS aircraft ; 15 km against: 0.1 m² ASM
+     30km to 2m^2 =  25.22689 km vs 1m^2
+     15km to .1m^2 = 26.67419 km vs 1m^2
+     NOTE:  We will use 25km vs 1m^2 for this model - D Schueths
+Tracking accuracy:  1mrad
+Tracking coverage: 360° (Az); -25°~85° (El)
+Antenna type: Circular parabolic antenna
+Polarization: Vertical
+Beam width: 1.8°±0.2°
+Transmitter / Receiver Pulse peak consumption: 150 kW (not xmtd power)
+NoiseFigure: <8 dB
+
+Ambient temperature Antenna: -25 +70 °C
+
+Power supply 115 V/50 Hz 3-phase AC: 5 kW
+115 V/400 Hz 3-phase AC: 1 kW
+
+Other features: Uses a coherent pulse doppler design
+Non coherent Moving Target Indicator/Detection (MTI, MTD), CFAR (Constant False Alarm Rate)
+Antinodding, anti clutter capability (A well advertised feature of the RTN family)
+
+
+
+*/
+antenna_pattern RED_CIWS_RADAR_1_ANTENNA
+  sine_pattern
+     peak_gain  29 db                          # adjusted for 1m2 detection range
+     minimum_gain -10 db                       # unknown
+     azimuth_beamwidth  1.8 deg                # stated
+     elevation_beamwidth  0.2 deg              # stated
+  end_sine_pattern
+end_antenna_pattern
+
+sensor RED_CIWS_RADAR_1 WSF_RADAR_SENSOR
+ # show_calibration_data
+ # maximum_request_count          1
+  
+  frame_time  0.01 sec 
+
+  minimum_range                  20 m         # unknown
+  maximum_range                  20 km         # unknown
+
+  field_of_view rectangular
+     azimuth_field_of_view -180.0 deg 180.0 deg # stated
+     elevation_field_of_view -25.0 deg 85.0 deg  # stated
+  end_field_of_view
+
+  slew_mode                      azimuth_and_elevation
+  azimuth_slew_limits            -180.0 deg 180.0 deg # stated
+  elevation_slew_limits          -25.0 deg 85.0 deg  # stated
+  azimuth_slew_rate 100 deg/s
+  elevation_slew_rate 85 deg/s
+
+  transmitter
+     antenna_pattern             RED_CIWS_RADAR_1_ANTENNA
+     power                       100.0 kw       # stated
+     frequency                   10000 mhz     # stated xband
+     pulse_width                 0.8 usec      
+     pulse_repetition_frequency  3600 hz       
+     polarization                vertical
+  end_transmitter
+
+  receiver
+     antenna_pattern             RED_CIWS_RADAR_1_ANTENNA     
+     noise_figure                 8 db          # stated
+  end_receiver
+
+  hits_to_establish_track  2 3                 # unknown
+                                               
+  hits_to_maintain_track   1 3
+
+  track_quality            1.0    # 'weapons' grade
+
+  ignore_domain subsurface
+  ignore_domain space
+
+  azimuth_error_sigma 1.0 mil
+  elevation_error_sigma 1.0 mil
+  range_error_sigma 1.0 meter  # unknown
+
+  reports_velocity
+  reports_location
+end_sensor
+

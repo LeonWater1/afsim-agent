@@ -1,0 +1,53 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+define_path_variable CASE alternate_locations
+#log_file output/$(CASE).log
+
+file_path .
+
+# setup file containing type definitions
+include_once setup.txt
+
+include_once scenarios/target_list.txt
+include_once scenarios/red_air_strike.txt
+include_once scenarios/blue_sams.txt
+
+event_output  file output/$(CASE).evt end_event_output
+event_pipe    file output/$(CASE).aer end_event_pipe
+
+end_time 60 minutes
+
+random_seed 5648
+
+alternate_locations_global_debug on
+
+alternate_locations_use_global_draw enabled
+alternate_locations_global_draw 1.0
+alternate_locations_global_draw -0.0
+alternate_locations_global_draw -1
+alternate_locations_use_global_draw disabled
+
+#terrain
+   #dted 0 ../../../terrain/dted0
+#end_terrain
+
+# The following table provides a set of seeds tested and the results.
+# Numbers in brackets represent the index chosen by the ruling alternate_locations block.
+
+# seed   target-location   ucav-formation
+# =======================================
+# 5636      south [3]        stepped     [2] 
+# 5637      north [2]        diamond     [1] 
+# 5638      west  [4]        stepped     [2] 
+# 5644      north [2]        v-formation [3] 
+# 5647      coast [1]        v-formation [3] 
+# 5648      west  [4]        diamond     [1] 
+# 5649      south [3]        v-formation [3] 
+# 5650      coast [1]        diamond     [1] 

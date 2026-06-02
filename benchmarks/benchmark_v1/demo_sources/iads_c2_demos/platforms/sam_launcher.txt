@@ -1,0 +1,51 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once weapons/sam.txt
+include_once weapons/sam_launch_computer.txt
+
+platform_type SAM_LAUNCHER WSF_PLATFORM
+   icon SA-10_Launcher
+
+   comm cmdr_net RED_DATALINK
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link dissemination
+   end_comm
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval       60 sec
+      unchanged_track_reporting disable
+      circular_report_rejection on
+   end_processor
+
+   processor dissemination DC2
+   end_processor
+
+   processor asset_manager WPN_AM
+   end_processor
+
+   processor weapons_manager WM_SAM
+   end_processor
+
+   weapon sam SAM
+      quantity 4
+   end_weapon
+
+   # Intercept calculator
+   script WsfBMInterceptCalcResult can_intercept(WsfWeapon weapon, WsfTrack track)
+      WsfBMInterceptCalcResult result = SAM_LaunchComputer (track, weapon.Platform(), "no-zone", 0);
+      return result;
+   end_script
+
+end_platform_type

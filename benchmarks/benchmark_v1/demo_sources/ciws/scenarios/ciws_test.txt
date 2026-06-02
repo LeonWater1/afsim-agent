@@ -1,0 +1,25 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform air_target1 AIR_TARGET 
+   side red
+   position 00:01:03.77n 00:00:00.00e
+   route
+      position 00:01:03.77n 00:00:00.00e altitude 100 m msl speed 480 knots
+      position 00:00:00.00n 00:00:00.00e
+   end_route
+   heading 180 deg
+
+  icon F-35
+end_platform
+
+platform ship1 SHIP
+   side blue
+   position 00:00:00.00n 00:00:00.00e
+end_platform

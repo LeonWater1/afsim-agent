@@ -1,0 +1,32 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+define_path_variable CASE iads-rt
+log_file output/$(CASE).log
+
+realtime
+
+include setup.txt
+
+include dis_data.txt
+include dis_realtime.txt
+
+include xio_interface.txt
+
+include scenarios/targets.txt
+include scenarios/iads_laydown.txt
+
+event_output file NULL end_event_output
+csv_event_output file NULL end_csv_event_output
+event_pipe file NULL end_event_pipe
+
+dis_interface
+   application 2
+end_dis_interface
+
+end_time 40 min

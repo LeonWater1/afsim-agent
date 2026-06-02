@@ -1,0 +1,67 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform_type SAM_BATTALION WSF_PLATFORM
+   icon TWIN_BOX
+   category ENGAGEMENT
+
+   infrared_signature    VEHICLE_INFRARED_SIGNATURE
+   optical_signature     VEHICLE_OPTICAL_SIGNATURE
+   radar_signature       VEHICLE_RADAR_SIGNATURE
+
+   track_manager
+      filter FILTER_TACTICS end_filter
+   end_track_manager
+
+   comm cmdr_net RED_DATALINK
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link dissemination
+   end_comm
+
+   comm sub_net RED_DATALINK
+      network_name <local:master>
+      internal_link data_mgr
+      internal_link dissemination
+   end_comm
+
+   zone full_kinematic
+      circular
+         maximum_altitude 30 km
+         maximum_radius   25 nm
+   end_zone
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval 60 seconds
+      report_to commander via cmdr_net to sub_net
+      report_interval 1 sec
+
+      fused_track_reporting on
+      raw_track_reporting off
+      unchanged_track_reporting disable
+      circular_report_rejection on
+   end_processor
+
+   processor asset_manager WPN_AM
+      status_settings
+         subord_yellow_timeout  40 secs
+         subord_red_timeout     60 secs
+      end_status_settings
+   end_processor
+
+   processor sensors_manager SIMPLE_SM
+   end_processor
+
+   processor dissemination DC2
+   end_processor
+end_platform_type

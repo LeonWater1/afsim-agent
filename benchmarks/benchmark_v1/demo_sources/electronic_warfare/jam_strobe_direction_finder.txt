@@ -1,0 +1,267 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# ******************************************************************************
+#  Setup
+# ******************************************************************************
+
+define_path_variable CASE jam_strobe_direction_finder
+log_file output/$(CASE).log
+
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+# ******************************************************************************
+#  Communication
+# ******************************************************************************
+
+comm RED_DATALINK WSF_COMM_TRANSCEIVER
+end_comm
+
+# ******************************************************************************
+#  Early Warning Radar
+# ******************************************************************************
+
+antenna_pattern EW_RADAR_ANTENNA
+  rectangular_pattern
+     peak_gain           35 dB
+     minimum_gain       -20 dB
+     azimuth_beamwidth   10 deg
+     elevation_beamwidth 45 deg
+  end_rectangular_pattern
+end_antenna_pattern
+
+sensor EW_RADAR WSF_RADAR_SENSOR
+   frame_time              10 sec
+   location                0.0 0.0 -30 m
+   scan_mode               azimuth
+   azimuth_scan_limits     -180 deg 180 deg
+   elevation_field_of_view -2.5 deg 42.5 deg
+   minimum_range           0 nm
+   maximum_range           400 km
+   one_m2_detect_range     225 km
+
+   transmitter
+      antenna_pattern           EW_RADAR_ANTENNA
+      antenna_tilt              10 deg
+      power                     750 kw
+      frequency                 900 mhz
+      bandwidth                 0.1 mhz
+      pulse_width               10  usec
+      pulse_repetition_interval 750 usec
+   end_transmitter
+
+   receiver
+      antenna_pattern           EW_RADAR_ANTENNA
+      antenna_tilt              10  deg
+      frequency                 900 mhz
+      bandwidth                 1   mhz
+   end_receiver
+
+   jam_strobe_detector
+      reports_bearing
+      #reports_elevation
+
+      gaussian_azimuth_error_sigma 2.0 deg
+      jamming_perception_threshold 3 db
+   end_jam_strobe_detector
+
+   jamming_perception_threshold 3 db
+
+   hits_to_establish_track 3 5
+   hits_to_maintain_track  1 4
+
+   reports_location
+   reports_velocity
+   reports_signal_to_noise
+   reports_range
+   reports_bearing
+   reports_elevation
+end_sensor
+
+platform_type EW_RADAR WSF_PLATFORM
+   icon ground_radar
+
+   comm datalink RED_DATALINK
+      network_name <local:slave>
+   end_comm
+
+   sensor radar EW_RADAR
+      internal_link data_manager
+      ignore_same_side
+   end_sensor
+
+   processor data_manager WSF_TRACK_PROCESSOR
+      report_to commander via datalink
+      raw_track_reporting on
+   end_processor
+end_platform_type
+
+platform radar_1 EW_RADAR
+   side      red
+   commander command_center
+   position 36:00:24.602n 116:00:18.006w
+   altitude  0.0 ft agl
+   heading   90 deg
+
+   sensor radar
+      on
+   end_sensor
+end_platform
+
+platform radar_2 EW_RADAR
+   side      red
+   commander command_center
+   position 38:00:02.775n 114:59:13.317w
+   altitude  0.0 ft agl
+   heading   90 deg
+
+   sensor radar
+      on
+   end_sensor
+end_platform
+
+platform radar_3 EW_RADAR
+   side red
+   position 35:59:06.771n 113:59:53.939w
+   altitude 0.0 ft agl
+   heading 90 degrees
+   commander command_center
+
+   sensor radar
+      on
+   end_sensor
+end_platform
+
+# ******************************************************************************
+#  Jammer
+# ******************************************************************************
+
+antenna_pattern JAMMER_ANTENNA
+  constant 10 db
+end_antenna_pattern
+
+radar_signature JAMMER_RADAR_SIGNATURE
+   constant -1000 m^2
+end_radar_signature
+
+weapon JAMMER WSF_RF_JAMMER
+   transmitter
+      power           100 w
+      frequency       900 mhz
+      bandwidth         1 mhz
+      antenna_pattern JAMMER_ANTENNA
+      electronic_attack
+         technique noise_jamming
+            default_on
+            effect noise_power_effect WSF_POWER_EFFECT
+            end_effect
+         end_technique
+      end_electronic_attack
+   end_transmitter
+end_weapon
+
+platform_type JAMMER_PLATFORM WSF_PLATFORM
+   icon EA-6B
+
+   radar_signature JAMMER_RADAR_SIGNATURE
+
+   mover WSF_AIR_MOVER
+   end_mover
+
+   weapon jammer JAMMER
+      pitch -10 deg
+   end_weapon
+end_platform_type
+
+platform jammer JAMMER_PLATFORM
+   side blue
+
+   route
+      position 37:00:00n 110:00:00w
+      altitude 35000 ft
+      speed      450 kts
+      heading    270 deg
+   end_route
+
+   weapon jammer
+      on
+   end_weapon
+end_platform
+
+# ******************************************************************************
+#  Command Center
+# ******************************************************************************
+
+radar_signature COMMAND_CENTER_RADAR_SIGNATURE
+  constant 10 m^2
+end_radar_signature
+
+platform_type COMMAND_CENTER WSF_PLATFORM
+  icon C4I
+
+  radar_signature COMMAND_CENTER_RADAR_SIGNATURE
+
+  comm datalink RED_DATALINK
+     network_name <local:master>
+     internal_link direction_finder
+  end_comm
+
+  processor direction_finder WSF_DIRECTION_FINDER_PROCESSOR
+     processor               track_processor
+     maximum_time_difference 5 sec
+     use_truth_altitude      true
+  end_processor
+
+  processor track_processor WSF_TRACK_PROCESSOR
+  end_processor
+end_platform_type
+
+platform command_center COMMAND_CENTER
+   side      red
+   commander SELF
+   position  37:05:00n 116:00:00w
+   altitude  0.0 ft agl
+   heading   90 deg
+
+   script_variables
+      WsfDraw draw = WsfDraw();
+   end_script_variables
+
+   execute at_interval_of 10.0 s
+      foreach (WsfTrack track in MasterTrackList())
+      {
+         if (track.IsValid() && track.LocationValid())
+         {
+            string trackId = track.TrackId().ToString();
+            draw.SetId(trackId);
+            draw.SetDuration(10.0);
+
+            draw.SetColor(0,0.3,0.9, 0.4);
+            draw.SetLineStyle("solid");
+
+           draw.BeginLines();
+              draw.Vertex(PLATFORM);
+              draw.Vertex(track.ReportedLocation());
+           draw.End();
+
+           draw.BeginIcons(track.Heading(), "Wedge");
+              draw.Vertex(track.ReportedLocation());
+           draw.End();
+        }
+     }
+   end_execute
+end_platform
+
+# ******************************************************************************
+#  Simulation Commands
+# ******************************************************************************
+
+end_time 4800 sec

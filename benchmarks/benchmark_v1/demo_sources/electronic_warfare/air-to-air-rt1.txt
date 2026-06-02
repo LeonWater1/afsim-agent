@@ -1,0 +1,411 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Simple agile jammer example.
+#    with scripting logic to maintain frequency for spot jamming of a agile
+#    radar.
+#
+#    EW_RADAR is a mode and frequency agile radar.
+#
+
+realtime
+
+# ****************************************************************************
+# Define the system types (movers, sensors, weapons, etc.)
+# ****************************************************************************
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 10 m^2
+end_radar_signature
+
+radar_signature WIDE_BODY_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+# ****************************************************************************
+#                       Agile Repeater Jammer
+
+antenna_pattern ESM_ANTENNA
+   constant 0 db
+end_antenna_pattern
+
+sensor ESM_SENSOR WSF_ESM_SENSOR
+   #debug
+
+   frame_time              2.5 sec
+
+   maximum_range           400 km
+
+   receiver
+      antenna_pattern      ESM_ANTENNA
+      detection_threshold  5 db
+      noise_power          -180 dbw
+      internal_loss        0 db
+   end_receiver
+
+   frequency_band          100 mhz 10000 mhz
+
+   reports_location
+   reports_type
+   reports_frequency
+   reports_pw
+   reports_pri
+end_sensor
+
+antenna_pattern JAMMER_ANTENNA
+  circular_pattern
+     peak_gain             10 dB
+     beamwidth             10 deg
+  end_circular_pattern
+end_antenna_pattern
+
+weapon JAMMER WSF_RF_JAMMER
+   debug
+   debug_level 1
+
+   maximum_number_of_spots 2
+
+   repeater
+      frequency_following    true
+      operating_mode         auto
+      #debug
+   end_repeater
+
+   transmitter
+      power                100 w
+      frequency_band       100 mhz 10000 mhz
+      antenna_pattern      JAMMER_ANTENNA
+
+      electronic_attack
+         technique noise_jamming
+            default_on
+            mitigation_class_name NOISE_JAMMING
+            effect power_effect WSF_JAMMER_POWER_EFFECT
+            end_effect
+         end_technique
+
+         technique false_target_jamming
+            //default_on
+            mitigation_class_name FALSE_TARGET_JAMMING
+            effect ft_effect WSF_FALSE_TARGET_EFFECT
+                system_type_data default
+                   jamming_pulse_density 0.2
+                   scan_rate_multiplier 2.0
+                end_system_type_data
+                system_type_data AIRBORNE_RADAR
+                   jamming_pulse_density 0.1
+                   scan_rate_multiplier 2.0
+                end_system_type_data
+             end_effect
+          end_technique
+      end_electronic_attack
+   end_transmitter
+end_weapon
+
+processor JAMMER_TASK_MGR WSF_TASK_PROCESSOR
+
+   script_debug_writes on
+   #show_state_transitions
+   #show_task_messages
+
+   # Script to select a jammer and add a spot
+   script bool AddSpot()
+      bool startedJamming = false;
+      for (int i=0; i < PLATFORM.WeaponCount(); i = i+1)
+      {
+         int tasksAssigned = TasksAssignedFor(TRACK.TrackId(), "Jam");
+         WsfWeapon jammer = PLATFORM.WeaponEntry(i);
+         writeln_d("TrackId=", TRACK.TrackId());
+         writeln_d("RawTrackId=", TRACK.RawTrackId(0));
+         if (PLATFORM.WithinFieldOfView(TRACK, jammer.Name()))
+         {
+            writeln_d("SignalFreq=", TRACK.Frequency());
+            if (StartJamming(TRACK, "Jam", jammer, "false_target_jamming"))
+            {
+               writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":",
+                         jammer.Name(), " started jamming ", TRACK.TargetName());
+               writeln_d("Previous Tasks Assigned=", tasksAssigned,
+                         " Tasks assigned=", TasksAssignedFor(TRACK.TrackId(), "Jam"));
+               if (TasksAssignedFor(TRACK.TrackId(), "Jam") > tasksAssigned)
+               {
+                  startedJamming = true;
+                  break;
+               }
+            }
+            else
+            {
+               writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":",
+                         jammer.Name(), " FAILED started jamming ", TRACK.TargetName());
+            }
+         }
+      }
+      return startedJamming;
+   end_script
+
+   # script to determine if platform can still jam emitter with current jammer
+   script bool HadToStopJamming()
+      bool stoppedJamming = false;
+      bool cancelledTasks = true;
+      WsfTaskList taskList = AssignedTaskList(TRACK.TrackId(),"Jam");
+      foreach(WsfTask task in taskList)
+      {
+         if (task.ResourceIsJammer())
+         {
+            string reason = "UNKNOWN";
+            bool needToStopJamming = true;
+            if (PLATFORM.WithinFieldOfView(TRACK, task.ResourceName()))
+            {
+               if (TRACK.FrequencyValid())
+               {
+                  needToStopJamming = false;
+                  break;
+               }
+
+               if (needToStopJamming)
+               {
+                  reason = "frequency invalid";
+               }
+            }
+            else
+            {
+              reason = "FOV limits";
+            }
+
+            if (needToStopJamming)
+            {
+               cancelledTasks = (cancelledTasks && CancelTask(task.TrackId(), task.TaskType()));
+               if (cancelledTasks)
+               {
+                  writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", task.ResourceName(), " stopped jamming ",
+                            TRACK.TargetName(), ", task=", task.TaskType()," freq=", task.ResourceFrequency(),
+                            " due to ", reason);
+               }
+               stoppedJamming = true;
+            }
+         }
+      }
+      return (stoppedJamming && cancelledTasks);
+   end_script
+
+   # -------------------------------------------------------------------------
+
+   evaluation_interval DETECTED 5.0 sec
+   state DETECTED
+      next_state CAN_JAM
+         return (TRACK.TimeSinceUpdated() < 10.0);
+      end_next_state
+   end_state
+
+   evaluation_interval CAN_JAM 5.0 sec
+   state CAN_JAM
+      next_state DETECTED
+         return (TRACK.TimeSinceUpdated() > 10.0);
+      end_next_state
+
+      next_state IS_JAMMING
+         return AddSpot();
+      end_next_state
+   end_state
+
+   evaluation_interval IS_JAMMING 5.0 sec
+   state IS_JAMMING
+      next_state CAN_JAM
+         return HadToStopJamming();
+      end_next_state
+   end_state
+
+end_processor
+
+# ****************************************************************************
+#                     Airborne Radar
+
+antenna_pattern AIRBORNE_RADAR_ANTENNA
+   rectangular_pattern
+      peak_gain           35 dB
+      minimum_gain       -20 dB
+      azimuth_beamwidth   10 deg
+      elevation_beamwidth 10 deg
+   end_rectangular_pattern
+end_antenna_pattern
+
+sensor AIRBORNE_RADAR WSF_RADAR_SENSOR
+      #debug
+      frame_time                      1.0 sec
+
+      frequency_select_delay 3.0 sec
+
+      false_target_screener SCREENER WSF_FT_SCREENER
+         track_capacity              100
+         plot_capacity                50
+         transfer_capacity            50
+      end_false_target_screener
+
+      one_m2_detect_range          100.0 nm
+
+      antenna_height               6.0 m
+
+      scan_mode                    azimuth_and_elevation
+      azimuth_scan_limits         -55 deg 55 deg
+
+      jamming_perception_threshold 3.0 dB
+
+      transmitter
+         antenna_pattern           AIRBORNE_RADAR_ANTENNA
+         power                     10000.0 kw
+         pulse_width                  50  usec
+         pulse_repetition_interval    750 usec // max PRI range of 225 km
+         frequency_channels 9200 mhz 10 mhz 9400 mhz
+      end_transmitter
+
+      receiver
+         antenna_tilt              10 deg
+         bandwidth                 2.0 mhz
+
+         electronic_protect
+            technique agility
+               mitigated_technique_classes
+                  NOISE_JAMMING
+                  FALSE_TARGET_JAMMING
+               end_mitigated_technique_classes
+               effect agility_effect WSF_AGILITY_EFFECT
+                  #debug
+                  agility_type frequency_changing
+                  end_agility_type
+               end_effect
+            end_technique
+         end_electronic_protect
+      end_receiver
+
+      required_pd                     0.5
+
+      hits_to_establish_track         2 4
+      hits_to_maintain_track          1 2
+
+      reports_location
+      reports_iff
+end_sensor
+
+# ****************************************************************************
+# Define the platform types
+
+platform_type JAMMER WSF_PLATFORM
+   icon EA-6B
+
+   mover WSF_AIR_MOVER end_mover
+
+   radar_signature WIDE_BODY_SIGNATURE
+
+   weapon jammer JAMMER
+      pitch  0 deg                  // Aim jammer slightly toward the ground
+   end_weapon
+
+   sensor esm ESM_SENSOR
+      internal_link data_mgr
+      internal_link jammer
+      ignore_same_side
+   end_sensor
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+     purge_interval   20.0 sec
+   end_processor
+
+   //processor task_mgr JAMMER_TASK_MGR
+   //end_processor
+end_platform_type
+
+platform_type STRIKER WSF_PLATFORM
+   icon F-18E
+
+   radar_signature FIGHTER_RADAR_SIGNATURE
+
+   mover WSF_AIR_MOVER
+   end_mover
+
+   sensor airborne_radar AIRBORNE_RADAR
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform jammer JAMMER
+   side blue
+
+   route
+      position 37:00:00n 114:30:00w
+      altitude 35000 ft
+      speed      450 kts
+      heading    -90 deg
+   end_route
+
+   sensor esm
+      on
+   end_sensor
+
+   weapon jammer
+      on
+   end_weapon
+end_platform
+/*
+platform striker STRIKER
+   side red
+
+   route
+      position 37:00:00n 115:30:00w
+      altitude 34500 ft
+      speed     450 kts
+      heading   90 deg
+   end_route
+
+   sensor airborne_radar
+      on
+   end_sensor
+end_platform
+*/
+event_output
+   file NULL
+end_event_output
+
+# Specify parameters for a dis_interface record object
+dis_interface
+   exercise    1
+   site        25
+   application 1
+   multicast   224.2.25.55 10.
+   #broadcast 10.
+   port        3225
+   autostart
+
+   heartbeat_timer             5.0 sec
+   heartbeat_multiplier        2.4
+   mover_update_timer          5.0 sec
+   entity_position_threshold   10.0 meters
+
+   debug_emission_pdu 2
+
+   entity_type STRIKER         1:2:225:1:9:10:0
+   entity_type JAMMER          1:2:225:2:10:1:0
+
+   emitter_type JAMMER     1
+   #emitter_type ESM_SENSOR 10
+   emitter_type AIRBORNE_RADAR   11
+
+   ew_technique_type noise_jamming               0
+   ew_technique_type random_pulse_jamming        132
+   ew_technique_type jtos_gain_jamming           136
+   ew_technique_type false_target_jamming        148
+   ew_technique_type simple_false_target_jamming 152
+end_dis_interface
+
+terrain
+   #load_cme_terrain
+end_terrain
+
+end_time 480 sec

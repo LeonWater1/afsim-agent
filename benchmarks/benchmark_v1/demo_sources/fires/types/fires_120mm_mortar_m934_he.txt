@@ -1,0 +1,73 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// source: FM23-91 (Mortar Gunnery): p. 4-17 (Approved for unlimited distribution)
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_120MM_MORTAR_M934_HE_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_table FIRES_120MM_MORTAR_M934_HE
+      range_values             1500 1600  1700  1800  1900  2000  2100  2200  2300  end_range_values
+      time_of_flight_values    41.8 41.7  41.6  41.5  41.4  41.3  41.2  41    40.9  end_time_of_flight_values
+      elevation_angle_values   1410 1397  1383  1370  1356  1342  1328  1314  1299  end_elevation_angle_values
+   end_fires_table
+end_launch_computer
+
+weapon_effects FIRES_120MM_MORTAR_M934_HE_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_120MM_MORTAR_M934_HE WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 2.0 seconds
+   launch_computer
+      FIRES_120MM_MORTAR_M934_HE_LAUNCH_COMPUTER
+   end_launch_computer
+  weapon_effects FIRES_120MM_MORTAR_M934_HE_EFFECTS
+  launched_platform_type FIRES_120MM_MORTAR_M934_HE
+end_weapon
+
+platform_type FIRES_120MM_MORTAR_M934_HE WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_120MM_MORTAR_M934_HE_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   maximum_request_count 100
+   salvo_interval 2.0 seconds
+   launch_computer
+      FIRES_120MM_MORTAR_M934_HE_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_120MM_MORTAR_M934_HE
+  weapon_effects FIRES_120MM_MORTAR_M934_HE_EFFECTS
+end_weapon
+
+platform_type FIRES_120MM_MORTAR_M934_HE_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_120mm_mortar_m934_he FIRES_120MM_MORTAR_M934_HE_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_120MM_MORTAR_M934_HE_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_120mm_mortar_m934_he FIRES_120MM_MORTAR_M934_HE
+   end_weapon
+end_platform_type
+

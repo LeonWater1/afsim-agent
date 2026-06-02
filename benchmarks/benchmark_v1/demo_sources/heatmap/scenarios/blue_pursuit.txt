@@ -1,0 +1,68 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# SEARCH agent
+platform blue_1 STRIKER_PURSUIT
+  side blue
+  icon F-18
+  heading 000 deg
+  commander SELF
+  route
+     position 16:46:51.58s 50:52:00.70e altitude 35000.00 ft speed 450 kts
+     position 16:20:51.58s 50:52:00.70e altitude 35000.00 ft
+  end_route
+
+  edit processor task_mgr
+     edit behavior engage_weapon_task_target
+        script_variables
+           DefaultPercentRangeMax = 0.85;
+        end_script_variables
+     end_behavior
+  end_processor
+
+# Draws lines to current tracks
+# can help visualize what platform is doing
+#  execute at_interval_of 1 sec
+#    WsfLocalTrackList myTracks = PLATFORM.MasterTrackList();
+#    if (myTracks.Count() > 0)
+#    {
+#       WsfGeoPoint myPosition = PLATFORM.Location();
+#       WsfDraw draw = WsfDraw();
+#       draw.SetColor(1,0,1);
+#       draw.SetDuration(1.0);
+#       foreach (WsfLocalTrack track in myTracks)
+#       {
+#          draw.BeginLines();
+#          draw.Vertex(myPosition);
+#          draw.Vertex(track.CurrentLocation());
+#          draw.End();
+#       }
+#    }
+#  end_execute
+
+end_platform
+
+platform red_1 STRIKER
+   commander SELF
+   side red
+   icon weasel
+   route
+      position 16:23:18.22s 50:55:38.32e altitude 35000.00 ft msl speed 500 kts
+        radial_acceleration 2 g
+      position 16:15:06.42s 50:55:34.87e altitude 35000.00 ft msl speed 500 kts
+        radial_acceleration 2 g
+      position 16:03:08.11s 51:13:05.50e altitude 35000.00 ft speed 450 kts
+        radial_acceleration 2 g
+      position 15:46:46.22s 50:52:52.98e altitude 35000.00 ft
+   end_route
+   heading 360 deg
+
+   edit processor task_mgr
+      off
+   end_processor
+end_platform

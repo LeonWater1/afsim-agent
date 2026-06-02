@@ -1,0 +1,56 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+script WsfBMInterceptCalcResult SAM_LaunchComputer(WsfTrack aTrack,
+                                                          WsfPlatform aLauncher,
+                                                          string aEnvelopeName,
+                                                          double aLaunchDelay)
+
+   WsfBMInterceptCalcResult result = WsfBMInterceptCalcResult();
+   result.SetCantIntercept();
+
+   double tgtAlt = aLauncher.RelativeAltitudeOf(aTrack);
+
+   double maxTOF = 0.0;
+   double avgSpd = 0.0;
+   double maxRng = 0.0;
+   double shootDelay = 0.0;
+
+   # simple wpn-spd data for now
+   maxTOF = 27.0;
+   avgSpd = 2643.0 * 1852.0 / 3600.0; # kts -> m/sec
+   maxRng = maxTOF * avgSpd;
+
+   WsfWaypoint intercept = WsfWaypoint();
+   # the battle managers will send us a track that is already projected to the time they want to test
+   # so use the non-projecting versions provided by the C2 plugins.
+   double tti = WsfBMUtils.InterceptLocation2DNoProject(aTrack, aLauncher, intercept, avgSpd);
+
+   if ((tti > 0.0) && (tti < maxTOF))
+   {
+      # don't introduce zones at this point - just mark as capable
+      result.SetCanIntercept (true);
+      result.SetTTI (tti);
+
+      double lat = intercept.Latitude();
+      double lon = intercept.Longitude();
+      WsfGeoPoint point;
+      point = point.Construct(lat, lon, tgtAlt);
+      result.SetPredPoint (point);
+
+      result.SetWeaponMaxRange (maxRng);
+      result.SetEstimatedPK (0.7);
+   }
+
+   return result;
+end_script

@@ -1,0 +1,49 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+include_once weapons/agm/blue_gps_bomb_1.txt
+
+include_once signatures/uav_optical_sig.txt
+include_once signatures/uav_infrared_sig.txt
+include_once signatures/uav_radar_sig.txt
+
+include_once processors/uav_weapon_release.txt
+
+include_once cyber/cyber_protections/altitude_protect.txt
+
+platform_type UAV WSF_PLATFORM
+  # indestructible
+   icon x-45c
+   side blue
+   
+   cyber_protect ALTITUDE_PROTECT
+   end_cyber_protect
+   
+   radar_signature UAV_RADAR_SIG
+   infrared_signature UAV_INFRARED_SIG
+   optical_signature UAV_OPTICAL_SIG
+   
+   mover WSF_AIR_MOVER 
+      maximum_climb_rate 900.8 m/s
+      maximum_impact_speed 0 mph
+   end_mover
+   
+   weapon blue_gps_bomb_1 BLUE_GPS_BOMB_1
+      quantity 2
+   end_weapon
+   
+   processor fire-em BOMBER_WEAPON_RELEASE 
+   end_processor
+   
+end_platform_type
+
+
+

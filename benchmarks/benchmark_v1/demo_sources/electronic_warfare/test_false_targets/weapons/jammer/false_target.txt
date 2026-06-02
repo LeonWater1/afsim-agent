@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+false_target FALSE_TARGET_1 WSF_FALSE_TARGET
+  quantity               250
+
+  multi_radar_behavior consistent_to_multiple_radars
+  #multi_radar_behavior random_to_multiple_radars
+
+  false_target_behavior  consistent_scan_to_scan
+  #false_target_behavior  random_scan_to_scan
+
+  scan_time 10 sec
+
+  distribution_centroid
+    position 39:22:36n 117:33:25w
+    altitude 30000.0 ft agl
+    heading 0 deg
+    speed 0 kts
+  end_distribution_centroid
+
+  distribution
+    bearing_reference       jammer
+    radius      200 km
+    sector_arc  360 deg
+  end_distribution
+
+  false_target_movement
+     speeds     0 kts 0 kts
+     headings -90 deg -90 deg
+     #reference jammer
+  end_false_target_movement
+
+  range_constrained  false
+  persistence        1.0
+end_false_target

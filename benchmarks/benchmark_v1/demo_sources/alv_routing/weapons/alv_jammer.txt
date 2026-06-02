@@ -1,0 +1,80 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+antenna_pattern ALV_JAMMER_ANTENNA
+      sine_pattern
+      peak_gain             10.0 db
+      minimum_gain         -20.0 db
+      azimuth_beamwidth     20.0 deg
+      elevation_beamwidth   20.0 deg
+   end_sine_pattern
+end_antenna_pattern
+
+electronic_warfare ALV_EA WSF_ELECTRONIC_ATTACK
+   technique noise_jamming WSF_EA_TECHNIQUE
+      mitigation_class noise_jamming
+      effect noise_effect WSF_POWER_EFFECT
+         jamming_delta_gain 0 dB
+      end_effect
+   end_technique
+
+   technique random_pulse_jamming WSF_EA_TECHNIQUE
+      mitigation_class pulse_jamming
+      effect rpj_effect WSF_RPJ_EFFECT
+         system_type_data default
+            jamming_pulse_density 0.15
+            minimum_jammer_to_noise_threshold 0.0 dB
+            jammer_gain_table
+               jammer_to_noise_ratio 10.0 dB
+                  pulse_density_to_jamming_gain 0.05 11.0 dB
+                   pulse_density_to_jamming_gain 0.2  8.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+               jammer_to_noise_ratio 5.0 dB
+                  pulse_density_to_jamming_gain 0.05 8.0 dB
+                  pulse_density_to_jamming_gain 0.2  5.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+               jammer_to_noise_ratio 0.0 dB
+                  pulse_density_to_jamming_gain 0.05 5.0 dB
+                  pulse_density_to_jamming_gain 0.2   2.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+            end_jammer_gain_table
+         end_system_type_data
+      end_effect
+   end_technique
+end_electronic_warfare
+
+weapon ALV_JAMMER WSF_RF_JAMMER
+   maximum_range             200 km
+
+   maximum_number_of_beams   2
+   beam_power_distribution   average
+
+   maximum_spots_per_beam    2
+   spot_power_distribution   average
+
+   azimuth_field_of_view    -90.0 deg 90.0 deg
+   elevation_field_of_view  -90.0 deg 90.0 deg
+
+  slew_mode                    azimuth_and_elevation
+  azimuth_slew_limits          -80.0 deg 80.0 deg
+  elevation_slew_limits        -80.0 deg 80.0 deg
+
+   transmitter
+      antenna_pattern         ALV_JAMMER_ANTENNA
+      frequency_band          30 mhz 3000 mhz
+      power                   100.0 w
+      internal_loss           0.0 db
+
+      electronic_attack ALV_EA end_electronic_attack
+   end_transmitter
+end_weapon

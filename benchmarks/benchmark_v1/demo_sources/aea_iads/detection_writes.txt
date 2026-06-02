@@ -1,0 +1,64 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+script_variables
+   global Set< string > mPlatformTypes = Set< string >();
+
+   global FileIO mSensorDetectFile = FileIO();
+
+   global string mSensorFileName = "sensor_detection_data.txt";
+
+end_script_variables
+
+on_initialize
+   if (! mSensorDetectFile.Open(mSensorFileName, "out"))
+   {
+      writeln("Could not open file: ", mSensorFileName);
+   }
+   string header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mSensorDetectFile.Writeln(header);
+
+   #Fill in platform names of interest
+   mPlatformTypes.Clear();
+   mPlatformTypes.Insert("EW_RADAR");
+   mPlatformTypes.Insert("ACQ_RADAR");
+   mPlatformTypes.Insert("TTR_RADAR");
+end_on_initialize
+
+script bool FindStr(Array<string> aArray, string aKey)
+   foreach (string key in aArray)
+   {
+      if (key == aKey)
+      {
+         return true;
+      }
+   }
+end_script
+
+script void SensorDetectionAttempt(WsfPlatform aPlatform, WsfSensor aSensor, WsfPlatform aTarget, WsfSensorInteraction aResult)
+   if (mPlatformTypes.Exists(aPlatform.Type()))
+   {
+      WsfEW_Effects effects = aResult.EW_Effects();
+      int mask = effects.Mask();
+      bool cohCheck = effects.EA_CoherencyCheck("noise");
+      double myValue1 = effects.EffectValue("jamming", "blanking");
+      double myValue2 = effects.EffectValue("jamming", "cancellation");
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorDetectionAttempt",
+                                  ",", aPlatform.Name(),
+                                  //",", aResult.Failed(),
+                                  //",", cohCheck,
+                                  ",", myValue1,
+                                  ",", myValue2);
+      mSensorDetectFile.Writeln(mystring);
+   }
+end_script
+
+observer
+   enable SENSOR_DETECTION_ATTEMPT SensorDetectionAttempt
+end_observer

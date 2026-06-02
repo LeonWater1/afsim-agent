@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+advanced_behavior rtb
+   
+   script_variables
+      bool reachedBase = false;
+      bool commandIssued = false;
+   end_script_variables
+
+   precondition
+      return Success();
+   end_precondition
+   
+   execute
+      if (reachedBase)
+      {
+         return Success("Successfully returned to base!");
+      }
+      
+      if (PLATFORM.GroundRangeTo(WsfSimulation.FindPlatform("Blue_Base")) < 10000)
+      {
+         reachedBase = true;
+         PLATFORM.Pause(6000);
+         return Success("Successfully returned to base!");
+      }
+      
+      if (!commandIssued)
+      {
+         commandIssued = true;
+         FlyTarget(PLATFORM, WsfSimulation.FindPlatform("Blue_Base").Location(), 450);
+      }
+      return Running("Returning to base.");
+   end_execute
+   
+end_advanced_behavior

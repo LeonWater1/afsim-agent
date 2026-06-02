@@ -1,0 +1,16 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# A setup file typically defines the platform types that are used in the scenario
+include_once platforms/common.txt
+#include_once platforms/fuser_platform1.txt # script method example
+include_once platforms/fuser_platform2.txt  # direction processor example
+include_once platforms/geometric_bearing_only_sensor_platform.txt
+include_once platforms/commander_platform.txt
+include_once platforms/air_target.txt
+

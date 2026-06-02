@@ -1,0 +1,40 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+dis_interface
+
+   entity_type TARGET                                  2:1:222:2:1:1:0
+   entity_type ACQ_RADAR                               9:1:222:2:2:3:0
+   entity_type EW_RADAR                                9:1:222:2:2:2:0
+   entity_type LARGE_SAM_TTR                           1:1:222:28:4:3:0
+   entity_type LARGE_SAM_LAUNCHER                      1:1:222:28:4:2:0
+   entity_type LARGE_SAM_BATTALION                     1:1:222:7:0:0:0
+   entity_type IADS_CMDR                               1:1:225:0:5:0:0
+   entity_type RADAR_COMPANY                           1:1:222:7:6:0:0
+   entity_type BLUE_MULTIROLE_FIGHTER_1E               1:2:225:1:9:10:0
+   entity_type SOJ                                     1:2:225:6:9:2:0   
+   #entity_type UCAV                                   1:2:225:50:8:0:0 # UCAV
+   entity_type UCAV                                    1:2:225:1:9:10:0  
+
+   entity_type LARGE_SAM           2:1:225:1:16:0:0
+
+   entity_type BLUE_GPS_BOMB_2              2:1:225:1:13:1:0
+   entity_type BLUE_GPS_BOMB_1              2:1:225:1:13:2:0
+   entity_type BLUE_GLIDE_BOMB_1            2:1:225:1:13:2:1
+
+   emitter_type SOJ_SBAND_JAMMER 1
+   emitter_type SOJ_VHF_JAMMER   2
+   emitter_type SOJ_XBAND_JAMMER 3
+
+   emitter_type UCAV_ESM 10
+
+   emitter_type EW_RADAR  11
+   emitter_type TTR_RADAR 12
+   emitter_type ACQ_RADAR 13
+
+end_dis_interface

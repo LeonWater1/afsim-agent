@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once ../weapons/agm/leader_agm.txt
+include_once ../weapons/agm/client_agm.txt
+platform_type  BOMBER  WSF_PLATFORM
+   icon C-17
+   mover WSF_AIR_MOVER end_mover
+   weapon leader_agm LEADER_AGM
+      quantity 1
+   end_weapon
+   weapon client_agm CLIENT_AGM
+      quantity 1  # gets changed in the scenario
+   end_weapon
+end_platform_type
+

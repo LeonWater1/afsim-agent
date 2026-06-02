@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+
+platform target_1 TARGET
+   position 38:51:42.411n 90:25:57.064w
+end_platform
+
+platform cyber_command_post_1 CYBER_COMMAND_POST
+   position 38:48:46.960n 90:17:43.609w
+   icon c4i
+   commander SELF
+end_platform
+
+platform ground_radar_1 GROUND_RADAR
+   position 38:47:59.857n 90:16:40.107w
+   heading 90 degrees
+   commander cyber_command_post_1
+   sensor ground_radar 
+      off
+   end_sensor
+end_platform
+
+platform spotter_1 SPOTTER
+   commander ground_radar_1
+   position 38:53:05.558n 90:21:52.435w
+end_platform

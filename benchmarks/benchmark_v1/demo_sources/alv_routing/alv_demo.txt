@@ -1,0 +1,107 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+##### UNCLASSIFIED #####
+# D. Schueths 6/27/2017
+# Shows how to apply a route to a guided mover
+######################
+
+define_path_variable CASE alv_demo
+log_file output/$(CASE).log
+
+include setup.txt
+
+event_pipe file output/$(CASE).aer end_event_pipe
+event_output file output/$(CASE).evt end_event_output
+
+// Take note that the ALV routes are external to the platform (global)
+route bogus_route_1  # ALV route 1
+   position 39:16:57.69n 87:09:26.66w altitude 37000.00 ft msl #speed 500 knots (speed set in guidance computer)
+   position 40:13:18.92n 89:22:09.13w altitude 35000.00 ft msl #speed 450 knots
+   position 39:51:00.01n 90:35:21.10w altitude 35000.00 ft msl #speed 400 knots
+end_route
+
+route bogus_route_2  # ALV route 2
+   position 39:17:21.57n 89:04:41.24w altitude 36000.00 ft msl #speed 500 knots
+   position 39:53:18.75n 91:00:51.95w altitude 35000.00 ft msl #speed 450 knots
+end_route
+
+route final_route
+   position 39:46:13.97n 92:07:27.91w
+   position 39:33:10.21n 92:08:00.10w
+   position 39:32:14.44n 91:07:44.61w
+   position 39:47:58.27n 91:07:52.76w
+   position 39:53:07.00n 91:52:44.37w
+end_route
+
+platform threat-ew-1 EW_RADAR_SITE
+   side red
+   position 39:31:42.42n 91:38:35.111w
+
+   sensor ew-radar-1
+      off
+   end_sensor
+
+   execute at_time 1 minutes absolute
+      PLATFORM.TurnSensorOn("ew-radar-1");
+   end_execute
+
+end_platform
+
+platform awacs-1 AWACS
+   side blue
+   command_chain GOOD_GUYS SELF
+
+   route
+      label awacs_loiter
+      position 41:34:32.15n 89:12:49.08w altitude 35000.00 ft speed 450 kts
+      position 42:34:31.97n 89:13:40.29w
+      position 42:34:32.11n 88:42:27.79w
+      position 41:34:32.11n 88:42:28.54w
+      goto awacs_loiter
+   end_route
+  heading 359 deg
+
+   sensor esm-1
+     on
+   end_sensor
+
+   execute at_time 5 minutes absolute
+     # PLATFORM.TurnSensorOn("esm-1"); # Turn on the ground radar system instead...
+   end_execute
+
+   processor track-proc
+      report_to command_chain GOOD_GUYS subordinates via xmtr-1 to rcvr-1
+   end_processor
+end_platform
+
+platform strike-1 FIGHTER_BOMBER
+   side blue
+   command_chain GOOD_GUYS awacs-1
+
+   route
+      label Loiter_Cap
+      position 39:12:32.96n 83:59:04.84w altitude 40000.00 ft msl speed 250 kts
+      position 39:18:28.95n 83:58:21.90w altitude 40000.00 ft agl speed 270 kts
+      position 39:22:40.95n 83:57:37.59w altitude 40000.00 ft speed 400 kts
+      position 39:33:04.96n 83:52:17.31w altitude 40000.00 ft
+      position 39:30:16.95n 83:37:40.98w
+      position 39:20:46.95n 83:33:33.22w altitude 40000.00 ft speed 250 kts
+      position 39:08:16.96n 83:40:06.06w altitude 40000.00 ft agl speed 220 kts
+      goto Loiter_Cap
+   end_route
+
+  heading 5 deg
+
+  add weapon alv ALV_WEAPON
+     quantity 2
+     firing_interval 4 sec
+  end_weapon
+end_platform
+
+end_time 2.0 hr

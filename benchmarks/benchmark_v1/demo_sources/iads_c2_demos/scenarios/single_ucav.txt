@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 100_ucav UCAV
+   side blue
+   commander SELF
+   route
+      position 38:14:46.0n 114:01:56.0w altitude 35000 ft msl speed 460 kts
+      position 38:14:46.0n 118:44:19.0w altitude 35000 ft msl speed 400 kts
+   end_route
+end_platform

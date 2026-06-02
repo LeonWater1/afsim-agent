@@ -1,0 +1,20 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+xio_interface
+   multicast 235.7.11.27 10.
+   #broadcast 10.
+   port 3002
+   connect_to_simulations
+   auto_dis_mapping yes
+   time_to_live 8
+
+   #verbose true
+   #debug true
+end_xio_interface

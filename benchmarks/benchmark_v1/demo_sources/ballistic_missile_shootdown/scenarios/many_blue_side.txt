@@ -1,0 +1,64 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# UNCLASSIFIED
+platform blue_naval_sam_battery_01 BLUE_NAVAL_SAM_BATTERY
+  commander SELF
+  side blue
+  icon close-sam_cdr
+  position 39:43:45.97n 76:33:04.76w
+end_platform
+
+platform blue_naval_sam_launcher_01 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:44:35.76n 76:33:10.07w
+  weapon blue_naval_sam
+     quantity 4
+  end_weapon
+end_platform
+platform blue_naval_sam_launcher_02 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:44:07.55n 76:31:50.90w
+end_platform
+platform blue_naval_sam_launcher_03 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:43:20.75n 76:32:04.70w
+end_platform
+platform blue_naval_sam_launcher_04 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:43:04.84n 76:33:26.69w
+end_platform
+platform blue_naval_sam_launcher_05 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:43:58.34n 76:33:50.58w
+end_platform
+
+platform blue_naval_sam_launcher_06 BLUE_NAVAL_SAM_LAUNCHER
+  commander blue_naval_sam_battery_01
+  side blue
+  icon PAC-3_Launcher
+  position 39:43:58.39n 76:33:50.56w
+end_platform
+
+platform blue_abm_ttr_01 BLUE_ABM_TTR
+  commander blue_naval_sam_battery_01
+  side blue
+  position 39:43:46.64n 76:32:38.11w
+  heading 340 deg
+  icon Ground_Radar
+end_platform

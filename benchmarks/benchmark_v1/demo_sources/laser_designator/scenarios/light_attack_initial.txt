@@ -1,0 +1,132 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform blue_ground_troop-JTAC SOLDIER_JTAC
+  side blue
+  commander SELF
+  heading 265 deg
+  position 45:02:22.16n 121:47:56.00w altitude 10.00 ft agl
+  #position 45:02:20.88n 121:47:56.93w altitude 12.00 ft agl
+  processor CMDR_TASK_MGR
+     script_variables
+        DRAW_DESIGNATE_BEAM  = true; # draws the lasing beam from the forward observer
+     end_script_variables
+  end_processor
+end_platform
+
+platform blue_ground_troop-1 SOLDIER
+  side blue
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:18.33n 121:47:53.35w altitude 6.00 ft agl
+end_platform
+
+platform blue_ground_troop-3 SOLDIER
+  side blue  
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:19.80n 121:47:54.78w altitude 6.00 ft agl
+end_platform
+
+platform blue_ground_troop-4 SOLDIER
+  side blue
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:25.05n 121:47:52.53w altitude 6.00 ft agl
+end_platform
+
+platform blue_ground_troop-5 SOLDIER
+  side blue
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:20.12n 121:47:55.86w altitude 6.00 ft agl
+end_platform
+
+platform blue_ground_troop-6 SOLDIER
+  side blue
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:20.88n 121:47:56.93w altitude 6.00 ft agl
+end_platform
+
+platform blue_ground_troop-2 SOLDIER
+  side blue
+  commander blue_ground_troop-JTAC
+  heading 265 deg
+  position 45:02:23.91n 121:47:54.09w altitude 10.00 ft agl
+end_platform
+#################################################################################
+
+platform red_ground_troop-1 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:08.51n 121:48:54.19w altitude 6.00 ft msl
+  heading 83 deg
+  route
+    position 45:02:08.51n 121:48:54.19w altitude 6.00 ft msl speed 2 kts
+    position 45:02:10.15n 121:48:35.78w altitude 6.00 ft agl
+  end_route
+end_platform
+
+platform red_ground_troop-3 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:09.77n 121:48:52.88w altitude 6.00 ft msl
+  heading 85 deg
+  route
+    position 45:02:09.77n 121:48:52.88w altitude 6.00 ft msl speed 2 kts
+    position 45:02:10.84n 121:48:34.38w altitude 6.00 ft agl
+  end_route
+end_platform
+
+platform red_ground_troop-4 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:11.05n 121:48:51.57w altitude 6.00 ft msl
+  heading 87 deg
+  route
+    position 45:02:11.05n 121:48:51.57w altitude 6.00 ft msl speed 2 kts
+    position 45:02:11.55n 121:48:36.46w altitude 6.00 ft agl
+  end_route
+end_platform
+
+platform red_ground_troop-5 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:12.31n 121:48:50.27w altitude 6.00 ft msl
+  heading 89 deg
+  route
+    position 45:02:12.31n 121:48:50.27w altitude 6.00 ft msl speed 2 kts
+    position 45:02:12.56n 121:48:35.88w altitude 6.00 ft agl
+  end_route
+end_platform
+
+platform red_ground_troop-6 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:12.30n 121:48:52.88w altitude 6.00 ft msl
+  heading 86 deg
+  route
+    position 45:02:12.30n 121:48:52.88w altitude 6.00 ft msl speed 2 kts
+    position 45:02:13.03n 121:48:38.19w altitude 6.00 ft agl
+  end_route
+end_platform
+
+platform red_ground_troop-2 SOLDIER
+  side red
+  #icon mil_GroundCombat
+  position 45:02:08.77n 121:48:50.23w altitude 6.00 ft msl
+  heading 84 deg
+  route
+    position 45:02:08.77n 121:48:50.23w altitude 6.00 ft msl speed 2 kts
+    position 45:02:09.97n 121:48:34.39w altitude 6.00 ft agl
+  end_route
+end_platform
+
+

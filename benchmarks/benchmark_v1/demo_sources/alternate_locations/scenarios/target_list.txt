@@ -1,0 +1,48 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform target_1 TARGET
+  side blue
+  icon Bullseye_team
+  #position 30:30:00.00n 81:41:00.00w
+  
+  alternate_locations reference sam-1
+     offset_ara 0 deg 11 nm altitude 0 m
+  end_alternate_locations
+end_platform
+
+platform target_2 TARGET
+  side blue
+  icon Bullseye_team
+  #position 30:18:23.10n 81:29:13.79w
+
+   alternate_locations
+     offset_ara 90 deg 11 nm altitude 0 m reference sam-1
+  end_alternate_locations
+end_platform
+
+platform target_3 TARGET
+  side blue
+  icon Bullseye_team
+#  position 30:06:46.36n 81:41:01.00w
+
+   alternate_locations
+     offset_lla 0:00n 0:15w altitude 0 m heading 0 deg reference sam-1
+  end_alternate_locations
+end_platform
+
+platform target_4 TARGET
+  side blue
+  icon Bullseye_team
+#  position 30:17:57.00n 81:53:16.28w
+
+   alternate_locations reference sam-1
+     offset_lla 0.2s 0.0w altitude 10 m heading 12 rad
+  end_alternate_locations
+end_platform

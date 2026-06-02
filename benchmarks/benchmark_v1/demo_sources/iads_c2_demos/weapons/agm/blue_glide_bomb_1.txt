@@ -1,0 +1,95 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+#  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  #
+#  All information below is representative only,   #
+#  and is estimated or obtained from open sources. #
+#  It is not yet substantiated or corroborated by  #
+#  definitive data.                                #
+#  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  #
+
+# -------------------------
+
+radar_signature BLUE_GLIDE_BOMB_1_RADAR_SIGNATURE
+   constant 1 m^2
+end_radar_signature
+
+aero BLUE_GLIDE_BOMB_1_AERO WSF_AERO
+  cd_zero_subsonic    0.150
+  cd_zero_supersonic  0.220
+  mach_begin_cd_rise  0.850
+  mach_end_cd_rise    1.150
+  mach_max_supersonic 2.000
+  reference_area      0.028 m2 # 19cm body dia
+  cl_max              7.000    # unknown
+  aspect_ratio        4.000    # unknown
+  oswalds_factor      0.950    # unknown
+end_aero
+
+# -------------------------
+
+platform_type BLUE_GLIDE_BOMB_1 WSF_PLATFORM
+   icon gbu-15
+   #radar_signature BLUE_GLIDE_BOMB_1_RADAR_SIGNATURE
+
+   mover WSF_GUIDED_MOVER
+      aero BLUE_GLIDE_BOMB_1_AERO
+      mass 250.0 lbm
+      update_interval 0.5 s
+      #debug
+      #show_trajectory
+   end_mover
+
+   processor guidance_computer WSF_GUIDANCE_COMPUTER
+      proportional_navigation_gain 10.0
+      velocity_pursuit_gain        10.0
+      g_bias                        1.0
+      maximum_commanded_g              25.0 g
+      guidance_delay                0.0 sec
+      #debug
+   end_processor
+
+   processor fuse WSF_GROUND_TARGET_FUSE
+      max_time_of_flight_to_detonate  900.0 sec
+#      gross_proximity_range           150.0 m
+#      hit_proximity_range              15.0 m
+#      proximity_cancel_on_loss_of_target
+   end_processor
+end_platform_type
+
+# -------------------------
+
+weapon_effects BLUE_GLIDE_BOMB_1_EFFECTS WSF_SPHERICAL_LETHALITY
+  # Note:  Does not consider the hardness of any target.  All are treated the same.
+  minimum_radius  30.0 ft # largest blast radius at which damage inflicted is maximum.
+  maximum_damage   1.0    # maximum damage level achievable upon the target.
+  maximum_radius 100.0 ft # blast radius beyond which the damage inflicted is Zero.
+  minimum_damage   0.05   # damage level acheived at the maximum radius.
+  threshold_damage 0.20   # initial damage level which must be acheived
+                          # before effects begin to accumulate upon the target
+  exponent         1.00   # exponent of proportionality of damage with radius.
+                          # ( e = 1.0 ==> linear damage within blast region,
+                          #   e > 1.0 ==> more damaging within the blast region,
+                          #   0.0 < e < 1.0 ==> less damaging within blast region. )
+end_weapon_effects
+
+# -------------------------
+
+weapon BLUE_GLIDE_BOMB_1 WSF_EXPLICIT_WEAPON
+   launched_platform_type BLUE_GLIDE_BOMB_1
+   aux_data
+      double lar_meters = 74080 # meters = 40 nm
+   end_aux_data
+
+   weapon_effects         BLUE_GLIDE_BOMB_1_EFFECTS
+end_weapon

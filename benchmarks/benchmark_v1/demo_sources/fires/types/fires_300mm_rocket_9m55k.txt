@@ -1,0 +1,97 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// 227 mm rocket for m26 (MLRS)
+// source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+// Note: The fuse time is given instead of impact time
+// (this is documented to be impact time -3.4 s).
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_300MM_9M55K_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_300MM_9M55K
+      19000 7.4 23.8
+      20000 7.9 25.3
+      21000 8.3 27.0
+      22000 8.9 28.7
+      23000 9.4 30.4
+      24000 10.0 32.2
+      25000 10.6 34.0
+      26000 11.2 35.9
+      27000 11.8 37.8
+      28000 12.4 39.7
+      29000 13.1 41.7
+      30000 13.8 43.8
+      31000 14.5 45.9
+      32000 15.2 47.9
+      33000 16.0 50.1
+      34000 16.7 52.2
+      35000 17.5 54.4
+      36000 18.2 56.5
+      37000 19.0 58.7
+      38000 19.8 60.9
+      39000 20.6 63.3
+      40000 21.4 65.3
+      41000 22.3 67.6
+      42000 23.1 69.8
+      43000 23.9 72.0
+      44000 24.7 74.2
+      45000 25.5 76.4
+      46000 26.3 78.6
+      47000 27.1 80.8
+      48000 28.0 83.1
+      49000 29.6 87.4
+      51000 30.4 89.5
+      52000 31.2 91.6
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_300MM_9M55K_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_300MM_9M55K WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 2.0 seconds
+   launch_computer
+      FIRES_300MM_9M55K_LAUNCH_COMPUTER
+   end_launch_computer
+   weapon_effects FIRES_300MM_9M55K_EFFECTS
+   launched_platform_type FIRES_300MM_9M55K
+end_weapon
+
+platform_type FIRES_300MM_9M55K WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_300MM_9M55K_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   launch_computer
+      FIRES_300MM_9M55K_LAUNCH_COMPUTER
+   end_launch_computer
+   salvo_interval 5.0 seconds
+   launched_platform_type FIRES_300MM_9M55K
+  weapon_effects FIRES_300MM_9M55K_EFFECTS
+end_weapon
+
+platform_type FIRES_300MM_9M55K_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_300MM_ROCKET_9M55K FIRES_300MM_9M55K_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_300MM_9M55K_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_300MM_ROCKET_9M55K FIRES_300MM_9M55K
+   end_weapon
+end_platform_type

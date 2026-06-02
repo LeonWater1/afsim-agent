@@ -1,0 +1,91 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once sensors/radar/ttr_radar.txt
+
+platform_type LARGE_SAM_TTR WSF_PLATFORM
+   icon Flap_Lid
+   category FIRE_CONTROL
+
+   comm datalink RED_DATALINK
+     network_name <local:slave>
+     internal_link task_mgr
+   end_comm
+
+   sensor ttr TTR_RADAR
+     off
+     #debug
+     #debug_scheduler
+     internal_link data_mgr
+     ignore_same_side
+   end_sensor
+
+   processor data_mgr WSF_LINKED_PROCESSOR
+      report_to commander via datalink
+   end_processor
+
+   processor task_mgr WSF_TASK_PROCESSOR
+      #show_state_transitions
+      #show_task_messages
+   end_processor
+
+   aux_data
+      double max_range = 64820 # meters = 35 nm
+      double pk = .7
+   end_aux_data
+
+   script_variables
+      # Create a WsfDraw object.
+      WsfDraw draw = WsfDraw();
+   end_script_variables
+
+   execute at_interval_of 0.025 s
+
+      foreach (WsfTrack track in MasterTrackList())
+      {
+         if (track.IsValid())
+         {
+           if (track.IsFalseTarget())
+           {
+              //writeln("TTR ", track.TargetName(), "  ", track.Latitude(), "  ", track.Longitude()
+              //        , "  ", track.Altitude());
+              # use the track ID as a unique draw ID
+              # a track icon and a line to the track icon
+              # is drawn at each track update
+              string trackId = track.TrackId().ToString();
+              draw.SetId(trackId);
+              draw.SetDuration(0.25); # this is faster than calling erase every time
+
+              # Draw a track icon
+              draw.SetColor(1,0,0);
+              draw.SetPointSize(0.25);
+              draw.SetLineSize(0.25);
+              //writeln("Heading: ", track.Heading(), " deg");
+              draw.BeginIcons(track.Heading(), "Wedge");
+                 draw.Vertex(track.CurrentLocation());
+              draw.End();
+
+              draw.SetLineStyle("solid");
+              draw.SetLineSize(3);
+
+              # Draw a line to the track
+              draw.BeginLines();
+                 draw.Vertex(PLATFORM);
+                 draw.Vertex(track.CurrentLocation());
+              draw.End();
+           }
+         }
+      }
+   end_execute
+
+end_platform_type

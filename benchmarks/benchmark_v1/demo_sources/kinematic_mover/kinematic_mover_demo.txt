@@ -1,0 +1,227 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# *   ******      UNCLASSIFIED        ******   *
+# Kinematic Mover Demo
+# This demo has three platforms using the same route (just offset from each other) but have different
+# limits using the kinematic mover. Flyer4 is the same as Flyer3 but uses the WSF_AIR_MOVER
+# to illustrate the difference between the AIR MOVER vs the KINEMATIC MOVER.
+# Keep in mind that the KINEMATIC MOVER  calculates acceleration in the
+# vertical plane whereas the AIR MOVER does not (only in the horizontal plane).
+# After running, view the replay file with tracelines on to view the
+# differences.
+# Note that the mover update time interval is 0.1 secs which make larger
+# replay files sizes.
+
+event_pipe
+   file kinematic_mover_demo.aer
+end_event_pipe
+
+end_time 200 min
+
+# platform with kinematic mover...
+platform_type   FLYER    WSF_PLATFORM
+  icon F-15
+  side blue
+  spatial_domain air
+  mover WSF_KINEMATIC_MOVER
+  end_mover
+end_platform_type
+
+# platform with air mover...
+platform_type   AIRFLYER  WSF_PLATFORM
+  icon F-18
+  side blue
+  spatial_domain air
+  mover WSF_AIR_MOVER
+  end_mover
+end_platform_type
+
+processor VARY_DIR_ALT WSF_SCRIPT_PROCESSOR # Just to make the platform do something
+   script_variables
+      double COMMANDED_HEIGHT_ABOVE_TERRAIN = 5000;
+      double HEIGHT_TOLERANCE               = 100;
+   end_script_variables
+   update_interval 10.0 sec
+   on_update
+      WsfGeoPoint FutureLocation  = PLATFORM.Location();
+      double CurrentAltAGL  = PLATFORM.HeightAboveTerrain();
+      double CurrentSpeed   = PLATFORM.Speed();
+      double CurrentAltMSL  = PLATFORM.Altitude();
+      double MaxRate        = 100;
+      double Rate           =  50;
+      double NewAlt         = CurrentAltMSL + 20000;
+      double staticAlt      = 4000;
+      if (TIME_NOW >  25 && TIME_NOW < 35)
+      {
+      PLATFORM.GoToAltitude(NewAlt); # Alt, Rate, stay on route
+      }
+      if (TIME_NOW >  100 && TIME_NOW < 120)
+            {
+            PLATFORM.GoToAltitude(staticAlt); # Alt
+      }
+      if (TIME_NOW >  200 && TIME_NOW < 220)
+      PLATFORM.ReturnToRoute();
+   end_on_update
+end_processor
+
+platform flyer1 FLYER
+    position 33:54:44.51n 83:20:16.78w altitude 32808.40 ft
+
+    mover
+      #detailed_debug true
+      initial_speed          250 kts
+      initial_flight_path_angle 5 deg
+      target_speed           210 kts
+      maximum_linear_acceleration  1.4 g
+      maximum_radial_acceleration 4.0 g
+      maximum_body_turn_rate  65 deg/sec
+      maximum_body_roll_rate  80 deg/sec
+      proportional_navigation_gain 10.0
+      velocity_pursuit_gain        30.0
+      update_interval 0.1 sec
+    end_mover
+
+    route
+        label begin
+        position 33:54:44.51n 83:20:16.78w altitude 32808.40 ft speed 200 kts
+        position 33:54:20.38n 83:20:36.86w altitude 29527.56 ft speed 210 kts
+        position 33:54:47.86n 83:21:11.54w altitude 25965.88 ft  speed 180 kts
+        position 33:56:39.14n 83:21:36.47w altitude 25685.04 ft  speed 210 kts
+        position 33:56:27.61n 83:22:50.54w altitude 23246.72 ft
+        position 33:57:01.69n 83:21:55.05w altitude 24685.04 ft  speed 300 kts
+        position 33:56:58.70n 83:21:10.76w altitude 26246.72 ft speed 200 kts
+        position 33:55:00.49n 83:20:57.03w altitude 22685.04 ft speed 210 kts
+        position 33:57:11.21n 83:20:31.00w altitude 29685.04 ft speed 200 kts
+        go_to begin
+
+     end_route
+
+     add processor thingy VARY_DIR_ALT end_processor
+     heading 215 deg
+end_platform
+
+platform flyer2 FLYER
+    position 33:58:17.63n 83:14:40.49w altitude 32808.40 ft
+
+   mover
+      #detailed_debug true
+      initial_speed          250 kts
+      initial_flight_path_angle 5 deg
+      target_speed           210 kts
+      maximum_linear_acceleration  1.4 g
+      maximum_radial_acceleration 2.2 g  # about 2.5 g total...
+      maximum_body_turn_rate  50 deg/sec
+      maximum_body_roll_rate  45 deg/sec
+      proportional_navigation_gain 30.0
+      velocity_pursuit_gain        30.0
+      update_interval 0.1 sec
+   end_mover
+      route
+
+    label begin
+    position 33:58:17.63n 83:14:40.49w altitude 32808.40 ft
+    speed 200 kts
+    position 33:57:53.50n 83:15:01.07w altitude 29527.56 ft
+    speed 210 kts
+    position 33:58:20.98n 83:15:35.77w altitude 25965.88 ft
+    speed 180 kts
+    position 34:00:12.26n 83:16:00.72w altitude 25685.04 ft
+    speed 210 kts
+    position 34:00:00.73n 83:17:14.84w altitude 23246.72 ft
+    position 34:00:34.81n 83:16:19.31w altitude 24685.04 ft  speed 300 kts
+    position 34:00:31.82n 83:15:34.99w altitude 26246.72 ft
+    speed 200 kts
+    position 33:58:33.61n 83:15:21.25w altitude 22685.04 ft
+    speed 210 kts
+    position 34:00:44.33n 83:14:55.21w altitude 29685.04 ft
+    speed 200 kts
+    goto begin
+      end_route
+
+  heading 215 deg
+  side blue
+  icon F-15
+end_platform
+
+platform flyer3 FLYER
+    position 34:00:05.33n 83:12:52.77w altitude 32808.40 ft
+
+   mover
+      #detailed_debug true
+      initial_speed          250 kts
+      initial_flight_path_angle 5 deg
+      target_speed           210 kts
+      maximum_linear_acceleration  1.4 g
+      maximum_radial_acceleration 2.2 g
+      maximum_body_turn_rate  120 deg/sec
+      maximum_body_roll_rate  90 deg/sec
+      proportional_navigation_gain 30.0
+      velocity_pursuit_gain        30.0
+      update_interval 0.1 sec
+   end_mover
+   route
+
+    label begin
+    position 34:00:05.33n 83:12:52.77w altitude 32808.40 ft
+    speed 200 kts
+    position 33:59:41.20n 83:13:13.35w altitude 29527.56 ft
+    speed 210 kts
+    position 34:00:08.68n 83:13:48.07w altitude 25965.88 ft
+    speed 180 kts
+    position 34:01:59.96n 83:14:13.03w altitude 25685.04 ft
+    speed 210 kts
+    position 34:01:48.43n 83:15:27.17w altitude 23246.72 ft
+    position 34:02:22.51n 83:14:31.62w altitude 24685.04 ft speed 300 kts
+    position 34:02:19.52n 83:13:47.29w altitude 26246.72 ft
+    speed 200 kts
+    position 34:00:21.31n 83:13:33.54w altitude 22685.04 ft
+    speed 210 kts
+    position 34:02:32.03n 83:13:07.49w altitude 29685.04 ft
+    speed 200 kts
+    goto begin
+  end_route
+  heading 215 deg
+  side blue
+  icon F-15
+end_platform
+
+platform flyer4 AIRFLYER  #uses the AIR_MOVER to show differences...
+   position 34:00:05.33n 83:12:52.77w altitude 32808.40 ft
+
+   mover
+      maximum_linear_acceleration  1.4 g
+      maximum_radial_acceleration 2.2 g
+      turn_rate_limit           50 deg/sec
+      update_interval 0.1 sec
+   end_mover
+
+   route
+    label begin
+    position 34:00:05.33n 83:12:52.77w altitude 32808.40 ft
+    speed 200 kts
+    position 33:59:41.20n 83:13:13.35w altitude 29527.56 ft
+    speed 210 kts
+    position 34:00:08.68n 83:13:48.07w altitude 25965.88 ft
+    speed 180 kts
+    position 34:01:59.96n 83:14:13.03w altitude 25685.04 ft
+    speed 210 kts
+    position 34:01:48.43n 83:15:27.17w altitude 23246.72 ft
+    position 34:02:22.51n 83:14:31.62w altitude 24685.04 ft speed 300 kts
+    position 34:02:19.52n 83:13:47.29w altitude 26246.72 ft
+    speed 200 kts
+    position 34:00:21.31n 83:13:33.54w altitude 22685.04 ft
+    speed 210 kts
+    position 34:02:32.03n 83:13:07.49w altitude 29685.04 ft
+    speed 200 kts
+    goto begin
+  end_route
+  heading 215 deg
+  side blue
+  icon F-18
+end_platform

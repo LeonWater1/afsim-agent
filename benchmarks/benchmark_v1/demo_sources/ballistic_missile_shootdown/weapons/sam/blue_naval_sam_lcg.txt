@@ -1,0 +1,51 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+###############################################################################
+# Launch computer generator for blue_naval_sam.
+###############################################################################
+
+#file_path ../../../base_types
+include blue_naval_sam.txt
+
+platform_type LAUNCH_PLATFORM_TYPE WSF_PLATFORM
+   side red
+   weapon blue_naval_sam BLUE_NAVAL_SAM
+     firing_delay 0.0 sec
+   end_weapon
+end_platform_type
+
+tool BALLISTIC_MISSILE_LAUNCH_COMPUTER_GENERATOR # ballistic_missile_launch_computer_generator
+   tool_debug
+
+   frame_step 0.5 sec # sample time of trajectory
+
+   # altitude 1 m choosen to correspond with typical scenario altitudes
+   position 0n 0e altitude 1 m
+
+   air_target_file blue_naval_sam_launch_data.txt
+   #gnuplot_file    blue_naval_sam_trajectory.plt
+
+   loft_angles from 62 deg to 89.8 deg by 0.2 deg
+
+   ############################################################################
+   # All of the remaining data is used to keep the launch computer dataset
+   # small and to only enable solutions that are doctrinally allowed.
+   ############################################################################
+
+   # 'minimum_output_time' should be greater than or equal to the burn time.
+   # (No intercept during boost)
+   minimum_output_time       46 sec
+
+   maximum_output_range      1000 km
+   #maximum_output_altitude   440 km
+end_tool
+
+event_pipe
+   file blue_naval_sam_replay.aer
+end_event_pipe

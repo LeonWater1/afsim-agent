@@ -1,0 +1,141 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+route detector_route
+   label start offset 0 5 km speed 200 km/h  
+   offset -5 0 km   
+   offset 0 -5 km  
+   offset 5 0 km
+   goto start
+end_route
+
+platform_type DETECTOR WSF_PLATFORM
+   category ad_hoc
+   side blue
+   icon predator
+   add comm ad_hoc AD_HOC end_comm
+   add router default DEFAULT end_router
+   
+   add mover WSF_AIR_MOVER
+   end_mover
+   
+   add processor tracker WSF_TRACK_PROCESSOR
+      external_link platform black_van comm van_comm via ad_hoc
+   end_processor
+   
+   add sensor sense WSF_GEOMETRIC_SENSOR
+      on
+      maximum_range 50 km
+      frame_time 10 s
+      reports_location
+      ignore ad_hoc
+      internal_link tracker 
+   end_sensor
+   
+   on_initialize
+      double latitude = 40;
+      double longitude = -100;
+      double altitude = 2000;
+      double heading = 0;
+      
+      latitude = latitude + RANDOM.Uniform(-1, 1);
+      longitude = longitude + RANDOM.Uniform(-1, 1);
+      altitude = altitude + RANDOM.Uniform(-2000, 2000);
+      heading = RANDOM.Uniform(0, 359);
+      
+      PLATFORM.SetLocation(latitude, longitude, altitude);
+      PLATFORM.SetHeading(heading);
+      PLATFORM.SetRoute("detector_route");
+   end_on_initialize
+end_platform_type
+
+// This platform is on the same network, but only exists
+// to highlight the creation/removal of linkage as it
+// passes by the network
+platform spectator WSF_PLATFORM
+   category ad_hoc
+   side blue
+   icon f-35
+   
+   add mover WSF_AIR_MOVER
+      route
+         position 40n 102w altitude 30000 ft speed 3000 km/hr
+         position 40n 98w altitude 30000 ft speed 3000 km/hr extrapolate
+      end_route
+   end_mover
+   
+   add comm ad_hoc AD_HOC end_comm
+   add router default DEFAULT end_router
+end_platform
+
+platform detect1 DETECTOR
+   add comm van_comm WSF_COMM_TRANSCEIVER
+      network_name van_net
+   end_comm
+   edit comm ad_hoc
+      local_link van_comm
+   end_comm
+end_platform
+
+platform detect2 DETECTOR
+end_platform
+
+platform detect3 DETECTOR
+end_platform
+
+platform detect4 DETECTOR
+end_platform
+
+platform detect5 DETECTOR
+end_platform
+
+platform detect6 DETECTOR
+end_platform
+
+platform detect7 DETECTOR
+end_platform
+
+platform detect8 DETECTOR
+end_platform
+
+platform detect9 DETECTOR
+end_platform
+
+platform detect10 DETECTOR
+end_platform
+
+platform detect11 DETECTOR
+end_platform
+
+platform detect12 DETECTOR
+end_platform
+
+platform detect13 DETECTOR
+end_platform
+
+platform detect14 DETECTOR
+end_platform
+
+platform detect15 DETECTOR
+end_platform
+
+platform detect16 DETECTOR
+end_platform
+
+platform detect17 DETECTOR
+end_platform
+
+platform detect18 DETECTOR
+end_platform
+
+platform detect19 DETECTOR
+end_platform
+
+platform detect20 DETECTOR
+end_platform

@@ -1,0 +1,28 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform sam-1 SINGLE_LARGE_SAM
+   #position 30:20n 81:40w
+   heading 90 deg
+   #position 20:20n 70:40w
+   side blue
+   
+   # sam-1 has 4 possible starting locations.
+   # Index 1 has 40% chance (2-in-5 probability) of selection.
+   # Indices 2-4 have 20% chance (1-in-5) of selection.
+   #
+   # All the targets refer to sam-1 for their positions.
+   
+   alternate_locations 
+      location 30:20n 81:40w weight 20 altitude 0 m agl   # [1] coast - the training-class position
+      location 31:20n 81:40w weight 10 altitude 0 m agl   # [2] north
+      location 29:20n 81:40w weight 10 altitude 0 m agl   # [3] south
+      location 30:20n 82:40w weight 10 altitude 0 m agl   # [4] west
+   end_alternate_locations
+end_platform

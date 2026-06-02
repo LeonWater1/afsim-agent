@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+log_file output/cyber_script_effect_demo.log
+
+include_once setup.txt
+
+include_once scenarios/red_laydown.txt
+include_once scenarios/blue_laydown.txt
+
+include_once observer.txt
+
+event_output file output/cyber_script_effect_demo.evt
+   enable CYBER_ATTACK_INITIATED
+   enable CYBER_ATTACK_SUCCEEDED
+   enable CYBER_ATTACK_FAILED
+   enable MESSAGE_TRANSMITTED
+   enable MESSAGE_RECEIVED
+end_event_output
+
+event_pipe file output/cyber_script_effect_demo.aer
+use_preset full
+disable DRAW
+end_event_pipe
+
+end_time 1 hour
+
+

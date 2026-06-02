@@ -1,0 +1,204 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# UNCLASSIFIED
+# This is a make believe prop driven UAV that weighs 50 lbs and can go 200nm.
+
+radar_signature CLIENT_AGM_RADAR_SIG
+  constant 20 dbsm
+end_radar_signature
+
+aero CLIENT_AGM_FOLDED_AERO WSF_AERO #used for initial drop from aircraft
+  reference_area      450 in2
+  cd_zero_subsonic    0.800
+  cd_zero_supersonic  0.80
+  mach_begin_cd_rise  0.800
+  mach_end_cd_rise    1.200
+  mach_max_supersonic 2.000
+  cl_max              1.00    // drops like a rock
+  aspect_ratio        1.000   // unknown
+end_aero
+
+aero CLIENT_AGM_EXTENDED_AERO WSF_AERO
+   reference_area      350 in2
+   cd_zero_subsonic    0.500
+   cd_zero_supersonic  0.60
+   mach_begin_cd_rise  0.800
+   mach_end_cd_rise    1.200
+   mach_max_supersonic 2.000
+   cl_max              15.00    // give it lots of lift
+   aspect_ratio        10.000   // unknown
+end_aero
+
+weapon_effects CLIENT_AGM_EFFECT WSF_GRADUATED_LETHALITY
+   radius_and_pk 30 m 1
+end_weapon_effects
+
+platform_type CLIENT_AGM WSF_PLATFORM
+   icon cruise_missile
+   side blue
+   radar_signature CLIENT_AGM_RADAR_SIG
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+   end_processor
+   processor task_mgr WSF_TASK_PROCESSOR
+   end_processor
+   mover WSF_GUIDED_MOVER
+      update_interval 0.1 secs
+      stage 1
+         aero CLIENT_AGM_FOLDED_AERO
+         total_mass 0 lbs
+         pre_ignition_coast_time 0.1 sec
+         pre_separation_coast_time 10.0 sec // give it 10 secs to open wings
+      end_stage
+      stage 2
+         aero CLIENT_AGM_EXTENDED_AERO
+         total_mass 50 lbs
+         thrust 150 lbsf
+         fuel_mass 40 lbs
+         thrust_duration 4 hours
+      end_stage
+   end_mover
+   processor guidance WSF_GUIDANCE_COMPUTER
+       #show_status
+       #show_evaluations
+       #debug
+       script_variables
+          double   ClientCommandedAlt         = 6096;       // alt in meters (20000 ft)
+          double   ClientMaxVel               = 130;        // meters per sec
+          double   ClientMinVel               = 70;         // meters per sec
+          double   ClientMinClimbVel          = 110;
+          double   ClientMaxHeadingDeviation  = 45;         // Max heading deviation from track location
+          double   ClientMaxAltDeviation      = 900;        // meters
+          double   ClientNoDeviationRange     = 4500;       // meters from target - it goes in for the kill (no deviation)
+          double   ClientMaxRangeToLeader     = 1800;
+          double   ClientMinRangeToLeader     = 400;
+          double   PhaseTimeAltFly            = RANDOM.Uniform(22,28);
+        end_script_variables
+
+
+        phase CLIENT_LAUNCH   // Drop like a rock
+            guidance_delay                   10 sec
+            next_phase CLIENT_INITIAL when phase_time > 10 sec
+        end_phase
+        phase CLIENT_INITIAL
+            on_entry             
+               // Immediately go to some random bearing away from the track.
+               // This will separate the clients out from each other
+               SetAllowRouteFollowing(true);
+               double newheading = RANDOM.Uniform(0, 360);
+               WsfGeoPoint NewPoint = PLATFORM.Location();
+               NewPoint.Extrapolate(newheading, 5000);
+               WsfRoute NR = WsfRoute.Create("NewRoute");
+               NR.Append(NewPoint, ClientCommandedAlt);
+               PLATFORM.SetRoute(NR);
+            end_on_entry
+            maximum_commanded_g            10 g
+            commanded_speed                 100 m/s
+            next_phase CLIENT_FLY when phase_time > 10 sec
+        end_phase
+        phase CLIENT_FLY  // Puts the client back on a course to the target
+            maximum_commanded_g           1.3 g
+            commanded_speed                 100 m/s
+            commanded_altitude              20000 ft
+            allow_route_following          false
+            next_phase CLIENT_TERMINAL  if target_ground_range < variable ClientNoDeviationRange m
+            next_phase CLIENT_ALT_FLY if phase_time > 10 sec
+        end_phase
+
+        phase CLIENT_ALT_FLY
+           on_entry
+              SetAllowRouteFollowing(true);
+              WsfTrack targetTrack = PLATFORM.CurrentTargetTrack();
+              if( ! targetTrack.IsValid())
+              {
+               SelectPhase("CLIENT_TERMINAL");
+              }
+              double CurrentSpeed = PLATFORM.Speed();
+              double CurrentAlt   = PLATFORM.Altitude(); // meters above sea level
+              double targetRelativeBearing = PLATFORM.RelativeBearingTo(targetTrack);
+              WsfPlatform Leader = WsfSimulation.FindPlatform("bomber_leader_agm_1"); // Use this if the bomber launched us.
+              if(Leader.IsNull() || ! Leader.IsValid() || ! targetTrack.IsValid())
+              {
+                 SelectPhase("CLIENT_TERMINAL");
+                 return;
+              }
+              double leaderRelativeBearing = PLATFORM.RelativeBearingTo(Leader);
+
+              if (leaderRelativeBearing < -15)  leaderRelativeBearing = leaderRelativeBearing + 360;
+
+              if ((Leader.IsValid())  && (PLATFORM.SlantRangeTo(Leader) < ClientMinRangeToLeader))
+              {
+                 // Randomly turn away from the leader
+                 double newspeed = RANDOM.Uniform(ClientMinVel, ClientMaxVel);
+                 double newalt = RANDOM.Uniform((CurrentAlt - ClientMaxAltDeviation),(CurrentAlt + ClientMaxAltDeviation));
+                 double newheading = RANDOM.Uniform(0,360);
+                 WsfGeoPoint NewPoint = PLATFORM.Location();
+                 NewPoint.Extrapolate(newheading, 5000);
+                 WsfRoute NR1 = WsfRoute.Create("NewRoute1");
+                 if(newalt > CurrentAlt) // This is to prevent stalling out
+                 {
+                    newspeed = ClientMinClimbVel;
+                 }
+                 NR1.Append(NewPoint, newspeed);
+                 PLATFORM.SetRoute(NR1);
+                 SetCommandedAltitude(newalt);
+              }
+              if ((Leader.IsValid())  && (PLATFORM.SlantRangeTo(Leader) > ClientMaxRangeToLeader))
+              {
+                 double newspeed = RANDOM.Uniform(ClientMinVel, ClientMaxVel);
+                 double newalt = RANDOM.Uniform((Leader.Altitude() - ClientMaxAltDeviation),(Leader.Altitude() + ClientMaxAltDeviation));
+                 if (newalt < (ClientCommandedAlt / 2))
+                 {
+                    newalt = newalt + ClientMaxAltDeviation; // This prevents the cliant alt from getting too low if the leader already is in terminal
+                 }
+
+                 SetCommandedAltitude(newalt);
+                 double newheading = RANDOM.Uniform((leaderRelativeBearing - 5),(leaderRelativeBearing + 5));
+                 if (newheading < 0) newheading = newheading + 360;
+
+                 WsfGeoPoint NewPoint = Leader.Location();
+
+                 NewPoint.Extrapolate(newheading, 8550);
+                 WsfRoute NR2 = WsfRoute.Create("NewRoute2");
+                 if(newalt > CurrentAlt) // This is to prevent stalling out
+                 {
+                    newspeed = ClientMinClimbVel;
+                 }
+                 NR2.Append(NewPoint, newspeed);
+                 PLATFORM.SetRoute(NR2);
+
+              }
+           end_on_entry
+           maximum_commanded_g           4.5 g
+           allow_route_following          true
+           next_phase CLIENT_TERMINAL  if target_ground_range < variable ClientNoDeviationRange m
+           next_phase CLIENT_FLY if phase_time > variable PhaseTimeAltFly sec # 22 - 28 secs
+           on_exit
+           end_on_exit
+         end_phase
+
+         phase CLIENT_TERMINAL
+           proportional_navigation_gain  5 # 10
+           maximum_pitch_angle           80 deg
+           maximum_commanded_g           10 g
+         end_phase
+   end_processor
+   processor fuse WSF_WEAPON_FUSE
+      proximity_all_on_loss_of_target
+      detonate_below_height_agl 1 m
+   end_processor
+end_platform_type
+
+// Define the explicit weapon from the type def...
+weapon CLIENT_AGM WSF_EXPLICIT_WEAPON
+   launched_platform_type CLIENT_AGM
+   weapon_effects         CLIENT_AGM_EFFECT
+
+end_weapon
+

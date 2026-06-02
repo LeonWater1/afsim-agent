@@ -1,0 +1,99 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once ./weapons/jammer/false_target.txt
+
+electronic_warfare SOJ_EA WSF_ELECTRONIC_ATTACK
+   technique noise_jamming WSF_EA_TECHNIQUE
+      mitigation_class noise_jamming
+      effect noise_effect WSF_POWER_EFFECT
+         jamming_delta_gain 0 dB
+      end_effect
+   end_technique
+
+   technique false_target_jamming WSF_EA_TECHNIQUE
+      mitigation_class false_target_jamming
+      effect ft_effect WSF_FALSE_TARGET_EFFECT
+          #jamming_pulse_density 0.1
+          #scan_rate_multiplier 5
+          false_target_technique FALSE_TARGET_1
+      end_effect
+   end_technique
+
+   technique simple_false_target_jamming WSF_EA_TECHNIQUE
+      mitigation_class false_target_jamming
+      effect ft_effect WSF_SIMPLE_FT_EFFECT
+          jamming_pulse_density               0.1
+          percent_of_beamwidth_for_detection  0.5
+          use_random_calculation_draw true
+      end_effect
+   end_technique
+
+   technique random_pulse_jamming WSF_EA_TECHNIQUE
+      mitigation_class pulse_jamming
+      effect rpj_effect WSF_RPJ_EFFECT
+         system_type_data default
+            jamming_pulse_density 0.15
+            minimum_jammer_to_noise_threshold 0.0 dB
+            jammer_gain_table
+               jammer_to_noise_ratio 10.0 dB
+                  pulse_density_to_jamming_gain 0.05 11.0 dB
+                   pulse_density_to_jamming_gain 0.2  8.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+               jammer_to_noise_ratio 5.0 dB
+                  pulse_density_to_jamming_gain 0.05 8.0 dB
+                  pulse_density_to_jamming_gain 0.2  5.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+               jammer_to_noise_ratio 0.0 dB
+                  pulse_density_to_jamming_gain 0.05 5.0 dB
+                  pulse_density_to_jamming_gain 0.2   2.0 dB
+                  pulse_density_to_jamming_gain 0.30  0.0 dB
+            end_jammer_gain_table
+         end_system_type_data
+      end_effect
+   end_technique
+
+   technique track_error WSF_EA_TECHNIQUE
+      mitigation_class pulse_jamming
+      effect RANGE_ERROR WSF_TRACK_EFFECT
+         track_behavior distort
+         range_error 200 m
+         //azimuth_error <angle-value>
+         //elevation_error <angle-value>
+         //range_drift_rate <speed-value>
+      end_effect
+   end_technique
+
+   technique jtos_gain_jamming WSF_EA_TECHNIQUE
+      mitigation_class pulse_jamming
+      effect jtos_gain_effect WSF_JAMMER_POWER_EFFECT
+         jamming_to_signal_gain_table
+           jamming_to_signal   -30 db  -30 db
+           jamming_to_signal   0 db    0 db
+           jamming_to_signal   3 db    5 db
+           jamming_to_signal   6 db   10 db
+           jamming_to_signal  15 db   15 db
+         end_jamming_to_signal_gain_table
+      end_effect
+   end_technique
+end_electronic_warfare
+
+weapon SOJ_BASE_JAMMER WSF_RF_JAMMER
+
+   maximum_range                400 km
+
+   transmitter
+      electronic_attack SOJ_EA
+      end_electronic_attack
+   end_transmitter
+end_weapon

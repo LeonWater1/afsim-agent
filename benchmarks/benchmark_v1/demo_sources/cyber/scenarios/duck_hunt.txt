@@ -1,0 +1,126 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+platform target01 TARGET
+   side red
+   position 40n 88w
+end_platform
+
+
+platform bomber BOMBER
+   side blue
+   position 39:31:42.00n 91:38:35.00w
+   altitude 30000.00 ft
+   heading 90 deg
+   route
+      navigation
+         position 39:31:42n 91:38:35w
+            altitude 30000 feet
+            speed 300 nm/h
+         position 39:31:40n 91:30:00w
+            altitude 30000 feet
+            speed 300 nm/h
+      end_navigation
+   end_route
+   track platform target01 end_track
+   edit weapon client_agm
+      quantity 200
+   end_weapon
+
+
+   add processor launch_leader_agm WSF_SCRIPT_PROCESSOR
+      update_interval 1.0 sec
+      on_update
+         if (TIME_NOW > 1.0)
+         {
+            int trackIndex = 0;
+            WsfWeapon weapon = PLATFORM.Weapon("leader_agm");
+            WsfLocalTrackList trackList = PLATFORM.MasterTrackList();
+            double clientquantity = weapon.QuantityRemaining();
+            while (clientquantity > 0)
+            {
+              weapon.Fire(trackList.TrackEntry(trackIndex));
+              clientquantity = weapon.QuantityRemaining();
+            }
+          }
+          if (TIME_NOW > 10)
+          {
+             PLATFORM.TurnToRelativeHeading(179, 9.9);
+             PROCESSOR.TurnOff();
+          }
+      end_on_update
+    end_processor
+    add processor launch_client_agm WSF_SCRIPT_PROCESSOR
+      update_interval 1.0 sec
+      on_update
+         if (TIME_NOW > 3.0)
+         {
+            int trackIndex = 0;
+            double LastFired = 0;
+            double Interval  = 1;
+            WsfWeapon weapon = PLATFORM.Weapon("client_agm");
+            WsfLocalTrackList trackList = PLATFORM.MasterTrackList();
+            double clientquantity = weapon.QuantityRemaining();
+            while (clientquantity > 0)
+            {
+              weapon.Fire(trackList.TrackEntry(trackIndex));
+              clientquantity = weapon.QuantityRemaining();
+
+            }
+          }
+          if (TIME_NOW > 10)
+          {
+             #PLATFORM.TurnToHeading(270);
+             PROCESSOR.TurnOff();
+          }
+
+
+      end_on_update
+    end_processor
+end_platform
+
+// CYBER OUTPOST 1
+platform cyber_post_1 CYBER_OUTPOST
+   commander SELF
+   position 39:41:50.835n 89:04:55.128w
+end_platform
+
+platform ground_radar_1 GROUND_RADAR
+   commander cyber_post_1
+   position 39:48:41.354n 89:11:49.315w
+   heading 270 degrees
+end_platform
+
+// CYBER OUTPOST 2
+platform cyber_post_2 CYBER_OUTPOST
+   commander SELF
+   position 40:08:29.927n 88:47:15.844w
+end_platform
+
+platform ground_radar_2 GROUND_RADAR
+   commander cyber_post_2
+   position 40:11:07.341n 88:47:00.216w
+   heading 270 degrees
+end_platform
+
+// CYBER OUTPOST 3
+platform cyber_post_3 CYBER_OUTPOST
+   commander SELF
+   position 39:44:08.403n 88:27:35.870w
+end_platform
+
+platform ground_radar_3 GROUND_RADAR
+   commander cyber_post_3
+   position 39:47:47.507n 88:27:30.050w
+   heading 270 degrees
+end_platform
+
+platform sr_sam_1 SR_SAM_TELAR
+   position 39:59:15.636n 87:59:59.962w
+   side red
+end_platform

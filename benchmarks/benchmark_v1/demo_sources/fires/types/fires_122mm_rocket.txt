@@ -1,0 +1,107 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Fires table generated using existing (unclassified, exportable) 122mm rocket model.
+#
+# Representative Description:  The TR-122 unguided rocket can be fired from a
+# Roketsan made 122 mm T-122 Multi-Barrel Rocket Launcher and its foreign
+# equivalents, such as the widely deployed Russian 122 mm BM-21 Grad. The T-122
+# rocket can also be fired by other 122 mm systems, such as the Czech RM-70 and
+# the Romanian APRA 40. The latest production T-122 rocket system is based on a
+# MAN (6 × 6) cross-country truck chassis and has been in service with Turkish
+# Land Forces Command since 1996.  The complete Roketsan 122 mm rocket family
+# consists of the following types:TR-122 with HE warhead and maximum range 40 km,
+# minimum range without drag ring is 21 km while with drag ring it is 10 km.
+# Propellant is composite (HTB/AP/Al) and a point detonating fuze is fitted.
+# TRB-122 with steel ball warhead and maximum range of 40 km, minimum range
+# without drag ring is 21 km while with drag ring it is 10 km. Propellant is
+# composite (HTB/AP/Al) and a proximity fuze is fitted. The warhead contains
+# 5,500 steel balls and 4 kg of TNT + RDX and has a lethal radius of 40 m.
+# TRK-122 with submunition warhead and maximum range of 30 km and a minimum
+# range of 16 km. Propellant is composite (HTB/AP/Al). An electronic time fuze
+# is fitted. The warhead contains 50 anti-personnel/anti-armour munitions and
+# six incendiary munitions. The former will penetrate between 120 and 150 mm
+# of conventional steel armour. A self-destruct system is fitted.
+
+# Typical Web Reference (1):  http://www.mtc.edu.eg/ASAT13/pdf/FM04.pdf
+# source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_122MM_ROCKET_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_122MM_ROCKET
+      5000 3.5 8.5
+      6000 4.3 10.5
+      7000 5.2 12.6
+      8000 6.3 15.2
+      9000 7.5 17.8
+      10000 8.8 20.6
+      11000 10.4 23.8
+      12000 12.2 27.2
+      13000 14.2 30.8
+      14000 16.5 34.7
+      15000 19.0 38.8
+      16000 21.9 43.3
+      17000 25.1 48.1
+      18000 28.7 53.4
+      19000 33.3 60.1
+      20000 39.2 68.3
+      20470 47.0 78.8
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_122MM_ROCKET_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_122MM_ROCKET WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_122MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_122MM_ROCKET
+   weapon_effects FIRES_122MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_122MM_ROCKET WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_122MM_ROCKET_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_122MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_122MM_ROCKET
+   weapon_effects FIRES_122MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_122MM_ROCKET_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_122mm_rocket FIRES_122MM_ROCKET_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_122MM_ROCKET_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_122mm_rocket FIRES_122MM_ROCKET
+   end_weapon
+end_platform_type
+

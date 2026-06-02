@@ -1,0 +1,102 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+#shows use of a processor to force a platform to fly straight "laser beam" movement on a route
+
+end_time 30 min
+random_seed 142536
+
+event_pipe
+   file proc_mover_demo.aer
+end_event_pipe
+
+
+platform_type     MY_STRIKER           WSF_PLATFORM
+   side blue
+   icon F-18
+   #note: speed used is a processor script variable!
+   #wish I could do without the mover at all, but then I cant attach a route to the platform
+   #if you can define the route globally & just refer to it by name from the script, then get rid of the mover
+   mover WSF_AIR_MOVER
+      maximum_speed     0.000000001 knots
+      minimum_speed     0 knots
+      maximum_altitude  50000 ft
+      minimum_altitude  0 ft
+      at_end_of_path    stop
+  end_mover
+
+  processor i_like_to_move_it_move_it WSF_SCRIPT_PROCESSOR
+     update_interval 0.1 sec   #dunno what is necessary, this is rather frequent
+     script_variables
+        int routeIndex = 0;
+        double speedMPS = 200.0;   #TODO - use speed from route points???
+                                   #TODO - adjust heading & pitch based on current route leg???
+     end_script_variables
+     on_update
+        WsfRoute rowt = PLATFORM.Route();
+        if (!rowt.IsValid()) {
+           return;
+        }
+        if (routeIndex >= rowt.Size()) {
+           return;
+        }
+        double delta = PROCESSOR.UpdateInterval();
+        double myDist = delta * speedMPS;
+        WsfGeoPoint a = PLATFORM.Location();
+        WsfGeoPoint b = rowt.Get(routeIndex).Location();
+        double dist = a.SlantRangeTo(b);
+        Vec3 direction = Vec3.Subtract(b.LocationWCS(),a.LocationWCS());
+        if (myDist >= dist) {
+           #we reach the waypoint this update, start along next leg too
+           routeIndex += 1;
+           if (routeIndex >= rowt.Size()) {
+              PLATFORM.SetLocation(b);
+              return;
+           }
+           a = b;
+           b = rowt.Get(routeIndex).Location();
+           myDist -= dist;
+        }
+#        else {
+#           #sanity check: both slant range & vector magnitude should be about equal
+#           writeln("slant range = ", dist, ", vec magnitude = ", direction.Magnitude());
+#        }
+        direction.Normalize();
+        direction.Scale(myDist);
+        a.OffsetWCS(direction);
+        PLATFORM.SetLocation(a);
+     end_on_update
+  end_processor
+end_platform_type
+
+
+platform cap_west_1 MY_STRIKER
+  commander SELF
+  ## NOTE: please do NOT use any speeds on the platform route
+  ##       let the processor handle it
+  ## up & down zig zaggy route
+  route
+    position 15:31:04.25s 49:02:50.44e altitude 35000.00 ft msl
+    position 15:18:12.10s 49:03:57.67e altitude 15000.00 ft msl
+    position 15:14:25.02s 48:52:27.80e altitude 30000.00 ft msl
+    position 15:27:46.88s 48:40:41.80e altitude 10000.00 ft msl
+    position 15:07:40.48s 48:34:25.45e altitude 25000.00 ft msl
+    position 15:28:08.23s 48:57:14.80e altitude  5000.00 ft msl
+    position 15:41:45.27s 48:28:58.68e altitude 45000.00 ft msl
+    position 14:49:20.14s 48:56:36.25e altitude 25000.00 ft msl
+  end_route
+   ## stair step route
+#  route
+#    position 15:31:04.25s 49:02:50.44e altitude 5000.00 ft msl
+#    position 15:31:46.39s 48:27:01.50e altitude 5000.00 ft msl
+#    position 15:04:21.42s 48:27:16.30e altitude 5000.00 ft msl
+#    position 15:04:18.24s 47:44:00.40e altitude 5000.00 ft msl
+#  end_route
+end_platform
+

@@ -1,0 +1,59 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once ./weapons/jammer/soj_base_jammer.txt
+
+antenna_pattern SOJ_XBAND_ANTENNA
+  esa_pattern
+    minimum_gain                -80.0 db
+    amplitude_quantization_bits   8
+    phase_quantization_bits       8
+    element_spacing_x             0.015 m
+    number_elements_x            100
+    element_spacing_y             0.015 m
+    number_elements_y            25
+
+    distribution_type taylor
+       sidelobe_level_x         25 dB
+       sidelobe_level_y         25 dB
+       n_bar_x                    5
+       n_bar_y                    5
+end_antenna_pattern
+
+weapon SOJ_XBAND_JAMMER SOJ_BASE_JAMMER
+
+  maximum_number_of_beams      2
+  beam_power_distribution      average
+
+  maximum_spots_per_beam       2
+  spot_power_distribution      average
+
+  # Field of view limits are slew limits + 1/2 the beamwidth
+  azimuth_field_of_view       -65.0 deg 65.0 deg    # beamwidth estimate is 10 deg
+  elevation_field_of_view     -70.0 deg 70.0 deg    # beamwidth estimate is 20 deg
+
+  slew_mode                    azimuth_and_elevation
+  azimuth_slew_limits          -60.0 deg 60.0 deg
+  elevation_slew_limits        -60.0 deg 60.0 deg
+
+  electronic_beam_steering               azimuth_and_elevation
+  electronic_beam_steering_loss_exponent 1.2
+
+  transmitter
+    antenna_pattern            SOJ_XBAND_ANTENNA
+    frequency_band             8 ghz 12 ghz
+    power                      1.5 kw
+    internal_loss              0.0 db
+  end_transmitter
+end_weapon
+

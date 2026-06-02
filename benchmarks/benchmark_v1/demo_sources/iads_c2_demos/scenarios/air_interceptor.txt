@@ -1,0 +1,51 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+route cap_orbit
+   label start
+      offset 10 -10 km
+      offset 20 0 km
+      offset 10 10 km
+      offset 0 0 km
+   goto start
+end_route
+
+platform 17_ai AIR_INTERCEPTOR
+   side red
+   icon SU-27
+   commander   10_iads_cmdr
+
+   route
+      position 38:00:00n 117:15:00w altitude 30000 ft msl speed 580 kts
+      transform_route cap_orbit reference_heading 0.0 deg
+   end_route
+
+   aux_data
+      WsfBMAuxDataZoneAttachment iads_c2_zones
+   end_aux_data
+
+   zone weapon_engagement_zone
+      polygonal lat_lon
+         point 38:40:24n 117:00:00w // Top Right
+         point 37:04:10n 117:00:00w // Bottom Right
+         point 37:04:10n 117:47:40w // Bottom Left
+         point 38:40:24n 117:47:40w // Top Left
+   end_zone
+
+   on_initialize2
+      # add zone references to this platform
+      WsfBMAuxDataZoneAttachment iads_c2_zones = WsfBMAuxDataZoneAttachment ();
+      iads_c2_zones.Add ("platform", 1.0, "weapon_engagement_zone", "FEZ");
+      WsfBMUtils.SetZoneAuxData (PLATFORM, "iads_c2_zones", iads_c2_zones);
+   end_on_initialize2
+end_platform

@@ -1,0 +1,48 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+# common file for selecting which messages appear in the event log
+
+event_output
+   file replay.evt
+   time_format h:m:s.1
+   lat_lon_format d:m:s.2
+   print_track_in_message true
+
+   disable TEAM_NAME_DEFINITION
+
+   enable LOCAL_TRACK_INITIATED
+   enable LOCAL_TRACK_DROPPED
+   enable OPERATING_LEVEL_CHANGED
+   enable PLATFORM_BROKEN
+   enable SENSOR_MODE_ACTIVATED
+   enable SENSOR_MODE_DEACTIVATED
+   enable SENSOR_REQUEST_CANCELED
+   enable SENSOR_REQUEST_INITIATED
+   enable SENSOR_REQUEST_UPDATED
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_DROPPED
+   enable SENSOR_TURNED_ON
+   enable SENSOR_TURNED_OFF
+   enable TASK_ASSIGNED
+   enable TASK_CANCELED
+   enable TASK_COMPLETED
+   enable WEAPON_FIRE_ABORTED
+   enable WEAPON_FIRE_REQUESTED
+   enable WEAPON_FIRED
+   enable WEAPON_HIT
+   enable WEAPON_MISSED
+   enable WEAPON_RELOAD_STARTED
+   enable WEAPON_RELOAD_ENDED
+   enable WEAPON_TERMINATED
+end_event_output

@@ -1,0 +1,30 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+script_variables 
+   Map<WsfPlatform,double> originalAltitude = Map<WsfPlatform,double>();
+end_script_variables
+
+cyber_effect LOWER_ALTITUDE_EFFECT WSF_CYBER_SCRIPT_EFFECT
+   default
+      script void Attack(WsfCyberEngagement aEngagement)
+         WsfPlatform victim = aEngagement.VictimPlatform();
+         originalAltitude.Set(victim, victim.Altitude());
+         victim.GoToAltitude(1000*MATH.M_PER_FT());
+      end_script
+      
+      script void Restore(WsfCyberEngagement aEngagement)
+         WsfPlatform victim = aEngagement.VictimPlatform();
+         victim.GoToAltitude(originalAltitude.Get(victim));
+      end_script
+   end_default
+end_cyber_effect
+

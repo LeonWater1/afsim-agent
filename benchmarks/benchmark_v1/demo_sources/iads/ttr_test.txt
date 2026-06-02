@@ -1,0 +1,150 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include setup.txt
+include signatures/ucav_radar_sig_20db_down.txt
+
+processor TEST_LARGE_SAM_BATTALION_TASK_MGR WSF_TASK_PROCESSOR
+   show_task_messages
+   track_update_interval 5 secs
+
+   evaluation_interval DETECTED 5 secs
+   state DETECTED
+      next_state ACQUIRE
+         return true;
+      end_next_state
+   end_state
+
+   evaluation_interval ACQUIRE 5 secs
+   state ACQUIRE
+      on_entry
+         StartTracking(TRACK, "TRACK", "ttr", "ACQUIRE", WsfSimulation.FindPlatform("2920_large_sam_ttr"));
+      end_on_entry
+      //on_exit
+      //   StopTracking(TRACK, "TRACK", "ttr");
+      //end_on_exit
+   end_state
+end_processor
+
+# -----------------------------------------------------------------------------
+
+platform 100_iads_cmdr IADS_CMDR
+   side red
+   commander SELF
+   position 40:00:00n 90:01:00w altitude 0.0 m agl
+   processor task_mgr
+      show_task_messages
+      show_state_transitions
+   end_processor
+end_platform
+
+platform 1500_radar_company RADAR_COMPANY
+   side red
+   #commander 2900_large_sam_battalion
+   commander 100_iads_cmdr
+   position 39:59:00n 90:00:00w altitude 0.0 m agl
+end_platform
+
+platform 1510_ew_radar EW_RADAR
+   side red
+   commander 1500_radar_company
+   position 40:00n 89:30:00w altitude 0.0 m agl
+end_platform
+
+
+platform 2900_large_sam_battalion LARGE_SAM_BATTALION
+   side red
+   #commander SELF
+   commander 100_iads_cmdr
+   position 40:00:00n 90:00:00w altitude 0.0 m agl
+
+   zone battalion_sector
+      circular maximum_radius 100 nm
+   end_zone
+
+#   delete processor task_mgr
+#   add processor task_mgr TEST_LARGE_SAM_BATTALION_TASK_MGR
+#   end_processor
+
+   processor task_mgr
+     show_task_messages
+     show_state_transitions
+#     operating_level ENGAGE 1
+   end_processor
+
+end_platform
+
+platform 2910_acq_radar ACQ_RADAR
+   side red
+   commander 2900_large_sam_battalion
+   position 40:00:05n 90:00:00w altitude 0.0 m agl
+   processor task_mgr
+      show_task_messages
+#      execute at_time 1 sec absolute
+#         ChangeOperatingLevel("ENGAGE", 1);
+#      end_execute
+   end_processor
+end_platform
+
+platform 2920_large_sam_ttr LARGE_SAM_TTR
+   side red
+   commander 2900_large_sam_battalion
+   position 39:59:55n 90:00:00w altitude 0.0 m agl
+   processor task_mgr
+      show_task_messages
+   end_processor
+end_platform
+
+platform 2930_large_sam_launcher LARGE_SAM_LAUNCHER
+   side red
+   commander 2900_large_sam_battalion
+   position 40:00:05n 90:00:00w altitude 0.0 m agl
+end_platform
+
+# -----------------------------------------------------------------------------
+
+platform 100_ucav UCAV
+   indestructible
+   side blue
+   commander SELF
+   route
+     navigation
+        position 40:00:00n 89:00:00w altitude 35000 ft heading 270 deg speed 400 kts
+     end_navigation
+   end_route
+   sensor esm off end_sensor
+end_platform
+
+# -----------------------------------------------------------------------------
+
+event_output
+#   file STDOUT
+   time_format s.3
+   disable all
+   enable LOCAL_TRACK_INITIATED
+   enable LOCAL_TRACK_UPDATED
+   enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_TRANSMITTED
+   #enable MESSAGE_RECEIVED
+   enable SENSOR_TURNED_OFF
+   enable SENSOR_TURNED_ON
+   enable SENSOR_DETECTION_ATTEMPT
+   enable SENSOR_REQUEST_INITIATED
+   enable SENSOR_REQUEST_CANCELED
+   enable SENSOR_REQUEST_UPDATED
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_UPDATED
+   enable SENSOR_TRACK_DROPPED
+   enable STATE_ENTRY
+   enable STATE_EXIT
+   enable TASK_ASSIGNED
+   enable TASK_CANCELED
+   enable TASK_COMPLETED
+end_event_output
+
+end_time 500 secs

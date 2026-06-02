@@ -1,0 +1,46 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 2900_sam_battalion SAM_BATTALION
+   side red
+
+   commander 10_iads_cmdr
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+end_platform
+
+platform 2910_acq_radar ACQ_RADAR
+   side red
+
+   commander 2900_sam_battalion
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+
+   edit sensor acq_radar
+      transmitter
+         frequency  2800.0 mhz
+      end_transmitter
+   end_sensor
+end_platform
+
+platform 2920_ttr TTR
+   side red
+
+   commander 2900_sam_battalion
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+end_platform
+
+platform 2930_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 2900_sam_battalion
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+end_platform

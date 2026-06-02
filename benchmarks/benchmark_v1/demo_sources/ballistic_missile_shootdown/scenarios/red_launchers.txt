@@ -1,0 +1,29 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+platform target01 TARGET
+  side blue
+  position 39:38:18.98n 75:55:20.79w
+end_platform
+
+
+platform red_mrbm_1_launcher01 RED_MRBM_1_LAUNCHER
+   side red
+   position 54:51:26.26n 99:44:00.71w
+   processor launch_ssm_processor
+     script_variables
+       TIME_TO_LAUNCH = 60 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+     platform target01
+   end_track
+end_platform

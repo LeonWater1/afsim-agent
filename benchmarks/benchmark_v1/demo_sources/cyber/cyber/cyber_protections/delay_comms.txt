@@ -1,0 +1,26 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+
+cyber_protect DELAY_COMMS WSF_CYBER_PROTECT
+   attack_response DELAY_COMMS
+      probability_of_scan_detection 1.0
+      probability_of_attack_success 1.0
+      probability_of_status_report 1.0
+      probability_of_attack_detection 1.0
+      probability_of_future_immunity 0.0
+      
+      
+      attack_detection_delay_time 0 s
+      attack_recovery_delay_time 2000 s
+      restore      
+    end_attack_response     
+end_cyber_protect

@@ -1,0 +1,31 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+infrared_signature AIR_TARGET_INFRARED_SIGNATURE
+   constant 1 watts/steradian
+end_infrared_signature
+
+optical_signature AIR_TARGET_OPTICAL_SIGNATURE
+   constant 1 m^2
+end_optical_signature
+
+radar_signature AIR_TARGET_RADAR_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+platform_type       AIR_TARGET                      WSF_PLATFORM
+   indestructible
+   icon rafale_icon
+   side blue
+   mover WSF_AIR_MOVER
+   end_mover
+   radar_signature AIR_TARGET_RADAR_SIGNATURE
+end_platform_type
+
+
+

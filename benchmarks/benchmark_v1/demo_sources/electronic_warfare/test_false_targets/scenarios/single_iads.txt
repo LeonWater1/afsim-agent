@@ -1,0 +1,74 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform iads_cmdr IADS_CMDR
+  side red
+
+  commander SELF
+  position 39:15:10n 117:33:42w  altitude 0.0 m agl
+end_platform
+
+platform radar_company RADAR_COMPANY
+  side red
+
+  commander iads_cmdr
+  position 39:18:44n 117:36:24w  altitude 0.0 m agl
+end_platform
+
+platform ew_radar EW_RADAR
+  side red
+
+  commander radar_company
+  position 39:22:36n 117:33:25w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  150.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander iads_cmdr
+  position 39:23:56n 117:40:20w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform acq_radar ACQ_RADAR
+  side red
+
+  commander large_sam_battalion
+  position 39:26:32n 117:34:00w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  2800.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander large_sam_battalion
+  position 39:19:04n 117:29:16w  altitude 0.0 m agl
+end_platform
+
+platform large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander large_sam_battalion
+  position 39:23:12n 117:28:56w  altitude 0.0 m agl
+end_platform

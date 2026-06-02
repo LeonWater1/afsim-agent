@@ -1,0 +1,31 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#    * * ************************************** * *
+#    *   ****** Demonstration input file ******   *
+#    *   ******      UNCLASSIFIED        ******   *
+#    * * ************************************** * *
+#    ----------------------------------------------------------------
+#                             Penetrating UCAVs
+#    ----------------------------------------------------------------
+
+#    ----------------------------------------------------------------
+#                             SOJ Jammer
+#    ----------------------------------------------------------------
+platform soj SOJ
+indestructible
+   side blue
+   commander SELF
+   route
+      position 39:49:08.000n 116:58:56.000w altitude 25000.00 ft msl
+         speed 450 kts
+     position 39:18:40n 117:39:06w altitude 25000.00 ft msl
+       speed 450 kts
+   end_route
+   heading 224 deg
+end_platform

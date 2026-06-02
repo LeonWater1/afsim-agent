@@ -1,0 +1,72 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Fires table generated using existing (unclassified, exportable) 152 mm artillery model.
+   # Ref http://www.mtc.edu.eg/ASAT13/pdf/FM05.pdf, page 7 of 13
+   # (Here we assume 120mm and 152 mm shell have similar aero.)
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_152MM_ARTILLERY_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_table FIRES_152MM_ARTILLERY
+      maximum_ordinate_values   1262.84 1424.94 1747.79 2025.67 2351.48 2693.45 2988.04 3412.53 3856.25 4444.4 4892.21 5454.56 6189.51 6874.48 7586.17 8302.16 9153.56 end_maximum_ordinate_values
+      range_values              16954.8 17772 18657.5 19507.1 20368.3 21218.2 22028 22897.5 23748.2 24647.6 25484.9 26333.9 27220.9 28083.2 28915.5 29815.9 30686.9 end_range_values
+      time_of_flight_values   29.51 31.91 35.01 37.86 40.86 43.96 46.66 49.91 53.26 57.26 60.36 64.01 68.56 72.66 76.86 80.86 85.46 end_time_of_flight_values
+   end_fires_table
+end_launch_computer
+
+weapon_effects FIRES_152MM_ARTILLERY_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.00
+  radius_and_pk  249.9 m 1.0
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_152MM_ARTILLERY WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 1.0 seconds
+   launch_computer
+      FIRES_152MM_ARTILLERY_LAUNCH_COMPUTER
+   end_launch_computer
+  weapon_effects FIRES_152MM_ARTILLERY_EFFECTS
+   launched_platform_type FIRES_152MM_ARTILLERY
+end_weapon
+
+platform_type FIRES_152MM_ARTILLERY WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+   end_mover
+end_platform_type
+
+weapon FIRES_152MM_ARTILLERY_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 10.0 seconds
+   launch_computer
+      FIRES_152MM_ARTILLERY_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_152MM_ARTILLERY
+  weapon_effects FIRES_152MM_ARTILLERY_EFFECTS
+end_weapon
+
+platform_type FIRES_152MM_ARTILLERY_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_152mm_artillery FIRES_152MM_ARTILLERY_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_152MM_ARTILLERY_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_152mm_artillery FIRES_152MM_ARTILLERY
+   end_weapon
+end_platform_type
+

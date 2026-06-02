@@ -1,0 +1,93 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include radars/lrsam_ttr.txt
+include radars/geometric_sensor.txt
+
+platform_type GENERIC_TRACKER WSF_PLATFORM
+   side red
+   icon Flap_Lid
+
+   sensor acq GEOMETRIC_SENSOR
+      ignore_same_side
+      on
+      internal_link tracker
+   end_sensor
+
+   sensor ttr LRSAM_TTR
+      on
+      internal_link tracker
+   end_sensor
+
+   comm comm WSF_COMM_TRANSCEIVER
+      internal_link operator
+   end_comm
+
+   processor tracker WSF_TRACK_PROCESSOR
+   end_processor
+
+   script_variables
+      string weapon_name = "weapon";
+   end_script_variables
+
+   processor operator WSF_TASK_PROCESSOR
+      show_state_transitions
+
+      evaluation_interval DETECTED 0.5 sec
+      state DETECTED
+         next_state TRY_TO_ACQUIRE
+            return StartTracking(TRACK, "DUMMY", PLATFORM.Sensor("ttr"), "SEARCH");
+         end_next_state
+      end_state
+
+      evaluation_interval TRY_TO_ACQUIRE 0.5 sec
+      state TRY_TO_ACQUIRE
+         next_state TRY_TO_TRACK
+            bool status = false;
+            if (TRACK.TrackQuality() > 0.65)
+            {
+               status = StartTracking(TRACK, "DUMMY", PLATFORM.Sensor("ttr"), "ACQUIRE");
+            }
+            return status;
+         end_next_state
+      end_state
+
+      evaluation_interval TRY_TO_TRACK 0.5 sec
+      state TRY_TO_TRACK
+         next_state TRY_TO_FIRE
+            bool status = false;
+            if (TRACK.TrackQuality() > 0.85)
+            {
+               status = StartTracking(TRACK, "DUMMY", PLATFORM.Sensor("ttr"), "TRACK");
+            }
+            return status;
+         end_next_state
+      end_state
+
+      evaluation_interval TRY_TO_FIRE 0.5 sec
+      state TRY_TO_FIRE
+         next_state FIRED
+            bool status = false;
+            if (TRACK.TrackQuality() > 0.95)
+            {
+               WsfPlatform launcher = WsfSimulation.FindPlatform("launcher");
+               status = FireAt(TRACK, "DUMMY", weapon_name, 1, launcher);
+            }
+            return status;
+         end_next_state
+      end_state
+
+      evaluation_interval FIRED 0.1 sec
+      state FIRED
+         next_state FIRED
+            return true;
+         end_next_state
+      end_state
+   end_processor
+end_platform_type

@@ -1,0 +1,34 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+platform_type FIRES_LAUNCHER WSF_PLATFORM
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+
+   script bool WARLOCK_FireAtLocation(WsfGeoPoint aLocation, int aQuantity)
+      WsfTrack targetLoc = WsfTrack();
+      targetLoc.SetLocation(aLocation);
+      targetLoc.Initialize();
+
+      // We assume we are firing the first weapon in the list.
+      return PLATFORM.WeaponEntry(0).FireSalvo(targetLoc, aQuantity);
+   end_script
+  
+#  #For testing purposes
+#   track
+#      platform scenario_center
+#   end_track
+#    execute at_time 1 s absolute
+#       WsfTrack myTrack = PLATFORM.MasterTrackList().Entry(0);
+#       PLATFORM.WeaponEntry(0).FireSalvo(myTrack, 1);
+#    end_execute
+
+   //include ../scripts/move.txt
+
+end_platform_type

@@ -1,0 +1,79 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This is a 6-ft 122 mm rocket ("short" rocket), as opposed to the
+# longer range 9-ft version.
+# source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_122MM_ROCKET_SHORT_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_122MM_ROCKET_SHORT
+    2000 4.6 5.3
+    3000 6.3 8.0
+    4000 8.3 11.1
+    5000 10.6 14.5
+    6000 13.3 18.1
+    7000 16.5 22.3
+    8000 20.3 27.0
+    9000 24.9 32.4
+    10000 31.2 39.4
+    10800 46.0 54.1
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_122MM_ROCKET_SHORT_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_122MM_ROCKET_SHORT WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_122MM_ROCKET_SHORT_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_122MM_ROCKET_SHORT
+   weapon_effects FIRES_122MM_ROCKET_SHORT_EFFECTS
+end_weapon
+
+platform_type FIRES_122MM_ROCKET_SHORT WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_122MM_ROCKET_SHORT_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_122MM_ROCKET_SHORT_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_122MM_ROCKET_SHORT
+   weapon_effects FIRES_122MM_ROCKET_SHORT_EFFECTS
+end_weapon
+
+platform_type FIRES_122MM_ROCKET_SHORT_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_122mm_rocket_short FIRES_122MM_ROCKET_SHORT_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_122MM_ROCKET_SHORT_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_122mm_rocket_short FIRES_122MM_ROCKET_SHORT
+   end_weapon
+end_platform_type
+

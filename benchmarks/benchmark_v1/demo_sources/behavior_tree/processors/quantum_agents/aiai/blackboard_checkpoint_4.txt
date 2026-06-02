@@ -1,0 +1,44 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once ../common/common_platform_script.txt
+
+advanced_behavior checkpoint_4
+  
+   script_variables
+      bool commandIssued = false;
+   end_script_variables
+
+   precondition
+      if (SharedBlackboardVarExists("checkpoint_tasks", "checkpoint_4"))
+      {
+         return Success();
+      }
+      else
+      {
+         return Failure("No checkpoint_4 task found!");
+      }
+   end_precondition
+   
+   execute
+      if (PLATFORM.GroundRangeTo(WsfSimulation.FindPlatform("Blue_checkpoint_4")) < 10000)
+      {
+         DeleteSharedBlackboardVar("checkpoint_tasks", "checkpoint_4");
+         return Success("Checkpoint 4 reached!");
+      }
+      
+      if (!commandIssued)
+      {
+         commandIssued = true;
+         FlyTarget(PLATFORM, WsfSimulation.FindPlatform("Blue_checkpoint_4").Location(), 450);
+      }
+      return Running("Flying to Checkpoint 4");
+   end_execute
+   
+end_advanced_behavior

@@ -1,0 +1,18 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+track_manager
+   correlation_method perfect
+   end_correlation_method
+   #correlation_method cluster end_cluster_method
+   fusion_method weighted_average
+   end_fusion_method
+
+  filter FILTER_TACTICS
+   end_filter
+end_track_manager

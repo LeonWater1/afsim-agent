@@ -1,0 +1,83 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+weapon_effects ALWAYS_ANGRY WSF_SPHERICAL_LETHALITY 
+   maximum_damage 1.0
+   minimum_radius 0.0 m
+   minimum_damage 0.5
+   maximum_radius 0.1 m
+end_weapon_effects
+
+platform_type HULK WSF_PLATFORM
+   weapon_effects ALWAYS_ANGRY
+   
+   processor fuse WSF_WEAPON_FUSE
+      proximity_all_on_loss_of_target
+      detonate_below_height_agl 1 m
+   end_processor
+end_platform_type
+
+platform shield_helicarrier WSF_PLATFORM
+   side blue
+   icon awacs
+   add weapon hulk WSF_EXPLICIT_WEAPON
+      launched_platform_type HULK 
+      quantity 1
+   end_weapon
+   add mover WSF_AIR_MOVER
+      route 
+      position 40:42:46.080n 74:00:21.600w altitude 32808.40 ft msl
+         speed 50 m/s 
+      position 41:02:05.979n 71:50:38.476w
+         altitude 32808.40 ft 
+      end_route
+   end_mover   
+end_platform
+
+cyber_effect DETONATE WSF_CYBER_DETONATE_EFFECT 
+   weapon_name hulk
+end_cyber_effect
+
+cyber_attack MIND_CONTROL WSF_CYBER_ATTACK
+   effect DETONATE
+   
+   probability_of_attack_success 0.05 
+end_cyber_attack
+
+platform loki WSF_PLATFORM
+   side red
+   execute at_interval_of 10 s
+      foreach(WsfTrack track in PLATFORM.MasterTrackList()) 
+      {
+         PLATFORM.CyberAttack(track.Target(), "MIND_CONTROL");
+      }
+   end_execute
+   position 40:52:15.41n 72:42:55.23w
+   icon infantry
+   
+   add processor mtl WSF_TRACK_PROCESSOR 
+   end_processor 
+   
+   add sensor eyes WSF_GEOMETRIC_SENSOR
+      frame_time 10 s
+      on
+      maximum_range 100 km
+      azimuth_field_of_view -30 deg 30 deg
+      elevation_field_of_view -30 deg 30 deg
+      yaw -90 deg
+      reports_location 
+      internal_link mtl
+   end_sensor
+end_platform
+
+event_pipe
+   file output/avengers.aer
+end_event_pipe
+
+end_time 20 m

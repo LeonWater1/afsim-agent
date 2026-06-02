@@ -1,0 +1,28 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+define_path_variable CASE many_ballistic_shootdown
+log_file output/$(CASE).log
+
+# event selection
+include event_output.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe
+   file output/$(CASE).aer
+   use_preset default  #can be default, low, high, or full
+end_event_pipe
+
+# setup.txt includes the platform types
+include setup.txt
+
+# these are the scenario laydowns
+include scenarios/many_red_launchers.txt   # launches a ballistic missile at the blue target
+include scenarios/many_blue_side.txt       # has the anti-ballistic sam missiles to protect the blue_target.
+
+end_time 30 mins

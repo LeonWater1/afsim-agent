@@ -1,0 +1,33 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# UNCLASSIFIED.
+
+
+include_once weapons/sam/blue_naval_sam.txt
+
+platform_type BLUE_NAVAL_SAM_LAUNCHER WSF_PLATFORM
+  icon PAC-3_Launcher
+
+  comm cmdr_net DATALINK
+     network_name <local:slave>
+     internal_link data_mgr
+     internal_link task_mgr
+  end_comm
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+    purge_interval       60 sec
+  end_processor
+
+  processor task_mgr WSF_TASK_PROCESSOR
+  end_processor
+
+  weapon blue_naval_sam BLUE_NAVAL_SAM
+     quantity 1
+  end_weapon
+end_platform_type

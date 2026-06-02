@@ -1,0 +1,327 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+file_path .
+
+define_path_variable CASE brawler_demo_combined_agent_BVR_8v16_close
+log_file output/$(CASE).log
+
+include_once platforms/gci_cmdr.txt
+include_once platforms/flight_lead.txt
+include_once platforms/combined_platform.txt
+
+#event_output
+#   file output/$(CASE).evt
+#   disable all
+#   enable PLATFORM_ADDED
+#   enable BTREE_NODE_CHILDREN
+#   enable BTREE_NODE_EXEC
+#end_event_output
+
+#end_time 15 min
+#end_time 5 min
+end_time 60 sec
+
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+#platform_availability
+##   type RED_COMBINED_PLATFORM availability 0.5
+##   type COMBINED_PLATFORM     availability 0.5
+#   name blue_1 availability 0
+#   name blue_2 availability 0
+#   name blue_3 availability 0
+#   name blue_4 availability 0
+#   name blue_5 availability 1
+#   name blue_6 availability 1
+#   name blue_7 availability 0
+#   name blue_8 availability 0
+#   name red_1 availability 1
+#   name red_2 availability 1
+#   name red_3 availability 0
+#   name red_4 availability 0
+#   name red_5 availability 0
+#   name red_6 availability 0
+#   name red_7 availability 0
+#   name red_8 availability 0
+#   name red_9 availability 0
+#   name red_10 availability 0
+#   name red_11 availability 0
+#   name red_12 availability 0
+#   name red_13 availability 0
+#   name red_14 availability 0
+#   name red_15 availability 0
+#   name red_16 availability 0
+#end_platform_availability
+
+
+#half the red fighters use  ACFT_RAC1.FXW aero and half use  ACFT_BAC1.FXW aero
+#all blue fighters use  ACFT_BD.FXW aero
+
+platform blue_gci GCI_CMDR
+   side blue
+   position 00:26:45.16n  00:07:58.71e
+   edit processor task_mgr
+      script_variables
+         mDrawClusters = true;
+      end_script_variables
+   end_processor
+end_platform
+
+platform blue_cmdr_1 FLIGHT_LEAD
+   side blue
+   commander blue_gci
+   position 00:26:45.16n  00:07:58.71e
+   edit processor task_mgr
+      script_variables
+         mSelfCreateTasks = false;
+      end_script_variables
+      update_interval 2.0 sec
+   end_processor
+end_platform
+
+platform blue_cmdr_2 FLIGHT_LEAD
+   side blue
+   commander blue_gci
+   position 00:26:45.16n  00:07:58.71e
+   edit processor task_mgr
+      script_variables
+         mSelfCreateTasks = false;
+      end_script_variables
+      update_interval 2.0 sec
+   end_processor
+end_platform
+
+platform blue_1 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:26:45.16n 00:07:58.71e  altitude 15000.00 ft
+end_platform
+
+platform blue_2 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:26:55.55n 00:12:58.23e  altitude 15000.00 ft
+end_platform
+
+platform blue_3 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:25:40.93n 00:15:36.50e  altitude 15000.00 ft
+end_platform
+
+platform blue_4 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:25:04.49n 00:18:06.45e  altitude 15000.00 ft
+end_platform
+
+platform blue_5 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:26:38.72n 00:02:59.08e  altitude 15000.00 ft
+end_platform
+
+platform blue_6 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:25:39.03n 00:00:43.03e  altitude 15000.00 ft
+end_platform
+
+platform blue_7 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:25:35.16n 00:06:23.82e  altitude 15000.00 ft
+end_platform
+
+platform blue_8 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:25:18.90n 00:10:58.34e  altitude 15000.00 ft
+end_platform
+
+platform red_cmdr FLIGHT_LEAD
+   side red
+   position 00:30:00.00n  00:00:00.00e
+   edit processor task_mgr
+      update_interval 2.0 sec
+   end_processor
+end_platform
+
+platform_type  RED_COMBINED_PLATFORM  COMBINED_PLATFORM
+   edit weapon mrm
+      quantity 1
+   end_weapon
+   edit mover
+      aero_file platforms/ACFT_RAC1.FXW
+   end_mover
+   edit processor thinker
+      edit behavior engage_weapon_task_target
+         script_variables
+            DefaultPercentRangeMax = 0.65;
+         end_script_variables
+      end_behavior
+      edit behavior pursue_weapon_task_target
+         script_variables
+            mDrawSteering = false;
+         end_script_variables
+      end_behavior
+   end_processor
+end_platform_type
+
+platform_type  RED_COMBINED_PLATFORM_B  RED_COMBINED_PLATFORM
+   edit mover
+      aero_file platforms/ACFT_BAC1.FXW
+   end_mover
+end_platform_type
+
+
+platform red_1 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:00.00n 00:00:00.00e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_2 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:00.77n 00:02:31.28e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_3 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:02.98n 00:05:10.19e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_4 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:05.17n 00:07:28.77e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_5 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:11.09n 00:15:44.17e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_6 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:06.75n 00:18:17.14e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_7 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:14.07n 00:20:54.35e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_8 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:06.04n 00:23:20.89e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_9 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:18.30n 00:06:35.07w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_10 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:19.06n 00:04:03.80w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_11 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:21.28n 00:01:43.18w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_12 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:23.47n 00:00:53.69e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_13 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:26.56n 00:09:14.95e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_14 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:27.33n 00:11:42.84e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_15 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:29.54n 00:14:21.74e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_16 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:31:31.73n 00:16:35.25e altitude 15000.00 ft
+   heading 180 deg
+end_platform

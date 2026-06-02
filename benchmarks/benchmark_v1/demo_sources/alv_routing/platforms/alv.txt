@@ -1,0 +1,158 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include processors/alv_task_mgr.txt
+include sensors/alv_esm.txt
+include weapons/alv_jammer.txt
+
+radar_signature ALV_RADAR_SIGNATURE
+   constant 1 m^2
+end_radar_signature
+
+aero ALV_WINGS_FOLDED_AERO WSF_AERO
+  cd_zero_subsonic    0.180
+  cd_zero_supersonic  0.410
+  mach_begin_cd_rise  0.850
+  mach_end_cd_rise    1.350
+  mach_max_supersonic 2.000
+  reference_area      0.092347 m2 # 19cm body dia
+  cl_max              1.000    # unknown
+  aspect_ratio        4.000    # unknown
+  oswalds_factor      0.950    # unknown
+end_aero
+
+aero ALV_AERO WSF_AERO
+  cd_zero_subsonic    0.120
+  cd_zero_supersonic  0.410
+  mach_begin_cd_rise  0.930
+  mach_end_cd_rise    1.350
+  mach_max_supersonic 2.000
+  reference_area      0.092347 m2 # 19cm body dia
+  cl_max              8.000    # unknown
+  aspect_ratio        10.000    # unknown
+  oswalds_factor      0.950    # unknown
+end_aero
+
+platform_type ALV WSF_PLATFORM
+   icon cruise_missile
+   radar_signature ALV_RADAR_SIGNATURE
+
+   mover WSF_GUIDED_MOVER
+         #update_interval 0.10 s
+         integration_timestep 0.1 sec
+         #debug
+		   #show_status
+         #show_trajectory
+         stage 1 # Drop for 1 sec with folded wings
+           aero               ALV_WINGS_FOLDED_AERO
+           pre_separation_coast_time 0.2 sec
+         end_stage
+         stage 2 # Open wings and fire off engine
+         total_mass         250 lb
+         fuel_mass          200 lb  # Guess 80% fuel
+         thrust             800 Nt
+         thrust_duration      100 min
+         aero                ALV_AERO
+         #bank_to_turn
+         end_stage
+   end_mover
+
+   processor guidance WSF_GUIDANCE_COMPUTER
+      #show_status
+      #show_evaluations
+      #debug
+      script_variables
+         double TimeLeft = 1;
+      end_script_variables
+      phase DROP
+         next_phase CRUISE when phase_time >= .1 sec
+      end_phase
+
+      phase CRUISE
+         on_entry
+            SetAllowRouteFollowing(true);
+
+            if(PLATFORM.Name().Contains("_1"))
+            {
+               PLATFORM.SetRoute("bogus_route_1");
+               SetCommandedMach(0.90);
+#               SetCommandedAltitudeAGL(9000);
+               SetMaximumCommandedGees(15);
+            }
+            else
+            {
+               PLATFORM.SetRoute("bogus_route_2");
+               SetCommandedMach(0.91);
+#               SetCommandedAltitudeAGL(9000);
+               SetMaximumCommandedGees(15);
+            }
+            TimeLeft = 5800 - (PLATFORM.TimeSinceCreation()); # give time to get back to target
+         end_on_entry
+         next_phase OVER_TARGET if end_of_route
+         next_phase TERMINAL1 if phase_time >=  /variable TimeLeft
+         #next_phase TERMINAL when phase_time >= 100 min     # allow 9 minutes for target endpoint / ditch point
+      end_phase
+      phase OVER_TARGET
+         on_entry
+            SetAllowRouteFollowing(true);
+            PLATFORM.SetRoute("final_route");
+            SetCommandedMach(0.80);
+            SetCommandedAltitude(11000);
+            SetMaximumCommandedGees(10);
+            TimeLeft = 5200 - (PLATFORM.TimeSinceCreation()); # give time to get back to target
+         end_on_entry
+
+           next_phase TERMINAL1 if phase_time >= /variable TimeLeft
+           next_phase OVER_TARGET if end_of_route
+      end_phase
+      phase TERMINAL1
+         on_entry
+            SetCommandedAltitude(11000);
+         end_on_entry
+         maximum_commanded_g 15 g
+         next_phase FINAL_DIVE when target_ground_range <= 7 km
+      end_phase
+      phase  FINAL_DIVE
+         maximum_commanded_g 10 g
+      end_phase
+   end_processor
+
+   processor fuse WSF_GROUND_TARGET_FUSE
+      max_time_of_flight_to_detonate  100 min
+      proximity_all_on_loss_of_target  # weapon keeps going even if target lost
+   end_processor
+end_platform_type
+
+
+# -------------------------
+
+platform_type ALV_JAMMER ALV
+   sensor esm ALV_ESM
+     on
+     internal_link data_mgr
+     ignore_same_side
+  end_sensor
+
+  weapon fwd_jammer ALV_JAMMER
+     off
+     ignore_same_side
+  end_weapon
+
+  weapon aft_jammer ALV_JAMMER
+     off
+     yaw 180.0 deg
+     ignore_same_side
+  end_weapon
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+     purge_interval   60.0 sec
+  end_processor
+
+  processor alv_task_mgr ALV_TASK_MGR
+  end_processor
+end_platform_type

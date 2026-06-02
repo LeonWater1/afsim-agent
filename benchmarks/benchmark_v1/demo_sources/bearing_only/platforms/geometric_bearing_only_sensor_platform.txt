@@ -1,0 +1,39 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once sensors/geometric_bearing_only_sensor.txt
+
+platform_type GEOMETRIC_BEARING_ONLY_SENSOR_PLATFORM WSF_PLATFORM
+  icon ew_radar_icon
+  category 2D_RADAR
+  infrared_signature   VEHICLE_INFRARED_SIGNATURE
+  optical_signature    VEHICLE_OPTICAL_SIGNATURE
+  radar_signature      VEHICLE_RADAR_SIGNATURE
+
+  comm datalink RED_DATALINK
+     network_name <local:slave>
+     internal_link task_mgr
+  end_comm
+
+  processor task_mgr WSF_TASK_PROCESSOR
+  end_processor
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+     report_to commander via datalink to sub_net
+     report_interval      2 sec
+     raw_track_reporting on
+  end_processor
+
+  sensor geometric_bearing_only_sensor GEOMETRIC_BEARING_ONLY_SENSOR
+     on
+     internal_link data_mgr
+     ignore_same_side
+  end_sensor
+
+end_platform_type

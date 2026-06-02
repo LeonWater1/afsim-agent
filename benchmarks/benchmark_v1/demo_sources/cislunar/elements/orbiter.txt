@@ -1,0 +1,12 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+position -2.508695509977e+08 m -2.517868333675e+08 m -8.289819610884e+07 m
+velocity 7.285652506948e+02 m/s -5.543265024856e+02 m/s 1.253542266425e+03 m/s
+epoch_date_time mar 13 2020 12:00:00

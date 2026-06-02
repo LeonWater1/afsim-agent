@@ -1,0 +1,50 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE air_interceptor
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include setup/setup.txt
+include setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_ai.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/ucav.txt
+include_once platforms/air_interceptor.txt
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/four_ucavs.txt
+include_once scenarios/air_interceptor.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+edit platform 10_iads_cmdr
+   add processor sensors_manager SIMPLE_SM
+      max_ttr_acquisition_time   360 sec
+   end_processor
+end_platform
+
+end_time 30 min

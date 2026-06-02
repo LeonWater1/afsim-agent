@@ -1,0 +1,27 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include ew_radar.txt
+
+radar_signature TARGET_RADAR_SIG
+   constant -20 dbsm
+end_radar_signature
+
+platform_type TARGET_PLATFORM_TYPE WSF_PLATFORM
+   radar_signature TARGET_RADAR_SIG
+end_platform_type
+
+platform_type SENSOR_PLATFORM_TYPE WSF_PLATFORM
+   sensor sensor EW_RADAR end_sensor
+end_platform_type
+
+vertical_coverage
+   output_file ew_radar.vcd
+   x_units nm
+   y_units kft
+end_vertical_coverage

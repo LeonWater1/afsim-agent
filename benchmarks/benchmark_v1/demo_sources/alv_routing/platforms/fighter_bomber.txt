@@ -1,0 +1,69 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+################################################################################
+# Define the platform type for the notional fighter/bomber.
+platform_type FIGHTER_BOMBER WSF_PLATFORM
+   category no_awacs_esm
+   icon FIGHTER
+
+   mover WSF_AIR_MOVER
+     maximum_radial_acceleration 1.12 g
+     maximum_linear_acceleration 2 g
+   end_mover
+
+   comm rcvr-1 WSF_RADIO_RCVR
+      frequency 1200 mhz
+      processor track-proc
+      processor attack-proc
+   end_comm
+
+   comm xmtr-1 WSF_RADIO_XMTR
+      frequency 1200 mhz
+   end_comm
+
+   processor track-proc WSF_TRACK_PROCESSOR
+   end_processor
+
+   processor attack-proc WSF_SCRIPT_PROCESSOR
+      on_message
+         type WSF_TRACK_MESSAGE
+            script
+               WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+               WsfTrack        track    = trackMsg.Track();
+               WsfTrackId      trackId  = track.TrackId();
+               double     targetLat     = track.Latitude();
+               double     targetLon     = track.Longitude();
+               if (TIME_NOW < 50.0)
+               {
+                  #writeln("Received track message from ", trackId.OwningPlatform());
+               }
+
+               // If we aren't attacking then start the 'attack'
+               WsfProcessor launchComputer = PLATFORM.Processor("alv-launch-computer");
+               if (! launchComputer.IsTurnedOn())
+               {
+                  writeln_d("Starting attack at T=", TIME_NOW);
+                  launchComputer.TurnOn();
+                  PLATFORM.GoToLocation(targetLat, targetLon);
+               }
+            end_script
+
+         type default
+            script
+               writeln_d("Received message of type ", MESSAGE.Type());
+            end_script
+      end_on_message
+   end_processor
+
+   processor alv-launch-computer ALV_LAUNCH_COMPUTER
+     off
+     update_interval 1 sec
+   end_processor
+end_platform_type

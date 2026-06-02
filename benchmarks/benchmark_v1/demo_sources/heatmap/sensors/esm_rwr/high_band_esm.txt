@@ -1,0 +1,32 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+antenna_pattern ESM_ANTENNA
+   constant_pattern
+      peak_gain 3 db
+end_antenna_pattern
+
+sensor HIGH_BAND_ESM WSF_ESM_SENSOR
+   on
+   frame_time                 1 sec
+   detection_sensitivity      -105 dbw
+   receiver
+      antenna_pattern         ESM_ANTENNA
+      instantaneous_bandwidth 1 mhz
+   end_receiver
+   frequency_band             5 ghz 30 ghz
+  #reports_range
+   reports_elevation
+   reports_bearing
+   reports_frequency
+   internal_link data_mgr
+   internal_link task_mgr
+   ignore_same_side
+   ignore_domain land
+end_sensor

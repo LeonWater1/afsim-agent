@@ -1,0 +1,80 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform uav-1 UCAV
+  side red
+  icon UCAV
+  #position 30:30:00.00n 79:00:00.00w altitude 35000.00 ft
+  heading 270 deg
+  
+  # All other UCAVs refer to uav-1 for their locations.
+  
+  alternate_locations 
+     location 30:30:00n   79:00:00w  altitude 35000 ft heading  90 deg # [1] diamond formation
+     location 30:35:00n   79:00:00w  altitude 35000 ft heading 235 deg # [2] stepped formation
+     location 30:20:00n   79:30:00w  altitude 35000 ft heading 270 deg # [3] V formation
+  end_alternate_locations
+  
+  track platform target_1 end_track
+  track platform target_2 end_track
+
+end_platform
+
+platform uav-2 UCAV
+  side red
+  icon UCAV
+#  position 30:18:42.17n 78:48:39.59w altitude 35000.00 ft
+  heading 271 deg
+  
+  track platform target_3 end_track
+  track platform target_2 end_track
+  
+  # refers to uav-1 for location
+  alternate_locations reference uav-1
+     location 30:18:42.17n 78:48:39.59w altitude 35000.00 ft heading 90 deg
+     location 30:25n   78:55w altitude 35000 ft heading 585 deg
+     location 30:30n   79:15w altitude 35000 ft heading 270 deg
+     debug on
+  end_alternate_locations
+  
+end_platform
+
+platform uav-3 UCAV
+  side red
+  icon UCAV
+#  position 30:06:59.68n 78:59:23.29w altitude 35000.00 ft
+  heading 271 deg
+  
+  track platform target_3 end_track
+  track platform target_4 end_track
+  
+  # refers to uav-1 for location
+  alternate_locations
+     location 30:06:59.68n 78:59:23.29w altitude 35000.00 ft 
+     location 30:15n   78:50w altitude 35000 ft
+     location 30:10n   79:30w altitude 35000 ft reference uav-1
+  end_alternate_locations
+end_platform
+
+platform uav-4 UCAV
+  side red
+  icon UCAV
+#  position 30:18:33.14n 79:10:14.04w altitude 35000.00 ft
+  heading 271 deg
+  
+  track platform target_1 end_track
+  track platform target_4 end_track
+  
+  # refers to uav-1 for location
+  alternate_locations reference uav-1
+     location 30:18:33.14n 79:10:14.04w altitude 35000.00 ft
+     location 30:05n   78:45w altitude 35000 ft
+     location 30:00n   79:15w altitude 35000 ft
+  end_alternate_locations
+end_platform

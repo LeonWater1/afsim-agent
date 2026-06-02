@@ -1,0 +1,492 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+file_path .
+include_once platforms/gci_cmdr.txt
+include_once platforms/flight_lead.txt
+include_once platforms/combined_platform.txt
+
+end_time 1000 sec
+#end_time 30 sec
+
+random_seed 6453
+
+define_path_variable CASE brawler_demo_combined_agent_BVR_8v16
+log_file output/$(CASE).log
+
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+#event_output
+#   file output/$(CASE).evt
+#   disable all
+#   enable BTREE_NODE_CHILDREN
+#   enable BTREE_NODE_EXEC
+#end_event_output
+
+
+#event_output
+#   file output/$(CASE).evt
+#   disable all
+#   enable LOCAL_TRACK_CORRELATION
+#   enable LOCAL_TRACK_DECORRELATION
+#   enable LOCAL_TRACK_DROPPED
+#   enable LOCAL_TRACK_INITIATED
+#   enable LOCAL_TRACK_UPDATED
+#
+#   enable MESSAGE_DELIVERY_ATTEMPT
+#   enable MESSAGE_DISCARDED
+#   enable MESSAGE_QUEUED
+#   enable MESSAGE_RECEIVED
+#   enable MESSAGE_TRANSMITTED
+#   enable MESSAGE_UPDATED
+#
+#   enable SENSOR_TRACK_DROPPED
+#   enable SENSOR_TRACK_INITIATED
+#   enable SENSOR_TRACK_UPDATED
+#
+#   enable TASK_ASSIGNED
+#   enable TASK_CANCELED
+#   enable TASK_COMPLETED
+#end_event_output
+
+#platform_availability
+##   type RED_COMBINED_PLATFORM availability 0.5
+##   type COMBINED_PLATFORM     availability 0.5
+#   name blue_1 availability 0
+#   name blue_2 availability 0
+#   name blue_3 availability 0
+#   name blue_4 availability 0
+#   name blue_5 availability 1
+#   name blue_6 availability 1
+#   name blue_7 availability 0
+#   name blue_8 availability 0
+#   name red_1 availability 1
+#   name red_2 availability 1
+#   name red_3 availability 0
+#   name red_4 availability 0
+#   name red_5 availability 0
+#   name red_6 availability 0
+#   name red_7 availability 0
+#   name red_8 availability 0
+#   name red_9 availability 0
+#   name red_10 availability 0
+#   name red_11 availability 0
+#   name red_12 availability 0
+#   name red_13 availability 0
+#   name red_14 availability 0
+#   name red_15 availability 0
+#   name red_16 availability 0
+#end_platform_availability
+
+#half the red fighters use  ACFT_RAC1.FXW aero and half use  ACFT_BAC1.FXW aero
+#all blue fighters use  ACFT_BD.FXW aero
+
+#script_variables
+#   double mytime = MATH.RandomUniform() * 100.0;   #some random time between 0-200 sec
+#end_script_variables
+#
+#script bool on_platform_injection(WsfPlatform aPlatform)
+#   if (aPlatform.Side() == "blue" &&
+#       aPlatform.IsA_TypeOf("COMBINED_PLATFORM"))
+#   {
+#      aPlatform.SetCreationTime(mytime);
+#   }
+#   return true;
+#end_script
+
+//Allows the user to prevent or delay the injection of a platform.
+//This script is executed prior to adding any platform to the simulation.
+//True should be returned to continue adding the platform normally.
+//False should be returned to prevent the platform from being injected.
+//SetCreationTime may be used in this script to delay the creation of the platform.
+
+platform blue_gci GCI_CMDR
+   side blue
+   position 00:30:00.00s  00:10:00.00e
+
+   edit processor task_mgr
+      script_variables
+         mDrawClusters = true;
+      end_script_variables
+   end_processor
+end_platform
+
+platform blue_cmdr_1 FLIGHT_LEAD
+   side blue
+   commander blue_gci
+   position 00:30:00.00s  00:10:00.00e
+   edit processor task_mgr
+      script_variables
+         mSelfCreateTasks = false;
+      end_script_variables
+      update_interval 2.0 sec
+   end_processor
+
+
+#   edit processor data_mgr
+#
+##      on_message
+##         type WSF_TRACK_MESSAGE
+##            script
+##               #must get sensor info from sensing platform's master RAW track list
+##               WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+##               WsfTrack t = trackMsg.Track();
+##               WsfLocalTrackList ltl = t.Originator().MasterTrackList();
+##               WsfLocalTrack lt = ltl.Find(t.TrackId());
+##               WsfTrackList list = t.Originator().MasterRawTrackList();
+##               for(int i=0; i<lt.RawTrackCount(); i+=1) {
+##                  WsfTrack rt = lt.RawTrack(i);
+##                  WsfTrack rrt = list.Find(rt.TrackId());
+##                  writeln("raw trk sensor: ", rrt.SensorName(), " / ", rrt.SensorType());
+##               }
+##            end_script
+##      end_on_message
+#
+#
+#
+##      update_interval 5 sec
+##      on_update
+##         writeln("master track list: -----------------------------------");
+##         WsfLocalTrackList list = PLATFORM.MasterTrackList();
+##         foreach (WsfLocalTrack lt in list)
+##         {
+##            if (lt.IsValid())
+##            {
+##               writeln("loc trk: ", lt.TargetName(), " sen: ", lt.SensorName(), " / ", lt.SensorType());
+##               for(int i=0; i<=lt.RawTrackCount(); i+=1)
+##               {
+##                  WsfTrack rt = lt.RawTrack(i);
+##                  if (rt.IsValid())
+##                  {
+##                     writeln("raw trk: ", rt.TargetName(), " sen: ", rt.SensorName(), " / ", rt.SensorType());
+##                  }
+##                  else
+##                  {
+##                     writeln("raw track indexed at ", i, " is invalid!");
+##                  }
+##               }
+##            }
+##         }
+##         writeln("------------------------------------------------------");
+##         writeln("raw master track list: -------------------------------");
+##         WsfTrackList rawlist = PLATFORM.MasterRawTrackList();
+##         foreach(WsfTrack rt in rawlist)
+##         {
+##            writeln("raw trk: ", rt.TargetName(), " sen: ", rt.SensorName(), " / ", rt.SensorType());
+##         }
+##         writeln("------------------------------------------------------");
+##
+##      end_on_update
+#
+#   end_processor
+end_platform
+
+platform blue_cmdr_2 FLIGHT_LEAD
+   side blue
+   commander blue_gci
+#   edit comm datalink
+#      debug
+#   end_comm
+   position 00:30:00.00s  00:10:00.00e
+   edit processor task_mgr
+      script_variables
+         mSelfCreateTasks = false;
+      end_script_variables
+      update_interval 2.0 sec
+   end_processor
+end_platform
+
+platform blue_1 COMBINED_PLATFORM
+   #creation_time $<X:500>$ seconds
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:30:00.00s 00:10:00.00e  altitude 15000.00 ft
+#
+#   edit processor data_mgr
+##      on_message
+##         type WSF_TRACK_MESSAGE
+##            script
+##               WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+##               WsfTrack t = trackMsg.Track();
+##               writeln("rcv trk: ", t.TargetName(), " sen: ", t.SensorName(), " / ", t.SensorType());
+##               WsfLocalTrack lt = (WsfLocalTrack)t;
+##               if (lt.IsValid())
+##               {
+##                  writeln("loc trk: ", lt.TargetName(), " sen: ", lt.SensorName(), " / ", lt.SensorType());
+##                  for(int i=0; i<=lt.RawTrackCount(); i+=1)
+##                  {
+##                     WsfTrack rt = lt.RawTrack(i);
+##                     writeln("raw trk: ", rt.TargetName(), " sen: ", rt.SensorName(), " / ", rt.SensorType());
+##                  }
+##               }
+##            end_script
+##      end_on_message
+#
+#      update_interval 5 sec
+#      on_update
+#         writeln("master track list: -----------------------------------");
+#         WsfLocalTrackList list = PLATFORM.MasterTrackList();
+#         foreach (WsfLocalTrack lt in list)
+#         {
+#            if (lt.IsValid())
+#            {
+#               writeln("loc trk: ", lt.TargetName(), " sen: ", lt.SensorName(), " / ", lt.SensorType());
+#               for(int i=0; i<=lt.RawTrackCount(); i+=1)
+#               {
+#                  WsfTrack rt = lt.RawTrack(i);
+#                  if (rt.IsValid())
+#                  {
+#                     writeln("raw trk: ", rt.TargetName(), " sen: ", rt.SensorName(), " / ", rt.SensorType());
+#                  }
+#                  else
+#                  {
+#                     writeln("raw track indexed at ", i, " is invalid!");
+#                  }
+#               }
+#            }
+#         }
+#         writeln("------------------------------------------------------");
+#         writeln("raw master track list: -------------------------------");
+#         WsfTrackList rawlist = PLATFORM.MasterRawTrackList();
+#         foreach(WsfTrack rt in rawlist)
+#         {
+#            writeln("raw trk: ", rt.TargetName(), " sen: ", rt.SensorName(), " / ", rt.SensorType());
+#         }
+#         writeln("------------------------------------------------------");
+#
+#      end_on_update
+#
+#   end_processor
+end_platform
+
+platform blue_2 COMBINED_PLATFORM
+   #creation_time $<X:500>$ seconds
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:29:49.61s 00:14:59.52e  altitude 15000.00 ft
+end_platform
+
+platform blue_3 COMBINED_PLATFORM
+   #creation_time $<X:500>$ seconds
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:34:40.25s 00:23:29.27e  altitude 15000.00 ft
+end_platform
+
+platform blue_4 COMBINED_PLATFORM
+   #creation_time $<X:500>$ seconds
+   side blue
+   icon F-15
+   commander blue_cmdr_1
+   heading 360 deg
+   position 00:38:17.15s 00:26:48.90e  altitude 15000.00 ft
+end_platform
+
+platform blue_5 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:34:08.56s 00:01:17.13w  altitude 15000.00 ft
+end_platform
+
+platform blue_6 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:38:06.43s 00:04:37.12w  altitude 15000.00 ft
+end_platform
+
+platform blue_7 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:41:43.68s 00:10:08.82e  altitude 15000.00 ft
+end_platform
+
+platform blue_8 COMBINED_PLATFORM
+   side blue
+   icon F-15
+   commander blue_cmdr_2
+   heading 360 deg
+   position 00:41:59.93s 00:14:43.36e  altitude 15000.00 ft
+end_platform
+
+platform red_cmdr FLIGHT_LEAD
+   side red
+   position 00:30:00.00n  00:00:00.00e
+   edit processor task_mgr
+      update_interval 2.0 sec
+   end_processor
+end_platform
+
+platform_type RED_COMBINED_PLATFORM COMBINED_PLATFORM
+   edit weapon mrm
+      quantity 1
+   end_weapon
+   edit mover
+      aero_file platforms/ACFT_RAC1.FXW
+   end_mover
+   edit processor thinker
+      edit behavior engage_weapon_task_target
+         script_variables
+            DefaultPercentRangeMax = 0.65;
+         end_script_variables
+      end_behavior
+      edit behavior pursue_weapon_task_target
+         script_variables
+            mDrawSteering = false;
+         end_script_variables
+      end_behavior
+   end_processor
+end_platform_type
+
+platform_type RED_COMBINED_PLATFORM_B RED_COMBINED_PLATFORM
+   edit mover
+      aero_file platforms/ACFT_BAC1.FXW
+   end_mover
+end_platform_type
+
+
+platform red_1 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:00.00n 00:00:00.00e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_2 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:00.77n 00:02:31.28e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_3 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:02.98n 00:05:10.19e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_4 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:05.17n 00:07:28.77e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_5 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:11.09n 00:15:44.17e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_6 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:06.75n 00:18:17.14e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_7 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:14.07n 00:20:54.35e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_8 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:30:06.04n 00:23:20.89e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_9 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:51.76n 00:06:38.92w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_10 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:52.52n 00:04:07.64w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_11 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:54.74n 00:01:47.02w altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_12 RED_COMBINED_PLATFORM
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:56.93n 00:00:49.85e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_13 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:50.08n 00:09:18.14e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_14 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:50.85n 00:11:46.04e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_15 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:53.06n 00:14:24.94e altitude 15000.00 ft
+   heading 180 deg
+end_platform
+
+platform red_16 RED_COMBINED_PLATFORM_B
+   side red
+   icon SU-27
+   commander red_cmdr
+   position 00:35:55.25n 00:16:38.45e altitude 15000.00 ft
+   heading 180 deg
+end_platform

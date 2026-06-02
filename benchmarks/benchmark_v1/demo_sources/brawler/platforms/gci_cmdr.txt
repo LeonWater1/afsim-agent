@@ -1,0 +1,275 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once processors/quantum_agents/behavior_debug_quantum_tasker.txt
+
+
+platform_type GCI_CMDR WSF_PLATFORM
+   icon C4I
+
+   comm datalink WSF_COMM_TRANSCEIVER
+      propagation_speed 0 m/s   #instantaneous propogation (faster than speed of light)
+      network_name  brawler_net
+      internal_link data_mgr
+      internal_link task_mgr
+      internal_link perception
+   end_comm
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval            60 sec
+      fused_track_reporting     on
+      raw_track_reporting       off
+      report_interval           0.5 sec
+      circular_report_rejection true
+      report_to commander via datalink
+      report_to subordinates via datalink
+   end_processor
+
+   processor perception WSF_PERCEPTION_PROCESSOR
+      script_debug_writes      off
+#      reporting_self           false
+#      reporting_others         false
+      asset_perception         status_messages
+#      asset_update_interval     5 sec
+#      max_asset_load          100
+#      threat_update_interval    5 sec
+#      max_threat_load         100
+   end_processor
+
+   processor task_mgr WSF_QUANTUM_TASKER_PROCESSOR
+
+         script_debug_writes  off
+         update_interval 10.0 sec
+        #show_task_messages
+
+         script_variables
+            ##########################################################################
+            ##  user parameters, change these at will
+            ##########################################################################
+            bool    mDrawClusters           = false;
+            bool    mRequireTasking         = false;
+            bool    mRequireMinWeapons      = false;
+            int     mMaxTaskPerformers      =  1;
+            string  mClusterMethod          =  "H_TREE_MAX";         //valid: K_MEANS, H_TREE_MIN, H_TREE_MAX
+            string  mDistanceFunction       =  "POSITION_VELOCITY";  //valid: POSITION_VELOCITY, POSITION_ONLY, 2D_POSITION
+            double  mClusterDistanceLimit   =  20*MATH.M_PER_NM();
+            double  mClusterJobPriority     =  1;  //if set to zero or less, then number of cluster occupants will be the priority
+
+            Map<string,int> mKnownTargetTypes = Map<string,int>();
+           #mKnownTargetTypes["BRAWLER_PLATFORM"] = 1;
+           #mKnownTargetTypes["COMBINED_PLATFORM"] = 1;
+            mKnownTargetTypes["RED_COMBINED_PLATFORM"]   = 1;
+            mKnownTargetTypes["RED_COMBINED_PLATFORM_B"] = 1;
+
+            ##########################################################################
+            ##  script variables, used by methods below, do not change
+            ##########################################################################
+            WsfDraw                 draw             = WsfDraw();
+            WsfClusterManager       cManager;
+            Array< Array<WsfTrack> > mClusters;
+         end_script_variables
+
+
+         on_initialize
+            cManager = WsfClusterManager.Create(); // creates a cluster manager owned by this script
+            cManager.SetClusterMethod(mClusterMethod);
+            cManager.SetDistanceLimit(mClusterDistanceLimit);
+            cManager.SetDistanceFunction(mDistanceFunction);
+         end_on_initialize
+
+         ############################################################################
+         ##  utility method used to draw lines around tracks in a cluster
+         ##  lines are drawn according to the convex hull of the cluster members
+         ############################################################################
+         script void draw_cluster_hull(Array<WsfTrack> hull)
+            if (hull.Size() <= 0)
+            {
+               return;
+            }
+
+            draw.SetDuration(PROCESSOR.UpdateInterval());
+            #draw.SetColor(1.0,0.5,0.0);  //orange?
+            draw.SetColor(1.0,0.0,1.0);  //purple?
+            draw.SetLineStyle("solid");
+            draw.SetLineSize(2);
+
+            if (hull.Size() == 1)
+            {
+               draw.SetEllipseMode("line");
+               draw.BeginCircle(0, 3*1852);
+                  draw.Vertex(hull.Get(0).CurrentLocation());
+               draw.End();
+            }
+            else
+            {
+               draw.BeginPolyline();
+               foreach(WsfTrack t in hull)
+               {
+                  draw.Vertex(t.CurrentLocation());
+               }
+               draw.Vertex(hull.Get(0).CurrentLocation());
+               draw.End();
+            }
+         end_script
+
+
+         script Array<WsfQuantumTask> GciCommanderTaskGeneration(Array<WsfLocalTrack> aTracks, Array<WsfAssetPerception> aAssets)
+
+            #writeln("T=",TIME_NOW,", ",PLATFORM.Name(),", tracks: ", TRACKS.Size());
+
+            //create weapon tasks for enemy track groups (clusters)
+            Array<WsfQuantumTask> tasks = Array<WsfQuantumTask>();
+            writeln_d(PLATFORM.Name(), " executing GciCommanderTaskGeneration(), T=", TIME_NOW);
+
+            ##########################################################################
+            ##   update the cluster manager with the current master track list
+            ##########################################################################
+            WsfLocalTrackList localTracks = PLATFORM.MasterTrackList();
+            Array<WsfTrack> trackArray = Array<WsfTrack>();
+            foreach (WsfLocalTrack lt in localTracks)
+            {
+               if (mRequireTasking == true && TasksReceivedForTarget(lt.TrackId()).Count() <= 0)
+               {
+                  continue;
+               }
+               if (lt.IsValid() && (!lt.SideValid() || lt.Side() != PLATFORM.Side()))
+               {
+                  if (mKnownTargetTypes.Size() <= 0 || mKnownTargetTypes.Exists(lt.TargetType()))
+                  {
+                     lt.SetBearing( lt.Heading() );  #useful for the cluster processing
+                     trackArray.PushBack(lt);
+                  }
+               }
+            }
+            mClusters = cManager.GetClusters(trackArray);
+
+            #writeln("T=", TIME_NOW, ", ", PLATFORM.Name(), ", clusters: ", mClusters.Size());
+
+            ##########################################################################
+            ##  generate a task for each clusters
+            ##########################################################################
+            for(int i=0; i<mClusters.Size(); i+=1)
+            {
+               Array<WsfTrack> cluster  = mClusters[i];
+               int clusterId = cManager.UniqueId(cluster);
+
+               #string clusterString = write_str("cluster ", clusterId, " = ");
+               #foreach(WsfTrack t in cluster)
+               #{
+               #   clusterString += (t.TargetName() + ", ");
+               #}
+               #writeln(clusterString);
+
+               if (mDrawClusters == true)
+               {
+                  Array<WsfTrack> hull = cManager.ConvexHull(cluster);
+                  draw_cluster_hull(hull);
+               }
+               if( cluster.Size() > 0 )
+               {
+                  double ClusterPriority = mClusterJobPriority;
+                  if (ClusterPriority <= 0)
+                  {
+                     ClusterPriority = (double)cluster.Size();
+                  }
+                 #WsfTask qt = WsfTask.Construct(ClusterPriority, "CLUSTER", cluster.Entry(0));   //include a track with the task
+                  WsfQuantumTask qt = WsfQuantumTask.Construct(ClusterPriority, "CLUSTER");   //include a track with the task
+                  qt.SetTaskType("CLUSTER");
+                  qt.UniqueId(clusterId);
+                  qt.SetAuxData( "clusterIndex", i );   //for evaluation below
+                  //TODO local tracks in the quantum task???
+                  qt.SetAuxData( "maxPerformers", mMaxTaskPerformers );
+                  qt.SetAuxData( "clusterId", clusterId );
+                  WsfGeoPoint mean = cManager.MeanLocation(cluster);
+                  qt.SetAuxData( "ClusterMeanPoint", mean);
+                  //qt.SetAuxData( "ClusterBearing", cluster.Bearing() );
+                  //qt.SetAuxData( "ClusterBearingValid", cluster.BearingValid() );
+                  qt.SetAuxData( "ClusterNumMembers", cluster.Size() );
+                  Array<string> arr = Array<string>();
+                  for (int i = 0; i < cluster.Size(); i = i + 1 )
+                  {
+                     arr.PushBack(cluster[i].TargetName());
+                     writeln_d("job cluster member: ", cluster[i].TargetName());
+                  }
+                  qt.SetAuxData( "ClusterMemberNames", arr );
+                  tasks.PushBack(qt);
+                  writeln_d("cluster task generated for: ", clusterId);
+               }
+            }
+            return tasks;
+         end_script
+
+
+         script double GciCommanderEvaluation(WsfQuantumTask aTask, WsfAssetPerception aAsset)
+
+            //simplistic evaluation for now
+            //TODO : iterate over all perceived assets that are subordinates of this lead and...
+            //       evaluate each entry separately & make a composite value
+            writeln_d("evaluating ", aAsset.Name(), " and task type ", aTask.TaskType());
+            if (aAsset.Type() == "FLIGHT_LEAD")
+            {
+               WsfPlatform lead = WsfSimulation.FindPlatform(aAsset.Index());
+               if (lead.IsValid())
+               {
+                  writeln_d("calculating value");
+                  WsfGeoPoint subCentroid = lead.SubordinatesCentroid();   //cheating, TODO: use asset perception
+                  int clusterIndex = aTask.AuxDataInt("clusterIndex");
+                  Array<WsfTrack> cluster = mClusters[clusterIndex];
+                  WsfGeoPoint mean = cManager.MeanLocation(cluster);
+                  double dist = mean.GroundRangeTo(subCentroid);
+                  #double count = (double)lead.Subordinates().Count();
+
+                  //count available weapons
+                  double weaponCount = 0;
+                  Array<WsfAssetPerception> assets = PLATFORM.PerceivedAssets();
+                  WsfPlatformList subs = lead.Subordinates();
+                  foreach(WsfPlatform sub in subs)
+                  {
+                     foreach (WsfAssetPerception asset in assets)
+                     {
+                        if (asset.Index()==sub.Index())
+                        {
+                           for (int j=0; j<asset.SystemCount(); j+=1)
+                           {
+                              if (asset.SystemKind(j) == "weapon")
+                              {
+                                 weaponCount += asset.SystemQuantityRemaining(j);
+                              }
+                           }
+                           break;
+                        }
+                     }
+                  }
+                  double value = 1.0 / (dist*dist);
+                  if (mRequireMinWeapons == true && weaponCount < cluster.Size())
+                  {
+                     value = 0.0;
+                  }
+                  writeln_d("T=", TIME_NOW, ", ", lead.Name(), " evaluation: ", (weaponCount/dist));
+                  return value;
+               }
+            }
+            return 0.0;
+         end_script
+
+         reallocation_strategy  dynamic
+         generator              custom          GciCommanderTaskGeneration
+         evaluator              custom          GciCommanderEvaluation
+         allocator              optimal_profit
+        #allocator_extra_tasks  optimal_profit
+        #allocator              greedy_isolated
+        #allocator_extra_tasks  greedy_isolated
+
+   #      behavior_tree
+   #         behavior_node debug_quantum_tasker
+   #      end_behavior_tree
+
+   end_processor
+
+end_platform_type

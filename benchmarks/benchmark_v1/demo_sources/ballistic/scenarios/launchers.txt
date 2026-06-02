@@ -1,0 +1,109 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# predefined targets
+
+platform target01 TARGET
+  position 24n 55e
+end_platform
+
+platform target02 TARGET
+  position 24.7n 55.5e
+end_platform
+
+platform target03 TARGET
+  position 24.9n 55.2e
+end_platform
+
+platform target04 TARGET
+  position 21.9n 55.2e
+end_platform
+
+platform target05 TARGET
+  position 18.9n 55.2e
+end_platform
+
+# LAUNCHERS
+# The default times for the launch_weapon_processor is in
+# ../processor/launch_weapon_processor.txt
+
+platform red_mrbm_2_launcher RED_MRBM_2_LAUNCHER
+   position 31n 56e
+   processor launch_weapon_processor
+     script_variables
+       TIME_TO_LAUNCH = 180 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+     platform target01
+   end_track
+end_platform
+
+platform red_srbm_1_launcher RED_SRBM_1_LAUNCHER
+   position 27n 56e
+   processor launch_weapon_processor
+     script_variables
+       TIME_TO_LAUNCH = 220 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+      platform target02
+   end_track
+end_platform
+
+platform red_srbm_2_launcher RED_SRBM_2_LAUNCHER
+   position 28n 56e
+   processor launch_weapon_processor
+     script_variables
+       TIME_TO_LAUNCH = 300 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+      platform target03
+   end_track
+end_platform
+
+platform red_srbm_3_launcher RED_SRBM_3_LAUNCHER
+   position 34n 56e
+   processor launch_weapon_processor
+     script_variables
+       TIME_TO_LAUNCH = 100 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+      platform target04
+   end_track
+end_platform
+
+platform red_srbm_4_launcher RED_SRBM_4_LAUNCHER
+   position 38n 56e
+   processor launch_weapon_processor
+     script_variables
+       TIME_TO_LAUNCH = 600 ; # sim time in seconds
+       #LAUNCH_RANDOM = 1; # uncomment this if you want to randomize the launch time
+       #MIN_TIME      = 10; # minimum random launch time for this weapon
+       #MAX_TIME      = 500; # maximum random launch time for this weapon
+     end_script_variables
+   end_processor
+   track
+      platform target05
+   end_track
+end_platform
+

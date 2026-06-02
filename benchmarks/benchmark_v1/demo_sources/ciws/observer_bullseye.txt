@@ -1,0 +1,126 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This shows how to record the hits/misses data as well as illustrating it visually.
+###BEGIN OBSERVER SCRIPTS
+script_variables
+   int     ShotNum     = 100;  #Record only this many shots
+   bool    DrawTrajectory = 1; # Draws lines from the apparent launcher at time of launch.
+   double  FirstRadius = 1;    # Bullseye ring every meter
+   //Dont change any variables below this line.
+   WsfDraw BullDraw  =  WsfDraw(); #Will be used to draw the bullseye
+   WsfDraw HitDraw   =  WsfDraw(); #Will be used to draw the hits
+   Array<Vec3>  HitLocations = Array<Vec3>();  # Will store the location of hits/and misses
+   Array<Vec3>  ApparentLaunchLocations = Array<Vec3>();
+   int CurrentIndex = 0;
+end_script_variables
+
+script void WeaponTerminated(WsfWeaponEngagement aWeaponEngagement) 
+   extern  Array<Vec3>  HitLocations;
+   extern  Array<Vec3> ApparentLaunchLocations;
+   extern  double    FirstRadius;
+   extern  WsfDraw   BullDraw; #draw the bullseyes
+   extern  WsfDraw HitDraw;
+   extern int  ShotNum;
+      
+   WsfPlatform Weapon = aWeaponEngagement.WeaponPlatform();
+   WsfPlatform FiringPlatform =  aWeaponEngagement.FiringPlatform();
+   WsfPlatform TargetPlatform = aWeaponEngagement.TargetPlatform();
+   double MissDistanceToTarget = aWeaponEngagement.MissDistance(TargetPlatform);
+   WsfGeoPoint TargetLocationAtLaunch = aWeaponEngagement.TargetLocationAtLaunch();
+   WsfGeoPoint WeaponLocationAtLaunch = aWeaponEngagement.WeaponLocationAtLaunch();
+   double WeaponRange = TargetLocationAtLaunch.SlantRangeTo(WeaponLocationAtLaunch);
+
+   WsfGeoPoint TargetLocation = aWeaponEngagement.TargetLocation(TargetPlatform);
+   double ElevationAngle = TargetPlatform.RelativeElevationOf(FiringPlatform.Location());
+
+   WsfGeoPoint WeaponLocation = aWeaponEngagement.WeaponLocation();
+   Vec3 WeaponLocWCS = WeaponLocation.LocationWCS();  
+   Vec3 MissECS = TargetPlatform.ConvertWCSToECS(WeaponLocWCS);
+   HitLocations.PushBack(MissECS); # Save the hitlocation vector in the array.
+   
+   Vec3 Velocities3D  = Vec3.Subtract(Weapon.VelocityWCS(),TargetPlatform.VelocityWCS());
+   double ImpactSpd = Velocities3D.Magnitude();
+   double KEnergyJoules = .5 * 0.671 * (ImpactSpd * ImpactSpd); # In Joules
+   double FtLbs = KEnergyJoules * 0.737562; 
+   writeln(TIME_NOW , " Name ", Weapon.Name(),  
+           " RangeAtLaunch ", WeaponRange ," MissDistanceToTarget ", 
+           MissDistanceToTarget, " HIT/MISS ",aWeaponEngagement.Pk(), " MissECS ", MissECS, " " ,           
+            " WeapSpeed " , Weapon.Speed(), " TargetSpeed " , TargetPlatform.Speed(),
+           " ImpactSpeed " , ImpactSpd, " ", KEnergyJoules, " Joules ", FtLbs, " FootPounds ");
+   
+   //save off the apparent launcher location when it got hit
+   WsfGeoPoint launcherlocation = FiringPlatform.Location();
+   Vec3 WeaponLaunchLocationWCS = launcherlocation.LocationWCS();
+   Vec3 LauncherVertexECS = TargetPlatform.ConvertWCSToECS(WeaponLaunchLocationWCS);
+   #writeln("launcher eECS position ", LauncherVertexECS);
+   ApparentLaunchLocations.PushBack(LauncherVertexECS);
+   
+   if(Weapon.Index() == ShotNum)
+   {
+   BullDraw.SetDuration(100); 
+   BullDraw.SetEllipseMode("fill");
+   
+   // Draw the bullseyes from the outside in or else the little circles get overridden
+   BullDraw.BeginEllipsoid(TargetPlatform.Heading(),ElevationAngle,0,.1,FirstRadius*4,FirstRadius*4);   
+   BullDraw.SetColor(0,1,0,.3);  
+   BullDraw.Vertex(TargetPlatform);
+   BullDraw.End();   
+     
+   BullDraw.BeginEllipsoid(TargetPlatform.Heading(),ElevationAngle,0,.1,FirstRadius*3,FirstRadius*3);
+   BullDraw.SetColor(0,0,1,.4);  
+   BullDraw.Vertex(TargetPlatform);
+   BullDraw.End();   
+   
+   BullDraw.BeginEllipsoid(TargetPlatform.Heading(),ElevationAngle,0,.1,FirstRadius*2,FirstRadius*2);   
+   BullDraw.SetColor(0,1,0,.5);  
+   BullDraw.Vertex(TargetPlatform);
+   BullDraw.End();      
+   
+   BullDraw.BeginEllipsoid(TargetPlatform.Heading(),ElevationAngle,0,.1,FirstRadius,FirstRadius);   
+   BullDraw.SetColor(1,0,0,.6); 
+   BullDraw.Vertex(TargetPlatform);
+   BullDraw.End();
+
+   HitDraw.SetDuration(100);
+   int counter = 0;
+   foreach (Vec3 MissECS in HitLocations)    
+   {
+      HitDraw.BeginEllipsoid(TargetPlatform.Heading(),0,0,.07,.07,.07);
+      HitDraw.SetColor(1,0,0,0.999); #RED
+      // The +.25 offsets the point just in front of the bullseye
+      HitDraw.VertexECS(TargetPlatform, MissECS.X()+.25,MissECS.Y(),MissECS.Z());      
+      HitDraw.End();
+      
+      if (DrawTrajectory == true)
+      {
+         Vec3 LocationOfLauncher = ApparentLaunchLocations[counter];
+         HitDraw.BeginLines();
+            // The +.25 offsets the point just in front of the bullseye
+            HitDraw.VertexECS(TargetPlatform, MissECS.X()+.25,MissECS.Y(),MissECS.Z());
+            HitDraw.VertexECS(TargetPlatform, LocationOfLauncher.X(),LocationOfLauncher.Y(),LocationOfLauncher.Z());
+         HitDraw.End();
+      }
+      counter = counter+1;
+   }
+  }    
+end_script
+
+script void WeaponFired(WsfWeaponEngagement aWeaponEngagement, WsfTrack aTargetTrack)
+   if(aWeaponEngagement.FiringPlatformName() == "ship1")
+   {
+      CurrentIndex = CurrentIndex + 1;
+      WsfPlatform ship1 = WsfSimulation.FindPlatform("ship1");
+      WsfEventPipe.Record(ship1,"Shots Fired",CurrentIndex);
+   }
+end_script
+
+observer
+   enable WEAPON_TERMINATED
+   enable WEAPON_FIRED 
+end_observer

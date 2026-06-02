@@ -1,0 +1,67 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+processor UCAV_WEAPON_RELEASE WSF_SCRIPT_PROCESSOR 
+   script_variables
+      string wpn39 = "blue_glide_bomb_1";
+      string wpn38 = "blue_gps_bomb_1";
+      
+      Array<bool> tgt_engaged = Array<bool>();
+      string LARmeters = "lar_meters";
+   end_script_variables
+
+   on_initialize2 
+      for (int i = 0; i < PLATFORM.MasterTrackList().Count(); i = i + 1)
+      {
+         tgt_engaged[i] = false;
+      }
+   end_on_initialize2
+   
+   script bool fireWeapon(WsfTrack tTrack, string tWpn)
+      bool shot = false;
+      
+      WsfWeapon tempWeapon = PLATFORM.Weapon(tWpn);
+      if(tempWeapon.IsValid())
+      {
+         double tempRange = tempWeapon.AuxDataDouble(LARmeters);
+         if(PLATFORM.GroundRangeTo(tTrack) < tempRange)
+         {
+            shot = tempWeapon.FireSalvo(tTrack, 2);
+         }
+      }
+      
+      if (shot)
+      {
+         writeln(PLATFORM.Name(), " fired ", tWpn, " at ", tTrack.TargetName(), " at time ", TIME_NOW);
+      }
+      return shot;
+   end_script
+   
+   update_interval 3 sec
+   on_update 
+      
+      for(int i = 0; i < PLATFORM.MasterTrackList().Count(); i = i + 1)
+      {
+         if(!tgt_engaged[i])
+         {
+            
+            WsfTrack tempTrack = PLATFORM.MasterTrackList().TrackEntry(i);
+            if(fireWeapon(tempTrack, wpn39))
+            {
+               tgt_engaged[i] = true;
+            }
+            if(fireWeapon(tempTrack, wpn38))
+            {
+               tgt_engaged[i] = true;
+            }
+         }
+      }
+   end_on_update
+   
+end_processor

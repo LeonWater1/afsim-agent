@@ -1,0 +1,37 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+dis_interface
+   #log_created_entities
+   exercise    1
+   site        25
+   application 1
+   multicast   224.2.25.55 10.
+   #broadcast 10.
+   port        3225
+   autostart
+
+   #use_pdu_time
+   ignore_pdu_time
+
+   simple_detonations on
+   simple_kill_range  100 m
+
+   heartbeat_timer             5.0 sec
+   heartbeat_multiplier        2.4
+   mover_update_timer          5.0 sec
+   entity_position_threshold   10.0 meters
+
+   #suppress_comm_data          true
+
+   #initial_distribution_interval 5 sec
+
+   #debug_emission_pdu 2
+
+end_dis_interface
+
