@@ -10,7 +10,7 @@ Phase 1 - 领域调研与问题定义
 
 总体进度：
 
-18%
+30%
 
 ---
 
@@ -169,7 +169,34 @@ baseline_direct_v1
 
 ## 状态
 
-TODO
+DONE
+
+## 已产出
+
+- `scripts/run_direct_baseline.py`
+- `baseline_direct_v1/README.md`
+- `baseline_direct_v1/prompt_template.md`
+- `baseline_direct_v1/generated_scripts/`
+- `baseline_direct_v1/mission_logs/`
+- `baseline_direct_v1/results.jsonl`
+- `baseline_direct_v1/summary.json`
+- `baseline_direct_v1/error_stats.json`
+
+## 验证结果
+
+- benchmark 总数：27
+- 生成器：DeepSeek API，模型 `deepseek-v4-pro`
+- 语法正确率：0 / 27 = 0.00%
+- 静态通过率：0 / 27 = 0.00%
+- `mission.exe` 可执行率：0 / 27 = 0.00%
+- 语义匹配率：0 / 27 = 0.00%
+- 主错误分布：`E001=16`、`E002=23`、`E003=2`、`E004=12`、`E006=3`、`E007=26`
+
+## 结论
+
+- DeepSeek direct prompt 能产生 AFSIM 风格文本，但在没有 RAG、IR、grounding 和 demo 约束时，倾向生成 mission.exe 不接受的伪 DSL
+- 典型失败包括缺少/错配 `end_xxx`、单位格式错误、坐标格式错误和组件语法错配
+- 该结果为后续 RAG、IR、self-repair 提供了明确对照基线
 
 ---
 
@@ -203,7 +230,87 @@ baseline_rag_v1
 
 ## 状态
 
-TODO
+DONE
+
+## 已产出
+
+- `scripts/run_rag_baseline.py`
+- `baseline_rag_v1/README.md`
+- `baseline_rag_v1/generated_scripts/`
+- `baseline_rag_v1/mission_logs/`
+- `baseline_rag_v1/results.jsonl`
+- `baseline_rag_v1/summary.json`
+- `baseline_rag_v1/error_stats.json`
+
+## 验证结果
+
+- benchmark 总数：27
+- 生成器：DeepSeek API，模型 `deepseek-v4-pro`
+- 检索策略：source-tree priority + component-aware + keyword overlap
+- corpus chunks: 2090，max_context_chars: 12000
+- 语法正确率：6 / 27 = 22.22%
+- 静态通过率：5 / 27 = 18.52%
+- `mission.exe` 可执行率：4 / 27 = 14.81%
+- 语义匹配率：3 / 27 = 11.11%
+- 主错误分布：`E001=8`、`E002=13`、`E003=2`、`E004=5`、`E005=5`、`E006=1`、`E007=10`
+
+## 结论
+
+- RAG 检索显著提升生成质量：可执行率从 direct baseline 的 0% 提升到 14.81%
+- 检索策略的 source-tree priority 有效确保了同目录相关文件优先被选中
+- E005 共 5 个，经逐类型核查均为真实幻觉（WSF_ACTIVE_RADAR、WSF_COMMAND_CHAIN、WSF_WEAPON_TASK、WSF_MESSAGE、WSF_BATTLE_MANAGER），不在任何 demo、reference 或 SKILL.md 中出现
+- WSF_STATIONARY_MOVER 经 SKILL.md 确认合法，已加入白名单
+- 主要失败原因仍是块未闭合（E002=13）和组件语法错配（E007=10）
+- 4 个通过样例证明了 RAG 路线的有效性
+
+---
+
+# Task-005A 构建 Dataset v1 多任务样本
+
+## 目标
+
+将调研建议中的数据集设计正式落到项目文件中，覆盖：
+
+- Type A：指令 -> 脚本
+- Type B：脚本 -> 指令
+- Type C：指令 -> IR
+- Type D：IR -> 脚本
+- Type E：错误脚本 + 报错 -> 修复脚本
+- Type F：log -> AAR
+- 泛化切分：Seen/Unseen、Single/Multi、Static/Dynamic 等
+
+## 输出
+
+dataset_v1
+
+## 状态
+
+DONE
+
+## 已产出
+
+- `docs/dataset_design_v1.md`
+- `datasets/dataset_v1/README.md`
+- `datasets/dataset_v1/type_a_instruction_to_script.jsonl`
+- `datasets/dataset_v1/type_b_script_to_instruction.jsonl`
+- `datasets/dataset_v1/type_c_instruction_to_ir.jsonl`
+- `datasets/dataset_v1/type_d_ir_to_script.jsonl`
+- `datasets/dataset_v1/type_e_error_repair.jsonl`
+- `datasets/dataset_v1/type_f_log_to_aar.jsonl`
+- `datasets/dataset_v1/splits_v1.json`
+
+## 验证结果
+
+- Type A/B/C/D/E/F 均已建立 starter set，且每类 5 条
+- 所有 JSONL 文件均已通过 `ConvertFrom-Json` 解析检查
+- `splits_v1.json` 已通过 JSON 解析检查
+
+## 说明
+
+- Type A 同时由 `benchmarks/benchmark_v1/tasks.jsonl` 提供全量 27 条，由 `datasets/dataset_v1/type_a_instruction_to_script.jsonl` 提供 5 条 starter set
+- Type C/D 当前使用 draft IR，后续 Task-006 会正式固化 schema
+- Type E 当前以 RAG baseline 错误脚本和 oracle demo 构造修复目标，后续可补充最小编辑 diff
+- Type F 当前为官方 demo mission log 到简短 AAR 的 5 条 starter set，后续可扩展到 `.evt` / `.aer` 事件级解释
 
 ---
 
@@ -233,7 +340,20 @@ ir_examples_v1
 
 ## 状态
 
-TODO
+DONE
+
+## 已产出
+
+- `docs/afsim_ir_schema_v1.json`
+- `docs/afsim_ir_schema_v1.md`
+- `docs/ir_examples_v1.jsonl`
+
+## 验证结果
+
+- `afsim_ir_schema_v1` 已固定最小必需字段：Platform、Quantity、Side、Mission、Location
+- schema 同时覆盖 `scenario`、`sides`、`locations`、`routes`、`components`、`entities`、`tasks`、`constraints`、`expected_events`、`grounding_hints`
+- `ir_examples_v1` 已提供 5 个跨场景示例：acoustic、air-to-air、escort、group comm、basic IADS C2
+- 本任务未修改 `dataset_v1`，后续 `benchmark_v2` 可直接复用本 schema 与示例结构
 
 ---
 
@@ -475,25 +595,36 @@ Task-011
 
 ## 目标
 
-构建完整评测集。
+构建一个更完整的 AFSIM 多任务 benchmark，用于后续全面评估场景生成能力，而不只评测端到端 `Type A`。
 
-## 内容
+## 数据范围
 
-至少包含：
+后续 `benchmark_v2` 至少包含以下五类数据对：
 
-- 简单场景
-- 中等复杂场景
-- 多平台协同场景
+- Type A：指令 -> 脚本
+- Type B：脚本 -> 指令
+- Type C：指令 -> IR
+- Type D：IR -> 脚本
+- Type E：错误脚本 + 报错 -> 修复脚本
+
+## 说明
+
+- Type A 用于端到端场景生成主评测。
+- Type B 用于从现有脚本反向生成自然语言描述，并可通过人工抽样修订缓解标注不足。
+- Type C 用于训练意图理解与中间表示生成。
+- Type D 用于训练领域落地模块。
+- Type E 用于训练 self-repair 与错误修复闭环。
+- `benchmark_v2` 的目标不是只做单一 benchmark，而是形成覆盖 A-E 的统一评测集。
 
 ## 输出
 
-benchmark_v2
+`benchmark_v2`
 
 ## 状态
 
 BLOCKED
 
-依赖：
+## 依赖
 
 Task-002
 

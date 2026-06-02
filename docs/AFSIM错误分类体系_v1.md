@@ -185,25 +185,31 @@ position 0.0 0.0 1000.0
 
 ### E005 幻觉实体
 
-定义：生成了 AFSIM 中不存在、当前项目知识库中不存在，或未经 grounding 的实体名称/类型。
+定义：生成了 AFSIM 中不存在、当前项目已验证类型白名单中不存在，或未经 grounding 的实体名称/类型。
+
+**检测方式**：静态检测（基于已验证的 WSF_ 类型白名单匹配）。注意：当前白名单可能不完整——被标记为 E005 的类型可能实际上是 AFSIM 2.9.0 合法类型但尚未加入白名单。遇到此类情况应扩充白名单并重新分类。
 
 典型表现：
 
 - `platform_type J20 WSF_STEALTH_FIGHTER`
 - `sensor magic_radar WSF_QUANTUM_RADAR`
 - `weapon hypersonic_missile WSF_HYPERSONIC_WEAPON`
-- `mover WSF_SUPERSONIC_MOVER`
+- `mover WSF_STATIONARY_MOVER`（当前白名单未收录，但可能在 AFSIM 中存在）
+- `WSF_SPHERICAL_LETHALITY` 被当作顶层命令使用
 
 判断标准：
 
-- AFSIM 原生命令/类型参考中不存在。
-- benchmark demo、reference、grounding 表中不存在。
+- 类型未通过 mission.exe 执行验证。
+- benchmark demo、reference 中不存在该类型的可执行用例。
 - 自然语言中出现的真实装备未映射到可用模板。
+
+**已知局限**：静态检查器使用硬编码 WSF_ 类型白名单，白名单外的合法 AFSIM 类型会被误判为 E005。白名单需随类型验证结果持续扩充。
 
 修复策略：
 
-- 将用户概念映射到已有模板，例如“歼20”只能映射到已定义的 `J20_TEMPLATE` 或通用 fighter 模板。
+- 将用户概念映射到已有模板，例如”歼20”只能映射到已定义的 `J20_TEMPLATE` 或通用 fighter 模板。
 - 若 grounding 失败，不直接造类型；返回 `grounding_missing`，交给组件库扩展。
+- 对于白名单外但实际合法的类型，验证后加入白名单并重新分类。
 
 ### E006 必填项缺失
 
@@ -235,7 +241,7 @@ position 0.0 0.0 1000.0
 
 ### E007 组件语法错配
 
-定义：参数写在了错误的组件块中，或使用了当前组件类型不支持的参数。
+定义：参数写在了错误的组件块中，或使用了当前组件类型不支持的参数，或将必须嵌套的关键字用作顶层命令。
 
 典型例子：
 
@@ -243,16 +249,19 @@ position 0.0 0.0 1000.0
 - 给 `WSF_AIR_MOVER` 写不兼容参数。
 - 将 route 命令写到不支持 route 的静态平台中。
 - 将 radar 的 `transmitter` / `receiver` 写到非 radar sensor 中。
+- **将必须嵌套的关键字用作顶层命令**：`task`（必须在 `processor` 内）、`command_chain`（必须在 `platform` 内）、`antenna_pattern`（作为定义可独立，作为引用需在 `transmitter` 内）。
+- **将子组件关键字用作独立命令**：`weapon_type`、`sensor_type` 等不存在于 AFSIM 语法的伪关键字。
 
 修复策略：
 
 - 生成时按组件模板输出，不自由拼接参数。
-- 静态检查器维护“组件类型 -> 允许命令”白名单。
+- 静态检查器维护”组件类型 -> 允许命令”白名单。
 - 对错位参数，移动到合法子块；无法移动时删除并记录。
+- 对嵌套关键字，确保在正确的父块上下文中生成。
 
 ### E008 脚本 API/语言错误
 
-定义：`WSF_SCRIPT_PROCESSOR` 内部脚本使用了 AFSIM 脚本语言不支持的语法、函数或事件结构。
+定义：`WSF_SCRIPT_PROCESSOR` 内部脚本使用了 AFSIM 脚本语言不支持的语法、函数、API 方法或事件结构。
 
 典型错误：
 
@@ -260,13 +269,18 @@ position 0.0 0.0 1000.0
 - 在 `on_initialize` / `on_update` 内再包一层 `script ... end_script`
 - 使用 `fmod()`、`%`、三元运算符、C++ 风格强制类型转换
 - 调用不存在的方法，例如 `PLATFORM.Position().Geodetic()`
+- **调用目标类上不存在的方法**：`WsfMessage.Source()`（应为 `Originator()`）、`WsfMover.Speed()`、`WsfSimulation.Time()`（应使用 `TIME_NOW`）
+- **void 类型的 script 函数返回值**
+- **分号/括号缺失**导致编译失败
+- **隐式类型转换错误**：如 double 直接赋值给 string（需显式 `(string)` 转换）
 
 修复策略：
 
 - 输出统一替换为 `print(...)`。
 - 事件块直接写代码，不包 `script`。
 - 定时逻辑用时间差比较替代取模。
-- API 调用必须来自 `script_api_reference.md` 或 demo 实例。
+- API 调用必须来自 `script_api_reference.md` 或经过 mission.exe 验证的 demo 实例。
+- 对未知方法名，查阅 script_api_reference.md 确认正确方法名后替换。
 
 ### E009 文件与执行环境错误
 

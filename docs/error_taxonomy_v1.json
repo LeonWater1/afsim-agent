@@ -48,11 +48,16 @@
       "id": "E005",
       "name": "hallucinated_entity_or_type",
       "zh_name": "幻觉实体",
-      "level": "semantic",
-      "default_severity": "major",
+      "level": "static",
+      "default_severity": "blocking",
       "components": ["Grounding", "Platform", "Sensor", "Weapon", "Mover"],
-      "signals": ["AFSIM type not in references", "domain entity not mapped to a known template", "invented command or component"],
-      "repair_hint": "Reject ungrounded entities; map user concepts to known templates or mark grounding_missing."
+      "signals": [
+        "WSF_ prefix type not in the verified-type whitelist (note: whitelist may be incomplete; a flagged type may be valid in AFSIM but not yet verified)",
+        "domain entity not mapped to a known template",
+        "type name used as a top-level command (e.g., WSF_SPHERICAL_LETHALITY on its own line)"
+      ],
+      "repair_hint": "Compare against the verified-type whitelist. If the type is valid in AFSIM but not in the whitelist, add it to the whitelist and reclassify. If truly hallucinated, reject ungrounded entities; map user concepts to known templates or mark grounding_missing.",
+      "known_limitation": "The static checker uses a hardcoded whitelist of WSF_ types. Types that are valid in AFSIM 2.9.0 but absent from the whitelist WILL be misclassified as E005. The whitelist must be expanded as new types are verified against mission.exe."
     },
     {
       "id": "E006",
@@ -71,8 +76,14 @@
       "level": "static",
       "default_severity": "blocking",
       "components": ["AntennaPattern", "Mover", "Sensor", "Weapon", "Route"],
-      "signals": ["parameter appears in unsupported component block", "required sub-block missing", "command not allowed for component type"],
-      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks when possible."
+      "signals": [
+        "parameter appears in unsupported component block",
+        "required sub-block missing (e.g., radar sensor without transmitter)",
+        "command not allowed for component type",
+        "valid AFSIM keyword used as top-level command when it must be nested (e.g., task, command_chain, antenna_pattern at script root)",
+        "sub-component keyword used as a standalone command (e.g., weapon_type, sensor_type)"
+      ],
+      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks. For nested keywords, always wrap inside the parent block (task inside processor, command_chain inside platform, etc.)."
     },
     {
       "id": "E008",
@@ -81,8 +92,16 @@
       "level": "static",
       "default_severity": "blocking",
       "components": ["Processor", "ScriptAPI"],
-      "signals": ["cout or endl", "event handler wrapped by script/end_script", "unsupported fmod, percent operator, ternary operator, cast", "unknown API method"],
-      "repair_hint": "Use print(), direct on_initialize/on_update bodies, time-delta checks, and only API methods found in the script API reference or demos."
+      "signals": [
+        "cout or endl",
+        "event handler wrapped by script/end_script",
+        "unsupported fmod, percent operator, ternary operator, cast",
+        "API method name does not exist on target class (e.g., WsfMessage.Source(), WsfMover.Speed(), WsfSimulation.Time())",
+        "void script function returns a value",
+        "semicolon or parenthesis expected",
+        "type cast error (e.g., implicit cast from double to string)"
+      ],
+      "repair_hint": "Use print(), direct on_initialize/on_update bodies, time-delta checks, and only API methods validated against script_api_reference.md. For method calls, verify the method exists on the target class in the AFSIM Script API reference."
     },
     {
       "id": "E009",
