@@ -6,32 +6,24 @@
     "errors": [],
     "coverage": {
       "available": true,
-      "platform_hints_total": 18,
-      "task_hints_total": 9,
-      "component_hints_total": 25,
+      "platform_hints_total": 11,
+      "task_hints_total": 6,
+      "component_hints_total": 12,
       "platform_coverage": {
         "full": [
           "acoustic_sensor_platform",
           "acoustic_target",
-          "brawler_flight_lead",
-          "brawler_platform",
-          "chaff_platform",
           "detector_platform",
           "fighter_aircraft",
-          "fires_launcher",
           "iads_command_platform",
           "intruder_aircraft",
           "observer_platform",
           "radar_platform",
           "relay_platform",
           "sam_platform",
-          "space_platform",
           "transport_or_hvaa_aircraft"
         ],
-        "partial": [
-          "commander_platform",
-          "static_target"
-        ],
+        "partial": [],
         "unresolved": []
       },
       "task_coverage": {
@@ -39,35 +31,25 @@
           "air_attack",
           "air_engage",
           "area_air_defense",
-          "deploy_countermeasure",
           "detect",
           "escort",
-          "group_communication",
-          "time_on_target"
+          "group_communication"
         ],
-        "partial": [
-          "orbital_mission"
-        ],
+        "partial": [],
         "unresolved": []
       },
       "component_coverage": {
         "sensor": {
           "full": [
             "acoustic_sensor",
-            "geometric_sensor",
             "radar_sensor"
           ],
-          "partial": [
-            "optical_sensor"
-          ],
+          "partial": [],
           "unresolved": []
         },
         "mover": {
           "full": [
-            "air_mover",
-            "brawler_mover",
-            "ground_mover",
-            "integrating_space_mover"
+            "air_mover"
           ],
           "partial": [],
           "unresolved": []
@@ -75,27 +57,18 @@
         "weapon": {
           "full": [
             "air_to_air_missile",
-            "chaff_weapon",
-            "fires_implicit_weapon",
             "sam_weapon"
           ],
-          "partial": [
-            "gun_weapon"
-          ],
+          "partial": [],
           "unresolved": []
         },
         "processor": {
           "full": [
             "battle_manager_processor",
-            "brawler_processor",
             "escort_processor",
             "fighter_engagement_processor",
             "message_or_report_processor",
-            "perception_processor",
-            "sensor_manager_processor",
-            "task_processor",
-            "threat_processor",
-            "track_processor"
+            "sensor_manager_processor"
           ],
           "partial": [],
           "unresolved": []
@@ -109,9 +82,9 @@
           "unresolved": []
         }
       },
-      "total_hints": 52,
-      "total_full_match": 47,
-      "coverage_rate": 0.904,
+      "total_hints": 29,
+      "total_full_match": 29,
+      "coverage_rate": 1.0,
       "skipped_invalid_lines": []
     },
     "unresolved_total": 0,
@@ -123,32 +96,24 @@
   },
   "coverage": {
     "available": true,
-    "platform_hints_total": 18,
-    "task_hints_total": 9,
-    "component_hints_total": 25,
+    "platform_hints_total": 11,
+    "task_hints_total": 6,
+    "component_hints_total": 12,
     "platform_coverage": {
       "full": [
         "acoustic_sensor_platform",
         "acoustic_target",
-        "brawler_flight_lead",
-        "brawler_platform",
-        "chaff_platform",
         "detector_platform",
         "fighter_aircraft",
-        "fires_launcher",
         "iads_command_platform",
         "intruder_aircraft",
         "observer_platform",
         "radar_platform",
         "relay_platform",
         "sam_platform",
-        "space_platform",
         "transport_or_hvaa_aircraft"
       ],
-      "partial": [
-        "commander_platform",
-        "static_target"
-      ],
+      "partial": [],
       "unresolved": []
     },
     "task_coverage": {
@@ -156,35 +121,25 @@
         "air_attack",
         "air_engage",
         "area_air_defense",
-        "deploy_countermeasure",
         "detect",
         "escort",
-        "group_communication",
-        "time_on_target"
+        "group_communication"
       ],
-      "partial": [
-        "orbital_mission"
-      ],
+      "partial": [],
       "unresolved": []
     },
     "component_coverage": {
       "sensor": {
         "full": [
           "acoustic_sensor",
-          "geometric_sensor",
           "radar_sensor"
         ],
-        "partial": [
-          "optical_sensor"
-        ],
+        "partial": [],
         "unresolved": []
       },
       "mover": {
         "full": [
-          "air_mover",
-          "brawler_mover",
-          "ground_mover",
-          "integrating_space_mover"
+          "air_mover"
         ],
         "partial": [],
         "unresolved": []
@@ -192,27 +147,18 @@
       "weapon": {
         "full": [
           "air_to_air_missile",
-          "chaff_weapon",
-          "fires_implicit_weapon",
           "sam_weapon"
         ],
-        "partial": [
-          "gun_weapon"
-        ],
+        "partial": [],
         "unresolved": []
       },
       "processor": {
         "full": [
           "battle_manager_processor",
-          "brawler_processor",
           "escort_processor",
           "fighter_engagement_processor",
           "message_or_report_processor",
-          "perception_processor",
-          "sensor_manager_processor",
-          "task_processor",
-          "threat_processor",
-          "track_processor"
+          "sensor_manager_processor"
         ],
         "partial": [],
         "unresolved": []
@@ -226,9 +172,9 @@
         "unresolved": []
       }
     },
-    "total_hints": 52,
-    "total_full_match": 47,
-    "coverage_rate": 0.904,
+    "total_hints": 29,
+    "total_full_match": 29,
+    "coverage_rate": 1.0,
     "skipped_invalid_lines": []
   },
   "probe_results": {
@@ -320,25 +266,7 @@
         ]
       },
       "match_confidence": "partial",
-      "implementation_constraints": {
-        "preferred_declarations": [
-          "weapon <name> WSF_EXPLICIT_WEAPON"
-        ],
-        "wsf_context_rules": [
-          {
-            "wsf_type": "WSF_EXPLICIT_WEAPON",
-            "allowed_block_kinds": [
-              "weapon"
-            ],
-            "preferred_declaration": "weapon <name> WSF_EXPLICIT_WEAPON",
-            "provenance": [
-              "official_doc: wsf_explicit_weapon.html",
-              "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-              "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt"
-            ]
-          }
-        ]
-      },
+      "implementation_constraints": {},
       "provenance": [
         "benchmarks/benchmark_v1/demo_sources/brawler/weapons/other/gun.txt"
       ],
@@ -394,23 +322,7 @@
         "companion_wsf_types": [
           "WSF_BRAWLER_FUEL"
         ],
-        "companion_optional": true,
-        "preferred_declarations": [
-          "mover WSF_BRAWLER_MOVER"
-        ],
-        "wsf_context_rules": [
-          {
-            "wsf_type": "WSF_BRAWLER_MOVER",
-            "allowed_block_kinds": [
-              "mover"
-            ],
-            "preferred_declaration": "mover WSF_BRAWLER_MOVER",
-            "provenance": [
-              "official_doc: wsf_brawler_mover.html",
-              "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
-            ]
-          }
-        ]
+        "companion_optional": true
       },
       "provenance": [
         "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
@@ -471,9 +383,9 @@
   },
   "summary": {
     "ok": true,
-    "coverage_rate": 0.904,
-    "platform_hints_total": 18,
-    "task_hints_total": 9,
-    "component_hints_total": 25
+    "coverage_rate": 1.0,
+    "platform_hints_total": 11,
+    "task_hints_total": 6,
+    "component_hints_total": 12
   }
 }

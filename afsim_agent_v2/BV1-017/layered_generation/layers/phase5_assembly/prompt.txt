@@ -23,18 +23,7 @@ Requested outputs:
 ["event_pipe", "event_output"]
 
 Expected events:
-[
-  {
-    "id": "group_message_exchange",
-    "type": "communication",
-    "actor_refs": [
-      "detector_unit",
-      "relay_unit",
-      "observer_unit"
-    ],
-    "success_condition": "Participants exchange reports across the communication group."
-  }
-]
+[]
 
 Evaluation:
 {}
@@ -44,47 +33,52 @@ Duration / end_time:
 
 Chunk A - scenario skeleton:
 ```afsim
-# Group communication scenario skeleton
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
 
-side blue display_name Blue
-
-location detector_site
-  kind point
-  position 30.67n 104.07e
-end_location
-
-location relay_site
-  kind point
-  position 30.70n 104.10e
-end_location
-
-location observer_site
-  kind point
-  position 30.73n 104.13e
-end_location
+# UNCLASSIFIED
+#
+# Description: Group communication scenario.
+#
+# Scenario:
+#  - Platforms communicate track data within and across groups
 ```
 
 Chunk B - shared declarations:
 ```afsim
-network group_broadcast
-  group_join
-  internal_link
-end_network
+# Shared Comm and Processor Blocks
+comm datalink_basic WSF_COMM_TRANSCEIVER
+end_comm
 
-platform_type PT_OBSERVER_UNIT
-  platform observer_platform_basic
-  comm group_network WSF_COMM_TRANSCEIVER
+comm group_comm_basic WSF_COMM_TRANSCEIVER
+end_comm
+
+processor track_processor_basic WSF_TRACK_PROCESSOR
+end_processor
+
+# Platform Type Declarations
+platform_type PT_DETECTOR_UNIT WSF_PLATFORM
+   comm group_network datalink_basic
+      internal_link report_processor
+   end_comm
+   processor report_processor track_processor_basic
+   end_processor
 end_platform_type
 
-platform_type PT_RELAY_UNIT
-  platform relay_platform_basic
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_RELAY_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type
 
-platform_type PT_DETECTOR_UNIT
-  platform detector_platform_basic
-  processor report_processor WSF_TRACK_PROCESSOR
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_OBSERVER_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type
 ```
 
@@ -92,31 +86,31 @@ Chunk C - platform instances:
 [
   {
     "item_id": "detector_unit",
-    "text": "platform detector_unit\n  platform_type PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e\n  component group_network\n  component report_processor\nend_platform",
+    "text": "platform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 0n 0e\n   comm group_network WSF_COMM_TRANSCEIVER\n      internal_link report_processor\n   end_comm\n   processor report_processor WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n   end_processor\nend_platform",
     "record": {
       "phase": "phase3_platforms",
       "item_id": "detector_unit",
-      "seconds": 42.507,
+      "seconds": 33.825,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\detector_unit"
     }
   },
   {
     "item_id": "observer_unit",
-    "text": "platform observer_unit\n  side blue\n  platform_type PT_OBSERVER_UNIT\n  position 30.73n 104.13e\n  comm group_network\nend_platform",
+    "text": "platform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position observer_site\n\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform",
     "record": {
       "phase": "phase3_platforms",
       "item_id": "observer_unit",
-      "seconds": 15.934,
+      "seconds": 38.091,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\observer_unit"
     }
   },
   {
     "item_id": "relay_unit",
-    "text": "platform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e\n  comm group_network\nend_platform",
+    "text": "platform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.0n 100.0e\nend_platform",
     "record": {
       "phase": "phase3_platforms",
       "item_id": "relay_unit",
-      "seconds": 15.202,
+      "seconds": 28.371,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\relay_unit"
     }
   }
@@ -126,11 +120,11 @@ Chunk D - task overlays:
 [
   {
     "item_id": "share_group_reports",
-    "text": "comm_network share_group_net\n  network_type WSF_COMM_NETWORK_AD_HOC\n  link_frequency 3000 MHz\n  bandwidth 1 MHz\n  range 50 km\nend_comm_network\n\n# Inside platform_instance detector_unit\nadd transceiver dtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager dtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\n# Inside platform_instance relay_unit\nadd transceiver rtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager rtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\n# Inside platform_instance observer_unit\nadd transceiver otx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager otm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\ngroup report_sharing_group\n  members detector_unit relay_unit observer_unit\nend_group\n\ntask share_group_reports\n  task_type group_communication\n  assigned_to report_sharing_group\n  parameter message_flow group_broadcast\nend_task",
+    "text": "group broadcast_template WSF_GROUP end_group\n\nscript void CreateBroadcastGroups()\n   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");\n   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");\nend_script\n\nobserver\n   enable SIMULATION_INITIALIZING CreateBroadcastGroups\nend_observer\n\nplatform detector_unit PT_DETECTOR_UNIT\n   edit comm datalink group_join BROADCAST_DET end_comm\n   edit processor track_proc report_to_group BROADCAST_DET via datalink end_processor\n   edit sensor geo on end_sensor\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n   edit comm datalink group_join BROADCAST_DET end_comm\n   edit comm datalink group_join BROADCAST_OBS end_comm\n   edit processor track_proc report_to_group BROADCAST_OBS via datalink end_processor\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n   edit comm datalink group_join BROADCAST_OBS end_comm\nend_platform",
     "record": {
       "phase": "phase4_tasks",
       "item_id": "share_group_reports",
-      "seconds": 82.668,
+      "seconds": 120.667,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase4_tasks\\share_group_reports"
     }
   }
@@ -145,8 +139,133 @@ Instructions:
    - do not invent new platforms, components, or tasks
 5. Add top-level event_pipe / event_output only if requested by outputs.
 6. Emit exactly one end_time line as the LAST line of the script.
+7. Follow the reference script's proven top-level grammar and command shapes.
 
 Return ONLY the final AFSIM script.
+
+Verified task-family reference script:
+```afsim
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# UNCLASSIFIED
+#
+# Description: This simple scenario provides an example of transmitting 
+#   tracks received from off-board platforms to other groups.
+#
+# Scenario:
+#  - Platform 1 (p1) is the only platform that has their sensor ON in the simulation
+#  - Platform 1 (p1) can communicate tracks to platforms in FIGHTER_GROUP_1 (p1, p2)
+#  - Platform 2 (p2) can communicate tracks to platforms in FIGHTER_GROUP_2 (p2, p3)
+#  - p1 CANNOT communicate tracks to p3, but must go by way of p2
+#
+
+# -- Basic Subsystems --
+comm BASIC_COMM WSF_COMM_TRANSCEIVER 
+   #debug 
+end_comm
+
+processor BASIC_TRACK_PROC WSF_TRACK_PROCESSOR
+   report_interval 2 sec
+   circular_report_rejection on
+   update_interval 10 sec
+
+   on_message
+      type WSF_TRACK_MESSAGE
+      script
+         WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;
+         if(tmsg.Originator() != PLATFORM.Name())
+         {
+            print("T=",TIME_NOW," P=",PLATFORM.Name(),"  Track ",tmsg.Track().TargetName()," received from ",tmsg.Originator());
+         }
+      end_script
+   end_on_message
+end_processor
+
+# -- Groups --
+group fg_template WSF_GROUP end_group
+
+script void CreateGroups()
+   WsfSimulation.CreateGroup("FIGHTER_GROUP_1","fg_template");
+   WsfSimulation.CreateGroup("FIGHTER_GROUP_2","fg_template");
+end_script
+
+observer
+   enable SIMULATION_INITIALIZING CreateGroups
+end_observer
+
+# -- Platform Type --
+platform_type BASIC_FIGHTER WSF_PLATFORM
+   icon fighter
+   mover WSF_AIR_MOVER end_mover
+
+   comm datalink BASIC_COMM
+      internal_link track_proc
+   end_comm
+
+   processor track_proc BASIC_TRACK_PROC
+      script bool is_track_reportable(WsfTrack aTrack)
+         writeln("T=",TIME_NOW," P=",PLATFORM.Name()," checking if ",aTrack.TargetName()," is reportable: YES");
+         return true;
+      end_script
+
+      script void on_update()
+      writeln(PLATFORM.Name());
+      for (int i = 0; i < PLATFORM.MasterTrackList().TrackCount(); i = i + 1)
+      {
+         writeln(" * ", PLATFORM.MasterTrackList().TrackEntry(i).TrackId().ToString());
+      }
+      end_script
+   end_processor
+
+   sensor geo WSF_GEOMETRIC_SENSOR
+      off
+      ignore_same_side
+      reports_location
+      maximum_range 100 nm
+      frame_time 1 sec
+      internal_link track_proc
+   end_sensor
+end_platform_type
+
+# ======================================================================================
+
+# -- Blue Platforms ---
+platform cmdr WSF_PLATFORM
+   side blue
+   position 1n 0e
+end_platform
+
+platform p1 BASIC_FIGHTER
+   side blue
+   #commander cmdr
+   #group_join FIGHTER_GROUP_1
+
+   edit comm datalink group_join FIGHTER_GROUP_1 end_comm
+
+   route
+      position 0n 01w altitude 10 kft heading 90 deg speed 700 kts
+   end_route
+   
+   edit sensor geo on end_sensor
+   
+   edit processor track_proc
+      report_to_group FIGHTER_GROUP_1 via datalink
+      #report_to platform p3 comm datalink via datalink
+   end_processor
+end_platform
+
+platform p2 BASIC_FIGHTER
+   side blue
+   #commander cmdr
+   #group_join FIGHTER_GROUP_1
+```
 
 AFSIM 2.9.0 hard rules:
 - Return ONLY AFSIM script text. No markdown, no explanation.
@@ -154,9 +273,28 @@ AFSIM 2.9.0 hard rules:
 - ALL numbers must include units where AFSIM requires them.
 - Coordinates use n/s/e/w suffix, for example: position 30.67n 104.07e
 - Altitude format: altitude 10000 ft msl  or  altitude 500 m agl
-- side is a declaration, not a block. Never emit end_side.
+- side is set inside platform / platform_type context when supported. Never emit top-level side declarations or end_side.
 - Match every block with the correct end_* tag.
 - Do not invent DSL constructs outside the official command set.
+
+Mission-proven forbidden constructs:
+- scenario / end_scenario
+- top-level side declarations
+- network ... end_network
+- comm_network / end_comm_network
+- task_group / end_task_group
+- task_type / assigned_to / parameter message_flow
+- add transceiver / add track_manager
+- group report_sharing_group ... unless the reference script explicitly shows the full valid pattern
+- named event_pipe or named event_output blocks
+
+Preferred command shapes:
+- platform_type NAME WSF_PLATFORM
+- platform NAME TYPE
+- comm NAME WSF_COMM_TRANSCEIVER ... end_comm
+- processor NAME TYPE ... end_processor
+- event_pipe ... end_event_pipe
+- event_output ... end_event_output
 
 Verified WSF types:
 WSF_ACOUSTIC_SENSOR WSF_AERO WSF_AGILITY_EFFECT WSF_AIR_MOVER WSF_AIR_TARGET_FUSE WSF_AIR_TO_AIR_LAUNCH_COMPUTER WSF_AIR_TO_AIR_MISSILE WSF_ALPHA_BETA_FILTER

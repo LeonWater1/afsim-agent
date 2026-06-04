@@ -1,49 +1,106 @@
-group report_group WSF_GROUP
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# UNCLASSIFIED
+#
+# Description: Group communication scenario.
+#
+# Scenario:
+#  - Platforms communicate track data within and across groups
+#
+
+# -- Basic Subsystems --
+comm datalink_basic WSF_COMM_TRANSCEIVER 
+end_comm
+
+comm group_comm_basic WSF_COMM_TRANSCEIVER 
+end_comm
+
+processor track_processor_basic WSF_TRACK_PROCESSOR
+end_processor
+
+# -- Group Template --
+group broadcast_template WSF_GROUP 
 end_group
 
-platform_type PT_OBSERVER_UNIT WSF_PLATFORM
-  comm group_network WSF_COMM_TRANSCEIVER
-  end_comm
+# -- Script to Create Groups --
+script void CreateGroups()
+   WsfSimulation.CreateGroup("BROADCAST_DET", "broadcast_template")
+   WsfSimulation.CreateGroup("BROADCAST_OBS", "broadcast_template")
+end_script
+
+observer
+   enable SIMULATION_INITIALIZING CreateGroups
+end_observer
+
+# -- Platform Types --
+platform_type DETECTOR_PLATFORM WSF_PLATFORM
+   comm group_network group_comm_basic
+      internal_link report_processor
+   end_comm
+   processor report_processor track_processor_basic
+   end_processor
+   sensor geo_sensor WSF_GEOMETRIC_SENSOR
+      off
+      ignore_same_side
+      reports_location
+      maximum_range 100 nm
+      frame_time 1 sec
+      internal_link report_processor
+   end_sensor
 end_platform_type
 
-platform_type PT_RELAY_UNIT WSF_PLATFORM
-  comm group_network WSF_COMM_TRANSCEIVER
-  end_comm
+platform_type RELAY_PLATFORM WSF_PLATFORM
+   comm group_network group_comm_basic
+      internal_link track_proc
+   end_comm
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
 end_platform_type
 
-platform_type PT_DETECTOR_UNIT WSF_PLATFORM
-  comm group_network WSF_COMM_TRANSCEIVER
-  end_comm
-  processor report_processor WSF_TRACK_PROCESSOR
-    report_interval 2 sec
-    update_interval 10 sec
-  end_processor
+platform_type OBSERVER_PLATFORM WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type
 
-platform detector_unit PT_DETECTOR_UNIT
-  side blue
-  position 30.67n 104.07e altitude 0 ft msl
-  group report_group
+# -- Platform Instances --
+platform detector_unit DETECTOR_PLATFORM
+   side blue
+   position 30.67n 104.07e altitude 0 ft msl
+   group BROADCAST_DET
+   edit comm group_network group_join BROADCAST_DET
+   edit processor report_processor report_to_group BROADCAST_DET via group_network
+   edit sensor geo_sensor on
 end_platform
 
-platform relay_unit PT_RELAY_UNIT
-  side blue
-  position 30.70n 104.10e altitude 0 ft msl
-  group report_group
+platform relay_unit RELAY_PLATFORM
+   side blue
+   position 30.70n 104.10e altitude 0 ft msl
+   group BROADCAST_DET
+   group BROADCAST_OBS
+   edit comm group_network group_join BROADCAST_DET
+   edit comm group_network group_join BROADCAST_OBS
+   edit processor track_proc report_to_group BROADCAST_OBS via group_network
 end_platform
 
-platform observer_unit PT_OBSERVER_UNIT
-  side blue
-  position 30.73n 104.13e altitude 0 ft msl
-  group report_group
+platform observer_unit OBSERVER_PLATFORM
+   side blue
+   position 30.73n 104.13e altitude 0 ft msl
+   group BROADCAST_OBS
+   edit comm group_network group_join BROADCAST_OBS
 end_platform
 
-event_pipe group_event_pipe
-  file output/group_comm_example.aer
+# -- Outputs --
+event_pipe file output/group_comm_example.aer 
 end_event_pipe
 
-event_output group_output
-  file output/group_comm_example.evt
+event_output file output/group_comm_example.evt 
 end_event_output
 
 end_time 240 sec

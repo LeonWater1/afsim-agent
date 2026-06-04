@@ -549,7 +549,7 @@ DONE
 - `docs/human_readme/evaluation_protocol_v1.md`
 - `docs/machine/evaluation_protocol_v1.json`
 - `scripts/evaluate_protocol_v1.py`
-- `scripts/refresh_baseline_eval_v1.py`
+- `archive/scripts_legacy/refresh_baseline_eval_v1.py`
 - `evaluation/evaluation_protocol_v1_baselines.json`
 
 ## 验证结果
@@ -912,7 +912,7 @@ DONE
 
 ## 已产出
 
-- `scripts/minimal_agent_loop_v0.py`
+- `archive/scripts_legacy/minimal_agent_loop_v0.py`
 - `minimal_agent_v0/README.md`
 - `minimal_agent_v0/summary.json`
 - `minimal_agent_v0/BV1-001/`

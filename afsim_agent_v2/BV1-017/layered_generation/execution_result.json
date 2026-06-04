@@ -16,41 +16,41 @@
     {
       "phase": "phase1_skeleton",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase1_skeleton",
-      "seconds": 9.533
+      "seconds": 20.06
     },
     {
       "phase": "phase2_shared",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase2_shared",
-      "seconds": 47.102
+      "seconds": 99.735
     },
     {
       "phase": "phase3_platforms",
       "item_id": "detector_unit",
-      "seconds": 42.507,
+      "seconds": 33.825,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\detector_unit"
     },
     {
       "phase": "phase3_platforms",
       "item_id": "observer_unit",
-      "seconds": 15.934,
+      "seconds": 38.091,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\observer_unit"
     },
     {
       "phase": "phase3_platforms",
       "item_id": "relay_unit",
-      "seconds": 15.202,
+      "seconds": 28.371,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\relay_unit"
     },
     {
       "phase": "phase4_tasks",
       "item_id": "share_group_reports",
-      "seconds": 82.668,
+      "seconds": 120.667,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase4_tasks\\share_group_reports"
     },
     {
       "phase": "phase5_assembly",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase5_assembly",
-      "seconds": 90.89
+      "seconds": 98.273
     }
   ],
   "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\final_script.txt"

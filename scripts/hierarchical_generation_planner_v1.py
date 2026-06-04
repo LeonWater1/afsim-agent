@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from grounding_library_v1 import (
+from grounding_library_v2 import (
     normalize_component_family,
     resolve_component,
     resolve_platform,
@@ -19,21 +19,25 @@ from grounding_library_v1 import (
 
 
 ROOT = Path(__file__).resolve().parent.parent
-IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
+IR_EXAMPLES_V1_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
+IR_EXAMPLES_V2_PATH = ROOT / "docs" / "machine" / "ir_examples_v2.jsonl"
 
 
 def load_ir_from_examples(example_id: str):
-    for line in IR_EXAMPLES_PATH.read_text(encoding="utf-8-sig").splitlines():
-        if not line.strip():
+    for source_type, path in [("ir_examples_v2", IR_EXAMPLES_V2_PATH), ("ir_examples_v1", IR_EXAMPLES_V1_PATH)]:
+        if not path.exists():
             continue
-        row = json.loads(line)
-        if row.get("id") == example_id:
-            return {
-                "source_type": "ir_examples_v1",
-                "source_id": example_id,
-                "source_task_id": row.get("source_task_id"),
-                "ir": row.get("ir", {}),
-            }
+        for line in path.read_text(encoding="utf-8-sig").splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if row.get("id") == example_id:
+                return {
+                    "source_type": source_type,
+                    "source_id": example_id,
+                    "source_task_id": row.get("source_task_id"),
+                    "ir": row.get("ir", {}),
+                }
     raise ValueError(f"Example id not found: {example_id}")
 
 

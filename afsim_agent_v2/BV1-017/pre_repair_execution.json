@@ -17,48 +17,68 @@
     "findings": [
       {
         "error_id": "E002",
-        "line": 33,
-        "message": "end_platform_type closes processor from line 32"
+        "line": 85,
+        "message": "end_platform closes sensor from line 84"
       },
       {
         "error_id": "E002",
-        "line": 42,
-        "message": "end_platform_type closes comm from line 41"
+        "line": 93,
+        "message": "end_platform closes comm from line 92"
       },
       {
         "error_id": "E002",
-        "line": 51,
-        "message": "end_platform_type closes comm from line 50"
+        "line": 101,
+        "message": "end_platform closes processor from line 100"
       },
       {
         "error_id": "E002",
-        "line": 25,
-        "message": "missing end_platform_type"
+        "line": 71,
+        "message": "missing end_platform"
       },
       {
         "error_id": "E002",
-        "line": 31,
+        "line": 82,
         "message": "missing end_comm"
       },
       {
         "error_id": "E002",
-        "line": 35,
-        "message": "missing end_platform_type"
+        "line": 83,
+        "message": "missing end_processor"
       },
       {
         "error_id": "E002",
-        "line": 44,
-        "message": "missing end_platform_type"
+        "line": 87,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 95,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 98,
+        "message": "missing end_comm"
+      },
+      {
+        "error_id": "E002",
+        "line": 99,
+        "message": "missing end_comm"
       },
       {
         "error_id": "E007",
-        "line": 96,
+        "line": 111,
         "message": "end_time must appear at top level, not inside another block"
       },
       {
         "error_id": "E007",
-        "line": 61,
-        "message": "unknown command: WsfSimulation.CreateGroup(\"COMM_GROUP\",\"group_template\");"
+        "line": 62,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 63,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
       }
     ]
   },
@@ -71,7 +91,7 @@
     "suggested_action": "repair block structure and closing tags before mission.exe",
     "evidence_lines": [
       "***** FATAL: Could not process input files.",
-      "***** ERROR: Unknown command: max_speed"
+      "***** ERROR: Unknown command: WSF_COMM_TRANSCEIVER"
     ]
   },
   "repair_recommendation": {

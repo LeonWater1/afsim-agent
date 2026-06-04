@@ -1,43 +1,26 @@
-comm_network share_group_net
-  network_type WSF_COMM_NETWORK_AD_HOC
-  link_frequency 3000 MHz
-  bandwidth 1 MHz
-  range 50 km
-end_comm_network
+group broadcast_template WSF_GROUP end_group
 
-# Inside platform_instance detector_unit
-add transceiver dtx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager dtm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
+script void CreateBroadcastGroups()
+   WsfSimulation.CreateGroup("BROADCAST_DET","broadcast_template");
+   WsfSimulation.CreateGroup("BROADCAST_OBS","broadcast_template");
+end_script
 
-# Inside platform_instance relay_unit
-add transceiver rtx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager rtm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
+observer
+   enable SIMULATION_INITIALIZING CreateBroadcastGroups
+end_observer
 
-# Inside platform_instance observer_unit
-add transceiver otx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager otm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
+platform detector_unit PT_DETECTOR_UNIT
+   edit comm datalink group_join BROADCAST_DET end_comm
+   edit processor track_proc report_to_group BROADCAST_DET via datalink end_processor
+   edit sensor geo on end_sensor
+end_platform
 
-group report_sharing_group
-  members detector_unit relay_unit observer_unit
-end_group
+platform relay_unit PT_RELAY_UNIT
+   edit comm datalink group_join BROADCAST_DET end_comm
+   edit comm datalink group_join BROADCAST_OBS end_comm
+   edit processor track_proc report_to_group BROADCAST_OBS via datalink end_processor
+end_platform
 
-task share_group_reports
-  task_type group_communication
-  assigned_to report_sharing_group
-  parameter message_flow group_broadcast
-end_task
+platform observer_unit PT_OBSERVER_UNIT
+   edit comm datalink group_join BROADCAST_OBS end_comm
+end_platform

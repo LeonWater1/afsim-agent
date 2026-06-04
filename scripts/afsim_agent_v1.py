@@ -26,7 +26,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from execution_repair_planner_v1 import build_execution_repair_plan
-from grounding_library_v1 import (
+from grounding_library_v2 import (
     normalize_component_family,
     resolve_component,
     resolve_platform,

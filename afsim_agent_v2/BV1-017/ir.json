@@ -1,5 +1,5 @@
 {
-  "schema_version": "afsim_ir_v2",
+  "schema_version": "afsim_ir_v1",
   "scenario": {
     "name": "group_comm_example",
     "description": "Group communication scenario.",

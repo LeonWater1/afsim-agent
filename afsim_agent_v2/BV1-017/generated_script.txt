@@ -1,113 +1,111 @@
-# group_communication scenario skeleton
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
 
-side blue display_name Blue
+# UNCLASSIFIED
+#
+# Description: Group communication scenario.
+#
+# Scenario:
+#  - Platforms communicate track data within and across groups
+#
 
-location detector_site
-  kind point
-  position 30.67n 104.07e
-end_location
+# Shared Comm and Processor Blocks
+comm datalink_basic WSF_COMM_TRANSCEIVER
+end_comm
 
-location relay_site
-  kind point
-  position 30.70n 104.10e
-end_location
+comm group_comm_basic WSF_COMM_TRANSCEIVER
+end_comm
 
-location observer_site
-  kind point
-  position 30.73n 104.13e
-end_location
+processor track_processor_basic WSF_TRACK_PROCESSOR
+end_processor
 
-network group_broadcast
-  group_join
-  internal_link
-end_network
-
-platform_type PT_OBSERVER_UNIT
-  platform WSF_PLATFORM
-  comm group_network WSF_COMM_TRANSCEIVER
+# Platform Type Declarations
+platform_type PT_DETECTOR_UNIT WSF_PLATFORM
+   comm group_network datalink_basic
+      internal_link report_processor
+   end_comm
+   processor report_processor track_processor_basic
+   end_processor
+   sensor geo WSF_GEOMETRIC_SENSOR
+      off
+      ignore_same_side
+      reports_location
+      maximum_range 100 nm
+      frame_time 1 sec
+      internal_link report_processor
+   end_sensor
 end_platform_type
 
-platform_type PT_RELAY_UNIT
-  platform WSF_PLATFORM
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_RELAY_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+      internal_link track_proc
+   end_comm
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
 end_platform_type
 
-platform_type PT_DETECTOR_UNIT
-  platform WSF_PLATFORM
-  processor report_processor WSF_TRACK_PROCESSOR
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_OBSERVER_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type
 
-comm_network share_group_net
-  network_type WSF_COMM_NETWORK_AD_HOC
-  link_frequency 3000 MHz
-  bandwidth 1 MHz
-  range 50 km
-end_comm_network
+# Groups and Initialization
+group broadcast_template WSF_GROUP end_group
 
-platform detector_unit
-  platform_type PT_DETECTOR_UNIT
-  side blue
-  position 30.67n 104.07e
-  component group_network
-  component report_processor
+script void CreateBroadcastGroups()
+   WsfSimulation.CreateGroup("BROADCAST_DET","broadcast_template");
+   WsfSimulation.CreateGroup("BROADCAST_OBS","broadcast_template");
+end_script
+
+observer
+   enable SIMULATION_INITIALIZING CreateBroadcastGroups
+end_observer
+
+# Platform Instances
+platform detector_unit PT_DETECTOR_UNIT
+   side blue
+   position 0n 0e
+   comm group_network WSF_COMM_TRANSCEIVER
+      internal_link report_processor
+   end_comm
+   processor report_processor WSF_TRACK_PROCESSOR
+      report_interval 2 sec
+      circular_report_rejection on
+      update_interval 10 sec
+   end_processor
+   edit comm group_network group_join BROADCAST_DET
+   edit processor report_processor report_to_group BROADCAST_DET via group_network
+   edit sensor geo on
 end_platform
 
-add transceiver dtx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager dtm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
+platform observer_unit PT_OBSERVER_UNIT
+   side blue
+   position 60.0n 110.0e
+   comm group_network WSF_COMM_TRANSCEIVER
+   end_comm
+   edit comm group_network group_join BROADCAST_OBS
+end_platform
 
 platform relay_unit PT_RELAY_UNIT
-  side blue
-  position 30.70n 104.10e
-  comm group_network
+   side blue
+   position 30.0n 100.0e
+   edit comm group_network group_join BROADCAST_DET
+   edit comm group_network group_join BROADCAST_OBS
+   edit processor track_proc report_to_group BROADCAST_OBS via group_network
 end_platform
 
-add transceiver rtx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager rtm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
-
-platform observer_unit
-  side blue
-  platform_type PT_OBSERVER_UNIT
-  position 30.73n 104.13e
-  comm group_network
-end_platform
-
-add transceiver otx WSF_COMM_TRANSCEIVER
-  network share_group_net
-end_transceiver
-add track_manager otm WSF_TRACK_MANAGER
-  track_transmitter share_group_net
-  track_receiver share_group_net
-end_track_manager
-
-group report_sharing_group
-  members detector_unit relay_unit observer_unit
-end_group
-
-task share_group_reports
-  task_type group_communication
-  assigned_to report_sharing_group
-  parameter message_flow group_broadcast
-end_task
-
-event_pipe group_event_pipe
-  event group_message_exchange
-  forward_to event_output
+# Event handling
+event_pipe
 end_event_pipe
 
-event_output my_output
-  format json
-  file group_msg.json
+event_output
+   file "output.events"
 end_event_output
 
 end_time 240 sec

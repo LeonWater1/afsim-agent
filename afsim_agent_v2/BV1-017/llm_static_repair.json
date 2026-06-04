@@ -1,6 +1,6 @@
 {
   "version": "llm_repair_executor_v1",
-  "mode": "static_repair_llm",
+  "mode": "static_repair_full_script",
   "repair_plan": {
     "version": "repair_workflow_v1",
     "input": {
@@ -20,155 +20,75 @@
       "findings": [
         {
           "error_id": "E002",
-          "line": 28,
-          "message": "end_platform_type closes comm from line 27"
+          "line": 85,
+          "message": "end_platform closes sensor from line 84"
         },
         {
           "error_id": "E002",
-          "line": 33,
-          "message": "end_platform_type closes comm from line 32"
+          "line": 93,
+          "message": "end_platform closes comm from line 92"
         },
         {
           "error_id": "E002",
-          "line": 39,
-          "message": "end_platform_type closes comm from line 38"
+          "line": 101,
+          "message": "end_platform closes processor from line 100"
         },
         {
           "error_id": "E002",
-          "line": 54,
-          "message": "end_platform closes platform_type from line 49"
+          "line": 71,
+          "message": "missing end_platform"
         },
         {
           "error_id": "E002",
-          "line": 68,
-          "message": "end_platform closes comm from line 67"
+          "line": 82,
+          "message": "missing end_comm"
         },
         {
           "error_id": "E002",
           "line": 83,
-          "message": "end_platform closes comm from line 82"
-        },
-        {
-          "error_id": "E002",
-          "line": 25,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 26,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 30,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 31,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 35,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 36,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 37,
           "message": "missing end_processor"
         },
         {
           "error_id": "E002",
-          "line": 48,
+          "line": 87,
           "message": "missing end_platform"
         },
         {
           "error_id": "E002",
-          "line": 57,
-          "message": "missing end_network"
-        },
-        {
-          "error_id": "E002",
-          "line": 64,
+          "line": 95,
           "message": "missing end_platform"
         },
         {
           "error_id": "E002",
-          "line": 71,
-          "message": "missing end_network"
+          "line": 98,
+          "message": "missing end_comm"
         },
         {
           "error_id": "E002",
-          "line": 78,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 80,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 86,
-          "message": "missing end_network"
+          "line": 99,
+          "message": "missing end_comm"
         },
         {
           "error_id": "E007",
-          "line": 20,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 41,
-          "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
-        },
-        {
-          "error_id": "E007",
-          "line": 46,
-          "message": "end_comm_network closes an unsupported comm_network block"
-        },
-        {
-          "error_id": "E007",
-          "line": 57,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 71,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 86,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 97,
-          "message": "task must be nested under processor"
-        },
-        {
-          "error_id": "E007",
-          "line": 113,
+          "line": 111,
           "message": "end_time must appear at top level, not inside another block"
         },
         {
           "error_id": "E007",
-          "line": 21,
-          "message": "unknown command: group_join"
+          "line": 62,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+        },
+        {
+          "error_id": "E007",
+          "line": 63,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
         }
       ]
     },
     "repair_summary": {
-      "finding_count": 29,
-      "auto_repairable_count": 14,
-      "manual_or_regeneration_count": 15,
+      "finding_count": 13,
+      "auto_repairable_count": 7,
+      "manual_or_regeneration_count": 6,
       "target_layers": [
         "platform_layer",
         "mission_layer",
@@ -181,40 +101,15 @@
         "step_id": "SR-001",
         "priority": 10,
         "error_id": "E002",
-        "line": 25,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_OBSERVER_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_OBSERVER_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-002",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 26,
+        "line": 71,
         "issue": "missing end_platform",
         "layer_scope": "platform_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
+          "line_text": "platform detector_unit PT_DETECTOR_UNIT",
           "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
+          "nearest_block_name": "detector_unit"
         },
         "repair_mode": "safe_direct_edit",
         "auto_repairable": true,
@@ -223,23 +118,73 @@
         "suggested_action": "append missing closing tag `end_platform`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 113,
+          "target_line": 111,
           "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 82,
+        "issue": "missing end_comm",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   edit comm group_network group_join BROADCAST_DET",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_comm`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 111,
+          "replacement": "end_comm"
         }
       },
       {
         "step_id": "SR-003",
         "priority": 10,
         "error_id": "E002",
-        "line": 28,
-        "issue": "end_platform_type closes comm from line 27",
+        "line": 83,
+        "issue": "missing end_processor",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "end_platform_type",
-          "nearest_block_kind": "comm",
-          "nearest_block_name": "group_network"
+          "line_text": "   edit processor report_processor report_to_group BROADCAST_DET via group_network",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "report_processor"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_processor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 111,
+          "replacement": "end_processor"
+        }
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 85,
+        "issue": "end_platform closes sensor from line 84",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "geo"
         },
         "repair_mode": "manual_block_stack_repair",
         "auto_repairable": false,
@@ -249,43 +194,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-004",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 30,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_RELAY_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_RELAY_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
         "step_id": "SR-005",
         "priority": 10,
         "error_id": "E002",
-        "line": 31,
+        "line": 87,
         "issue": "missing end_platform",
-        "layer_scope": "platform_layer",
+        "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
+          "line_text": "platform observer_unit PT_OBSERVER_UNIT",
           "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
+          "nearest_block_name": "observer_unit"
         },
         "repair_mode": "safe_direct_edit",
         "auto_repairable": true,
@@ -294,7 +214,7 @@
         "suggested_action": "append missing closing tag `end_platform`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 113,
+          "target_line": 111,
           "replacement": "end_platform"
         }
       },
@@ -302,13 +222,13 @@
         "step_id": "SR-006",
         "priority": 10,
         "error_id": "E002",
-        "line": 33,
-        "issue": "end_platform_type closes comm from line 32",
+        "line": 93,
+        "issue": "end_platform closes comm from line 92",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "end_platform_type",
+          "line_text": "end_platform",
           "nearest_block_kind": "comm",
           "nearest_block_name": "group_network"
         },
@@ -323,174 +243,7 @@
         "step_id": "SR-007",
         "priority": 10,
         "error_id": "E002",
-        "line": 35,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_DETECTOR_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_DETECTOR_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-008",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 36,
-        "issue": "missing end_platform",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-009",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 37,
-        "issue": "missing end_processor",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  processor report_processor WSF_TRACK_PROCESSOR",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_processor`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_processor"
-        }
-      },
-      {
-        "step_id": "SR-010",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 39,
-        "issue": "end_platform_type closes comm from line 38",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "end_platform_type",
-          "nearest_block_kind": "comm",
-          "nearest_block_name": "group_network"
-        },
-        "repair_mode": "manual_block_stack_repair",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "repair block nesting first, then rerun static verification",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-011",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 48,
-        "issue": "missing end_platform",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform detector_unit",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "detector_unit"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-012",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 54,
-        "issue": "end_platform closes platform_type from line 49",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "end_platform",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_DETECTOR_UNIT"
-        },
-        "repair_mode": "manual_block_stack_repair",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "repair block nesting first, then rerun static verification",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-013",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 57,
-        "issue": "missing end_network",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_network`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_network"
-        }
-      },
-      {
-        "step_id": "SR-014",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 64,
+        "line": 95,
         "issue": "missing end_platform",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
@@ -507,23 +260,73 @@
         "suggested_action": "append missing closing tag `end_platform`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 113,
+          "target_line": 111,
           "replacement": "end_platform"
         }
       },
       {
-        "step_id": "SR-015",
+        "step_id": "SR-008",
         "priority": 10,
         "error_id": "E002",
-        "line": 68,
-        "issue": "end_platform closes comm from line 67",
+        "line": 98,
+        "issue": "missing end_comm",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   edit comm group_network group_join BROADCAST_DET",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_comm`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 111,
+          "replacement": "end_comm"
+        }
+      },
+      {
+        "step_id": "SR-009",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 99,
+        "issue": "missing end_comm",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   edit comm group_network group_join BROADCAST_OBS",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_comm`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 111,
+          "replacement": "end_comm"
+        }
+      },
+      {
+        "step_id": "SR-010",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 101,
+        "issue": "end_platform closes processor from line 100",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
           "line_text": "end_platform",
-          "nearest_block_kind": "comm",
-          "nearest_block_name": "group_network"
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "track_proc"
         },
         "repair_mode": "manual_block_stack_repair",
         "auto_repairable": false,
@@ -533,139 +336,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-016",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 71,
-        "issue": "missing end_network",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_network`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_network"
-        }
-      },
-      {
-        "step_id": "SR-017",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 78,
-        "issue": "missing end_platform",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform observer_unit",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "observer_unit"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-018",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 80,
-        "issue": "missing end_platform_type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  platform_type PT_OBSERVER_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_OBSERVER_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-019",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 83,
-        "issue": "end_platform closes comm from line 82",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "end_platform",
-          "nearest_block_kind": "comm",
-          "nearest_block_name": "group_network"
-        },
-        "repair_mode": "manual_block_stack_repair",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "repair block nesting first, then rerun static verification",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-020",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 86,
-        "issue": "missing end_network",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_network`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 113,
-          "replacement": "end_network"
-        }
-      },
-      {
-        "step_id": "SR-021",
+        "step_id": "SR-011",
         "priority": 60,
         "error_id": "E007",
-        "line": 20,
-        "issue": "network block must declare a backing WSF_* type",
+        "line": 62,
+        "issue": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");",
         "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "network group_broadcast",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "group_broadcast"
+          "line_text": "   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -675,18 +357,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-022",
+        "step_id": "SR-012",
         "priority": 60,
         "error_id": "E007",
-        "line": 21,
-        "issue": "unknown command: group_join",
+        "line": 63,
+        "issue": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");",
         "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "  group_join",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "group_broadcast"
+          "line_text": "   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -696,144 +378,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-023",
+        "step_id": "SR-013",
         "priority": 60,
         "error_id": "E007",
-        "line": 41,
-        "issue": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "comm_network share_group_net",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-024",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 46,
-        "issue": "end_comm_network closes an unsupported comm_network block",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "end_comm_network",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-025",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 57,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-026",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 71,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-027",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 86,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-028",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 97,
-        "issue": "task must be nested under processor",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "task share_group_reports",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-029",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 113,
+        "line": 111,
         "issue": "end_time must appear at top level, not inside another block",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
           "line_text": "end_time 240 sec",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -845,73 +401,46 @@
     ],
     "safe_repair_attempt": {
       "attempted": true,
-      "applied_action_count": 10,
+      "applied_action_count": 6,
       "applied_actions": [
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 113,
-          "replacement": "end_network"
-        },
-        {
-          "error_id": "E002",
-          "action": "insert_line",
-          "target_line": 113,
+          "target_line": 111,
           "replacement": "end_processor"
         },
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 113,
-          "replacement": "end_platform"
+          "target_line": 111,
+          "replacement": "end_comm"
         },
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 113,
-          "replacement": "end_platform_type"
+          "target_line": 111,
+          "replacement": "end_platform"
         },
         {
           "error_id": "E002",
           "action": "replace_line",
-          "target_line": 28,
-          "replacement": "end_comm",
-          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
+          "target_line": 85,
+          "replacement": "end_sensor",
+          "reason": "cross-close: end_platform -> end_sensor (closes sensor)"
         },
         {
           "error_id": "E002",
           "action": "replace_line",
-          "target_line": 33,
-          "replacement": "end_comm",
-          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
-        },
-        {
-          "error_id": "E002",
-          "action": "replace_line",
-          "target_line": 39,
-          "replacement": "end_comm",
-          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
-        },
-        {
-          "error_id": "E002",
-          "action": "replace_line",
-          "target_line": 54,
-          "replacement": "end_platform_type",
-          "reason": "cross-close: end_platform -> end_platform_type (closes platform_type)"
-        },
-        {
-          "error_id": "E002",
-          "action": "replace_line",
-          "target_line": 68,
+          "target_line": 93,
           "replacement": "end_comm",
           "reason": "cross-close: end_platform -> end_comm (closes comm)"
         },
         {
           "error_id": "E002",
           "action": "replace_line",
-          "target_line": 83,
-          "replacement": "end_comm",
-          "reason": "cross-close: end_platform -> end_comm (closes comm)"
+          "target_line": 101,
+          "replacement": "end_processor",
+          "reason": "cross-close: end_platform -> end_processor (closes processor)"
         }
       ],
       "post_repair_analysis": {
@@ -926,124 +455,60 @@
         "findings": [
           {
             "error_id": "E002",
+            "line": 111,
+            "message": "end_platform closes comm from line 99"
+          },
+          {
+            "error_id": "E002",
             "line": 113,
-            "message": "end_platform_type closes network from line 86"
+            "message": "end_processor closes platform from line 95"
           },
           {
             "error_id": "E002",
-            "line": 114,
-            "message": "end_platform closes platform_type from line 80"
-          },
-          {
-            "error_id": "E002",
-            "line": 115,
-            "message": "end_processor closes platform from line 78"
-          },
-          {
-            "error_id": "E002",
-            "line": 25,
-            "message": "missing end_platform_type"
-          },
-          {
-            "error_id": "E002",
-            "line": 26,
+            "line": 71,
             "message": "missing end_platform"
           },
           {
             "error_id": "E002",
-            "line": 30,
-            "message": "missing end_platform_type"
+            "line": 82,
+            "message": "missing end_comm"
           },
           {
             "error_id": "E002",
-            "line": 31,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E002",
-            "line": 35,
-            "message": "missing end_platform_type"
-          },
-          {
-            "error_id": "E002",
-            "line": 36,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E002",
-            "line": 37,
+            "line": 83,
             "message": "missing end_processor"
           },
           {
             "error_id": "E002",
-            "line": 48,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E002",
-            "line": 57,
-            "message": "missing end_network"
-          },
-          {
-            "error_id": "E002",
-            "line": 64,
+            "line": 87,
             "message": "missing end_platform"
           },
           {
             "error_id": "E007",
-            "line": 20,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 41,
-            "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
-          },
-          {
-            "error_id": "E007",
-            "line": 46,
-            "message": "end_comm_network closes an unsupported comm_network block"
-          },
-          {
-            "error_id": "E007",
-            "line": 57,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 71,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 86,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 97,
-            "message": "task must be nested under processor"
-          },
-          {
-            "error_id": "E007",
-            "line": 117,
+            "line": 114,
             "message": "end_time must appear at top level, not inside another block"
           },
           {
             "error_id": "E007",
-            "line": 21,
-            "message": "unknown command: group_join"
+            "line": 62,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+          },
+          {
+            "error_id": "E007",
+            "line": 63,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
           }
         ]
       },
-      "improved_finding_count": 7
+      "improved_finding_count": 4
     },
     "revalidation_plan": {
       "tool": "static_checker_v1",
       "command_hint": "python scripts/static_checker_v1.py BV1-017.txt",
       "success_condition": "static_pass == true"
     },
-    "repaired_text_preview": "# group_communication scenario skeleton\n\nside blue display_name Blue\n\nlocation detector_site\n  kind point\n  position 30.67n 104.07e\nend_location\n\nlocation relay_site\n  kind point\n  position 30.70n 104.10e\nend_location\n\nlocation observer_site\n  kind point\n  position 30.73n 104.13e\nend_location\n\nnetwork group_broadcast\n  group_join\n  internal_link\nend_network\n\nplatform_type PT_OBSERVER_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\nplatform_type PT_RELAY_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\nplatform_type PT_DETECTOR_UNIT\n  platform WSF_PLATFORM\n  processor report_processor WSF_TRACK_PROCESSOR\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm_network share_group_net\n  network_type WSF_COMM_NETWORK_AD_HOC\n  link_frequency 3000 MHz\n  bandwidth 1 MHz\n  range 50 km\nend_comm_network\n\nplatform detector_unit\n  platform_type PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e\n  component group_network\n  component report_processor\nend_platform_type\n\nadd transceiver dtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager dtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e\n  comm group_network\nend_comm\n\nadd transceiver rtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager rtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform observer_unit\n  side blue\n  platform_type PT_OBSERVER_UNIT\n  position 30.73n 104.13e\n  comm group_network\nend_comm\n\nadd transceiver otx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager otm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\ngroup report_sharing_group\n  members detector_unit relay_unit observer_unit\nend_group\n\ntask share_group_reports\n  task_type group_communication\n  assigned_to report_sharing_group\n  parameter message_flow group_broadcast\nend_task\n\nevent_pipe group_event_pipe\n  event group_message_exchange\n  forward_to event_output\nend_event_pipe\n\nevent_output my_output\n  format json\n  file group_msg.json\nend_event_output\n\nend_platform_type\nend_platform\nend_processor\nend_network\nend_time 240 sec\n"
+    "repaired_text_preview": "# ****************************************************************************\n# CUI\n#\n# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)\n#\n# The use, dissemination or disclosure of data in this file is subject to\n# limitation or restriction. See accompanying README and LICENSE for details.\n# ****************************************************************************\n\n# UNCLASSIFIED\n#\n# Description: Group communication scenario.\n#\n# Scenario:\n#  - Platforms communicate track data within and across groups\n#\n\n# Shared Comm and Processor Blocks\ncomm datalink_basic WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm group_comm_basic WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor track_processor_basic WSF_TRACK_PROCESSOR\nend_processor\n\n# Platform Type Declarations\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n   comm group_network datalink_basic\n      internal_link report_processor\n   end_comm\n   processor report_processor track_processor_basic\n   end_processor\n   sensor geo WSF_GEOMETRIC_SENSOR\n      off\n      ignore_same_side\n      reports_location\n      maximum_range 100 nm\n      frame_time 1 sec\n      internal_link report_processor\n   end_sensor\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n      internal_link track_proc\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n   end_comm\nend_platform_type\n\n# Groups and Initialization\ngroup broadcast_template WSF_GROUP end_group\n\nscript void CreateBroadcastGroups()\n   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");\n   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");\nend_script\n\nobserver\n   enable SIMULATION_INITIALIZING CreateBroadcastGroups\nend_observer\n\n# Platform Instances\nplatform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 0n 0e\n   comm group_network WSF_COMM_TRANSCEIVER\n      internal_link report_processor\n   end_comm\n   processor report_processor WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n   end_processor\n   edit comm group_network group_join BROADCAST_DET\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\n   edit sensor geo on\nend_sensor\n\nplatform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position 60.0n 110.0e\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\n   edit comm group_network group_join BROADCAST_OBS\nend_comm\n\nplatform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.0n 100.0e\n   edit comm group_network group_join BROADCAST_DET\n   edit comm group_network group_join BROADCAST_OBS\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\nend_processor\n\n# Event handling\nevent_pipe\nend_event_pipe\n\nevent_output\n   file \"output.events\"\nend_event_output\n\nend_platform\nend_comm\nend_processor\nend_time 240 sec\n",
+    "mission_errors": "mission:\n    WSF Version: 2.9.0 02-25-2022\n    Built: Feb 25 2022 08:12:40\nPlugin API version info:\n    Version: 2.9\n    Compiler: win_1916_64bit_release-hwe\nPlugins Loaded:\n    wsf_alternate_locations.dll, wsf_coverage.dll, wsf_iads_c2.dll, wsf_prompt.dll, wsf_scenario_analyzer.dll, wsf_scenario_analyzer_iads_c2.dll, wsf_air_combat.dll, wsf_annotation.dll, wsf_argo8.dll, wsf_brawler.dll, wsf_fires.dll, wsf_multiresolution.dll, wsf_oms_uci.dll, wsf_p6dof.dll, wsf_six_dof.dll, wsf_sosm.dll\nExtensions Included: \n    sensor_plot_lib, wsf_cyber, wsf_grammar_check, wsf_l16, wsf_mil, wsf_mil_parser, wsf_mtt, wsf_nx, wsf_parser, wsf_ripr, wsf_space, wsf_weapon_server, wsf_simdis\n\nLoading simulation input.\n\nLoading simulation input complete.\n    Elapsed Wall Clock Time: 0.0566597\n    Elapsed Processor Time : 0.046875\n***** FATAL: Could not process input files.\n    ***** ERROR: Unknown command: WSF_COMM_TRANSCEIVER\n             'C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\generated_script.txt', line 74, near column 43\n\nReading of simulation input failed\n"
   },
   "repair_plan_after_safe_repair": {
     "version": "repair_workflow_v1",
@@ -1064,120 +529,55 @@
       "findings": [
         {
           "error_id": "E002",
+          "line": 111,
+          "message": "end_platform closes comm from line 99"
+        },
+        {
+          "error_id": "E002",
           "line": 113,
-          "message": "end_platform_type closes network from line 86"
+          "message": "end_processor closes platform from line 95"
         },
         {
           "error_id": "E002",
-          "line": 114,
-          "message": "end_platform closes platform_type from line 80"
-        },
-        {
-          "error_id": "E002",
-          "line": 115,
-          "message": "end_processor closes platform from line 78"
-        },
-        {
-          "error_id": "E002",
-          "line": 25,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 26,
+          "line": 71,
           "message": "missing end_platform"
         },
         {
           "error_id": "E002",
-          "line": 30,
-          "message": "missing end_platform_type"
+          "line": 82,
+          "message": "missing end_comm"
         },
         {
           "error_id": "E002",
-          "line": 31,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 35,
-          "message": "missing end_platform_type"
-        },
-        {
-          "error_id": "E002",
-          "line": 36,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 37,
+          "line": 83,
           "message": "missing end_processor"
         },
         {
           "error_id": "E002",
-          "line": 48,
-          "message": "missing end_platform"
-        },
-        {
-          "error_id": "E002",
-          "line": 57,
-          "message": "missing end_network"
-        },
-        {
-          "error_id": "E002",
-          "line": 64,
+          "line": 87,
           "message": "missing end_platform"
         },
         {
           "error_id": "E007",
-          "line": 20,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 41,
-          "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
-        },
-        {
-          "error_id": "E007",
-          "line": 46,
-          "message": "end_comm_network closes an unsupported comm_network block"
-        },
-        {
-          "error_id": "E007",
-          "line": 57,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 71,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 86,
-          "message": "network block must declare a backing WSF_* type"
-        },
-        {
-          "error_id": "E007",
-          "line": 97,
-          "message": "task must be nested under processor"
-        },
-        {
-          "error_id": "E007",
-          "line": 117,
+          "line": 114,
           "message": "end_time must appear at top level, not inside another block"
         },
         {
           "error_id": "E007",
-          "line": 21,
-          "message": "unknown command: group_join"
+          "line": 62,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+        },
+        {
+          "error_id": "E007",
+          "line": 63,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
         }
       ]
     },
     "repair_summary": {
-      "finding_count": 22,
-      "auto_repairable_count": 10,
-      "manual_or_regeneration_count": 12,
+      "finding_count": 9,
+      "auto_repairable_count": 4,
+      "manual_or_regeneration_count": 5,
       "target_layers": [
         "platform_layer",
         "mission_layer",
@@ -1190,188 +590,13 @@
         "step_id": "SR-001",
         "priority": 10,
         "error_id": "E002",
-        "line": 25,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_OBSERVER_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_OBSERVER_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-002",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 26,
+        "line": 71,
         "issue": "missing end_platform",
         "layer_scope": "platform_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-003",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 30,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_RELAY_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_RELAY_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-004",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 31,
-        "issue": "missing end_platform",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-005",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 35,
-        "issue": "missing end_platform_type",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform_type PT_DETECTOR_UNIT",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_DETECTOR_UNIT"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform_type`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform_type"
-        }
-      },
-      {
-        "step_id": "SR-006",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 36,
-        "issue": "missing end_platform",
-        "layer_scope": "platform_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  platform WSF_PLATFORM",
-          "nearest_block_kind": "platform",
-          "nearest_block_name": "WSF_PLATFORM"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_platform`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_platform"
-        }
-      },
-      {
-        "step_id": "SR-007",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 37,
-        "issue": "missing end_processor",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "  processor report_processor WSF_TRACK_PROCESSOR",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "safe_direct_edit",
-        "auto_repairable": true,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_processor`",
-        "proposed_edit": {
-          "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_processor"
-        }
-      },
-      {
-        "step_id": "SR-008",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 48,
-        "issue": "missing end_platform",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "platform detector_unit",
+          "line_text": "platform detector_unit PT_DETECTOR_UNIT",
           "nearest_block_kind": "platform",
           "nearest_block_name": "detector_unit"
         },
@@ -1382,48 +607,73 @@
         "suggested_action": "append missing closing tag `end_platform`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 117,
+          "target_line": 114,
           "replacement": "end_platform"
         }
       },
       {
-        "step_id": "SR-009",
+        "step_id": "SR-002",
         "priority": 10,
         "error_id": "E002",
-        "line": 57,
-        "issue": "missing end_network",
+        "line": 82,
+        "issue": "missing end_comm",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
+          "line_text": "   edit comm group_network group_join BROADCAST_DET",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
         },
         "repair_mode": "safe_direct_edit",
         "auto_repairable": true,
         "needs_ir_context": false,
         "needs_grounding_refresh": false,
-        "suggested_action": "append missing closing tag `end_network`",
+        "suggested_action": "append missing closing tag `end_comm`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 117,
-          "replacement": "end_network"
+          "target_line": 114,
+          "replacement": "end_comm"
         }
       },
       {
-        "step_id": "SR-010",
+        "step_id": "SR-003",
         "priority": 10,
         "error_id": "E002",
-        "line": 64,
+        "line": 83,
+        "issue": "missing end_processor",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   edit processor report_processor report_to_group BROADCAST_DET via group_network",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "report_processor"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_processor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 114,
+          "replacement": "end_processor"
+        }
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 87,
         "issue": "missing end_platform",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "platform relay_unit PT_RELAY_UNIT",
+          "line_text": "platform observer_unit PT_OBSERVER_UNIT",
           "nearest_block_kind": "platform",
-          "nearest_block_name": "relay_unit"
+          "nearest_block_name": "observer_unit"
         },
         "repair_mode": "safe_direct_edit",
         "auto_repairable": true,
@@ -1432,44 +682,23 @@
         "suggested_action": "append missing closing tag `end_platform`",
         "proposed_edit": {
           "action": "append_line",
-          "target_line": 117,
+          "target_line": 114,
           "replacement": "end_platform"
         }
       },
       {
-        "step_id": "SR-011",
+        "step_id": "SR-005",
         "priority": 10,
         "error_id": "E002",
-        "line": 113,
-        "issue": "end_platform_type closes network from line 86",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
-        "evidence": {
-          "line_text": "end_platform_type",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "manual_block_stack_repair",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "repair block nesting first, then rerun static verification",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-012",
-        "priority": 10,
-        "error_id": "E002",
-        "line": 114,
-        "issue": "end_platform closes platform_type from line 80",
+        "line": 111,
+        "issue": "end_platform closes comm from line 99",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
           "line_text": "end_platform",
-          "nearest_block_kind": "platform_type",
-          "nearest_block_name": "PT_OBSERVER_UNIT"
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "group_network"
         },
         "repair_mode": "manual_block_stack_repair",
         "auto_repairable": false,
@@ -1479,18 +708,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-013",
+        "step_id": "SR-006",
         "priority": 10,
         "error_id": "E002",
-        "line": 115,
-        "issue": "end_processor closes platform from line 78",
+        "line": 113,
+        "issue": "end_processor closes platform from line 95",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
         "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
           "line_text": "end_processor",
           "nearest_block_kind": "platform",
-          "nearest_block_name": "observer_unit"
+          "nearest_block_name": "relay_unit"
         },
         "repair_mode": "manual_block_stack_repair",
         "auto_repairable": false,
@@ -1500,18 +729,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-014",
+        "step_id": "SR-007",
         "priority": 60,
         "error_id": "E007",
-        "line": 20,
-        "issue": "network block must declare a backing WSF_* type",
+        "line": 62,
+        "issue": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");",
         "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "network group_broadcast",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "group_broadcast"
+          "line_text": "   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -1521,18 +750,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-015",
+        "step_id": "SR-008",
         "priority": 60,
         "error_id": "E007",
-        "line": 21,
-        "issue": "unknown command: group_join",
+        "line": 63,
+        "issue": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");",
         "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "  group_join",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "group_broadcast"
+          "line_text": "   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -1542,136 +771,10 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-016",
+        "step_id": "SR-009",
         "priority": 60,
         "error_id": "E007",
-        "line": 41,
-        "issue": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "comm_network share_group_net",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-017",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 46,
-        "issue": "end_comm_network closes an unsupported comm_network block",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "end_comm_network",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "report_processor"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-018",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 57,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-019",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 71,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-020",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 86,
-        "issue": "network block must declare a backing WSF_* type",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "  network share_group_net",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-021",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 97,
-        "issue": "task must be nested under processor",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "task share_group_reports",
-          "nearest_block_kind": "network",
-          "nearest_block_name": "share_group_net"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-022",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 117,
+        "line": 114,
         "issue": "end_time must appear at top level, not inside another block",
         "layer_scope": "mission_layer",
         "default_severity": "blocking",
@@ -1679,7 +782,7 @@
         "evidence": {
           "line_text": "end_time 240 sec",
           "nearest_block_kind": "platform",
-          "nearest_block_name": "relay_unit"
+          "nearest_block_name": "observer_unit"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -1691,50 +794,37 @@
     ],
     "safe_repair_attempt": {
       "attempted": true,
-      "applied_action_count": 7,
+      "applied_action_count": 5,
       "applied_actions": [
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 117,
-          "replacement": "end_network"
-        },
-        {
-          "error_id": "E002",
-          "action": "insert_line",
-          "target_line": 117,
+          "target_line": 114,
           "replacement": "end_processor"
         },
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 117,
-          "replacement": "end_platform"
+          "target_line": 114,
+          "replacement": "end_comm"
         },
         {
           "error_id": "E002",
           "action": "insert_line",
-          "target_line": 117,
-          "replacement": "end_platform_type"
+          "target_line": 114,
+          "replacement": "end_platform"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 111,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform -> end_comm (closes comm)"
         },
         {
           "error_id": "E002",
           "action": "replace_line",
           "target_line": 113,
-          "replacement": "end_network",
-          "reason": "cross-close: end_platform_type -> end_network (closes network)"
-        },
-        {
-          "error_id": "E002",
-          "action": "replace_line",
-          "target_line": 114,
-          "replacement": "end_platform_type",
-          "reason": "cross-close: end_platform -> end_platform_type (closes platform_type)"
-        },
-        {
-          "error_id": "E002",
-          "action": "replace_line",
-          "target_line": 115,
           "replacement": "end_platform",
           "reason": "cross-close: end_processor -> end_platform (closes platform)"
         }
@@ -1751,98 +841,33 @@
         "findings": [
           {
             "error_id": "E002",
-            "line": 117,
-            "message": "end_platform_type closes platform from line 64"
+            "line": 115,
+            "message": "end_comm closes processor from line 83"
           },
           {
             "error_id": "E002",
-            "line": 118,
-            "message": "end_platform closes network from line 57"
+            "line": 116,
+            "message": "end_processor closes comm from line 82"
           },
           {
             "error_id": "E002",
-            "line": 119,
-            "message": "end_processor closes platform from line 48"
-          },
-          {
-            "error_id": "E002",
-            "line": 120,
-            "message": "end_network closes processor from line 37"
-          },
-          {
-            "error_id": "E002",
-            "line": 25,
-            "message": "missing end_platform_type"
-          },
-          {
-            "error_id": "E002",
-            "line": 26,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E002",
-            "line": 30,
-            "message": "missing end_platform_type"
-          },
-          {
-            "error_id": "E002",
-            "line": 31,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E002",
-            "line": 35,
-            "message": "missing end_platform_type"
-          },
-          {
-            "error_id": "E002",
-            "line": 36,
-            "message": "missing end_platform"
-          },
-          {
-            "error_id": "E007",
-            "line": 20,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 41,
-            "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
-          },
-          {
-            "error_id": "E007",
-            "line": 46,
-            "message": "end_comm_network closes an unsupported comm_network block"
-          },
-          {
-            "error_id": "E007",
-            "line": 57,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
             "line": 71,
-            "message": "network block must declare a backing WSF_* type"
+            "message": "missing end_platform"
           },
           {
             "error_id": "E007",
-            "line": 86,
-            "message": "network block must declare a backing WSF_* type"
-          },
-          {
-            "error_id": "E007",
-            "line": 97,
-            "message": "task must be nested under processor"
-          },
-          {
-            "error_id": "E007",
-            "line": 121,
+            "line": 117,
             "message": "end_time must appear at top level, not inside another block"
           },
           {
             "error_id": "E007",
-            "line": 21,
-            "message": "unknown command: group_join"
+            "line": 62,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+          },
+          {
+            "error_id": "E007",
+            "line": 63,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
           }
         ]
       },
@@ -1853,11 +878,224 @@
       "command_hint": "python scripts/static_checker_v1.py BV1-017.txt",
       "success_condition": "static_pass == true"
     },
-    "repaired_text_preview": "# group_communication scenario skeleton\n\nside blue display_name Blue\n\nlocation detector_site\n  kind point\n  position 30.67n 104.07e\nend_location\n\nlocation relay_site\n  kind point\n  position 30.70n 104.10e\nend_location\n\nlocation observer_site\n  kind point\n  position 30.73n 104.13e\nend_location\n\nnetwork group_broadcast\n  group_join\n  internal_link\nend_network\n\nplatform_type PT_OBSERVER_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\nplatform_type PT_RELAY_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\nplatform_type PT_DETECTOR_UNIT\n  platform WSF_PLATFORM\n  processor report_processor WSF_TRACK_PROCESSOR\n  comm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm_network share_group_net\n  network_type WSF_COMM_NETWORK_AD_HOC\n  link_frequency 3000 MHz\n  bandwidth 1 MHz\n  range 50 km\nend_comm_network\n\nplatform detector_unit\n  platform_type PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e\n  component group_network\n  component report_processor\nend_platform_type\n\nadd transceiver dtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager dtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e\n  comm group_network\nend_comm\n\nadd transceiver rtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager rtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform observer_unit\n  side blue\n  platform_type PT_OBSERVER_UNIT\n  position 30.73n 104.13e\n  comm group_network\nend_comm\n\nadd transceiver otx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager otm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\ngroup report_sharing_group\n  members detector_unit relay_unit observer_unit\nend_group\n\ntask share_group_reports\n  task_type group_communication\n  assigned_to report_sharing_group\n  parameter message_flow group_broadcast\nend_task\n\nevent_pipe group_event_pipe\n  event group_message_exchange\n  forward_to event_output\nend_event_pipe\n\nevent_output my_output\n  format json\n  file group_msg.json\nend_event_output\n\nend_network\nend_platform_type\nend_platform\nend_network\nend_platform_type\nend_platform\nend_processor\nend_network\nend_time 240 sec\n"
+    "repaired_text_preview": "# ****************************************************************************\n# CUI\n#\n# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)\n#\n# The use, dissemination or disclosure of data in this file is subject to\n# limitation or restriction. See accompanying README and LICENSE for details.\n# ****************************************************************************\n\n# UNCLASSIFIED\n#\n# Description: Group communication scenario.\n#\n# Scenario:\n#  - Platforms communicate track data within and across groups\n#\n\n# Shared Comm and Processor Blocks\ncomm datalink_basic WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm group_comm_basic WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor track_processor_basic WSF_TRACK_PROCESSOR\nend_processor\n\n# Platform Type Declarations\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n   comm group_network datalink_basic\n      internal_link report_processor\n   end_comm\n   processor report_processor track_processor_basic\n   end_processor\n   sensor geo WSF_GEOMETRIC_SENSOR\n      off\n      ignore_same_side\n      reports_location\n      maximum_range 100 nm\n      frame_time 1 sec\n      internal_link report_processor\n   end_sensor\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n      internal_link track_proc\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n   end_comm\nend_platform_type\n\n# Groups and Initialization\ngroup broadcast_template WSF_GROUP end_group\n\nscript void CreateBroadcastGroups()\n   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");\n   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");\nend_script\n\nobserver\n   enable SIMULATION_INITIALIZING CreateBroadcastGroups\nend_observer\n\n# Platform Instances\nplatform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 0n 0e\n   comm group_network WSF_COMM_TRANSCEIVER\n      internal_link report_processor\n   end_comm\n   processor report_processor WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n   end_processor\n   edit comm group_network group_join BROADCAST_DET\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\n   edit sensor geo on\nend_sensor\n\nplatform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position 60.0n 110.0e\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\n   edit comm group_network group_join BROADCAST_OBS\nend_comm\n\nplatform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.0n 100.0e\n   edit comm group_network group_join BROADCAST_DET\n   edit comm group_network group_join BROADCAST_OBS\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\nend_processor\n\n# Event handling\nevent_pipe\nend_event_pipe\n\nevent_output\n   file \"output.events\"\nend_event_output\n\nend_comm\nend_comm\nend_platform\nend_platform\nend_comm\nend_processor\nend_time 240 sec\n"
   },
-  "layer_regeneration_attempt": null,
-  "full_script_fallback_used": false,
-  "repaired_text": "side blue display_name Blue\n\nlocation detector_site\n  kind point\n  position 30.67n 104.07e\nend_location\n\nlocation relay_site\n  kind point\n  position 30.70n 104.10e\nend_location\n\nlocation observer_site\n  kind point\n  position 30.73n 104.13e\nend_location\n\ngroup report_group WSF_GROUP\nend_group\n\ncomm group_network WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor report_processor WSF_TRACK_PROCESSOR\n  report_interval 2 sec\n  update_interval 10 sec\nend_processor\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n  comm group_network\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n  comm group_network\nend_platform_type\n\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n  comm group_network\n  processor report_processor\nend_platform_type\n\nplatform detector_unit PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e altitude 0 ft msl\n  group report_group\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e altitude 0 ft msl\n  group report_group\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n  side blue\n  position 30.73n 104.13e altitude 0 ft msl\n  group report_group\nend_platform\n\nevent_pipe group_event_pipe\n  file output/group_comm_example.aer\nend_event_pipe\n\nevent_output group_output\n  file output/group_comm_example.evt\nend_event_output\n\nend_time 240 sec\n",
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 4,
+    "targets": [
+      {
+        "start_line": 71,
+        "end_line": 114,
+        "kind": "platform",
+        "layer_scope": "platform_layer",
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 111,
+            "message": "end_platform closes comm from line 99"
+          },
+          {
+            "error_id": "E002",
+            "line": 113,
+            "message": "end_processor closes platform from line 95"
+          },
+          {
+            "error_id": "E002",
+            "line": 71,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 82,
+            "message": "missing end_comm"
+          },
+          {
+            "error_id": "E002",
+            "line": 83,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 87,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 114,
+            "message": "end_time must appear at top level, not inside another block"
+          }
+        ]
+      },
+      {
+        "start_line": 82,
+        "end_line": 114,
+        "kind": "comm",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 111,
+            "message": "end_platform closes comm from line 99"
+          },
+          {
+            "error_id": "E002",
+            "line": 113,
+            "message": "end_processor closes platform from line 95"
+          },
+          {
+            "error_id": "E002",
+            "line": 82,
+            "message": "missing end_comm"
+          },
+          {
+            "error_id": "E002",
+            "line": 83,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 87,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 114,
+            "message": "end_time must appear at top level, not inside another block"
+          }
+        ]
+      },
+      {
+        "start_line": 83,
+        "end_line": 114,
+        "kind": "processor",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 111,
+            "message": "end_platform closes comm from line 99"
+          },
+          {
+            "error_id": "E002",
+            "line": 113,
+            "message": "end_processor closes platform from line 95"
+          },
+          {
+            "error_id": "E002",
+            "line": 83,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 87,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 114,
+            "message": "end_time must appear at top level, not inside another block"
+          }
+        ]
+      },
+      {
+        "start_line": 99,
+        "end_line": 111,
+        "kind": "comm",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 111,
+            "message": "end_platform closes comm from line 99"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 1,
+    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 71,\n      \"end_line\": 114,\n      \"text\": \"platform detector_unit PT_DETECTOR_UNIT\\n   side blue\\n   position 0n 0e\\n   comm group_network WSF_COMM_TRANSCEIVER\\n      internal_link report_processor\\n   end_comm\\n   processor report_processor WSF_TRACK_PROCESSOR\\n      report_interval 2 sec\\n      circular_report_rejection on\\n      update_interval 10 sec\\n   end_processor\\n   edit comm group_network group_join BROADCAST_DET\\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\\n   edit sensor geo on\\nend_platform\\n\\nplatform observer_unit PT_OBSERVER_UNIT\\n   side blue\\n   position 60.0n 110.0e\\n   comm group_network WSF_COMM_TRANSCEIVER\\n   end_comm\\n   edit comm group_network group_join BROADCAST_OBS\\nend_platform\\n\\nplatform relay_unit PT_RELAY_UNIT\\n   side blue\\n   position 30.0n 100.0e\\n   comm group_network WSF_COMM_TRANSCEIVER\\n   end_comm\\n   processor track_proc WSF_TRACK_PROCESSOR\\n   end_processor\\n   edit comm group_network group_join BROADCAST_DET\\n   edit comm group_network group_join BROADCAST_OBS\\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\\nend_platf",
+    "repaired_text": "# ****************************************************************************\n# CUI\n#\n# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)\n#\n# The use, dissemination or disclosure of data in this file is subject to\n# limitation or restriction. See accompanying README and LICENSE for details.\n# ****************************************************************************\n\n# UNCLASSIFIED\n#\n# Description: Group communication scenario.\n#\n# Scenario:\n#  - Platforms communicate track data within and across groups\n#\n\n# Shared Comm and Processor Blocks\ncomm datalink_basic WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm group_comm_basic WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor track_processor_basic WSF_TRACK_PROCESSOR\nend_processor\n\n# Platform Type Declarations\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n   comm group_network datalink_basic\n      internal_link report_processor\n   end_comm\n   processor report_processor track_processor_basic\n   end_processor\n   sensor geo WSF_GEOMETRIC_SENSOR\n      off\n      ignore_same_side\n      reports_location\n      maximum_range 100 nm\n      frame_time 1 sec\n      internal_link report_processor\n   end_sensor\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n      internal_link track_proc\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n   end_comm\nend_platform_type\n\n# Groups and Initialization\ngroup broadcast_template WSF_GROUP end_group\n\nscript void CreateBroadcastGroups()\n   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");\n   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");\nend_script\n\nobserver\n   enable SIMULATION_INITIALIZING CreateBroadcastGroups\nend_observer\n\n# Platform Instances\nplatform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 0n 0e\n   comm group_network WSF_COMM_TRANSCEIVER\n      internal_link report_processor\n   end_comm\n   processor report_processor WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n   end_processor\n   edit comm group_network group_join BROADCAST_DET\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\n   edit sensor geo on\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position 60.0n 110.0e\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\n   edit comm group_network group_join BROADCAST_OBS\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.0n 100.0e\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\n   edit comm group_network group_join BROADCAST_DET\n   edit comm group_network group_join BROADCAST_OBS\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\nend_platform\n\n# Event handling\nevent_pipe\n   file output/group_comm_example.aer\nend_event_pipe\n\nevent_output\n   file output/group_comm_example.evt\nend_event_output\n\nend_time 240 sec\n",
+    "static_analysis": {
+      "script": "BV1-017_layer_regeneration",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 85,
+          "message": "end_platform closes sensor from line 84"
+        },
+        {
+          "error_id": "E002",
+          "line": 93,
+          "message": "end_platform closes comm from line 92"
+        },
+        {
+          "error_id": "E002",
+          "line": 105,
+          "message": "end_platform closes processor from line 104"
+        },
+        {
+          "error_id": "E002",
+          "line": 71,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 82,
+          "message": "missing end_comm"
+        },
+        {
+          "error_id": "E002",
+          "line": 83,
+          "message": "missing end_processor"
+        },
+        {
+          "error_id": "E002",
+          "line": 87,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 95,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 102,
+          "message": "missing end_comm"
+        },
+        {
+          "error_id": "E002",
+          "line": 103,
+          "message": "missing end_comm"
+        },
+        {
+          "error_id": "E007",
+          "line": 116,
+          "message": "end_time must appear at top level, not inside another block"
+        },
+        {
+          "error_id": "E007",
+          "line": 62,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+        },
+        {
+          "error_id": "E007",
+          "line": 63,
+          "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
+        }
+      ]
+    }
+  },
+  "full_script_fallback_used": true,
+  "repaired_text": "# ****************************************************************************\n# CUI\n#\n# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)\n#\n# The use, dissemination or disclosure of data in this file is subject to\n# limitation or restriction. See accompanying README and LICENSE for details.\n# ****************************************************************************\n\n# UNCLASSIFIED\n#\n# Description: Group communication scenario.\n#\n# Scenario:\n#  - Platforms communicate track data within and across groups\n#\n\n# Shared Comm and Processor Blocks\ncomm datalink_basic WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm group_comm_basic WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor track_processor_basic WSF_TRACK_PROCESSOR\nend_processor\n\n# Platform Type Declarations\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n   comm group_network datalink_basic\n      internal_link report_processor\n   end_comm\n   processor report_processor track_processor_basic\n   end_processor\n   sensor geo WSF_GEOMETRIC_SENSOR\n      off\n      ignore_same_side\n      reports_location\n      maximum_range 100 nm\n      frame_time 1 sec\n      internal_link report_processor\n   end_sensor\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n      internal_link track_proc\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n   end_comm\nend_platform_type\n\n# Groups\ngroup BROADCAST_DET WSF_GROUP end_group\ngroup BROADCAST_OBS WSF_GROUP end_group\n\n# Platform Instances\nplatform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 30.67n 104.07e\n   group BROADCAST_DET\n   edit comm group_network group_join BROADCAST_DET\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\n   edit sensor geo on\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.70n 104.10e\n   group BROADCAST_DET\n   group BROADCAST_OBS\n   edit comm group_network group_join BROADCAST_DET\n   edit comm group_network group_join BROADCAST_OBS\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position 30.73n 104.13e\n   group BROADCAST_OBS\n   edit comm group_network group_join BROADCAST_OBS\nend_platform\n\n# Event handling\nevent_pipe\nend_event_pipe\n\nevent_output\n   file \"output.events\"\nend_event_output\n\nend_time 240 sec\n",
   "static_analysis": {
     "script": "BV1-017_static_repair",
     "syntax_correct": false,
@@ -1870,42 +1108,57 @@
     "findings": [
       {
         "error_id": "E002",
-        "line": 31,
-        "message": "end_platform_type closes comm from line 30"
+        "line": 70,
+        "message": "end_platform closes sensor from line 69"
       },
       {
         "error_id": "E002",
-        "line": 35,
-        "message": "end_platform_type closes comm from line 34"
+        "line": 80,
+        "message": "end_platform closes processor from line 79"
       },
       {
         "error_id": "E002",
-        "line": 40,
-        "message": "end_platform_type closes processor from line 39"
+        "line": 87,
+        "message": "end_platform closes comm from line 86"
       },
       {
         "error_id": "E002",
-        "line": 29,
-        "message": "missing end_platform_type"
+        "line": 63,
+        "message": "missing end_platform"
       },
       {
         "error_id": "E002",
-        "line": 33,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 37,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 38,
+        "line": 67,
         "message": "missing end_comm"
       },
       {
-        "error_id": "E007",
+        "error_id": "E002",
         "line": 68,
+        "message": "missing end_processor"
+      },
+      {
+        "error_id": "E002",
+        "line": 72,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 77,
+        "message": "missing end_comm"
+      },
+      {
+        "error_id": "E002",
+        "line": 78,
+        "message": "missing end_comm"
+      },
+      {
+        "error_id": "E002",
+        "line": 82,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E007",
+        "line": 97,
         "message": "end_time must appear at top level, not inside another block"
       }
     ]

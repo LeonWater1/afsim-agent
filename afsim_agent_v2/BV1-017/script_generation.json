@@ -1,7 +1,7 @@
 {
   "version": "hierarchical_generation_executor_v1",
   "generator_mode": "layered_executor_v1",
-  "script_text": "# group_communication scenario skeleton\n\nside blue display_name Blue\n\nlocation detector_site\n  kind point\n  position 30.67n 104.07e\nend_location\n\nlocation relay_site\n  kind point\n  position 30.70n 104.10e\nend_location\n\nlocation observer_site\n  kind point\n  position 30.73n 104.13e\nend_location\n\nnetwork group_broadcast\n  group_join\n  internal_link\nend_network\n\nplatform_type PT_OBSERVER_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_platform_type\n\nplatform_type PT_RELAY_UNIT\n  platform WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\nend_platform_type\n\nplatform_type PT_DETECTOR_UNIT\n  platform WSF_PLATFORM\n  processor report_processor WSF_TRACK_PROCESSOR\n  comm group_network WSF_COMM_TRANSCEIVER\nend_platform_type\n\ncomm_network share_group_net\n  network_type WSF_COMM_NETWORK_AD_HOC\n  link_frequency 3000 MHz\n  bandwidth 1 MHz\n  range 50 km\nend_comm_network\n\nplatform detector_unit\n  platform_type PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e\n  component group_network\n  component report_processor\nend_platform\n\nadd transceiver dtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager dtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e\n  comm group_network\nend_platform\n\nadd transceiver rtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager rtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\nplatform observer_unit\n  side blue\n  platform_type PT_OBSERVER_UNIT\n  position 30.73n 104.13e\n  comm group_network\nend_platform\n\nadd transceiver otx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager otm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\ngroup report_sharing_group\n  members detector_unit relay_unit observer_unit\nend_group\n\ntask share_group_reports\n  task_type group_communication\n  assigned_to report_sharing_group\n  parameter message_flow group_broadcast\nend_task\n\nevent_pipe group_event_pipe\n  event group_message_exchange\n  forward_to event_output\nend_event_pipe\n\nevent_output my_output\n  format json\n  file group_msg.json\nend_event_output\n\nend_time 240 sec",
+  "script_text": "# ****************************************************************************\n# CUI\n#\n# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)\n#\n# The use, dissemination or disclosure of data in this file is subject to\n# limitation or restriction. See accompanying README and LICENSE for details.\n# ****************************************************************************\n\n# UNCLASSIFIED\n#\n# Description: Group communication scenario.\n#\n# Scenario:\n#  - Platforms communicate track data within and across groups\n#\n\n# Shared Comm and Processor Blocks\ncomm datalink_basic WSF_COMM_TRANSCEIVER\nend_comm\n\ncomm group_comm_basic WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor track_processor_basic WSF_TRACK_PROCESSOR\nend_processor\n\n# Platform Type Declarations\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n   comm group_network datalink_basic\n      internal_link report_processor\n   end_comm\n   processor report_processor track_processor_basic\n   end_processor\n   sensor geo WSF_GEOMETRIC_SENSOR\n      off\n      ignore_same_side\n      reports_location\n      maximum_range 100 nm\n      frame_time 1 sec\n      internal_link report_processor\n   end_sensor\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n      internal_link track_proc\n   end_comm\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n   comm group_network group_comm_basic\n   end_comm\nend_platform_type\n\n# Groups and Initialization\ngroup broadcast_template WSF_GROUP end_group\n\nscript void CreateBroadcastGroups()\n   WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");\n   WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");\nend_script\n\nobserver\n   enable SIMULATION_INITIALIZING CreateBroadcastGroups\nend_observer\n\n# Platform Instances\nplatform detector_unit PT_DETECTOR_UNIT\n   side blue\n   position 0n 0e\n   comm group_network WSF_COMM_TRANSCEIVER\n      internal_link report_processor\n   end_comm\n   processor report_processor WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n   end_processor\n   edit comm group_network group_join BROADCAST_DET\n   edit processor report_processor report_to_group BROADCAST_DET via group_network\n   edit sensor geo on\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n   side blue\n   position 60.0n 110.0e\n   comm group_network WSF_COMM_TRANSCEIVER\n   end_comm\n   edit comm group_network group_join BROADCAST_OBS\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n   side blue\n   position 30.0n 100.0e\n   edit comm group_network group_join BROADCAST_DET\n   edit comm group_network group_join BROADCAST_OBS\n   edit processor track_proc report_to_group BROADCAST_OBS via group_network\nend_platform\n\n# Event handling\nevent_pipe\nend_event_pipe\n\nevent_output\n   file \"output.events\"\nend_event_output\n\nend_time 240 sec",
   "static_analysis": {
     "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\final_script.txt",
     "syntax_correct": false,
@@ -14,148 +14,68 @@
     "findings": [
       {
         "error_id": "E002",
-        "line": 28,
-        "message": "end_platform_type closes comm from line 27"
+        "line": 85,
+        "message": "end_platform closes sensor from line 84"
       },
       {
         "error_id": "E002",
-        "line": 33,
-        "message": "end_platform_type closes comm from line 32"
+        "line": 93,
+        "message": "end_platform closes comm from line 92"
       },
       {
         "error_id": "E002",
-        "line": 39,
-        "message": "end_platform_type closes comm from line 38"
+        "line": 101,
+        "message": "end_platform closes processor from line 100"
       },
       {
         "error_id": "E002",
-        "line": 54,
-        "message": "end_platform closes platform_type from line 49"
+        "line": 71,
+        "message": "missing end_platform"
       },
       {
         "error_id": "E002",
-        "line": 68,
-        "message": "end_platform closes comm from line 67"
+        "line": 82,
+        "message": "missing end_comm"
       },
       {
         "error_id": "E002",
         "line": 83,
-        "message": "end_platform closes comm from line 82"
-      },
-      {
-        "error_id": "E002",
-        "line": 25,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 26,
-        "message": "missing end_platform"
-      },
-      {
-        "error_id": "E002",
-        "line": 30,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 31,
-        "message": "missing end_platform"
-      },
-      {
-        "error_id": "E002",
-        "line": 35,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 36,
-        "message": "missing end_platform"
-      },
-      {
-        "error_id": "E002",
-        "line": 37,
         "message": "missing end_processor"
       },
       {
         "error_id": "E002",
-        "line": 48,
+        "line": 87,
         "message": "missing end_platform"
       },
       {
         "error_id": "E002",
-        "line": 57,
-        "message": "missing end_network"
-      },
-      {
-        "error_id": "E002",
-        "line": 64,
+        "line": 95,
         "message": "missing end_platform"
       },
       {
         "error_id": "E002",
-        "line": 71,
-        "message": "missing end_network"
+        "line": 98,
+        "message": "missing end_comm"
       },
       {
         "error_id": "E002",
-        "line": 78,
-        "message": "missing end_platform"
-      },
-      {
-        "error_id": "E002",
-        "line": 80,
-        "message": "missing end_platform_type"
-      },
-      {
-        "error_id": "E002",
-        "line": 86,
-        "message": "missing end_network"
+        "line": 99,
+        "message": "missing end_comm"
       },
       {
         "error_id": "E007",
-        "line": 20,
-        "message": "network block must declare a backing WSF_* type"
-      },
-      {
-        "error_id": "E007",
-        "line": 41,
-        "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
-      },
-      {
-        "error_id": "E007",
-        "line": 46,
-        "message": "end_comm_network closes an unsupported comm_network block"
-      },
-      {
-        "error_id": "E007",
-        "line": 57,
-        "message": "network block must declare a backing WSF_* type"
-      },
-      {
-        "error_id": "E007",
-        "line": 71,
-        "message": "network block must declare a backing WSF_* type"
-      },
-      {
-        "error_id": "E007",
-        "line": 86,
-        "message": "network block must declare a backing WSF_* type"
-      },
-      {
-        "error_id": "E007",
-        "line": 97,
-        "message": "task must be nested under processor"
-      },
-      {
-        "error_id": "E007",
-        "line": 113,
+        "line": 111,
         "message": "end_time must appear at top level, not inside another block"
       },
       {
         "error_id": "E007",
-        "line": 21,
-        "message": "unknown command: group_join"
+        "line": 62,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_DET\",\"broadcast_template\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 63,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"BROADCAST_OBS\",\"broadcast_template\");"
       }
     ]
   },
@@ -164,41 +84,41 @@
     {
       "phase": "phase1_skeleton",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase1_skeleton",
-      "seconds": 9.533
+      "seconds": 20.06
     },
     {
       "phase": "phase2_shared",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase2_shared",
-      "seconds": 47.102
+      "seconds": 99.735
     },
     {
       "phase": "phase3_platforms",
       "item_id": "detector_unit",
-      "seconds": 42.507,
+      "seconds": 33.825,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\detector_unit"
     },
     {
       "phase": "phase3_platforms",
       "item_id": "observer_unit",
-      "seconds": 15.934,
+      "seconds": 38.091,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\observer_unit"
     },
     {
       "phase": "phase3_platforms",
       "item_id": "relay_unit",
-      "seconds": 15.202,
+      "seconds": 28.371,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\relay_unit"
     },
     {
       "phase": "phase4_tasks",
       "item_id": "share_group_reports",
-      "seconds": 82.668,
+      "seconds": 120.667,
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase4_tasks\\share_group_reports"
     },
     {
       "phase": "phase5_assembly",
       "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase5_assembly",
-      "seconds": 90.89
+      "seconds": 98.273
     }
   ],
   "execution_result": {
@@ -219,41 +139,41 @@
       {
         "phase": "phase1_skeleton",
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase1_skeleton",
-        "seconds": 9.533
+        "seconds": 20.06
       },
       {
         "phase": "phase2_shared",
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase2_shared",
-        "seconds": 47.102
+        "seconds": 99.735
       },
       {
         "phase": "phase3_platforms",
         "item_id": "detector_unit",
-        "seconds": 42.507,
+        "seconds": 33.825,
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\detector_unit"
       },
       {
         "phase": "phase3_platforms",
         "item_id": "observer_unit",
-        "seconds": 15.934,
+        "seconds": 38.091,
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\observer_unit"
       },
       {
         "phase": "phase3_platforms",
         "item_id": "relay_unit",
-        "seconds": 15.202,
+        "seconds": 28.371,
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\relay_unit"
       },
       {
         "phase": "phase4_tasks",
         "item_id": "share_group_reports",
-        "seconds": 82.668,
+        "seconds": 120.667,
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase4_tasks\\share_group_reports"
       },
       {
         "phase": "phase5_assembly",
         "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase5_assembly",
-        "seconds": 90.89
+        "seconds": 98.273
       }
     ],
     "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\final_script.txt"

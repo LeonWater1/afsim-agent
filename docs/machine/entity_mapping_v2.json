@@ -312,7 +312,7 @@
       "canonical_id": "fires_launcher_basic",
       "canonical_role": "fires_launcher",
       "match_labels": ["fires_launcher", "artillery_launcher", "rocket_launcher", "mortar_launcher", "火力发射平台", "炮兵"],
-      "platform_type_hints": ["fires_launcher", "artillery_launcher", "rocket_launcher"],
+      "platform_type_hints": ["fires_launcher", "artillery_launcher", "artillery_platform", "rocket_launcher", "mortar_launcher"],
       "match_confidence": "full",
       "grounding_target": {
         "target_kind": "platform_template",
@@ -447,7 +447,7 @@
     "intercept": {
       "canonical_id": "intercept",
       "match_labels": ["intercept", "拦截", "截击"],
-      "ir_task_types": ["intercept", "air_engage"],
+      "ir_task_types": ["intercept", "air_engage", "air_to_air"],
       "match_confidence": "full",
       "grounding_target": {
         "target_kind": "behavior_bundle",
@@ -558,7 +558,7 @@
     "fires_mission": {
       "canonical_id": "fires_mission",
       "match_labels": ["fires_mission", "indirect_fire_mission", "火力打击", "炮火支援"],
-      "ir_task_types": ["fires_mission", "artillery_strike"],
+      "ir_task_types": ["fires_mission", "artillery_strike", "fires"],
       "match_confidence": "full",
       "grounding_target": {
         "target_kind": "behavior_bundle",
@@ -890,7 +890,7 @@
       "fires_implicit_weapon": {
         "canonical_id": "fires_implicit_weapon_basic",
         "match_labels": ["fires_weapon", "artillery", "mortar", "rocket", "indirect_fire", "火力武器", "火炮"],
-        "type_hints": ["fires_weapon", "artillery_weapon", "indirect_fire_weapon"],
+        "type_hints": ["fires_weapon", "artillery_weapon", "indirect_fire_weapon", "artillery_shell"],
         "match_confidence": "full",
         "grounding_target": {
           "target_kind": "wsf_type",
