@@ -8,9 +8,7 @@ Entity:
   "quantity": 1,
   "side": {
     "matched": true,
-    "match_level": "full",
     "mapping_type": "side",
-    "input": "blue",
     "canonical_id": "blue",
     "row": {
       "canonical_id": "blue",
@@ -21,18 +19,12 @@ Entity:
         "我方",
         "蓝方",
         "友方"
-      ],
-      "match_confidence": "full"
-    },
-    "match_confidence": "full",
-    "implementation_constraints": {},
-    "provenance": []
+      ]
+    }
   },
   "platform_grounding": {
     "matched": true,
-    "match_level": "full",
     "mapping_type": "platform",
-    "input": "detector",
     "canonical_id": "detector_platform_basic",
     "row": {
       "canonical_id": "detector_platform_basic",
@@ -46,7 +38,6 @@ Entity:
       "platform_type_hints": [
         "detector_platform"
       ],
-      "match_confidence": "full",
       "grounding_target": {
         "target_kind": "platform_template",
         "target_id": "detector_platform_basic",
@@ -60,21 +51,27 @@ Entity:
         "benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt"
       ]
     },
-    "match_confidence": "full",
-    "implementation_constraints": {},
-    "provenance": [
-      "benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt"
-    ],
-    "grounding_target": {
-      "target_kind": "platform_template",
-      "target_id": "detector_platform_basic",
-      "wsf_base_type": "WSF_PLATFORM"
+    "implementation_constraints": {
+      "grounding_target_kind": "platform_template",
+      "wsf_context_rules": [],
+      "preferred_declarations": [],
+      "default_component_bundle": [
+        "datalink_basic",
+        "track_processor_basic"
+      ]
     }
   },
-  "platform_constraints": {},
+  "platform_constraints": {
+    "grounding_target_kind": "platform_template",
+    "wsf_context_rules": [],
+    "preferred_declarations": [],
+    "default_component_bundle": [
+      "datalink_basic",
+      "track_processor_basic"
+    ]
+  },
   "initial_location_ref": "detector_site",
   "route_ref": null,
-  "commander_ref": null,
   "component_refs": [
     "group_network",
     "report_processor"
@@ -100,22 +97,140 @@ Platform naming contract:
 - platform type name: PT_DETECTOR_UNIT
 
 Resolved initial location:
-{
-  "id": "detector_site",
-  "kind": "point",
-  "position": {
-    "lat": "30.67n",
-    "lon": "104.07e"
-  }
-}
+{}
 
 Rules:
 - Emit EXACTLY one platform block for this entity.
 - Use the exact instance and type names above.
 - Set side and initial position.
 - If route_ref is present (none), you may reference it inside the platform block, but DO NOT define the route block here.
+- Do not put `platform_type` as a command inside a platform block. The syntax is `platform NAME TYPE`.
 - Do not emit any platform_type declaration here.
 - Do not emit event_pipe / event_output / end_time.
+
+Verified task-family reference script:
+```afsim
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# UNCLASSIFIED
+#
+# Description: This simple scenario provides an example of transmitting 
+#   tracks received from off-board platforms to other groups.
+#
+# Scenario:
+#  - Platform 1 (p1) is the only platform that has their sensor ON in the simulation
+#  - Platform 1 (p1) can communicate tracks to platforms in FIGHTER_GROUP_1 (p1, p2)
+#  - Platform 2 (p2) can communicate tracks to platforms in FIGHTER_GROUP_2 (p2, p3)
+#  - p1 CANNOT communicate tracks to p3, but must go by way of p2
+#
+
+# -- Basic Subsystems --
+comm BASIC_COMM WSF_COMM_TRANSCEIVER 
+   #debug 
+end_comm
+
+processor BASIC_TRACK_PROC WSF_TRACK_PROCESSOR
+   report_interval 2 sec
+   circular_report_rejection on
+   update_interval 10 sec
+
+   on_message
+      type WSF_TRACK_MESSAGE
+      script
+         WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;
+         if(tmsg.Originator() != PLATFORM.Name())
+         {
+            print("T=",TIME_NOW," P=",PLATFORM.Name(),"  Track ",tmsg.Track().TargetName()," received from ",tmsg.Originator());
+         }
+      end_script
+   end_on_message
+end_processor
+
+# -- Groups --
+group fg_template WSF_GROUP end_group
+
+script void CreateGroups()
+   WsfSimulation.CreateGroup("FIGHTER_GROUP_1","fg_template");
+   WsfSimulation.CreateGroup("FIGHTER_GROUP_2","fg_template");
+end_script
+
+observer
+   enable SIMULATION_INITIALIZING CreateGroups
+end_observer
+
+# -- Platform Type --
+platform_type BASIC_FIGHTER WSF_PLATFORM
+   icon fighter
+   mover WSF_AIR_MOVER end_mover
+
+   comm datalink BASIC_COMM
+      internal_link track_proc
+   end_comm
+
+   processor track_proc BASIC_TRACK_PROC
+      script bool is_track_reportable(WsfTrack aTrack)
+         writeln("T=",TIME_NOW," P=",PLATFORM.Name()," checking if ",aTrack.TargetName()," is reportable: YES");
+         return true;
+      end_script
+
+      script void on_update()
+      writeln(PLATFORM.Name());
+      for (int i = 0; i < PLATFORM.MasterTrackList().TrackCount(); i = i + 1)
+      {
+         writeln(" * ", PLATFORM.MasterTrackList().TrackEntry(i).TrackId().ToString());
+      }
+      end_script
+   end_processor
+
+   sensor geo WSF_GEOMETRIC_SENSOR
+      off
+      ignore_same_side
+      reports_location
+      maximum_range 100 nm
+      frame_time 1 sec
+      internal_link track_proc
+   end_sensor
+end_platform_type
+
+# ======================================================================================
+
+# -- Blue Platforms ---
+platform cmdr WSF_PLATFORM
+   side blue
+   position 1n 0e
+end_platform
+
+platform p1 BASIC_FIGHTER
+   side blue
+   #commander cmdr
+   #group_join FIGHTER_GROUP_1
+
+   edit comm datalink group_join FIGHTER_GROUP_1 end_comm
+
+   route
+      position 0n 01w altitude 10 kft heading 90 deg speed 700 kts
+   end_route
+   
+   edit sensor geo on end_sensor
+   
+   edit processor track_proc
+      report_to_group FIGHTER_GROUP_1 via datalink
+      #report_to platform p3 comm datalink via datalink
+   end_processor
+end_platform
+
+platform p2 BASIC_FIGHTER
+   side blue
+   #commander cmdr
+   #group_join FIGHTER_GROUP_1
+```
 
 AFSIM 2.9.0 hard rules:
 - Return ONLY AFSIM script text. No markdown, no explanation.
@@ -123,9 +238,28 @@ AFSIM 2.9.0 hard rules:
 - ALL numbers must include units where AFSIM requires them.
 - Coordinates use n/s/e/w suffix, for example: position 30.67n 104.07e
 - Altitude format: altitude 10000 ft msl  or  altitude 500 m agl
-- side is a declaration, not a block. Never emit end_side.
+- side is set inside platform / platform_type context when supported. Never emit top-level side declarations or end_side.
 - Match every block with the correct end_* tag.
 - Do not invent DSL constructs outside the official command set.
+
+Mission-proven forbidden constructs:
+- scenario / end_scenario
+- top-level side declarations
+- network ... end_network
+- comm_network / end_comm_network
+- task_group / end_task_group
+- task_type / assigned_to / parameter message_flow
+- add transceiver / add track_manager
+- group report_sharing_group ... unless the reference script explicitly shows the full valid pattern
+- named event_pipe or named event_output blocks
+
+Preferred command shapes:
+- platform_type NAME WSF_PLATFORM
+- platform NAME TYPE
+- comm NAME WSF_COMM_TRANSCEIVER ... end_comm
+- processor NAME TYPE ... end_processor
+- event_pipe ... end_event_pipe
+- event_output ... end_event_output
 
 Verified WSF types:
 WSF_ACOUSTIC_SENSOR WSF_AERO WSF_AGILITY_EFFECT WSF_AIR_MOVER WSF_AIR_TARGET_FUSE WSF_AIR_TO_AIR_LAUNCH_COMPUTER WSF_AIR_TO_AIR_MISSILE WSF_ALPHA_BETA_FILTER

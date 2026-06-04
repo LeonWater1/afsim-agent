@@ -1,58 +1,38 @@
 {
   "version": "execution_repair_spec_v1",
   "input": {
-    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\llm_repaired_script.txt",
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
     "mission_status": "FAIL",
     "return_code": 1
   },
   "static_analysis": {
-    "script": "BV1-012_static_repair",
-    "syntax_correct": false,
-    "static_pass": false,
-    "primary_error": "E007",
-    "static_error_ids": [
-      "E007"
-    ],
-    "findings": [
-      {
-        "error_id": "E007",
-        "line": 19,
-        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
-      },
-      {
-        "error_id": "E007",
-        "line": 32,
-        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
-      },
-      {
-        "error_id": "E007",
-        "line": 63,
-        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
-      },
-      {
-        "error_id": "E007",
-        "line": 76,
-        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
-      }
-    ]
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
   },
   "execution_analysis": {
     "mission_pass": false,
-    "primary_error": "E007",
-    "classifier": "input_parse_or_structure_error",
+    "primary_error": "E006",
+    "classifier": "missing_brawler_required_components",
     "route": "return_to_layer_regeneration",
-    "inferred_stage": "static_or_generation",
-    "suggested_action": "regenerate the affected layer or component template",
+    "inferred_stage": "component_generation",
+    "suggested_action": "when using a Brawler family platform, include the verified Brawler mover and threat processor pattern rather than approximating with generic air-platform components",
     "evidence_lines": [
-      "***** FATAL: Could not process input files.",
-      "***** ERROR: Unknown command: side"
+      "***** ERROR: WSF_BRAWLER_PLATFORM must have a WSF_BRAWLER_MOVER!",
+      "***** ERROR: Platform component failed phase one initialization.",
+      "***** ERROR: WSF_BRAWLER_PLATFORM must have a WSF_BRAWLER_MOVER!",
+      "***** ERROR: Platform component failed phase one initialization.",
+      "***** ERROR: Initialization of simulation failed due to unhandled exception."
     ]
   },
   "repair_recommendation": {
-    "primary_error": "E007",
+    "primary_error": "E006",
     "route": "return_to_layer_regeneration",
-    "inferred_stage": "static_or_generation",
-    "suggested_action": "regenerate the affected layer or component template"
+    "inferred_stage": "component_generation",
+    "suggested_action": "when using a Brawler family platform, include the verified Brawler mover and threat processor pattern rather than approximating with generic air-platform components"
   },
   "rerun_plan": {
     "preconditions": [
@@ -60,7 +40,7 @@
       "rerun static_checker_v1 after the repair changes the script text",
       "rerun mission.exe only after the regenerated script passes static verification"
     ],
-    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\llm_repaired_script.txt",
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
     "success_condition": "mission_status == PASS"
   }
 }

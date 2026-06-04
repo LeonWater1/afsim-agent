@@ -6,7 +6,7 @@
     "return_code": 1
   },
   "static_analysis": {
-    "script": "BV1-022_static_repair",
+    "script": "BV1-022_layer_regeneration",
     "syntax_correct": true,
     "static_pass": true,
     "primary_error": "",
@@ -22,7 +22,7 @@
     "suggested_action": "regenerate the affected layer or component template",
     "evidence_lines": [
       "***** FATAL: Could not process input files.",
-      "***** ERROR: Unknown command: scenario"
+      "***** ERROR: Unknown command: end_platform_type"
     ]
   },
   "repair_recommendation": {

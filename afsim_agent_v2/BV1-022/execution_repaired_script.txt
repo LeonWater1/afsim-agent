@@ -1,148 +1,95 @@
-# Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.
+script_interface
+   debug
+end_script_interface
 
-platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM
-  weapon artillery_155mm WSF_IMPLICIT_WEAPON
-    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
-      maximum_firing_range 30 km
-      minimum_firing_range 3 km
-    end_launch_computer
-    quantity 1
-  end_weapon
+weapon ARTILLERY_PROJECTILE WSF_IMPLICIT_WEAPON
+   launch_computer WSF_FIRES_LAUNCH_COMPUTER
+   end_launch_computer
+end_weapon
 
-  processor sub_task_proc WSF_TASK_PROCESSOR
-  end_processor
-
-  comm fires_comm WSF_COMM_TRANSCEIVER
-  end_comm
+platform_type ARTILLERY_BATTERY_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   weapon MAIN_GUN 100 ARTILLERY_PROJECTILE
+end_weapon
 end_platform_type
 
-platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM
-  weapon mortar_120mm WSF_IMPLICIT_WEAPON
-    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
-      maximum_firing_range 8 km
-      minimum_firing_range 1 km
-    end_launch_computer
-    quantity 1
-  end_weapon
-
-  processor sub_task_proc WSF_TASK_PROCESSOR
-  end_processor
-
-  comm fires_comm WSF_COMM_TRANSCEIVER
-  end_comm
+platform_type TARGET_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 10 m/sec
+      minimum_speed 0 m/sec
+   end_mover
 end_platform_type
 
-platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM
-  weapon rocket_122mm WSF_IMPLICIT_WEAPON
-    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
-      maximum_firing_range 20 km
-      minimum_firing_range 5 km
-    end_launch_computer
-    quantity 1
-  end_weapon
+platform_type COMMANDER_GROUP_TYPE WSF_GROUP
+   processor cmdr_task_proc WSF_TASK_PROCESSOR
 
-  processor sub_task_proc WSF_TASK_PROCESSOR
-  end_processor
+      script void SetTask(WsfPlatform aPlatform,
+                          WsfTrack    aTrack)
+         string weaponName = aPlatform.WeaponEntry(0).Name();
+         WsfWeaponTask task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName);
+         task.SetQuantity(1);
+         task.SetCommDevice("perfect");
+         task.SetAssignee(aPlatform.Name());
+         AssignTask(aTrack, task);
+      end_script
 
-  comm fires_comm WSF_COMM_TRANSCEIVER
-  end_comm
+      execute at_time 1.0 sec absolute
+         WsfPlatform target = WsfSimulation.FindPlatform("red_target");
+         WsfTrack targetTrack = target.MakeTrack();
+         targetTrack.SetAuxData("IMPACT_TIME", 300.0);
+         PLATFORM.SetCurrentTarget(targetTrack);
+         foreach(WsfPlatform subordinate in PLATFORM.Subordinates())
+         {
+            SetTask(subordinate, targetTrack);
+         }
+      end_execute
+
+      script void on_task_complete(WsfTask aTask)
+         writeln("Task ", aTask.TaskId(), " assigned to ", aTask.Assignee(), " complete.");
+      end_script
+
+   end_processor
 end_platform_type
 
-platform_type PT_FIRES_COMMANDER WSF_PLATFORM
-  processor commander_task_proc WSF_TASK_PROCESSOR
-    script void FireMission()
-       WsfPlatform target = WsfSimulation.FindPlatform("target_unit");
-       if (!target.IsValid())
-          return;
-       endif
-       WsfTrack targetTrack = target.MakeTrack();
-       targetTrack.SetAuxData("IMPACT_TIME", 300.0);
+comm perfect WSF_COMM_TRANSCEIVER
+end_comm
 
-       WsfPlatform launcher;
-       string weaponName;
-       WsfWeaponTask task;
-
-       launcher = WsfSimulation.FindPlatform("artillery_launcher");
-       if (launcher.IsValid())
-          weaponName = launcher.WeaponEntry(0).Name();
-          task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName);
-          task.SetQuantity(1);
-          task.SetCommDevice("fires_comm");
-          task.SetAssignee("artillery_launcher");
-          AssignTask(targetTrack, task);
-       endif
-
-       launcher = WsfSimulation.FindPlatform("mortar_launcher");
-       if (launcher.IsValid())
-          weaponName = launcher.WeaponEntry(0).Name();
-          task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName);
-          task.SetQuantity(1);
-          task.SetCommDevice("fires_comm");
-          task.SetAssignee("mortar_launcher");
-          AssignTask(targetTrack, task);
-       endif
-
-       launcher = WsfSimulation.FindPlatform("rocket_launcher");
-       if (launcher.IsValid())
-          weaponName = launcher.WeaponEntry(0).Name();
-          task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName);
-          task.SetQuantity(1);
-          task.SetCommDevice("fires_comm");
-          task.SetAssignee("rocket_launcher");
-          AssignTask(targetTrack, task);
-       endif
-    end_script
-
-    execute at_time 270 sec absolute
-       FireMission();
-    end_execute
-  end_processor
-
-  comm fires_comm WSF_COMM_TRANSCEIVER
-  end_comm
-end_platform_type
-
-platform_type PT_TARGET_UNIT WSF_PLATFORM
-end_platform_type
-
-platform artillery_launcher PT_ARTILLERY_LAUNCHER
-  side red
-  position 51.53n 0.44e
-  add weapon artillery_155mm
-  add processor sub_task_proc
-  add comm fires_comm
+platform commander_group COMMANDER_GROUP_TYPE
+   side blue
 end_platform
 
-platform mortar_launcher PT_MORTAR_LAUNCHER
-  side red
-  position 51.49n 0.37e
-  altitude 0 m agl
-  add weapon mortar_120mm
-  add processor sub_task_proc
-  add comm fires_comm
+platform battery_1 ARTILLERY_BATTERY_TYPE
+   side blue
+   parent commander_group
+   route
+      position 30.65n 104.05e altitude 100 m msl speed 0 m/sec
+   end_route
 end_platform
 
-platform rocket_launcher PT_ROCKET_LAUNCHER
-  side red
-  position 51.50n 0.27e
-  add weapon rocket_122mm
-  add processor sub_task_proc
-  add comm fires_comm
+platform battery_2 ARTILLERY_BATTERY_TYPE
+   side blue
+   parent commander_group
+   route
+      position 30.70n 104.08e altitude 100 m msl speed 0 m/sec
+   end_route
 end_platform
 
-platform fires_commander PT_FIRES_COMMANDER
-  side red
-  position 51.58n 0.31e
-  add processor commander_task_proc
-  add comm fires_comm
+platform red_target TARGET_TYPE
+   side red
+   route
+      position 30.68n 104.12e altitude 150 m msl speed 0 m/sec
+   end_route
 end_platform
 
-platform target_unit PT_TARGET_UNIT
-  side red
-  position 51.47n 0.35e
-end_platform
+event_pipe
+   file output/time_on_target_fires.aer
+end_event_pipe
 
-event_pipe file output/time_on_target_fires.aer end_event_pipe
-event_output file output/time_on_target_fires.evt end_event_output
+csv_event_output
+   file output/time_on_target_fires.csv
+end_csv_event_output
 
 end_time 600 sec

@@ -17,76 +17,26 @@
     "scenario_scaffold": {
       "layer_name": "scenario_scaffold",
       "scenario_name": "time_on_target_fires",
-      "description": "Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.",
+      "description": "Time-on-target fires scenario where multiple artillery units fire at a single target to achieve simultaneous impact.",
       "duration": {
         "value": 600,
         "unit": "sec"
       },
-      "schema_version": "afsim_ir_v2",
       "domains": [
         "ground"
       ],
       "outputs": [
         "event_pipe",
-        "event_output"
+        "csv_event_output"
       ],
       "side_ids": [
+        "blue",
         "red"
       ],
-      "sides": [
-        {
-          "id": "red",
-          "display_name": "Red"
-        }
-      ],
       "location_ids": [
-        "artillery_position_1",
-        "mortar_position",
-        "rocket_position",
-        "commander_position",
-        "target_location"
-      ],
-      "locations": [
-        {
-          "id": "artillery_position_1",
-          "kind": "point",
-          "position": {
-            "lat": "51.53n",
-            "lon": "0.44e"
-          }
-        },
-        {
-          "id": "mortar_position",
-          "kind": "point",
-          "position": {
-            "lat": "51.49n",
-            "lon": "0.37e"
-          }
-        },
-        {
-          "id": "rocket_position",
-          "kind": "point",
-          "position": {
-            "lat": "51.50n",
-            "lon": "0.27e"
-          }
-        },
-        {
-          "id": "commander_position",
-          "kind": "point",
-          "position": {
-            "lat": "51.58n",
-            "lon": "0.31e"
-          }
-        },
-        {
-          "id": "target_location",
-          "kind": "point",
-          "position": {
-            "lat": "51.47n",
-            "lon": "0.35e"
-          }
-        }
+        "blue_battery_1_position",
+        "blue_battery_2_position",
+        "red_target_position"
       ],
       "constraint_keys": [
         "coordinate_format",
@@ -100,524 +50,123 @@
       "layer_name": "platform_layer",
       "entities": [
         {
-          "entity_id": "artillery_launcher",
-          "role": "artillery_launcher",
+          "entity_id": "blue_battery_1",
+          "role": "artillery_battery",
           "domain": "ground",
           "quantity": 1,
           "side": {
             "matched": true,
-            "match_level": "full",
             "mapping_type": "side",
-            "input": "red",
-            "canonical_id": "red",
+            "canonical_id": "blue",
             "row": {
-              "canonical_id": "red",
+              "canonical_id": "blue",
               "aliases": [
-                "red",
-                "hostile",
-                "enemy",
-                "敌方",
-                "红方",
-                "目标方"
-              ],
-              "match_confidence": "full"
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": []
-          },
-          "platform_grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "platform",
-            "input": "artillery_launcher",
-            "canonical_id": "fires_launcher_basic",
-            "row": {
-              "canonical_id": "fires_launcher_basic",
-              "canonical_role": "fires_launcher",
-              "match_labels": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher",
-                "mortar_launcher",
-                "火力发射平台",
-                "炮兵"
-              ],
-              "platform_type_hints": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "platform_template",
-                "target_id": "fires_launcher_basic",
-                "wsf_base_type": "WSF_PLATFORM"
-              },
-              "default_component_bundle": [
-                "fires_weapon_basic",
-                "fires_launch_computer_basic",
-                "datalink_basic",
-                "task_processor_basic"
-              ],
-              "implementation_constraints": {
-                "required_components": [
-                  "fires_weapon_basic"
-                ],
-                "required_processor_types": [
-                  "WSF_TASK_PROCESSOR"
-                ],
-                "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-                "weapon_mode": "indirect_fire"
-              },
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
               ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "required_components": [
-                "fires_weapon_basic"
-              ],
-              "required_processor_types": [
-                "WSF_TASK_PROCESSOR"
-              ],
-              "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-              "weapon_mode": "indirect_fire"
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "platform_template",
-              "target_id": "fires_launcher_basic",
-              "wsf_base_type": "WSF_PLATFORM"
             }
           },
-          "platform_constraints": {
-            "required_components": [
-              "fires_weapon_basic"
-            ],
-            "required_processor_types": [
-              "WSF_TASK_PROCESSOR"
-            ],
-            "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-            "weapon_mode": "indirect_fire"
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "artillery_battery"
           },
-          "initial_location_ref": "artillery_position_1",
+          "platform_constraints": {},
+          "initial_location_ref": "blue_battery_1_position",
           "route_ref": null,
-          "commander_ref": null,
           "component_refs": [
-            "artillery_155mm",
-            "sub_task_proc",
-            "fires_comm"
+            "artillery_shell",
+            "towed_mover"
           ],
           "component_families": {
-            "mover": [],
+            "mover": [
+              "towed_mover"
+            ],
             "sensor": [],
             "weapon": [
-              "artillery_155mm"
+              "artillery_shell"
             ],
-            "processor": [
-              "sub_task_proc"
-            ],
-            "comm": [
-              "fires_comm"
-            ]
+            "processor": [],
+            "comm": []
           },
           "missing_component_refs": [],
-          "ready": true,
-          "unresolved_items": []
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_battery_1",
+              "role": "artillery_battery",
+              "platform_type_hint": "artillery_platform"
+            }
+          ]
         },
         {
-          "entity_id": "mortar_launcher",
-          "role": "mortar_launcher",
+          "entity_id": "blue_battery_2",
+          "role": "artillery_battery",
           "domain": "ground",
           "quantity": 1,
           "side": {
             "matched": true,
-            "match_level": "full",
             "mapping_type": "side",
-            "input": "red",
-            "canonical_id": "red",
+            "canonical_id": "blue",
             "row": {
-              "canonical_id": "red",
+              "canonical_id": "blue",
               "aliases": [
-                "red",
-                "hostile",
-                "enemy",
-                "敌方",
-                "红方",
-                "目标方"
-              ],
-              "match_confidence": "full"
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": []
-          },
-          "platform_grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "platform",
-            "input": "mortar_launcher",
-            "canonical_id": "fires_launcher_basic",
-            "row": {
-              "canonical_id": "fires_launcher_basic",
-              "canonical_role": "fires_launcher",
-              "match_labels": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher",
-                "mortar_launcher",
-                "火力发射平台",
-                "炮兵"
-              ],
-              "platform_type_hints": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "platform_template",
-                "target_id": "fires_launcher_basic",
-                "wsf_base_type": "WSF_PLATFORM"
-              },
-              "default_component_bundle": [
-                "fires_weapon_basic",
-                "fires_launch_computer_basic",
-                "datalink_basic",
-                "task_processor_basic"
-              ],
-              "implementation_constraints": {
-                "required_components": [
-                  "fires_weapon_basic"
-                ],
-                "required_processor_types": [
-                  "WSF_TASK_PROCESSOR"
-                ],
-                "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-                "weapon_mode": "indirect_fire"
-              },
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
               ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "required_components": [
-                "fires_weapon_basic"
-              ],
-              "required_processor_types": [
-                "WSF_TASK_PROCESSOR"
-              ],
-              "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-              "weapon_mode": "indirect_fire"
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "platform_template",
-              "target_id": "fires_launcher_basic",
-              "wsf_base_type": "WSF_PLATFORM"
             }
           },
-          "platform_constraints": {
-            "required_components": [
-              "fires_weapon_basic"
-            ],
-            "required_processor_types": [
-              "WSF_TASK_PROCESSOR"
-            ],
-            "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-            "weapon_mode": "indirect_fire"
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "artillery_battery"
           },
-          "initial_location_ref": "mortar_position",
+          "platform_constraints": {},
+          "initial_location_ref": "blue_battery_2_position",
           "route_ref": null,
-          "commander_ref": null,
           "component_refs": [
-            "mortar_120mm",
-            "sub_task_proc",
-            "fires_comm"
+            "artillery_shell",
+            "towed_mover"
           ],
           "component_families": {
-            "mover": [],
+            "mover": [
+              "towed_mover"
+            ],
             "sensor": [],
             "weapon": [
-              "mortar_120mm"
+              "artillery_shell"
             ],
-            "processor": [
-              "sub_task_proc"
-            ],
-            "comm": [
-              "fires_comm"
-            ]
+            "processor": [],
+            "comm": []
           },
           "missing_component_refs": [],
-          "ready": true,
-          "unresolved_items": []
-        },
-        {
-          "entity_id": "rocket_launcher",
-          "role": "rocket_launcher",
-          "domain": "ground",
-          "quantity": 1,
-          "side": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "side",
-            "input": "red",
-            "canonical_id": "red",
-            "row": {
-              "canonical_id": "red",
-              "aliases": [
-                "red",
-                "hostile",
-                "enemy",
-                "敌方",
-                "红方",
-                "目标方"
-              ],
-              "match_confidence": "full"
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": []
-          },
-          "platform_grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "platform",
-            "input": "rocket_launcher",
-            "canonical_id": "fires_launcher_basic",
-            "row": {
-              "canonical_id": "fires_launcher_basic",
-              "canonical_role": "fires_launcher",
-              "match_labels": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher",
-                "mortar_launcher",
-                "火力发射平台",
-                "炮兵"
-              ],
-              "platform_type_hints": [
-                "fires_launcher",
-                "artillery_launcher",
-                "rocket_launcher"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "platform_template",
-                "target_id": "fires_launcher_basic",
-                "wsf_base_type": "WSF_PLATFORM"
-              },
-              "default_component_bundle": [
-                "fires_weapon_basic",
-                "fires_launch_computer_basic",
-                "datalink_basic",
-                "task_processor_basic"
-              ],
-              "implementation_constraints": {
-                "required_components": [
-                  "fires_weapon_basic"
-                ],
-                "required_processor_types": [
-                  "WSF_TASK_PROCESSOR"
-                ],
-                "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-                "weapon_mode": "indirect_fire"
-              },
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "required_components": [
-                "fires_weapon_basic"
-              ],
-              "required_processor_types": [
-                "WSF_TASK_PROCESSOR"
-              ],
-              "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-              "weapon_mode": "indirect_fire"
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_base_types.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "platform_template",
-              "target_id": "fires_launcher_basic",
-              "wsf_base_type": "WSF_PLATFORM"
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_battery_2",
+              "role": "artillery_battery",
+              "platform_type_hint": "artillery_platform"
             }
-          },
-          "platform_constraints": {
-            "required_components": [
-              "fires_weapon_basic"
-            ],
-            "required_processor_types": [
-              "WSF_TASK_PROCESSOR"
-            ],
-            "required_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-            "weapon_mode": "indirect_fire"
-          },
-          "initial_location_ref": "rocket_position",
-          "route_ref": null,
-          "commander_ref": null,
-          "component_refs": [
-            "rocket_122mm",
-            "sub_task_proc",
-            "fires_comm"
-          ],
-          "component_families": {
-            "mover": [],
-            "sensor": [],
-            "weapon": [
-              "rocket_122mm"
-            ],
-            "processor": [
-              "sub_task_proc"
-            ],
-            "comm": [
-              "fires_comm"
-            ]
-          },
-          "missing_component_refs": [],
-          "ready": true,
-          "unresolved_items": []
+          ]
         },
         {
-          "entity_id": "fires_commander",
-          "role": "fires_commander",
-          "domain": "ground",
-          "quantity": 1,
-          "side": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "side",
-            "input": "red",
-            "canonical_id": "red",
-            "row": {
-              "canonical_id": "red",
-              "aliases": [
-                "red",
-                "hostile",
-                "enemy",
-                "敌方",
-                "红方",
-                "目标方"
-              ],
-              "match_confidence": "full"
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": []
-          },
-          "platform_grounding": {
-            "matched": true,
-            "match_level": "partial",
-            "mapping_type": "platform",
-            "input": "fires_commander",
-            "canonical_id": "commander_platform_basic",
-            "row": {
-              "canonical_id": "commander_platform_basic",
-              "canonical_role": "commander",
-              "match_labels": [
-                "commander",
-                "command_platform",
-                "c2_node",
-                "指挥平台",
-                "指挥节点"
-              ],
-              "platform_type_hints": [
-                "commander_platform",
-                "c2_node"
-              ],
-              "match_confidence": "partial",
-              "match_confidence_reason": "Generic commander role — specific processor bundle depends on mission type (IADS, fires, air combat, etc.)",
-              "grounding_target": {
-                "target_kind": "platform_template",
-                "target_id": "commander_platform_basic",
-                "wsf_base_type": "WSF_PLATFORM"
-              },
-              "default_component_bundle": [
-                "task_processor_basic",
-                "datalink_basic"
-              ],
-              "implementation_constraints": {
-                "required_components": [
-                  "task_processor_basic",
-                  "datalink_basic"
-                ]
-              },
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-              ]
-            },
-            "match_confidence": "partial",
-            "implementation_constraints": {
-              "required_components": [
-                "task_processor_basic",
-                "datalink_basic"
-              ]
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "platform_template",
-              "target_id": "commander_platform_basic",
-              "wsf_base_type": "WSF_PLATFORM"
-            },
-            "match_reason": "Generic commander role — specific processor bundle depends on mission type (IADS, fires, air combat, etc.)"
-          },
-          "platform_constraints": {
-            "required_components": [
-              "task_processor_basic",
-              "datalink_basic"
-            ]
-          },
-          "initial_location_ref": "commander_position",
-          "route_ref": null,
-          "commander_ref": null,
-          "component_refs": [
-            "commander_task_proc",
-            "fires_comm"
-          ],
-          "component_families": {
-            "mover": [],
-            "sensor": [],
-            "weapon": [],
-            "processor": [
-              "commander_task_proc"
-            ],
-            "comm": [
-              "fires_comm"
-            ]
-          },
-          "missing_component_refs": [],
-          "ready": true,
-          "unresolved_items": []
-        },
-        {
-          "entity_id": "target_unit",
+          "entity_id": "red_target",
           "role": "target",
           "domain": "ground",
           "quantity": 1,
           "side": {
             "matched": true,
-            "match_level": "full",
             "mapping_type": "side",
-            "input": "red",
             "canonical_id": "red",
             "row": {
               "canonical_id": "red",
@@ -628,18 +177,12 @@
                 "敌方",
                 "红方",
                 "目标方"
-              ],
-              "match_confidence": "full"
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": []
+              ]
+            }
           },
           "platform_grounding": {
             "matched": true,
-            "match_level": "full",
             "mapping_type": "platform",
-            "input": "target",
             "canonical_id": "acoustic_target_basic",
             "row": {
               "canonical_id": "acoustic_target_basic",
@@ -654,7 +197,6 @@
                 "acoustic_target",
                 "surface_target"
               ],
-              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
                 "target_id": "acoustic_target_basic",
@@ -665,21 +207,11 @@
                 "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
               ]
             },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "platform_template",
-              "target_id": "acoustic_target_basic",
-              "wsf_base_type": "WSF_PLATFORM"
-            }
+            "implementation_constraints": {}
           },
           "platform_constraints": {},
-          "initial_location_ref": "target_location",
+          "initial_location_ref": "red_target_position",
           "route_ref": null,
-          "commander_ref": null,
           "component_refs": [],
           "component_families": {
             "mover": [],
@@ -693,8 +225,21 @@
           "unresolved_items": []
         }
       ],
-      "ready": true,
-      "unresolved_items": []
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_battery_1",
+          "role": "artillery_battery",
+          "platform_type_hint": "artillery_platform"
+        },
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_battery_2",
+          "role": "artillery_battery",
+          "platform_type_hint": "artillery_platform"
+        }
+      ]
     },
     "sensor_layer": {
       "layer_name": "sensor_layer",
@@ -706,601 +251,93 @@
       "layer_name": "weapon_layer",
       "components": [
         {
-          "component_id": "artillery_155mm",
+          "component_id": "artillery_shell",
           "family": "weapon",
-          "role": "indirect_fire_weapon",
-          "type_hint": "fires_implicit_weapon",
-          "parameters": {},
-          "grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "weapon",
-            "input": "indirect_fire_weapon",
-            "canonical_id": "fires_implicit_weapon_basic",
-            "row": {
-              "canonical_id": "fires_implicit_weapon_basic",
-              "match_labels": [
-                "fires_weapon",
-                "artillery",
-                "mortar",
-                "rocket",
-                "indirect_fire",
-                "火力武器",
-                "火炮"
-              ],
-              "type_hints": [
-                "fires_weapon",
-                "artillery_weapon",
-                "indirect_fire_weapon"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "wsf_type",
-                "target_id": "WSF_IMPLICIT_WEAPON",
-                "script_pattern": "implicit_weapon_with_launch_computer",
-                "required_blocks": [
-                  "launch_computer",
-                  "weapon_effects",
-                  "quantity"
-                ],
-                "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
-              },
-              "host_block": "weapon",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "preferred_declarations": [
-                "weapon <name> WSF_IMPLICIT_WEAPON"
-              ],
-              "wsf_context_rules": [
-                {
-                  "wsf_type": "WSF_IMPLICIT_WEAPON",
-                  "allowed_block_kinds": [
-                    "weapon"
-                  ],
-                  "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                  "provenance": [
-                    "official_doc: wsf_implicit_weapon.html",
-                    "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                  ]
-                }
-              ]
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "wsf_type",
-              "target_id": "WSF_IMPLICIT_WEAPON",
-              "script_pattern": "implicit_weapon_with_launch_computer",
-              "required_blocks": [
-                "launch_computer",
-                "weapon_effects",
-                "quantity"
-              ],
-              "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
+          "role": "artillery_round",
+          "type_hint": "artillery_shell",
+          "parameters": {
+            "caliber": "155mm",
+            "range": {
+              "value": 30,
+              "unit": "km"
             }
           },
-          "implementation_constraints": {
-            "preferred_declarations": [
-              "weapon <name> WSF_IMPLICIT_WEAPON"
-            ],
-            "wsf_context_rules": [
-              {
-                "wsf_type": "WSF_IMPLICIT_WEAPON",
-                "allowed_block_kinds": [
-                  "weapon"
-                ],
-                "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                "provenance": [
-                  "official_doc: wsf_implicit_weapon.html",
-                  "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                ]
-              }
-            ]
-          },
-          "unresolved_items": []
-        },
-        {
-          "component_id": "mortar_120mm",
-          "family": "weapon",
-          "role": "indirect_fire_weapon",
-          "type_hint": "fires_implicit_weapon",
-          "parameters": {},
           "grounding": {
-            "matched": true,
-            "match_level": "full",
+            "matched": false,
             "mapping_type": "weapon",
-            "input": "indirect_fire_weapon",
-            "canonical_id": "fires_implicit_weapon_basic",
-            "row": {
-              "canonical_id": "fires_implicit_weapon_basic",
-              "match_labels": [
-                "fires_weapon",
-                "artillery",
-                "mortar",
-                "rocket",
-                "indirect_fire",
-                "火力武器",
-                "火炮"
-              ],
-              "type_hints": [
-                "fires_weapon",
-                "artillery_weapon",
-                "indirect_fire_weapon"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "wsf_type",
-                "target_id": "WSF_IMPLICIT_WEAPON",
-                "script_pattern": "implicit_weapon_with_launch_computer",
-                "required_blocks": [
-                  "launch_computer",
-                  "weapon_effects",
-                  "quantity"
-                ],
-                "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
-              },
-              "host_block": "weapon",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "preferred_declarations": [
-                "weapon <name> WSF_IMPLICIT_WEAPON"
-              ],
-              "wsf_context_rules": [
-                {
-                  "wsf_type": "WSF_IMPLICIT_WEAPON",
-                  "allowed_block_kinds": [
-                    "weapon"
-                  ],
-                  "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                  "provenance": [
-                    "official_doc: wsf_implicit_weapon.html",
-                    "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                  ]
-                }
-              ]
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "wsf_type",
-              "target_id": "WSF_IMPLICIT_WEAPON",
-              "script_pattern": "implicit_weapon_with_launch_computer",
-              "required_blocks": [
-                "launch_computer",
-                "weapon_effects",
-                "quantity"
-              ],
-              "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
+            "input": "artillery_round"
+          },
+          "implementation_constraints": {},
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "artillery_shell",
+              "family": "weapon",
+              "type_hint": "artillery_shell",
+              "role": "artillery_round"
             }
-          },
-          "implementation_constraints": {
-            "preferred_declarations": [
-              "weapon <name> WSF_IMPLICIT_WEAPON"
-            ],
-            "wsf_context_rules": [
-              {
-                "wsf_type": "WSF_IMPLICIT_WEAPON",
-                "allowed_block_kinds": [
-                  "weapon"
-                ],
-                "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                "provenance": [
-                  "official_doc: wsf_implicit_weapon.html",
-                  "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                ]
-              }
-            ]
-          },
-          "unresolved_items": []
-        },
-        {
-          "component_id": "rocket_122mm",
-          "family": "weapon",
-          "role": "indirect_fire_weapon",
-          "type_hint": "fires_implicit_weapon",
-          "parameters": {},
-          "grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "weapon",
-            "input": "indirect_fire_weapon",
-            "canonical_id": "fires_implicit_weapon_basic",
-            "row": {
-              "canonical_id": "fires_implicit_weapon_basic",
-              "match_labels": [
-                "fires_weapon",
-                "artillery",
-                "mortar",
-                "rocket",
-                "indirect_fire",
-                "火力武器",
-                "火炮"
-              ],
-              "type_hints": [
-                "fires_weapon",
-                "artillery_weapon",
-                "indirect_fire_weapon"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "wsf_type",
-                "target_id": "WSF_IMPLICIT_WEAPON",
-                "script_pattern": "implicit_weapon_with_launch_computer",
-                "required_blocks": [
-                  "launch_computer",
-                  "weapon_effects",
-                  "quantity"
-                ],
-                "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
-              },
-              "host_block": "weapon",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-                "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "preferred_declarations": [
-                "weapon <name> WSF_IMPLICIT_WEAPON"
-              ],
-              "wsf_context_rules": [
-                {
-                  "wsf_type": "WSF_IMPLICIT_WEAPON",
-                  "allowed_block_kinds": [
-                    "weapon"
-                  ],
-                  "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                  "provenance": [
-                    "official_doc: wsf_implicit_weapon.html",
-                    "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                  ]
-                }
-              ]
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
-              "benchmarks/benchmark_v1/demo_sources/fires/types/fires_all_indirect_fire.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "wsf_type",
-              "target_id": "WSF_IMPLICIT_WEAPON",
-              "script_pattern": "implicit_weapon_with_launch_computer",
-              "required_blocks": [
-                "launch_computer",
-                "weapon_effects",
-                "quantity"
-              ],
-              "required_launch_computer_type": "WSF_FIRES_LAUNCH_COMPUTER"
-            }
-          },
-          "implementation_constraints": {
-            "preferred_declarations": [
-              "weapon <name> WSF_IMPLICIT_WEAPON"
-            ],
-            "wsf_context_rules": [
-              {
-                "wsf_type": "WSF_IMPLICIT_WEAPON",
-                "allowed_block_kinds": [
-                  "weapon"
-                ],
-                "preferred_declaration": "weapon <name> WSF_IMPLICIT_WEAPON",
-                "provenance": [
-                  "official_doc: wsf_implicit_weapon.html",
-                  "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt"
-                ]
-              }
-            ]
-          },
-          "unresolved_items": []
+          ]
         }
       ],
-      "ready": true,
-      "unresolved_items": []
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "component_grounding",
+          "component_id": "artillery_shell",
+          "family": "weapon",
+          "type_hint": "artillery_shell",
+          "role": "artillery_round"
+        }
+      ]
     },
     "mission_layer": {
       "layer_name": "mission_layer",
-      "processors": [
-        {
-          "component_id": "commander_task_proc",
-          "family": "processor",
-          "role": "fires_coordination",
-          "type_hint": "task_processor",
-          "parameters": {},
-          "grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "processor",
-            "input": "fires_coordination",
-            "canonical_id": "task_processor_basic",
-            "row": {
-              "canonical_id": "task_processor_basic",
-              "match_labels": [
-                "task_processor",
-                "task_manager",
-                "任务处理",
-                "任务管理"
-              ],
-              "type_hints": [
-                "task_processor"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "wsf_type",
-                "target_id": "WSF_TASK_PROCESSOR"
-              },
-              "host_block": "processor",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/ciws/processors/gun_battery_tactics.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/ciws/processors/gun_battery_tactics.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "wsf_type",
-              "target_id": "WSF_TASK_PROCESSOR"
-            }
-          },
-          "implementation_constraints": {},
-          "unresolved_items": []
-        },
-        {
-          "component_id": "sub_task_proc",
-          "family": "processor",
-          "role": "launch_timing",
-          "type_hint": "task_processor",
-          "parameters": {},
-          "grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "processor",
-            "input": "launch_timing",
-            "canonical_id": "task_processor_basic",
-            "row": {
-              "canonical_id": "task_processor_basic",
-              "match_labels": [
-                "task_processor",
-                "task_manager",
-                "任务处理",
-                "任务管理"
-              ],
-              "type_hints": [
-                "task_processor"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "wsf_type",
-                "target_id": "WSF_TASK_PROCESSOR"
-              },
-              "host_block": "processor",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/ciws/processors/gun_battery_tactics.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {},
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/ciws/processors/gun_battery_tactics.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "wsf_type",
-              "target_id": "WSF_TASK_PROCESSOR"
-            }
-          },
-          "implementation_constraints": {},
-          "unresolved_items": []
-        }
-      ],
-      "comms": [
-        {
-          "component_id": "fires_comm",
-          "family": "comm",
-          "role": "fires_network",
-          "type_hint": "datalink",
-          "parameters": {},
-          "grounding": {
-            "matched": true,
-            "match_level": "full",
-            "mapping_type": "comm",
-            "input": "fires_network",
-            "canonical_id": "datalink_basic",
-            "row": {
-              "canonical_id": "datalink_basic",
-              "match_labels": [
-                "datalink",
-                "comm_system",
-                "network",
-                "通信链路",
-                "数据链"
-              ],
-              "type_hints": [
-                "datalink",
-                "comm_system"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "comm_profile",
-                "target_id": "datalink_profile",
-                "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
-                "network_pattern": "peer_to_peer_or_hierarchical",
-                "required_directives": [
-                  "network_name"
-                ],
-                "optional_directives": [
-                  "internal_link"
-                ],
-                "message_pattern": "report_to_via_named_comm"
-              },
-              "host_block": "comm",
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
-                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
-              ]
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "preferred_declarations": [
-                "comm <name> WSF_COMM_TRANSCEIVER"
-              ],
-              "wsf_context_rules": [
-                {
-                  "wsf_type": "WSF_COMM_TRANSCEIVER",
-                  "allowed_block_kinds": [
-                    "comm"
-                  ],
-                  "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
-                  "provenance": [
-                    "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
-                    "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
-                  ]
-                }
-              ]
-            },
-            "provenance": [
-              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
-              "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
-            ],
-            "grounding_target": {
-              "target_kind": "comm_profile",
-              "target_id": "datalink_profile",
-              "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
-              "network_pattern": "peer_to_peer_or_hierarchical",
-              "required_directives": [
-                "network_name"
-              ],
-              "optional_directives": [
-                "internal_link"
-              ],
-              "message_pattern": "report_to_via_named_comm"
-            }
-          },
-          "implementation_constraints": {
-            "preferred_declarations": [
-              "comm <name> WSF_COMM_TRANSCEIVER"
-            ],
-            "wsf_context_rules": [
-              {
-                "wsf_type": "WSF_COMM_TRANSCEIVER",
-                "allowed_block_kinds": [
-                  "comm"
-                ],
-                "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
-                "provenance": [
-                  "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
-                  "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
-                ]
-              }
-            ]
-          },
-          "unresolved_items": []
-        }
-      ],
+      "processors": [],
+      "comms": [],
       "routes": [],
       "tasks": [
         {
           "task_id": "time_on_target_strike",
-          "task_type": "time_on_target",
+          "task_type": "fires",
           "grounding": {
-            "matched": true,
-            "match_level": "full",
+            "matched": false,
             "mapping_type": "task",
-            "input": "time_on_target",
-            "canonical_id": "time_on_target",
-            "row": {
-              "canonical_id": "time_on_target",
-              "match_labels": [
-                "time_on_target",
-                "tot",
-                "同时弹着",
-                "火力协调"
-              ],
-              "ir_task_types": [
-                "time_on_target",
-                "fires_mission"
-              ],
-              "match_confidence": "full",
-              "grounding_target": {
-                "target_kind": "behavior_bundle",
-                "target_id": "time_on_target_behavior"
-              },
-              "script_realization": [
-                "processor",
-                "weapon",
-                "comm"
-              ],
-              "implementation_constraints": {
-                "requires_comm": true,
-                "requires_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-                "default_duration_sec": 600,
-                "timing_critical": true
-              }
-            },
-            "match_confidence": "full",
-            "implementation_constraints": {
-              "requires_comm": true,
-              "requires_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-              "default_duration_sec": 600,
-              "timing_critical": true
-            },
-            "provenance": [],
-            "grounding_target": {
-              "target_kind": "behavior_bundle",
-              "target_id": "time_on_target_behavior"
-            }
+            "input": "fires"
           },
-          "implementation_constraints": {
-            "requires_comm": true,
-            "requires_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
-            "default_duration_sec": 600,
-            "timing_critical": true
-          },
+          "implementation_constraints": {},
           "assignee_refs": [
-            "fires_commander",
-            "artillery_launcher",
-            "mortar_launcher",
-            "rocket_launcher"
+            "blue_battery_1",
+            "blue_battery_2"
           ],
           "target_refs": [
-            "target_unit"
+            "red_target"
           ],
-          "location_refs": [
-            "commander_position",
-            "artillery_position_1",
-            "mortar_position",
-            "rocket_position"
-          ],
+          "location_refs": [],
           "parameters": {
+            "time_on_target": true,
             "impact_time": {
-              "value": 120,
+              "value": 300,
               "unit": "sec"
-            },
-            "coordination_mode": "centralized_fire_direction"
+            }
           },
-          "phase_ref": "",
-          "ready": true,
-          "unresolved_items": []
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "time_on_target_strike",
+              "task_type": "fires"
+            }
+          ]
         }
       ],
-      "logic": {},
-      "ready": true,
-      "unresolved_items": []
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "task_grounding",
+          "task_id": "time_on_target_strike",
+          "task_type": "fires"
+        }
+      ]
     },
     "scenario_assembly": {
       "layer_name": "scenario_assembly",
@@ -1318,33 +355,44 @@
       },
       "outputs": [
         "event_pipe",
-        "event_output"
-      ],
-      "evaluation": {},
-      "expected_events": [
-        {
-          "id": "coordinated_impact",
-          "type": "weapon_impact",
-          "actor_refs": [
-            "artillery_launcher",
-            "mortar_launcher",
-            "rocket_launcher",
-            "target_unit"
-          ],
-          "success_condition": "Multiple launchers achieve simultaneous or near-simultaneous impact on the target via time-on-target coordination."
-        }
+        "csv_event_output"
       ],
       "layer_readiness": {
         "scenario_scaffold": true,
-        "platform_layer": true,
+        "platform_layer": false,
         "sensor_layer": true,
-        "weapon_layer": true,
-        "mission_layer": true
+        "weapon_layer": false,
+        "mission_layer": false
       },
-      "ready": true,
+      "ready": false,
       "unresolved_items": []
     }
   },
-  "manual_review_items": [],
-  "ready_for_generation": true
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_battery_1",
+      "role": "artillery_battery",
+      "platform_type_hint": "artillery_platform"
+    },
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_battery_2",
+      "role": "artillery_battery",
+      "platform_type_hint": "artillery_platform"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "artillery_shell",
+      "family": "weapon",
+      "type_hint": "artillery_shell",
+      "role": "artillery_round"
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "time_on_target_strike",
+      "task_type": "fires"
+    }
+  ],
+  "ready_for_generation": false
 }

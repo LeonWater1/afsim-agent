@@ -1,7 +1,12 @@
-platform detector_unit
-  platform_type PT_DETECTOR_UNIT
-  side blue
-  position 30.67n 104.07e
-  component group_network
-  component report_processor
+platform detector_unit PT_DETECTOR_UNIT
+   side blue
+   position 0n 0e
+   comm group_network WSF_COMM_TRANSCEIVER
+      internal_link report_processor
+   end_comm
+   processor report_processor WSF_TRACK_PROCESSOR
+      report_interval 2 sec
+      circular_report_rejection on
+      update_interval 10 sec
+   end_processor
 end_platform

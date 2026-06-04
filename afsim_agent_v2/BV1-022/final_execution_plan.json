@@ -15,25 +15,26 @@
   },
   "execution_analysis": {
     "mission_pass": false,
-    "primary_error": "",
-    "classifier": "unknown_failure",
-    "route": "manual_review",
-    "inferred_stage": "execution",
-    "suggested_action": "inspect mission log and rerun manually",
+    "primary_error": "E005",
+    "classifier": "ungrounded_component_type",
+    "route": "return_to_grounding",
+    "inferred_stage": "grounding",
+    "suggested_action": "replace the unresolved mover, weapon, or component type with a verified grounded target",
     "evidence_lines": [
       "***** FATAL: Could not process input files.",
-      "***** ERROR: Could not find launch_computer fires_launch_computer"
+      "***** ERROR: Could not find weapon 100"
     ]
   },
   "repair_recommendation": {
-    "primary_error": "",
-    "route": "manual_review",
-    "inferred_stage": "execution",
-    "suggested_action": "inspect mission log and rerun manually"
+    "primary_error": "E005",
+    "route": "return_to_grounding",
+    "inferred_stage": "grounding",
+    "suggested_action": "replace the unresolved mover, weapon, or component type with a verified grounded target"
   },
   "rerun_plan": {
     "preconditions": [
-      "apply the recommended repair at the routed stage"
+      "apply the recommended repair at the routed stage",
+      "refresh grounding outputs before regenerating the affected block or layer"
     ],
     "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\execution_repaired_script.txt",
     "success_condition": "mission_status == PASS"

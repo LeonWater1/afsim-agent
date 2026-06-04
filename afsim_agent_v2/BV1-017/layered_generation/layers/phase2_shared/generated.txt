@@ -1,20 +1,28 @@
-network group_broadcast
-  group_join
-  internal_link
-end_network
+# Shared Comm and Processor Blocks
+comm datalink_basic WSF_COMM_TRANSCEIVER
+end_comm
 
-platform_type PT_OBSERVER_UNIT
-  platform observer_platform_basic
-  comm group_network WSF_COMM_TRANSCEIVER
+comm group_comm_basic WSF_COMM_TRANSCEIVER
+end_comm
+
+processor track_processor_basic WSF_TRACK_PROCESSOR
+end_processor
+
+# Platform Type Declarations
+platform_type PT_DETECTOR_UNIT WSF_PLATFORM
+   comm group_network datalink_basic
+      internal_link report_processor
+   end_comm
+   processor report_processor track_processor_basic
+   end_processor
 end_platform_type
 
-platform_type PT_RELAY_UNIT
-  platform relay_platform_basic
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_RELAY_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type
 
-platform_type PT_DETECTOR_UNIT
-  platform detector_platform_basic
-  processor report_processor WSF_TRACK_PROCESSOR
-  comm group_network WSF_COMM_TRANSCEIVER
+platform_type PT_OBSERVER_UNIT WSF_PLATFORM
+   comm group_network group_comm_basic
+   end_comm
 end_platform_type

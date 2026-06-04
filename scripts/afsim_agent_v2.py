@@ -27,6 +27,7 @@ from typing import Any
 
 from afsim_agent_v1 import build_grounded_ir
 from execution_repair_planner_v1 import build_execution_repair_plan
+from hierarchical_generation_executor_v1 import execute_layered_generation
 from hierarchical_generation_planner_v1 import build_generation_plan
 from llm_client_v1 import LLMClient
 from llm_intent_parser_v1 import parse_intent_with_llm
@@ -50,6 +51,39 @@ EXECUTION_REPAIRABLE_ROUTES = {
     "return_to_grounding_or_ir",
     "return_to_grounding",
 }
+
+
+def generate_script_with_layered_executor(
+    task: dict[str, Any],
+    generation_plan: dict[str, Any],
+    client: LLMClient,
+    run_dir: Path,
+) -> dict[str, Any]:
+    layered_dir = run_dir / "layered_generation"
+    execution_result = execute_layered_generation(
+        generation_plan,
+        client,
+        layered_dir,
+        task_context={
+            "task_id": task["id"],
+            "input": task.get("input", ""),
+            "source_hint": task.get("source_hint", ""),
+            "demo_id": task.get("demo_id", ""),
+        },
+    )
+    final_script_path = Path(execution_result["final_script_path"])
+    script_text = final_script_path.read_text(encoding="utf-8-sig")
+    static_analysis = analyze_script_text(script_text, script_label=str(final_script_path))
+    return {
+        "version": "hierarchical_generation_executor_v1",
+        "generator_mode": "layered_executor_v1",
+        "script_text": script_text,
+        "static_analysis": static_analysis,
+        "attempt_count": execution_result.get("chunk_count", len(execution_result.get("layers", []))),
+        "attempts": execution_result.get("layers", []),
+        "execution_result": execution_result,
+        "artifact_dir": str(layered_dir.relative_to(ROOT)),
+    }
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -281,14 +315,22 @@ def run_task(
         }
     )
 
-    script_generation = generate_script_with_llm(
-        task,
-        ir,
-        grounded_ir,
-        generation_plan,
-        client,
-        max_attempts=max_generation_attempts,
-    )
+    if generation_plan.get("ready_for_generation", False):
+        script_generation = generate_script_with_layered_executor(
+            task,
+            generation_plan,
+            client,
+            run_dir,
+        )
+    else:
+        script_generation = generate_script_with_llm(
+            task,
+            ir,
+            grounded_ir,
+            generation_plan,
+            client,
+            max_attempts=max_generation_attempts,
+        )
 
     generated_script_path = run_dir / "generated_script.txt"
     generated_script_path.write_text(script_generation["script_text"], encoding="utf-8")
@@ -461,7 +503,10 @@ def run_task(
     write_json(run_dir / "final_execution_plan.json", final_execution_plan)
 
     substance = assess_script_substance(final_script_path.read_text(encoding="utf-8-sig"))
-    initial_static_pass = bool(script_generation.get("attempts", [{}])[0].get("static_analysis", {}).get("static_pass", static_before["static_pass"]))
+    if "execution_result" in script_generation:
+        initial_static_pass = bool(script_generation["static_analysis"].get("static_pass", static_before["static_pass"]))
+    else:
+        initial_static_pass = bool(script_generation.get("attempts", [{}])[0].get("static_analysis", {}).get("static_pass", static_before["static_pass"]))
     final_blocker = ""
     if final_mission_status != "PASS":
         final_blocker = extract_failure_family(final_static, final_execution_plan)

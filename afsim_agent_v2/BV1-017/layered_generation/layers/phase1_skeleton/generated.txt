@@ -1,18 +1,15 @@
-# Group communication scenario skeleton
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
 
-side blue display_name Blue
-
-location detector_site
-  kind point
-  position 30.67n 104.07e
-end_location
-
-location relay_site
-  kind point
-  position 30.70n 104.10e
-end_location
-
-location observer_site
-  kind point
-  position 30.73n 104.13e
-end_location
+# UNCLASSIFIED
+#
+# Description: Group communication scenario.
+#
+# Scenario:
+#  - Platforms communicate track data within and across groups
