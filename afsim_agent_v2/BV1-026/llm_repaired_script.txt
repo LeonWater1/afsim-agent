@@ -1,0 +1,37 @@
+# Kinematic Mover Demo
+
+event_pipe
+   file output/kinematic_mover_demo.aer
+end_event_pipe
+
+end_time 600 sec
+
+platform_type FLYER WSF_PLATFORM
+   icon F-15
+   side blue
+   spatial_domain air
+   mover WSF_KINEMATIC_MOVER
+   end_mover
+end_platform_type
+
+platform flyer1 FLYER
+   position 30.00n 104.00e altitude 5000 ft msl
+
+   mover
+      initial_speed 200 m/sec
+      initial_flight_path_angle 0 deg
+      target_speed 200 m/sec
+      maximum_linear_acceleration 5 m/sec^2
+      maximum_radial_acceleration 15 m/sec^2
+      maximum_body_turn_rate 3 deg/sec
+      update_interval 0.1 sec
+   end_mover
+
+   route
+      label begin
+      position 30.00n 104.00e altitude 5000 ft msl speed 200 m/sec
+      position 31.00n 105.00e altitude 5000 ft msl speed 200 m/sec
+   end_route
+
+   heading 45 deg
+end_platform

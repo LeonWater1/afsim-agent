@@ -1,0 +1,23 @@
+{
+  "id": "BV1-013",
+  "difficulty": "medium",
+  "input": "基于 chaff/chaff_example，生成箔条干扰示例场景。",
+  "covered_components": [
+    "Platform",
+    "Weapon",
+    "ElectronicWarfare"
+  ],
+  "expected_ir_focus": [
+    "countermeasures.chaff",
+    "entities"
+  ],
+  "evaluation_focus": [
+    "chaff deployment",
+    "EW effect"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/chaff/chaff_example.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C015"
+}

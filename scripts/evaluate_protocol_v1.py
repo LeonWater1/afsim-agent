@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Evaluate run directories under evaluation_protocol_v1.
+Task-009: Evaluation Protocol v1
 
 This script reads method outputs such as baseline_direct_v1 and baseline_rag_v1,
 refreshes static metrics from the current static checker when generated scripts
@@ -110,6 +110,39 @@ def refresh_static_by_script(run_dir: Path):
     }
 
 
+def refresh_static_from_results_rows(results_rows):
+    static_rows = {}
+    for row in results_rows:
+        script_ref = row.get("generated_script")
+        task_id = row.get("id")
+        if not script_ref or not task_id:
+            continue
+        script_path = resolve_run_dir(script_ref)
+        if not script_path.exists():
+            continue
+        static_rows[task_id] = check_script(script_path)
+
+    total = len(static_rows)
+    if total == 0:
+        return static_rows, None
+
+    syntax_correct = sum(1 for row in static_rows.values() if row["syntax_correct"])
+    static_pass = sum(1 for row in static_rows.values() if row["static_pass"])
+    error_counts = {}
+    for row in static_rows.values():
+        for error_id in row["static_error_ids"]:
+            error_counts[error_id] = error_counts.get(error_id, 0) + 1
+
+    return static_rows, {
+        "total": total,
+        "syntax_correct": syntax_correct,
+        "static_pass": static_pass,
+        "syntax_correct_rate": round(syntax_correct / total, 4),
+        "static_pass_rate": round(static_pass / total, 4),
+        "error_counts": dict(sorted(error_counts.items())),
+    }
+
+
 def merge_static_rows(results_rows, refreshed_static):
     if not refreshed_static:
         return results_rows
@@ -145,6 +178,8 @@ def evaluate_run(run_dir: Path, protocol):
     summary = load_json(summary_path) if summary_path.exists() else {}
     results_rows = load_jsonl(results_path) if results_path.exists() else []
     refreshed_static_rows, refreshed_static_summary = refresh_static_by_script(run_dir)
+    if refreshed_static_summary is None and results_rows:
+        refreshed_static_rows, refreshed_static_summary = refresh_static_from_results_rows(results_rows)
     merged_rows = merge_static_rows(results_rows, refreshed_static_rows)
 
     method_name = summary.get("name") or run_dir.name

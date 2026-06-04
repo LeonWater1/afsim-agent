@@ -1,0 +1,226 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-007",
+    "source_task_id": "BV1-007"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "alternate_locations_run_course",
+      "description": "Route execution scenario with alternate locations.",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue"
+      ],
+      "location_ids": [
+        "start_point",
+        "waypoint_1",
+        "primary_destination",
+        "alternate_destination"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "aircraft",
+          "role": "transport",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "transport"
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "start_point",
+          "route_ref": "primary_route",
+          "component_refs": [],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "aircraft",
+              "role": "transport",
+              "platform_type_hint": ""
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "aircraft",
+          "role": "transport",
+          "platform_type_hint": ""
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [],
+      "comms": [],
+      "routes": [
+        {
+          "route_id": "primary_route",
+          "kind": "transit",
+          "waypoint_count": 3,
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "route_id": "alternate_route",
+          "kind": "transit",
+          "waypoint_count": 3,
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "run_course_with_alternates",
+          "task_type": "run_course",
+          "grounding": {
+            "matched": false,
+            "mapping_type": "task",
+            "input": "run_course"
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "aircraft"
+          ],
+          "target_refs": [],
+          "location_refs": [
+            "primary_destination",
+            "alternate_destination"
+          ],
+          "parameters": {
+            "primary_route": "primary_route",
+            "alternate_route": "alternate_route",
+            "alternate_condition": "on_primary_not_feasible"
+          },
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "run_course_with_alternates",
+              "task_type": "run_course"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "task_grounding",
+          "task_id": "run_course_with_alternates",
+          "task_type": "run_course"
+        }
+      ]
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": false
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "aircraft",
+      "role": "transport",
+      "platform_type_hint": ""
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "run_course_with_alternates",
+      "task_type": "run_course"
+    }
+  ],
+  "ready_for_generation": false
+}

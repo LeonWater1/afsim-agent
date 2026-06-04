@@ -1,0 +1,75 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\ngroup g_template WSF_GROUP end_group\n\nobserver\n   enable SIMULATION_INITIALIZING CreateGroups\nend_observer\n\nscript void CreateGroups()\n   WsfSimulation.CreateGroup(\"GROUP1\",\"g_template\");\n   WsfSimulation.CreateGroup(\"GROUP2\",\"g_template\");\nend_script\n\nplatform_type BASIC_STATION WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n\n   comm BASIC_COMM WSF_COMM_TRANSCEIVER\n      internal_link track_proc\n   end_comm\n\n   processor track_proc WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n\n      on_message\n         type WSF_TRACK_MESSAGE\n         script\n            WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;\n            if(tmsg.Originator() != PLATFORM.Name())\n            {\n               print(\"T=\",TIME_NOW,\" P=\",PLATFORM.Name(),\"  Track \",tmsg.Track().TargetName(),\" received from \",tmsg.Originator());\n            }\n         end_script\n      end_on_message\n   end_processor\n\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANTENNA\n         power 150 kw\n         ",
+      "static_analysis": {
+        "script": "BV1-017",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 20,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP1\",\"g_template\");"
+          },
+          {
+            "error_id": "E007",
+            "line": 21,
+            "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP2\",\"g_template\");"
+          },
+          {
+            "error_id": "E007",
+            "line": 39,
+            "message": "unknown command: on_message"
+          },
+          {
+            "error_id": "E007",
+            "line": 48,
+            "message": "unknown command: end_on_message"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\ngroup g_template WSF_GROUP end_group\n\nobserver\n   enable SIMULATION_INITIALIZING CreateGroups\nend_observer\n\nscript void CreateGroups()\n   WsfSimulation.CreateGroup(\"GROUP1\",\"g_template\");\n   WsfSimulation.CreateGroup(\"GROUP2\",\"g_template\");\nend_script\n\nplatform_type BASIC_STATION WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n\n   comm BASIC_COMM WSF_COMM_TRANSCEIVER\n      internal_link track_proc\n   end_comm\n\n   processor track_proc WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n\n      on_message\n         type WSF_TRACK_MESSAGE\n         script\n            WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;\n            if(tmsg.Originator() != PLATFORM.Name())\n            {\n               print(\"T=\",TIME_NOW,\" P=\",PLATFORM.Name(),\"  Track \",tmsg.Track().TargetName(),\" received from \",tmsg.Originator());\n            }\n         end_script\n      end_on_message\n   end_processor\n\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform detector BASIC_STATION\n   side blue\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      on\n   end_sensor\n   group add GROUP1\nend_platform\n\nplatform relay BASIC_STATION\n   side blue\n   route\n      position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      off\n   end_sensor\n   group add GROUP1\n   group add GROUP2\nend_platform\n\nplatform observer BASIC_STATION\n   side blue\n   route\n      position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      off\n   end_sensor\n   group add GROUP2\nend_platform\n\nevent_pipe\n   file output/group_comm_example.aer\nend_event_pipe\n\nevent_output\n   file output/group_comm_example.evt\nend_event_output\n\nend_time 240 sec\n",
+  "static_analysis": {
+    "script": "BV1-017",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 20,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP1\",\"g_template\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 21,
+        "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP2\",\"g_template\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 39,
+        "message": "unknown command: on_message"
+      },
+      {
+        "error_id": "E007",
+        "line": 48,
+        "message": "unknown command: end_on_message"
+      }
+    ]
+  }
+}

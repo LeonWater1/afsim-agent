@@ -1,0 +1,66 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern DEF_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type DEFENDER_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 1 m/sec
+   end_mover
+   sensor defender_radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern DEF_RADAR_ANTENNA
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern DEF_RADAR_ANTENNA
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+end_platform_type
+
+platform_type BALLISTIC_TYPE WSF_PLATFORM
+   mover WSF_GUIDED_MOVER
+      maximum_speed 2000 m/sec
+   end_mover
+end_platform_type
+
+platform defender_unit DEFENDER_TYPE
+   side blue
+   route
+      position 30.60n 104.00e speed 0 m/sec
+   end_route
+   sensor defender_radar
+      on
+   end_sensor
+end_platform
+
+platform target_missile BALLISTIC_TYPE
+   side red
+   route
+      position 30.90n 104.40e altitude 50000 ft msl speed 1500 m/sec
+      position 30.60n 104.20e altitude 50000 ft msl speed 1500 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/ballistic_shootdown.aer
+end_event_pipe
+
+end_time 300 sec

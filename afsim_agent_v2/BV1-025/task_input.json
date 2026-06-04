@@ -1,0 +1,25 @@
+{
+  "id": "BV1-025",
+  "difficulty": "medium",
+  "input": "基于 iads_c2_demos/basic_iads，生成基础 IADS C2 场景。",
+  "covered_components": [
+    "Platform",
+    "Sensor",
+    "IADS",
+    "CommandChain"
+  ],
+  "expected_ir_focus": [
+    "iads_c2",
+    "command_chain",
+    "sensors"
+  ],
+  "evaluation_focus": [
+    "IADS C2",
+    "assignment logic"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/basic_iads.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C028"
+}

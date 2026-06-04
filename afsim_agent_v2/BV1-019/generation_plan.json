@@ -1,0 +1,355 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-019",
+    "source_task_id": "BV1-019"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "esm_detect_radar",
+      "description": "ESM 探测雷达辐射源场景。",
+      "duration": {
+        "value": 200,
+        "unit": "sec"
+      },
+      "domains": [
+        "air",
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue",
+        "red"
+      ],
+      "location_ids": [
+        "blue_start",
+        "red_radar_site"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_esm_platform",
+          "role": "esm_receiver",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "esm_receiver"
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "blue_start",
+          "route_ref": null,
+          "component_refs": [
+            "air_mover",
+            "esm_sensor"
+          ],
+          "component_families": {
+            "mover": [
+              "air_mover"
+            ],
+            "sensor": [
+              "esm_sensor"
+            ],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_esm_platform",
+              "role": "esm_receiver",
+              "platform_type_hint": "electronic_warfare_aircraft"
+            }
+          ]
+        },
+        {
+          "entity_id": "red_radar_emitter",
+          "role": "radar_emitter",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "red",
+            "row": {
+              "canonical_id": "red",
+              "aliases": [
+                "red",
+                "hostile",
+                "enemy",
+                "敌方",
+                "红方",
+                "目标方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "radar_emitter"
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "red_radar_site",
+          "route_ref": null,
+          "component_refs": [
+            "radar_sensor"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [
+              "radar_sensor"
+            ],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "red_radar_emitter",
+              "role": "radar_emitter",
+              "platform_type_hint": "ground_radar_site"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_esm_platform",
+          "role": "esm_receiver",
+          "platform_type_hint": "electronic_warfare_aircraft"
+        },
+        {
+          "kind": "platform_grounding",
+          "entity_id": "red_radar_emitter",
+          "role": "radar_emitter",
+          "platform_type_hint": "ground_radar_site"
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [
+        {
+          "component_id": "esm_sensor",
+          "family": "sensor",
+          "role": "esm_receiver",
+          "type_hint": "esm_sensor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "sensor",
+            "canonical_id": "esm_sensor_basic",
+            "row": {
+              "canonical_id": "esm_sensor_basic",
+              "match_labels": [
+                "esm",
+                "esm_sensor",
+                "电子支援",
+                "ESM传感器"
+              ],
+              "type_hints": [
+                "esm_sensor"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_ESM_SENSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/electronic_warfare/esm_detect_radar.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        },
+        {
+          "component_id": "radar_sensor",
+          "family": "sensor",
+          "role": "radar_emitter",
+          "type_hint": "radar_sensor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "sensor",
+            "canonical_id": "radar_sensor_basic",
+            "row": {
+              "canonical_id": "radar_sensor_basic",
+              "match_labels": [
+                "radar",
+                "radar_sensor",
+                "aesa_radar",
+                "雷达",
+                "AESA雷达"
+              ],
+              "type_hints": [
+                "radar_sensor",
+                "air_intercept_radar",
+                "acquisition_radar",
+                "tracking_radar"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_RADAR_SENSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [],
+      "comms": [],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "detect_radar",
+          "task_type": "detect",
+          "grounding": {
+            "matched": true,
+            "mapping_type": "task",
+            "canonical_id": "detect",
+            "row": {
+              "canonical_id": "detect",
+              "match_labels": [
+                "detect",
+                "探测",
+                "发现"
+              ],
+              "ir_task_types": [
+                "detect"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "detection_behavior"
+              },
+              "script_realization": [
+                "sensor",
+                "processor"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "blue_esm_platform"
+          ],
+          "target_refs": [
+            "red_radar_emitter"
+          ],
+          "location_refs": [],
+          "parameters": {
+            "detection_mode": "esm"
+          },
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 200,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": true
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_esm_platform",
+      "role": "esm_receiver",
+      "platform_type_hint": "electronic_warfare_aircraft"
+    },
+    {
+      "kind": "platform_grounding",
+      "entity_id": "red_radar_emitter",
+      "role": "radar_emitter",
+      "platform_type_hint": "ground_radar_site"
+    }
+  ],
+  "ready_for_generation": false
+}

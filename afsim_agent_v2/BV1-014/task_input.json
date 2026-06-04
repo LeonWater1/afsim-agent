@@ -1,0 +1,23 @@
+{
+  "id": "BV1-014",
+  "difficulty": "hard",
+  "input": "基于 cislunar/lunar_orbiter，生成月球轨道器空间场景。",
+  "covered_components": [
+    "Platform",
+    "Mover",
+    "Space"
+  ],
+  "expected_ir_focus": [
+    "entities.spacecraft",
+    "orbit"
+  ],
+  "evaluation_focus": [
+    "cislunar mover",
+    "space domain"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/cislunar/lunar_orbiter.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C016"
+}

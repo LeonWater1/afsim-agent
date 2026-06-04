@@ -1,0 +1,244 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "chaff_jamming_example",
+    "description": "基于 chaff/chaff_example 的箔条干扰示例场景，展示蓝方舰船在受到红方反舰导弹攻击时部署箔条干扰的过程。",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "surface",
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_ship_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.50n",
+        "lon": "104.00e"
+      }
+    },
+    {
+      "id": "red_attacker_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.30n",
+        "lon": "104.50e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_attacker_end",
+      "kind": "point",
+      "position": {
+        "lat": "30.55n",
+        "lon": "104.10e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "red_attack_route",
+      "kind": "intercept",
+      "waypoints": [
+        {
+          "location_ref": "red_attacker_start",
+          "speed": {
+            "value": 250,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "location_ref": "red_attacker_end",
+          "speed": {
+            "value": 250,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "red_air_mover",
+        "role": "air_mover",
+        "type_hint": "fighter_aircraft_mover"
+      },
+      {
+        "id": "blue_ship_mover",
+        "role": "surface_mover",
+        "type_hint": "ship_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "blue_ship_radar",
+        "role": "air_surveillance_radar",
+        "type_hint": "radar_sensor"
+      }
+    ],
+    "weapons": [
+      {
+        "id": "anti_ship_missile",
+        "role": "primary_weapon",
+        "type_hint": "anti_ship_missile"
+      },
+      {
+        "id": "chaff_launcher",
+        "role": "chaff_countermeasure",
+        "type_hint": "chaff"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_ship",
+      "role": "defender",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "surface",
+      "platform_type_hint": "surface_combatant",
+      "component_refs": [
+        "blue_ship_mover",
+        "blue_ship_radar",
+        "chaff_launcher"
+      ],
+      "initial_location_ref": "blue_ship_start"
+    },
+    {
+      "id": "red_attacker",
+      "role": "attacker",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "fighter_bomber",
+      "component_refs": [
+        "red_air_mover",
+        "anti_ship_missile"
+      ],
+      "initial_location_ref": "red_attacker_start",
+      "route_ref": "red_attack_route"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "attack_ship",
+      "type": "air_attack",
+      "assignee_refs": [
+        "red_attacker"
+      ],
+      "target_refs": [
+        "blue_ship"
+      ],
+      "parameters": {
+        "weapon_ref": "anti_ship_missile"
+      }
+    },
+    {
+      "id": "deploy_chaff",
+      "type": "deploy_chaff",
+      "assignee_refs": [
+        "blue_ship"
+      ],
+      "parameters": {
+        "trigger": "incoming_missile",
+        "pattern": "seduction"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.quantity",
+      "entities.side",
+      "tasks",
+      "components"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "chaff_deployment_triggered",
+      "type": "chaff_release",
+      "actor_refs": [
+        "blue_ship"
+      ],
+      "success_condition": "Blue ship deploys chaff when an incoming missile is detected."
+    },
+    {
+      "id": "missile_seduced_by_chaff",
+      "type": "missile_tracking_failure",
+      "actor_refs": [
+        "red_attacker",
+        "blue_ship"
+      ],
+      "success_condition": "The anti-ship missile locks onto chaff instead of the ship, causing a miss or reduced hit probability."
+    }
+  ],
+  "grounding_hints": [
+    {
+      "label": "chaff_launcher_type",
+      "target_kind": "weapon",
+      "candidate_types": [
+        "chaff",
+        "mk36_srboc",
+        "wallop_barricade"
+      ],
+      "notes": "Chaff launcher type may be specified as a specific model."
+    },
+    {
+      "label": "anti_ship_missile_type",
+      "target_kind": "weapon",
+      "candidate_types": [
+        "harpoon",
+        "exocet",
+        "c802"
+      ],
+      "notes": "Anti-ship missile type can be selected based on threat library."
+    },
+    {
+      "label": "blue_ship_type",
+      "target_kind": "platform",
+      "candidate_types": [
+        "destroyer",
+        "frigate",
+        "landing_platform"
+      ],
+      "notes": "The defending ship can be any surface combatant with chaff capability."
+    },
+    {
+      "label": "red_attacker_type",
+      "target_kind": "platform",
+      "candidate_types": [
+        "su24",
+        "j15",
+        "f15"
+      ],
+      "notes": "The attacking aircraft may be a dedicated strike fighter."
+    }
+  ]
+}

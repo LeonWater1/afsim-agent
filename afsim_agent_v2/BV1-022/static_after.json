@@ -1,0 +1,8 @@
+{
+  "script": "BV1-022_layer_regeneration",
+  "syntax_correct": true,
+  "static_pass": true,
+  "primary_error": "",
+  "static_error_ids": [],
+  "findings": []
+}

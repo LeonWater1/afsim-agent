@@ -1,0 +1,64 @@
+script_interface
+   debug
+end_script_interface
+
+chaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL
+   terminal_velocity 1.0 m/s
+   expiration_time 10 sec
+   number_dipoles 2000000
+   frequency_maximum_rcs_table
+      independent_variable units mhz extrapolate
+      100 71
+      500 57
+      1000 51
+      1500 48
+   end_frequency_maximum_rcs_table
+end_chaff_parcel
+
+weapon CHAFF_WEAPON WSF_CHAFF_WEAPON
+   ejector eject_1
+      quantity 4
+      parcel_type CHAFF_PARCEL
+      ejection_velocity 25 m/s
+   end_ejector
+end_weapon
+
+weapon MISSILE_WEAPON WSF_IMPLICIT_WEAPON
+end_weapon
+
+platform_type FIGHTER_CHAFF_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   weapon CHAFF_WEAPON
+end_platform_type
+
+platform_type FIGHTER_MISSILE_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   weapon MISSILE_WEAPON
+end_platform_type
+
+platform blue_aircraft FIGHTER_CHAFF_TYPE
+   side blue
+   route
+      position 30.65n 104.05e altitude 3500 m speed 200 m/sec
+      position 30.75n 104.20e altitude 3500 m speed 200 m/sec
+   end_route
+end_platform
+
+platform red_shooter FIGHTER_MISSILE_TYPE
+   side red
+   route
+      position 30.80n 104.30e altitude 3500 m speed 60 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/chaff_example.aer
+end_event_pipe
+
+end_time 300 sec

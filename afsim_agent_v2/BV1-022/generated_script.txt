@@ -1,0 +1,83 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type TARGET_TYPE WSF_PLATFORM
+   mover WSF_STATIONARY_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+platform_type LAUNCHER_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   weapon artillery_shell
+   comm perfect WSF_COMM_TRANSCEIVER
+   end_comm
+end_platform_type
+
+platform_type TASKER_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   processor cmdr WSF_TASK_PROCESSOR
+      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)
+         string weaponName = aPlatform.WeaponEntry(0).Name()
+         WsfWeaponTask task = WsfWeaponTask.Create("TIME_ON_TARGET", weaponName)
+         task.SetQuantity(1)
+         task.SetCommDevice("perfect")
+         task.SetAssignee(aPlatform.Name())
+         AssignTask(aTrack, task)
+      end_script
+
+      execute at_time 1.0 sec absolute
+         WsfPlatform target = WsfSimulation.FindPlatform("target-1")
+         WsfTrack targetTrack = target.MakeTrack()
+         targetTrack.SetAuxData("IMPACT_TIME", 120.0)
+         PLATFORM.SetCurrentTarget(targetTrack)
+         foreach(WsfPlatform subordinate in PLATFORM.Subordinates())
+         {
+            SetTask(subordinate, targetTrack)
+         }
+      end_execute
+
+      script void on_task_complete(WsfTask aTask)
+         writeln("Task ", aTask.TaskId(), " , assigned to ", aTask.Assignee(), " complete.")
+      end_script
+   end_processor
+   comm perfect WSF_COMM_TRANSCEIVER
+   end_comm
+end_platform_type
+
+weapon artillery_shell WSF_IMPLICIT_WEAPON
+   launch_computer WSF_FIRES_LAUNCH_COMPUTER
+end_weapon
+
+platform target-1 TARGET_TYPE
+   side red
+   route
+      position 30.70n 104.10e altitude 0 m msl speed 0 m/sec
+   end_route
+end_platform
+
+platform tasker TASKER_TYPE
+   side blue
+   route
+      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec
+   end_route
+   platform launcher1 LAUNCHER_TYPE
+      route
+         position 30.67n 104.07e altitude 0 m msl speed 0 m/sec
+      end_route
+   end_platform
+end_platform
+
+event_pipe
+   file output/fires_time_on_target.aer
+end_event_pipe
+
+end_time 300 sec

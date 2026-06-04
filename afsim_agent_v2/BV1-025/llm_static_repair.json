@@ -1,0 +1,263 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_layer_regeneration",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-025.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-025.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E006"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 5,
+          "message": "missing end_antenna_pattern"
+        },
+        {
+          "error_id": "E006",
+          "line": 0,
+          "message": "missing end_time"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 2,
+      "auto_repairable_count": 2,
+      "manual_or_regeneration_count": 0,
+      "target_layers": [
+        "scenario_scaffold",
+        "scenario_assembly"
+      ],
+      "recommended_next_action": "apply_safe_repairs_then_revalidate"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 5,
+        "issue": "missing end_antenna_pattern",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "antenna_pattern STANDARD_RAD",
+          "nearest_block_kind": "antenna_pattern",
+          "nearest_block_name": "STANDARD_RAD"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_antenna_pattern`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 5,
+          "replacement": "end_antenna_pattern"
+        }
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 30,
+        "error_id": "E006",
+        "line": 0,
+        "issue": "missing end_time",
+        "layer_scope": "scenario_assembly",
+        "default_severity": "blocking",
+        "repair_hint": "Fill minimal required fields from IR or nearest demo template; route semantic gaps back to IR repair.",
+        "evidence": {
+          "line_text": "",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "insert top-level `end_time 480 sec` from IR or generation plan",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 6,
+          "replacement": "end_time 480 sec"
+        }
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 2,
+      "applied_actions": [
+        {
+          "error_id": "E002",
+          "action": "append_line",
+          "target_line": 6,
+          "replacement": "end_antenna_pattern"
+        },
+        {
+          "error_id": "E006",
+          "action": "append_line",
+          "target_line": 7,
+          "replacement": "end_time 480 sec"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 5,
+            "message": "antenna_pattern missing constant_pattern block"
+          }
+        ]
+      },
+      "improved_finding_count": 1
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-025.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STANDARD_RAD\nend_antenna_pattern\nend_time 480 sec\n",
+    "mission_errors": "mission:\n    WSF Version: 2.9.0 02-25-2022\n    Built: Feb 25 2022 08:12:40\nPlugin API version info:\n    Version: 2.9\n    Compiler: win_1916_64bit_release-hwe\nPlugins Loaded:\n    wsf_alternate_locations.dll, wsf_coverage.dll, wsf_iads_c2.dll, wsf_prompt.dll, wsf_scenario_analyzer.dll, wsf_scenario_analyzer_iads_c2.dll, wsf_air_combat.dll, wsf_annotation.dll, wsf_argo8.dll, wsf_brawler.dll, wsf_fires.dll, wsf_multiresolution.dll, wsf_oms_uci.dll, wsf_p6dof.dll, wsf_six_dof.dll, wsf_sosm.dll\nExtensions Included: \n    sensor_plot_lib, wsf_cyber, wsf_grammar_check, wsf_l16, wsf_mil, wsf_mil_parser, wsf_mtt, wsf_nx, wsf_parser, wsf_ripr, wsf_space, wsf_weapon_server, wsf_simdis\n\nLoading simulation input.\n\nLoading simulation input complete.\n    Elapsed Wall Clock Time: 0.0602281\n    Elapsed Processor Time : 0.0625\n***** FATAL: Could not process input files.\n    ***** ERROR: Unexpected End Of Data\n             'C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-025\\generated_script.txt', line 6, near column 1\n\nReading of simulation input failed\n"
+  },
+  "repair_plan_after_safe_repair": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-025.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-025.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 5,
+          "message": "antenna_pattern missing constant_pattern block"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 1,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 1,
+      "target_layers": [
+        "scenario_scaffold"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 5,
+        "issue": "antenna_pattern missing constant_pattern block",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "antenna_pattern STANDARD_RAD",
+          "nearest_block_kind": "antenna_pattern",
+          "nearest_block_name": "STANDARD_RAD"
+        },
+        "repair_mode": "regenerate_component_from_template",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "re-render this component from its grounded template so required sub-blocks are present",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 0,
+      "applied_actions": [],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 5,
+            "message": "antenna_pattern missing constant_pattern block"
+          }
+        ]
+      },
+      "improved_finding_count": 0
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-025.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STANDARD_RAD\nend_antenna_pattern\nend_time 480 sec\n"
+  },
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 1,
+    "targets": [
+      {
+        "start_line": 5,
+        "end_line": 6,
+        "kind": "antenna_pattern",
+        "layer_scope": "sensor_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 5,
+            "message": "antenna_pattern missing constant_pattern block"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 1,
+    "raw_response_preview": "{\"replacement_blocks\":[{\"start_line\":5,\"end_line\":6,\"text\":\"antenna_pattern STANDARD_RAD\\n  constant_pattern\\n    gain 35.0 db\\n  end_constant_pattern\\nend_antenna_pattern\"}]}",
+    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STANDARD_RAD\n  constant_pattern\n    gain 35.0 db\n  end_constant_pattern\nend_antenna_pattern\nend_time 480 sec\n",
+    "static_analysis": {
+      "script": "BV1-025_layer_regeneration",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    }
+  },
+  "full_script_fallback_used": false,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STANDARD_RAD\n  constant_pattern\n    gain 35.0 db\n  end_constant_pattern\nend_antenna_pattern\nend_time 480 sec\n",
+  "static_analysis": {
+    "script": "BV1-025_layer_regeneration",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

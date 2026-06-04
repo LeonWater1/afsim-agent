@@ -1,0 +1,143 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "group_comm_example",
+    "description": "Group communication scenario.",
+    "duration": {
+      "value": 240,
+      "unit": "sec"
+    },
+    "domains": [
+      "surface"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    }
+  ],
+  "locations": [
+    {
+      "id": "detector_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e"
+      }
+    },
+    {
+      "id": "relay_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.70n",
+        "lon": "104.10e"
+      }
+    },
+    {
+      "id": "observer_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.73n",
+        "lon": "104.13e"
+      }
+    }
+  ],
+  "components": {
+    "comms": [
+      {
+        "id": "group_network",
+        "role": "group_comm",
+        "type_hint": "comm_system",
+        "parameters": {
+          "network_mode": "group"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "id": "report_processor",
+        "role": "reporting",
+        "type_hint": "message_or_report_processor"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "detector_unit",
+      "role": "detector",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "detector_platform",
+      "component_refs": [
+        "group_network",
+        "report_processor"
+      ],
+      "initial_location_ref": "detector_site"
+    },
+    {
+      "id": "relay_unit",
+      "role": "relay",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "relay_platform",
+      "component_refs": [
+        "group_network"
+      ],
+      "initial_location_ref": "relay_site"
+    },
+    {
+      "id": "observer_unit",
+      "role": "observer",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "observer_platform",
+      "component_refs": [
+        "group_network"
+      ],
+      "initial_location_ref": "observer_site"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "share_group_reports",
+      "type": "group_communication",
+      "assignee_refs": [
+        "detector_unit",
+        "relay_unit",
+        "observer_unit"
+      ],
+      "parameters": {
+        "message_flow": "group_broadcast"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "group_message_exchange",
+      "type": "communication",
+      "actor_refs": [
+        "detector_unit",
+        "relay_unit",
+        "observer_unit"
+      ],
+      "success_condition": "Participants exchange reports across the communication group."
+    }
+  ]
+}

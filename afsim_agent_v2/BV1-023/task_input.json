@@ -1,0 +1,23 @@
+{
+  "id": "BV1-023",
+  "difficulty": "medium",
+  "input": "基于 heatmap/heatmap_demo，生成热力图覆盖场景。",
+  "covered_components": [
+    "Platform",
+    "Coverage",
+    "Output"
+  ],
+  "expected_ir_focus": [
+    "coverage",
+    "outputs.heatmap"
+  ],
+  "evaluation_focus": [
+    "heatmap output",
+    "coverage modeling"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/heatmap/heatmap_demo.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C026"
+}

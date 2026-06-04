@@ -1,0 +1,439 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 600 m/sec\n      minimum_speed 200 m/sec\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 800 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      rece",
+      "static_analysis": {
+        "script": "BV1-024",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E001",
+        "static_error_ids": [
+          "E001",
+          "E002",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 96,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 117,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 169,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E002",
+            "line": 109,
+            "message": "end_processor closes weapon from line 101"
+          },
+          {
+            "error_id": "E002",
+            "line": 112,
+            "message": "end_comm closes network from line 111"
+          },
+          {
+            "error_id": "E002",
+            "line": 113,
+            "message": "end_platform_type closes comm from line 110"
+          },
+          {
+            "error_id": "E002",
+            "line": 164,
+            "message": "end_comm closes network from line 163"
+          },
+          {
+            "error_id": "E002",
+            "line": 165,
+            "message": "end_platform_type closes comm from line 162"
+          },
+          {
+            "error_id": "E002",
+            "line": 185,
+            "message": "end_comm closes network from line 184"
+          },
+          {
+            "error_id": "E002",
+            "line": 186,
+            "message": "end_platform_type closes comm from line 183"
+          },
+          {
+            "error_id": "E002",
+            "line": 196,
+            "message": "end_platform closes sensor from line 195"
+          },
+          {
+            "error_id": "E002",
+            "line": 206,
+            "message": "end_platform closes sensor from line 205"
+          },
+          {
+            "error_id": "E002",
+            "line": 214,
+            "message": "end_platform closes comm from line 213"
+          },
+          {
+            "error_id": "E002",
+            "line": 224,
+            "message": "end_platform closes comm from line 223"
+          },
+          {
+            "error_id": "E002",
+            "line": 232,
+            "message": "end_platform closes comm from line 231"
+          },
+          {
+            "error_id": "E002",
+            "line": 94,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 99,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 115,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 167,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 188,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 198,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 208,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 216,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 221,
+            "message": "missing end_sensor"
+          },
+          {
+            "error_id": "E002",
+            "line": 222,
+            "message": "missing end_sensor"
+          },
+          {
+            "error_id": "E002",
+            "line": 226,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 242,
+            "message": "end_time must appear at top level, not inside another block"
+          },
+          {
+            "error_id": "E007",
+            "line": 76,
+            "message": "unknown command: end_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 77,
+            "message": "unknown command: end_behavior_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 90,
+            "message": "unknown command: end_launcher"
+          },
+          {
+            "error_id": "E007",
+            "line": 100,
+            "message": "unknown command: weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 102,
+            "message": "unknown command: end_weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 103,
+            "message": "unknown command: scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 105,
+            "message": "unknown command: end_scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 106,
+            "message": "unknown command: engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 108,
+            "message": "unknown command: end_engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 181,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 600 m/sec\n      minimum_speed 200 m/sec\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 800 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_ATG_LAUNCH_COMPUTER\n   end_processor\n   processor strike_task WSF_TASK_PROCESSOR\n      advanced_behavior_tree\n         parallel\n            behavior_node choose_tree\n               node engage\n                  target_criteria side red type ground\n                  launch_weapon agm88\n               end_node\n            end_behavior_node\n         end_parallel\n      end_advanced_behavior_tree\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n      weapon_table\n         weapon sam_weapon\n      end_weapon_table\n      scoring_factors\n         enemy_aircraft 1.0\n      end_scoring_factors\n      engage_iff_permissions\n         blue engage\n      end_engage_iff_permissions\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_comm\nend_platform_type\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_comm\nend_platform_type\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_comm\nend_platform_type\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\nend_platform\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-024",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E001",
+    "static_error_ids": [
+      "E001",
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E001",
+        "line": 96,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E001",
+        "line": 117,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E001",
+        "line": 169,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E002",
+        "line": 109,
+        "message": "end_processor closes weapon from line 101"
+      },
+      {
+        "error_id": "E002",
+        "line": 112,
+        "message": "end_comm closes network from line 111"
+      },
+      {
+        "error_id": "E002",
+        "line": 113,
+        "message": "end_platform_type closes comm from line 110"
+      },
+      {
+        "error_id": "E002",
+        "line": 164,
+        "message": "end_comm closes network from line 163"
+      },
+      {
+        "error_id": "E002",
+        "line": 165,
+        "message": "end_platform_type closes comm from line 162"
+      },
+      {
+        "error_id": "E002",
+        "line": 185,
+        "message": "end_comm closes network from line 184"
+      },
+      {
+        "error_id": "E002",
+        "line": 186,
+        "message": "end_platform_type closes comm from line 183"
+      },
+      {
+        "error_id": "E002",
+        "line": 196,
+        "message": "end_platform closes sensor from line 195"
+      },
+      {
+        "error_id": "E002",
+        "line": 206,
+        "message": "end_platform closes sensor from line 205"
+      },
+      {
+        "error_id": "E002",
+        "line": 214,
+        "message": "end_platform closes comm from line 213"
+      },
+      {
+        "error_id": "E002",
+        "line": 224,
+        "message": "end_platform closes comm from line 223"
+      },
+      {
+        "error_id": "E002",
+        "line": 232,
+        "message": "end_platform closes comm from line 231"
+      },
+      {
+        "error_id": "E002",
+        "line": 94,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 99,
+        "message": "missing end_processor"
+      },
+      {
+        "error_id": "E002",
+        "line": 115,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 167,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 188,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 198,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 208,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 216,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 221,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 222,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 226,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E007",
+        "line": 111,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 163,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 184,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 242,
+        "message": "end_time must appear at top level, not inside another block"
+      },
+      {
+        "error_id": "E007",
+        "line": 76,
+        "message": "unknown command: end_node"
+      },
+      {
+        "error_id": "E007",
+        "line": 77,
+        "message": "unknown command: end_behavior_node"
+      },
+      {
+        "error_id": "E007",
+        "line": 90,
+        "message": "unknown command: end_launcher"
+      },
+      {
+        "error_id": "E007",
+        "line": 100,
+        "message": "unknown command: weapon_table"
+      },
+      {
+        "error_id": "E007",
+        "line": 102,
+        "message": "unknown command: end_weapon_table"
+      },
+      {
+        "error_id": "E007",
+        "line": 103,
+        "message": "unknown command: scoring_factors"
+      },
+      {
+        "error_id": "E007",
+        "line": 105,
+        "message": "unknown command: end_scoring_factors"
+      },
+      {
+        "error_id": "E007",
+        "line": 106,
+        "message": "unknown command: engage_iff_permissions"
+      },
+      {
+        "error_id": "E007",
+        "line": 108,
+        "message": "unknown command: end_engage_iff_permissions"
+      },
+      {
+        "error_id": "E007",
+        "line": 181,
+        "message": "unknown command: end_launcher"
+      }
+    ]
+  }
+}

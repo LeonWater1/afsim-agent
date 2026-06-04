@@ -1,0 +1,213 @@
+{
+  "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-024\\generated_script.txt",
+  "syntax_correct": false,
+  "static_pass": false,
+  "primary_error": "E001",
+  "static_error_ids": [
+    "E001",
+    "E002",
+    "E007"
+  ],
+  "findings": [
+    {
+      "error_id": "E001",
+      "line": 96,
+      "message": "maximum_speed must be greater than 0"
+    },
+    {
+      "error_id": "E001",
+      "line": 117,
+      "message": "maximum_speed must be greater than 0"
+    },
+    {
+      "error_id": "E001",
+      "line": 169,
+      "message": "maximum_speed must be greater than 0"
+    },
+    {
+      "error_id": "E002",
+      "line": 109,
+      "message": "end_processor closes weapon from line 101"
+    },
+    {
+      "error_id": "E002",
+      "line": 112,
+      "message": "end_comm closes network from line 111"
+    },
+    {
+      "error_id": "E002",
+      "line": 113,
+      "message": "end_platform_type closes comm from line 110"
+    },
+    {
+      "error_id": "E002",
+      "line": 164,
+      "message": "end_comm closes network from line 163"
+    },
+    {
+      "error_id": "E002",
+      "line": 165,
+      "message": "end_platform_type closes comm from line 162"
+    },
+    {
+      "error_id": "E002",
+      "line": 185,
+      "message": "end_comm closes network from line 184"
+    },
+    {
+      "error_id": "E002",
+      "line": 186,
+      "message": "end_platform_type closes comm from line 183"
+    },
+    {
+      "error_id": "E002",
+      "line": 196,
+      "message": "end_platform closes sensor from line 195"
+    },
+    {
+      "error_id": "E002",
+      "line": 206,
+      "message": "end_platform closes sensor from line 205"
+    },
+    {
+      "error_id": "E002",
+      "line": 214,
+      "message": "end_platform closes comm from line 213"
+    },
+    {
+      "error_id": "E002",
+      "line": 224,
+      "message": "end_platform closes comm from line 223"
+    },
+    {
+      "error_id": "E002",
+      "line": 232,
+      "message": "end_platform closes comm from line 231"
+    },
+    {
+      "error_id": "E002",
+      "line": 94,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 99,
+      "message": "missing end_processor"
+    },
+    {
+      "error_id": "E002",
+      "line": 115,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 167,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 188,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 198,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 208,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 216,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 221,
+      "message": "missing end_sensor"
+    },
+    {
+      "error_id": "E002",
+      "line": 222,
+      "message": "missing end_sensor"
+    },
+    {
+      "error_id": "E002",
+      "line": 226,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E007",
+      "line": 111,
+      "message": "network block must declare a backing WSF_* type"
+    },
+    {
+      "error_id": "E007",
+      "line": 163,
+      "message": "network block must declare a backing WSF_* type"
+    },
+    {
+      "error_id": "E007",
+      "line": 184,
+      "message": "network block must declare a backing WSF_* type"
+    },
+    {
+      "error_id": "E007",
+      "line": 242,
+      "message": "end_time must appear at top level, not inside another block"
+    },
+    {
+      "error_id": "E007",
+      "line": 76,
+      "message": "unknown command: end_node"
+    },
+    {
+      "error_id": "E007",
+      "line": 77,
+      "message": "unknown command: end_behavior_node"
+    },
+    {
+      "error_id": "E007",
+      "line": 90,
+      "message": "unknown command: end_launcher"
+    },
+    {
+      "error_id": "E007",
+      "line": 100,
+      "message": "unknown command: weapon_table"
+    },
+    {
+      "error_id": "E007",
+      "line": 102,
+      "message": "unknown command: end_weapon_table"
+    },
+    {
+      "error_id": "E007",
+      "line": 103,
+      "message": "unknown command: scoring_factors"
+    },
+    {
+      "error_id": "E007",
+      "line": 105,
+      "message": "unknown command: end_scoring_factors"
+    },
+    {
+      "error_id": "E007",
+      "line": 106,
+      "message": "unknown command: engage_iff_permissions"
+    },
+    {
+      "error_id": "E007",
+      "line": 108,
+      "message": "unknown command: end_engage_iff_permissions"
+    },
+    {
+      "error_id": "E007",
+      "line": 181,
+      "message": "unknown command: end_launcher"
+    }
+  ]
+}

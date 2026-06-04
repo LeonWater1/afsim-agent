@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Run a RAG-prompting baseline for AFSIM benchmark tasks.
+Task-005: RAG Baseline
 
 Retrieves relevant documentation (SKILL.md, references/) and demo snippets
 from the benchmark demo_sources, injects them into the prompt, then evaluates

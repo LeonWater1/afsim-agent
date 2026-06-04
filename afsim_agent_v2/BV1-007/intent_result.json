@@ -1,0 +1,243 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-007",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 alternate_locations/run_course，生成带备选位置的航线运行场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"alternate_locations_run_course\",\n    \"description\": \"Route execution scenario with alternate locations.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"start_point\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.60n\",\n        \"lon\": \"104.00e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"waypoint_1\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.70n\",\n        \"lon\": \"104.10e\",\n        \"altitude\": {\n          \"value\": 3200,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"primary_destination\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.85n\",\n        \"lon\": \"104.25e\",\n        \"altitude\": {\n          \"value\": 3100,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"alternate_destination\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.80n\",\n   ",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "alternate_locations_run_course",
+      "description": "Route execution scenario with alternate locations.",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "event_pipe"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "Blue"
+      }
+    ],
+    "locations": [
+      {
+        "id": "start_point",
+        "kind": "point",
+        "position": {
+          "lat": "30.60n",
+          "lon": "104.00e",
+          "altitude": {
+            "value": 3000,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "waypoint_1",
+        "kind": "point",
+        "position": {
+          "lat": "30.70n",
+          "lon": "104.10e",
+          "altitude": {
+            "value": 3200,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "primary_destination",
+        "kind": "point",
+        "position": {
+          "lat": "30.85n",
+          "lon": "104.25e",
+          "altitude": {
+            "value": 3100,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "alternate_destination",
+        "kind": "point",
+        "position": {
+          "lat": "30.80n",
+          "lon": "104.40e",
+          "altitude": {
+            "value": 3000,
+            "unit": "m"
+          }
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "primary_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "start_point",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "waypoint_1",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "primary_destination",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          }
+        ]
+      },
+      {
+        "id": "alternate_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "start_point",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "waypoint_1",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "alternate_destination",
+            "speed": {
+              "value": 200,
+              "unit": "m/sec"
+            }
+          }
+        ]
+      }
+    ],
+    "platform_templates": [
+      {
+        "id": "generic_aircraft",
+        "domain": "air",
+        "type_hint": "transport_aircraft",
+        "component_refs": [
+          "air_mover"
+        ]
+      }
+    ],
+    "components": {
+      "movers": [
+        {
+          "id": "air_mover",
+          "role": "air_mover",
+          "type_hint": "jet_engine"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "aircraft",
+        "role": "transport",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "air",
+        "template_ref": "generic_aircraft",
+        "initial_location_ref": "start_point",
+        "route_ref": "primary_route",
+        "tags": [
+          "primary_mission"
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "id": "run_course_with_alternates",
+        "type": "run_course",
+        "assignee_refs": [
+          "aircraft"
+        ],
+        "location_refs": [
+          "primary_destination",
+          "alternate_destination"
+        ],
+        "parameters": {
+          "primary_route": "primary_route",
+          "alternate_route": "alternate_route",
+          "alternate_condition": "on_primary_not_feasible"
+        }
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "scenario.duration",
+        "entities.side",
+        "entities.quantity",
+        "locations",
+        "routes",
+        "tasks"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "reach_primary_or_alternate",
+        "type": "arrival",
+        "actor_refs": [
+          "aircraft"
+        ],
+        "success_condition": "Aircraft reaches either the primary or alternate destination along the designated route."
+      }
+    ],
+    "grounding_hints": [
+      {
+        "label": "air_mover_type",
+        "target_kind": "mover",
+        "candidate_types": [
+          "jet_engine",
+          "turboprop"
+        ],
+        "notes": "Choose based on platform type_hint."
+      },
+      {
+        "label": "route_alternate_logic",
+        "target_kind": "task",
+        "candidate_types": [
+          "run_course"
+        ],
+        "notes": "Implement decision logic in task parameters to switch routes when primary not feasible."
+      }
+    ]
+  }
+}

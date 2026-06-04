@@ -1,0 +1,24 @@
+{
+  "id": "BV1-001",
+  "difficulty": "easy",
+  "input": "基于 acoustic/simple_demo，生成一个声学探测最小示例场景。",
+  "covered_components": [
+    "Platform",
+    "Sensor",
+    "Acoustic"
+  ],
+  "expected_ir_focus": [
+    "entities",
+    "sensors.acoustic",
+    "scenario.duration"
+  ],
+  "evaluation_focus": [
+    "acoustic sensor setup",
+    "minimal executable demo"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C001"
+}

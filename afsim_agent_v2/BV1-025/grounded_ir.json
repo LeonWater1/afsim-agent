@@ -1,0 +1,647 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "basic_iads_c2",
+    "description": "Basic IADS command-and-control scenario.",
+    "duration": {
+      "value": 480,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground",
+      "air"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    },
+    {
+      "id": "red",
+      "display_name": "Red",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "iads_core",
+      "kind": "point",
+      "position": {
+        "lat": "30.80n",
+        "lon": "104.25e"
+      }
+    },
+    {
+      "id": "radar_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.84n",
+        "lon": "104.29e"
+      }
+    },
+    {
+      "id": "sam_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.86n",
+        "lon": "104.31e"
+      }
+    },
+    {
+      "id": "intruder_axis",
+      "kind": "point",
+      "position": {
+        "lat": "31.00n",
+        "lon": "104.50e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [],
+  "components": {
+    "sensor": [
+      {
+        "id": "acq_radar",
+        "role": "acquisition_radar",
+        "type_hint": "radar_sensor",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "sensor",
+          "canonical_id": "radar_sensor_basic",
+          "row": {
+            "canonical_id": "radar_sensor_basic",
+            "match_labels": [
+              "radar",
+              "radar_sensor",
+              "aesa_radar",
+              "雷达",
+              "AESA雷达"
+            ],
+            "type_hints": [
+              "radar_sensor",
+              "air_intercept_radar",
+              "acquisition_radar",
+              "tracking_radar"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_RADAR_SENSOR"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+            ]
+          }
+        }
+      },
+      {
+        "id": "track_radar",
+        "role": "tracking_radar",
+        "type_hint": "radar_sensor",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "sensor",
+          "canonical_id": "radar_sensor_basic",
+          "row": {
+            "canonical_id": "radar_sensor_basic",
+            "match_labels": [
+              "radar",
+              "radar_sensor",
+              "aesa_radar",
+              "雷达",
+              "AESA雷达"
+            ],
+            "type_hints": [
+              "radar_sensor",
+              "air_intercept_radar",
+              "acquisition_radar",
+              "tracking_radar"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_RADAR_SENSOR"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "weapon": [
+      {
+        "id": "sam_weapon",
+        "role": "surface_to_air_missile",
+        "type_hint": "sam_weapon",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "weapon",
+          "canonical_id": "sam_weapon_basic",
+          "row": {
+            "canonical_id": "sam_weapon_basic",
+            "match_labels": [
+              "sam",
+              "sam_weapon",
+              "surface_to_air_missile",
+              "防空导弹"
+            ],
+            "type_hints": [
+              "sam_weapon"
+            ],
+            "grounding_target": {
+              "target_kind": "weapon_profile",
+              "target_id": "sam_weapon_profile",
+              "backing_wsf_type": "WSF_EXPLICIT_WEAPON",
+              "script_pattern": "explicit_weapon_with_spawned_platform",
+              "launched_platform_type": "SAM",
+              "required_spawned_platform_blocks": [
+                "mover",
+                "processor fuse",
+                "processor seeker"
+              ],
+              "required_spawned_processor_types": [
+                "WSF_AIR_TARGET_FUSE",
+                "WSF_PERFECT_TRACKER"
+              ],
+              "required_weapon_blocks": [
+                "weapon_effects",
+                "quantity",
+                "firing_delay",
+                "salvo_interval"
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt",
+              "benchmarks/benchmark_v1/demo_sources/alternate_locations/weapons/sam/large_sam.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "processor": [
+      {
+        "id": "battle_manager",
+        "role": "iads_c2",
+        "type_hint": "battle_manager_processor",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "processor",
+          "canonical_id": "battle_manager_basic",
+          "row": {
+            "canonical_id": "battle_manager_basic",
+            "match_labels": [
+              "battle_manager",
+              "iads_c2",
+              "战斗管理",
+              "指挥控制"
+            ],
+            "type_hints": [
+              "battle_manager_processor"
+            ],
+            "grounding_target": {
+              "target_kind": "processor_profile",
+              "target_id": "battle_manager_profile",
+              "backing_wsf_type": "WSF_UNCLASS_BM",
+              "script_pattern": "iads_battle_manager",
+              "required_blocks": [
+                "weapon_table",
+                "scoring_factors",
+                "engage_iff_permissions"
+              ],
+              "preferred_comm_profile": "datalink_profile"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/processors/battle_manager.txt"
+            ]
+          }
+        }
+      },
+      {
+        "id": "sensor_manager",
+        "role": "sensor_management",
+        "type_hint": "sensor_manager_processor",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "processor",
+          "canonical_id": "sensor_manager_basic",
+          "row": {
+            "canonical_id": "sensor_manager_basic",
+            "match_labels": [
+              "sensor_manager",
+              "sensor_management",
+              "传感器调度",
+              "传感器管理"
+            ],
+            "type_hints": [
+              "sensor_manager_processor"
+            ],
+            "grounding_target": {
+              "target_kind": "processor_profile",
+              "target_id": "sensor_manager_profile",
+              "backing_wsf_type": "WSF_TASK_PROCESSOR",
+              "script_pattern": "radar_company_task_manager",
+              "required_peer_components": [
+                "track_processor_basic",
+                "datalink_basic"
+              ],
+              "preferred_platform_context": "ground_radar_site_basic"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/aea_iads/platforms/red_radar_company.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "comm": [
+      {
+        "id": "iads_datalink",
+        "role": "iads_network",
+        "type_hint": "datalink",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "comm",
+          "canonical_id": "datalink_basic",
+          "row": {
+            "canonical_id": "datalink_basic",
+            "match_labels": [
+              "datalink",
+              "comm_system",
+              "network",
+              "通信链路",
+              "数据链"
+            ],
+            "type_hints": [
+              "datalink",
+              "comm_system"
+            ],
+            "grounding_target": {
+              "target_kind": "comm_profile",
+              "target_id": "datalink_profile",
+              "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+              "network_pattern": "peer_to_peer_or_hierarchical",
+              "required_directives": [
+                "network_name"
+              ],
+              "optional_directives": [
+                "internal_link"
+              ],
+              "message_pattern": "report_to_via_named_comm"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "iads_commander",
+      "role": "iads_commander",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "iads_command_platform",
+      "component_refs": [
+        "battle_manager",
+        "iads_datalink"
+      ],
+      "initial_location_ref": "iads_core",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "iads_command_platform_basic",
+        "row": {
+          "canonical_id": "iads_command_platform_basic",
+          "canonical_role": "iads_commander",
+          "match_labels": [
+            "iads_command",
+            "iads_command_platform",
+            "iads_commander",
+            "防空指挥节点",
+            "防空指挥平台"
+          ],
+          "platform_type_hints": [
+            "iads_command_platform",
+            "iads_commander"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "iads_command_platform_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [
+            "battle_manager_basic",
+            "datalink_basic"
+          ],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/processors/battle_manager.txt",
+            "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+          ]
+        }
+      }
+    },
+    {
+      "id": "radar_company",
+      "role": "radar_company",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "radar_platform",
+      "component_refs": [
+        "acq_radar",
+        "track_radar",
+        "sensor_manager",
+        "iads_datalink"
+      ],
+      "initial_location_ref": "radar_site",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "ground_radar_site_basic",
+        "row": {
+          "canonical_id": "ground_radar_site_basic",
+          "canonical_role": "radar_site",
+          "match_labels": [
+            "radar_site",
+            "radar_platform",
+            "radar_company",
+            "雷达站",
+            "雷达阵地",
+            "雷达平台"
+          ],
+          "platform_type_hints": [
+            "radar_platform",
+            "radar_site",
+            "radar_company"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "ground_radar_site_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [
+            "radar_sensor_basic",
+            "track_processor_basic"
+          ],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt",
+            "benchmarks/benchmark_v1/demo_sources/electronic_warfare/test_false_targets/platforms/red_radar.txt"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sam_battery",
+      "role": "sam_battery",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "sam_platform",
+      "component_refs": [
+        "sam_weapon",
+        "iads_datalink"
+      ],
+      "initial_location_ref": "sam_site",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "sam_site_basic",
+        "row": {
+          "canonical_id": "sam_site_basic",
+          "canonical_role": "missile_site",
+          "match_labels": [
+            "missile_site",
+            "sam_platform",
+            "sam_battery",
+            "missile_battery",
+            "导弹阵地",
+            "防空导弹阵地",
+            "防空导弹连"
+          ],
+          "platform_type_hints": [
+            "sam_platform",
+            "sam_site",
+            "sam_battery"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "sam_site_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [
+            "sam_weapon_basic",
+            "radar_sensor_basic",
+            "task_processor_basic"
+          ],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/sam_launcher.txt",
+            "benchmarks/benchmark_v1/demo_sources/electronic_warfare/test_false_targets/platforms/large_sam_battalion.txt"
+          ]
+        }
+      }
+    },
+    {
+      "id": "blue_intruder",
+      "role": "intruder",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "intruder_aircraft",
+      "initial_location_ref": "intruder_axis",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "fighter_aircraft_basic",
+        "row": {
+          "canonical_id": "fighter_aircraft_basic",
+          "canonical_role": "fighter",
+          "match_labels": [
+            "fighter",
+            "fighter_aircraft",
+            "战斗机",
+            "截击机",
+            "歼击机"
+          ],
+          "platform_type_hints": [
+            "fighter_aircraft",
+            "escort_fighter",
+            "intruder_aircraft"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "fighter_aircraft_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [
+            "air_mover_basic",
+            "fighter_radar_basic",
+            "air_to_air_missile_basic",
+            "track_processor_basic"
+          ],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
+            "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+          ]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "defend_iads_area",
+      "type": "area_air_defense",
+      "assignee_refs": [
+        "iads_commander",
+        "radar_company",
+        "sam_battery"
+      ],
+      "target_refs": [
+        "blue_intruder"
+      ],
+      "location_refs": [
+        "iads_core",
+        "radar_site",
+        "sam_site"
+      ],
+      "parameters": {
+        "assignment_logic": "centralized_c2"
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "task",
+        "canonical_id": "area_air_defense",
+        "row": {
+          "canonical_id": "area_air_defense",
+          "match_labels": [
+            "area_air_defense",
+            "iads_defense",
+            "区域防空",
+            "防空拦截"
+          ],
+          "ir_task_types": [
+            "area_air_defense"
+          ],
+          "grounding_target": {
+            "target_kind": "behavior_bundle",
+            "target_id": "iads_area_defense_behavior"
+          },
+          "script_realization": [
+            "processor",
+            "sensor",
+            "weapon",
+            "comm"
+          ]
+        }
+      }
+    }
+  ],
+  "all_grounded": true,
+  "unresolved_items": []
+}

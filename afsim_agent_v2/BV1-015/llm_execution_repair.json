@@ -1,0 +1,80 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-015.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-015_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E007",
+      "classifier": "input_parse_or_structure_error",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unknown command: end_platform"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E007",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-015.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern CIWS_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type SHIP_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 30 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor ciws_sensor WSF_RADAR_SENSOR\n      frame_time 1 sec\n      minimum_range 0 nm\n      maximum_range 20 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern CIWS_RADAR_ANT\n         power 100 kw\n         pulse_width 1.0e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 10 ghz\n      end_transmitter\n      receiver\n         antenna_pattern CIWS_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   processor ciws_manager WSF_WEAPONS_MANAGER_AI\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 400 m/sec\n      minimum_speed 50 m/sec\n   end_mover\nend_platform_type\n\nweapon ciws_gun WSF_IMPLICIT_WEAPON\n   weapon_quantity 1500\n   rate_of_fire 3000 /min\n   maximum_range 3 nm\n   minimum_range 0 nm\nend_weapon\n\nplatform blue_ship SHIP_TYPE\n   side blue\n   route\n      position 30.50n 122.00e speed 0 m/sec\n   end_route\n   weapon ciws_gun 1500\n   sensor ciws_sensor on\nend_platform\n\nplatform red_missile_1 MISSILE_TYPE\n   side red\n   heading 270 deg\n   route\n      position 30.70n 122.10e altitude 3000 m msl speed 300 m/sec\n      position 30.55n 122.02e altitude 10 m msl speed 300 m/sec\n   end_route\nend_platform\n\nplatform red_missile_2 MISSILE_TYPE\n   side red\n   heading 270 deg\n   route\n      position 30.70n 122.10e altitude 3000 m msl speed 300 m/sec\n      position 30.55n 122.02e altitude 10 m msl speed 300 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/ciws_interception.aer\nend_event_pipe\n\nend_time 180 sec\n",
+  "static_analysis": {
+    "script": "BV1-015_execution_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 62,
+        "message": "end_platform closes sensor from line 61"
+      },
+      {
+        "error_id": "E002",
+        "line": 55,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 60,
+        "message": "missing end_weapon"
+      },
+      {
+        "error_id": "E007",
+        "line": 86,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  }
+}

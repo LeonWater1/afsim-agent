@@ -1,0 +1,238 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_layer_regeneration",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-007.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-007.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E004",
+      "static_error_ids": [
+        "E004"
+      ],
+      "findings": [
+        {
+          "error_id": "E004",
+          "line": 22,
+          "message": "invalid altitude format"
+        },
+        {
+          "error_id": "E004",
+          "line": 23,
+          "message": "invalid altitude format"
+        },
+        {
+          "error_id": "E004",
+          "line": 25,
+          "message": "invalid altitude format"
+        },
+        {
+          "error_id": "E004",
+          "line": 26,
+          "message": "invalid altitude format"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 4,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 4,
+      "target_layers": [
+        "mission_layer"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 50,
+        "error_id": "E004",
+        "line": 22,
+        "issue": "invalid altitude format",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
+        "evidence": {
+          "line_text": "      position 30.60n 104.00e altitude 3500 m speed 200 m/sec",
+          "nearest_block_kind": "route",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 50,
+        "error_id": "E004",
+        "line": 23,
+        "issue": "invalid altitude format",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
+        "evidence": {
+          "line_text": "      position 31.20n 104.80e altitude 3500 m speed 200 m/sec",
+          "nearest_block_kind": "route",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-003",
+        "priority": 50,
+        "error_id": "E004",
+        "line": 25,
+        "issue": "invalid altitude format",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
+        "evidence": {
+          "line_text": "            position 31.10n 104.50e altitude 3500 m",
+          "nearest_block_kind": "route",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 50,
+        "error_id": "E004",
+        "line": 26,
+        "issue": "invalid altitude format",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
+        "evidence": {
+          "line_text": "            position 31.00n 104.60e altitude 3500 m",
+          "nearest_block_kind": "route",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 0,
+      "applied_actions": [],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E004",
+        "static_error_ids": [
+          "E004"
+        ],
+        "findings": [
+          {
+            "error_id": "E004",
+            "line": 22,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 23,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 25,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 26,
+            "message": "invalid altitude format"
+          }
+        ]
+      },
+      "improved_finding_count": 0
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-007.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nrandom_seed 5648\n\nalternate_locations_global_debug on\nalternate_locations_use_global_draw enabled\nalternate_locations_global_draw 1.0\n\nplatform_type transport_type WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 50 m/sec\n   end_mover\nend_platform_type\n\nplatform transport_aircraft_1 transport_type\n   side blue\n   heading 45 deg\n   route\n      position 30.60n 104.00e altitude 3500 m speed 200 m/sec\n      position 31.20n 104.80e altitude 3500 m speed 200 m/sec\n         alternate_locations\n            position 31.10n 104.50e altitude 3500 m\n            position 31.00n 104.60e altitude 3500 m\n         end_alternate_locations\n   end_route\nend_platform\n\nevent_pipe\n   file output/alternate_locations_run_course.aer\nend_event_pipe\n\nend_time 600 sec\n"
+  },
+  "repair_plan_after_safe_repair": null,
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 1,
+    "targets": [
+      {
+        "start_line": 21,
+        "end_line": 28,
+        "kind": "route",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E004",
+            "line": 22,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 23,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 25,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 26,
+            "message": "invalid altitude format"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 1,
+    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 21,\n      \"end_line\": 28,\n      \"text\": \"   route\\n      position 30.60n 104.00e altitude 11500 ft msl speed 200 m/sec\\n      position 31.20n 104.80e altitude 11500 ft msl speed 200 m/sec\\n         alternate_locations\\n            position 31.10n 104.50e altitude 11500 ft msl\\n            position 31.00n 104.60e altitude 11500 ft msl\\n         end_alternate_locations\\n   end_route\"\n    }\n  ]\n}",
+    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nrandom_seed 5648\n\nalternate_locations_global_debug on\nalternate_locations_use_global_draw enabled\nalternate_locations_global_draw 1.0\n\nplatform_type transport_type WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 50 m/sec\n   end_mover\nend_platform_type\n\nplatform transport_aircraft_1 transport_type\n   side blue\n   heading 45 deg\n   route\n      position 30.60n 104.00e altitude 11500 ft msl speed 200 m/sec\n      position 31.20n 104.80e altitude 11500 ft msl speed 200 m/sec\n         alternate_locations\n            position 31.10n 104.50e altitude 11500 ft msl\n            position 31.00n 104.60e altitude 11500 ft msl\n         end_alternate_locations\n   end_route\nend_platform\n\nevent_pipe\n   file output/alternate_locations_run_course.aer\nend_event_pipe\n\nend_time 600 sec\n",
+    "static_analysis": {
+      "script": "BV1-007_layer_regeneration",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    }
+  },
+  "full_script_fallback_used": false,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nrandom_seed 5648\n\nalternate_locations_global_debug on\nalternate_locations_use_global_draw enabled\nalternate_locations_global_draw 1.0\n\nplatform_type transport_type WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 50 m/sec\n   end_mover\nend_platform_type\n\nplatform transport_aircraft_1 transport_type\n   side blue\n   heading 45 deg\n   route\n      position 30.60n 104.00e altitude 11500 ft msl speed 200 m/sec\n      position 31.20n 104.80e altitude 11500 ft msl speed 200 m/sec\n         alternate_locations\n            position 31.10n 104.50e altitude 11500 ft msl\n            position 31.00n 104.60e altitude 11500 ft msl\n         end_alternate_locations\n   end_route\nend_platform\n\nevent_pipe\n   file output/alternate_locations_run_course.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-007_layer_regeneration",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

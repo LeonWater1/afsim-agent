@@ -1,0 +1,134 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "cyber_script_effect_demo",
+    "description": "Minimal cyber script effect scenario.",
+    "duration": {
+      "value": 120,
+      "unit": "sec"
+    },
+    "domains": [
+      "cyber",
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "cyber_origin",
+      "kind": "point",
+      "position": {
+        "lat": "30.68n",
+        "lon": "104.08e"
+      }
+    },
+    {
+      "id": "target_location",
+      "kind": "point",
+      "position": {
+        "lat": "30.71n",
+        "lon": "104.13e"
+      }
+    }
+  ],
+  "components": {
+    "processors": [
+      {
+        "id": "cyber_script",
+        "role": "cyber_effect",
+        "type_hint": "cyber_script_processor",
+        "parameters": {}
+      },
+      {
+        "id": "target_processor",
+        "role": "target_processing",
+        "type_hint": "generic_processor",
+        "parameters": {}
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_cyber_unit",
+      "role": "cyber_effector",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "cyber",
+      "platform_type_hint": "cyber_platform",
+      "component_refs": [
+        "cyber_script"
+      ],
+      "initial_location_ref": "cyber_origin"
+    },
+    {
+      "id": "red_target_unit",
+      "role": "target",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_station",
+      "component_refs": [
+        "target_processor"
+      ],
+      "initial_location_ref": "target_location"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "launch_cyber_effect",
+      "type": "cyber_effect",
+      "assignee_refs": [
+        "blue_cyber_unit"
+      ],
+      "target_refs": [
+        "red_target_unit"
+      ],
+      "parameters": {
+        "script": "degrade_processor"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "cyber_effect_applied",
+      "type": "cyber_event",
+      "actor_refs": [
+        "blue_cyber_unit",
+        "red_target_unit"
+      ],
+      "success_condition": "Red target processor is degraded by the cyber script."
+    }
+  ],
+  "grounding_hints": [
+    {
+      "label": "cyber_script_processor",
+      "target_kind": "processor",
+      "candidate_types": [
+        "Cyber_Script_Effect"
+      ],
+      "notes": "Hints for grounding the cyber script processor to a concrete AFSIM component."
+    }
+  ]
+}

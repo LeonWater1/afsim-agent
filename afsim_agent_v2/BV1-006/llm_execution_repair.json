@@ -1,0 +1,69 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-006.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-006_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E007",
+      "classifier": "input_parse_or_structure_error",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unknown command: orbit"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E007",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-006.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SIMPLE_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type FIGHTER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 350 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 60 nm\n      transmitter\n         antenna_pattern SIMPLE_RADAR_ANTENNA\n         power 100 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 9500 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SIMPLE_RADAR_ANTENNA\n         bandwidth 2 mhz\n      end_receiver\n   end_sensor\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\n   processor weapon_mgr WSF_WEAPONS_MANAGER_AI\n   end_processor\n   weapon aam WSF_AIR_TO_AIR_MISSILE\n      quantity 4\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network_name hva_datalink\n   end_comm\nend_platform_type\n\nplatform_type RED_FIGHTER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 350 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 60 nm\n      transmitter\n         antenna_pattern SIMPLE_RADAR_ANTENNA\n         power 100 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 9500 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SIMPLE_RADAR_ANTENNA\n         bandwidth 2 mhz\n      end_receiver\n   end_sensor\n   processor track_proc WSF_TRACK_PROCESSOR\n   end_processor\n   processor weapon_mgr WSF_WEAPONS_MANAGER_AI\n   end_processor\n   weapon aam WSF_AIR_TO_AIR_MISSILE\n      quantity 4\n   end_weapon\nend_platform_type\n\nplatform_type HVA_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 220 m/sec\n      minimum_speed 80 m/sec\n   end_mover\n   comm datalink WSF_COMM_TRANSCEIVER\n      network_name hva_datalink\n   end_comm\nend_platform_type\n\nplatform blue_dca_1 FIGHTER_TYPE\n   side blue\n   heading 120 deg\n   route\n      position 30.60n 104.00e altitude 5000 m msl speed 250 m/sec\n      position 30.72n 104.12e altitude 5000 m msl speed 250 m/sec\n   end_route\nend_platform\n\nplatform blue_dca_2 FIGHTER_TYPE\n   side blue\n   heading 120 deg\n   route\n      position 30.60n 104.02e altitude 5000 m msl speed 250 m/sec\n      position 30.72n 104.14e altitude 5000 m msl speed 250 m/sec\n   end_route\nend_platform\n\nplatform protected_hvaa HVA_TYPE\n   side blue\n   heading 30 deg\n   route\n      position 30.65n 104.05e altitude 5000 m msl speed 200 m/sec\n      position 30.80n 104.20e altitude 5000 m msl speed 200 m/sec\n   end_route\nend_platform\n\nplatform red_attacker_1 RED_FIGHTER_TYPE\n   side red\n   heading 210 deg\n   route\n      position 30.95n 104.40e altitude 5000 m msl speed 300 m/sec\n      position 30.75n 104.15e altitude 5000 m msl speed 300 m/sec\n   end_route\nend_platform\n\nplatform red_attacker_2 RED_FIGHTER_TYPE\n   side red\n   heading 210 deg\n   route\n      position 30.93n 104.42e altitude 5000 m msl speed 300 m/sec\n      position 30.73n 104.17e altitude 5000 m msl speed 300 m/sec\n   end_route\nend_platform\n\nevent_pipe file output/hvaa_dca.aer\nend_event_pipe\nevent_output file output/hvaa_dca.evt\nend_event_output\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-006_execution_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 38,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      },
+      {
+        "error_id": "E007",
+        "line": 71,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      }
+    ]
+  }
+}

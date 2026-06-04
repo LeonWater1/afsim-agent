@@ -1,0 +1,90 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern SEARCH_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type BLUE_SHIP_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor ship_radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern SEARCH_RADAR_ANTENNA
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SEARCH_RADAR_ANTENNA
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+end_platform_type
+
+chaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL
+   terminal_velocity 1.0 m/s
+   expiration_time 10 sec
+   number_dipoles 2000000
+   frequency_maximum_rcs_table
+      independent_variable units mhz extrapolate
+      100 71
+      500 57
+   end_frequency_maximum_rcs_table
+end_chaff_parcel
+
+weapon CHAFF_WEAPON WSF_CHAFF_WEAPON
+   launched_platform_type BLUE_SHIP_TYPE
+   ejector eject_1
+      quantity 15
+      parcel_type CHAFF_PARCEL
+      location 0 5 0 m
+      ejection_velocity 25 m/s
+   end_ejector
+end_weapon
+
+platform blue_ship BLUE_SHIP_TYPE
+   side blue
+   route
+      position 30.50n 104.00e speed 0 m/sec
+   end_route
+   sensor ship_radar
+      on
+   end_sensor
+end_platform
+
+platform_type RED_AIRCRAFT_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+end_platform_type
+
+platform red_attacker RED_AIRCRAFT_TYPE
+   side red
+   heading 270 deg
+   route
+      position 30.30n 104.50e altitude 5000 m msl speed 250 m/sec
+      position 30.55n 104.10e altitude 5000 m msl speed 250 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/chaff_jamming_example.aer
+end_event_pipe
+
+end_time 300 sec

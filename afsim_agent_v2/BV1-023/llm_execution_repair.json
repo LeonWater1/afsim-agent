@@ -1,0 +1,57 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-023.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-023_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E006",
+      "classifier": "missing_required_component_or_initialization",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "component_generation",
+      "suggested_action": "add the required supporting component or regenerate the affected component template",
+      "evidence_lines": [
+        "***** ERROR: Either 'angular_resolution' or 'pixel_count' must be specified.",
+        "***** ERROR: Platform component failed phase one initialization.",
+        "***** ERROR: Initialization of simulation failed due to unhandled exception."
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E006",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "component_generation",
+      "suggested_action": "add the required supporting component or regenerate the affected component template"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-023.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type UAV_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 60 m/sec\n      minimum_speed 20 m/sec\n   end_mover\n   sensor gimbal WSF_EOIR_SENSOR\n      frame_time 1 sec\n      maximum_range 20 nm\n      reports_location\n      angular_resolution 1 deg\n   end_sensor\nend_platform_type\n\nplatform blue_uav UAV_TYPE\n   side blue\n   route\n      position 30.70n 104.10e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.12e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.14e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.16e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.18e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.20e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.18e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.16e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.14e altitude 1000 m msl speed 50 m/sec\n      position 30.70n 104.12e altitude 1000 m msl speed 50 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/heatmap_demo.aer\nend_event_pipe\n\nevent_output\n   file output/heatmap_demo.evt\nend_event_output\n\ncsv_event_output\n   file output/heatmap_demo.csv\nend_csv_event_output\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-023_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

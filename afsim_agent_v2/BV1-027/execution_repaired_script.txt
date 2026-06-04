@@ -1,0 +1,67 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type GROUND_DESIGNATOR WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0.1 m/sec
+   end_mover
+   sensor laser_des WSF_LASER_DESIGNATOR
+   end_sensor
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type FIGHTER_AIRCRAFT WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 150 m/sec
+   end_mover
+   sensor fighter_radar WSF_RADAR_SENSOR
+   end_sensor
+   weapon lg_bomb WSF_EXPLICIT_WEAPON
+   end_weapon
+   processor strike_proc WSF_QUANTUM_TASKER_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type RED_GROUND WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0.1 m/sec
+   end_mover
+end_platform_type
+
+platform blue_designator GROUND_DESIGNATOR
+   side blue
+   route
+      position 30.65n 104.10e altitude 0 m msl speed 0 m/sec
+   end_route
+   task designator_track track red_target
+end_platform
+
+platform blue_fighter FIGHTER_AIRCRAFT
+   side blue
+   route
+      position 30.50n 104.00e altitude 3000 m msl speed 250 m/sec
+      position 30.70n 104.15e altitude 3000 m msl speed 250 m/sec
+   end_route
+   task strike attack red_target weapon lg_bomb
+end_platform
+
+platform red_target RED_GROUND
+   side red
+   route
+      position 30.70n 104.15e altitude 0 m msl speed 0 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/laser_designation_cooperative.aer
+end_event_pipe
+
+event_output
+   file output/laser_designation_cooperative.evt
+   enable TASK_ASSIGNED
+end_event_output
+
+end_time 240 sec

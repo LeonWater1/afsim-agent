@@ -1,0 +1,187 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "ciws_interception_demo",
+    "description": "CIWS近距离武器系统拦截场景，拦截来袭反舰导弹。",
+    "duration": {
+      "value": 120,
+      "unit": "sec"
+    },
+    "domains": [
+      "surface",
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_ship_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e",
+        "altitude": {
+          "value": 0,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_missile_launch",
+      "kind": "point",
+      "position": {
+        "lat": "30.80n",
+        "lon": "104.30e",
+        "altitude": {
+          "value": 500,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "red_missile_route",
+      "kind": "transit",
+      "waypoints": [
+        {
+          "location_ref": "red_missile_launch",
+          "speed": {
+            "value": 300,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "position": {
+            "lat": "30.67n",
+            "lon": "104.07e",
+            "altitude": {
+              "value": 10,
+              "unit": "m"
+            }
+          },
+          "speed": {
+            "value": 300,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "ship_mover",
+        "role": "surface_mover",
+        "type_hint": "surface_ship_mover"
+      },
+      {
+        "id": "missile_mover",
+        "role": "air_mover",
+        "type_hint": "air_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "ciws_radar",
+        "role": "target_acquisition_radar",
+        "type_hint": "radar_sensor",
+        "parameters": {
+          "mode": "search"
+        }
+      }
+    ],
+    "weapons": [
+      {
+        "id": "ciws_gun",
+        "role": "close_in_weapon",
+        "type_hint": "ciws_gun_system"
+      }
+    ],
+    "processors": [
+      {
+        "id": "ciws_weapon_manager",
+        "role": "weapon_engagement_manager",
+        "type_hint": "ciws_engagement_processor"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_ciws_ship",
+      "role": "ciws_platform",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "surface",
+      "platform_type_hint": "surface_combatant",
+      "component_refs": [
+        "ship_mover",
+        "ciws_radar",
+        "ciws_gun",
+        "ciws_weapon_manager"
+      ],
+      "initial_location_ref": "blue_ship_start"
+    },
+    {
+      "id": "red_ashm",
+      "role": "anti_ship_missile",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "anti-ship_missile",
+      "component_refs": [
+        "missile_mover"
+      ],
+      "initial_location_ref": "red_missile_launch",
+      "route_ref": "red_missile_route"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "ciws_engage_ashm",
+      "type": "ciws_engage",
+      "assignee_refs": [
+        "blue_ciws_ship"
+      ],
+      "target_refs": [
+        "red_ashm"
+      ],
+      "parameters": {
+        "engagement_doctrine": "auto_engage"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "scenario.duration",
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "ciws_interception",
+      "type": "engagement",
+      "actor_refs": [
+        "blue_ciws_ship",
+        "red_ashm"
+      ],
+      "success_condition": "CIWS detects and engages the incoming missile, achieving interception."
+    }
+  ]
+}

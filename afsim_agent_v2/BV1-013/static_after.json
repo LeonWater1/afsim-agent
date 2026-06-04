@@ -1,0 +1,21 @@
+{
+  "script": "BV1-013_static_repair",
+  "syntax_correct": false,
+  "static_pass": false,
+  "primary_error": "E007",
+  "static_error_ids": [
+    "E007"
+  ],
+  "findings": [
+    {
+      "error_id": "E007",
+      "line": 45,
+      "message": "unknown command: 100"
+    },
+    {
+      "error_id": "E007",
+      "line": 46,
+      "message": "unknown command: 500"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern JAMMER_ANTENNA\n   constant_pattern\n      peak_gain 10 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type GROUND_RADAR_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor search_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nelectronic_warfare JAMMER_EA WSF_ELECTRONIC_ATTACK\n   technique noise_jamming WSF_EA_TECHNIQUE\n      target search_radar\n      effect power_effect WSF_POWER_EFFECT\n         jamming_delta_gain 0.0001 db\n      end_effect\n   end_technique\nend_electronic_warfare\n\nplatform_type GROUND_JAMMER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   electronic_warfare JAMMER_EA\nen",
+      "static_analysis": {
+        "script": "BV1-020",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern JAMMER_ANTENNA\n   constant_pattern\n      peak_gain 10 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type GROUND_RADAR_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor search_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nelectronic_warfare JAMMER_EA WSF_ELECTRONIC_ATTACK\n   technique noise_jamming WSF_EA_TECHNIQUE\n      target search_radar\n      effect power_effect WSF_POWER_EFFECT\n         jamming_delta_gain 0.0001 db\n      end_effect\n   end_technique\nend_electronic_warfare\n\nplatform_type GROUND_JAMMER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   electronic_warfare JAMMER_EA\nend_platform_type\n\nplatform blue_radar GROUND_RADAR_TYPE\n   side blue\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor search_radar\n      on\n   end_sensor\nend_platform\n\nplatform red_jammer GROUND_JAMMER_TYPE\n   side red\n   route\n      position 30.69n 104.11e altitude 0 m msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/spot_jamming_suppression.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-020",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

@@ -1,0 +1,149 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern SEARCH_ANT
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type IADS_COMMAND_PLATFORM WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   comm iads_datalink WSF_COMM_TRANSCEIVER
+      network_name "iads_net"
+   end_comm
+   processor battle_mgr WSF_UNCLASS_BM
+      weapon_table
+      end_weapon_table
+      scoring_factors
+      end_scoring_factors
+      engage_iff_permissions
+      end_engage_iff_permissions
+   end_processor
+end_platform_type
+
+platform_type RADAR_PLATFORM WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor acq_radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern SEARCH_ANT
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SEARCH_ANT
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+   sensor track_radar WSF_RADAR_SENSOR
+      frame_time 1 sec
+      minimum_range 0 nm
+      maximum_range 60 nm
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern SEARCH_ANT
+         power 100 kw
+         pulse_width 1.0e-6 sec
+         pulse_repetition_frequency 800 hz
+         frequency 1290 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SEARCH_ANT
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+   comm iads_datalink WSF_COMM_TRANSCEIVER
+      network_name "iads_net"
+   end_comm
+   processor sensor_mgr WSF_TASK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type SAM_PLATFORM WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   comm iads_datalink WSF_COMM_TRANSCEIVER
+      network_name "iads_net"
+   end_comm
+end_platform_type
+
+platform_type STRIKE_AIRCRAFT WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 300 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   comm strike_datalink WSF_COMM_TRANSCEIVER
+      network_name "strike_net"
+   end_comm
+end_platform_type
+
+platform iads_commander IADS_COMMAND_PLATFORM
+   side red
+   route
+      position 30.80n 104.25e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+platform radar_company RADAR_PLATFORM
+   side red
+   route
+      position 30.84n 104.29e altitude 0 ft msl speed 0 m/sec
+   end_route
+   sensor acq_radar
+      on
+   end_sensor
+   sensor track_radar
+      on
+   end_sensor
+end_platform
+
+platform sam_battery SAM_PLATFORM
+   side red
+   route
+      position 30.86n 104.31e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+platform blue_aircraft_1 STRIKE_AIRCRAFT
+   side blue
+   route
+      position 31.00n 104.50e altitude 5000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+platform blue_aircraft_2 STRIKE_AIRCRAFT
+   side blue
+   route
+      position 31.01n 104.51e altitude 5000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/iads_strike.aer
+end_event_pipe
+
+event_output
+   file output/iads_strike.evt
+end_event_output
+
+end_time 600 sec

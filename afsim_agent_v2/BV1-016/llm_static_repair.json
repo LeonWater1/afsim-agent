@@ -1,0 +1,831 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_safe_direct_edit",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-016.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-016.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 27,
+          "message": "end_platform closes network from line 26"
+        },
+        {
+          "error_id": "E002",
+          "line": 35,
+          "message": "end_platform closes network from line 34"
+        },
+        {
+          "error_id": "E002",
+          "line": 43,
+          "message": "end_platform closes network from line 42"
+        },
+        {
+          "error_id": "E002",
+          "line": 21,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 29,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 37,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E007",
+          "line": 5,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 26,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 34,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 42,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 54,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 11,
+      "auto_repairable_count": 3,
+      "manual_or_regeneration_count": 8,
+      "target_layers": [
+        "platform_layer",
+        "scenario_scaffold"
+      ],
+      "recommended_next_action": "apply_safe_repairs_then_regenerate_flagged_layers"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 21,
+        "issue": "missing end_platform",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform node_a COMM_NODE_TYPE",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "node_a"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 54,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 27,
+        "issue": "end_platform closes network from line 26",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-003",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 29,
+        "issue": "missing end_platform",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform node_b COMM_NODE_TYPE",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "node_b"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 54,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 35,
+        "issue": "end_platform closes network from line 34",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 37,
+        "issue": "missing end_platform",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform node_c COMM_NODE_TYPE",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "node_c"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 54,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 43,
+        "issue": "end_platform closes network from line 42",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-007",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 5,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-008",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 26,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-009",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 34,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-010",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 42,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-011",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 54,
+        "issue": "end_time must appear at top level, not inside another block",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "end_time 240 sec",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "node_c"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 3,
+      "applied_actions": [
+        {
+          "error_id": "E002",
+          "action": "append_line",
+          "target_line": 55,
+          "replacement": "end_platform"
+        },
+        {
+          "error_id": "E002",
+          "action": "append_line",
+          "target_line": 56,
+          "replacement": "end_platform"
+        },
+        {
+          "error_id": "E002",
+          "action": "append_line",
+          "target_line": 57,
+          "replacement": "end_platform"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E002",
+        "static_error_ids": [
+          "E002",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 27,
+            "message": "end_platform closes network from line 26"
+          },
+          {
+            "error_id": "E002",
+            "line": 35,
+            "message": "end_platform closes network from line 34"
+          },
+          {
+            "error_id": "E002",
+            "line": 43,
+            "message": "end_platform closes network from line 42"
+          },
+          {
+            "error_id": "E007",
+            "line": 5,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 26,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 34,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 42,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 54,
+            "message": "end_time must appear at top level, not inside another block"
+          }
+        ]
+      },
+      "improved_finding_count": 3
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-016.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nnetwork ad_hoc_net\n   protocol WSF_COMM_ROUTER_PROTOCOL_AD_HOC\n   transceiver\n       WSF_COMM_TRANSCEIVER\n       frequency 300 mhz\n       power 10 kw\n   end_transceiver\nend_network\n\nplatform_type COMM_NODE_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n       maximum_speed 1 m/sec\n       minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform node_a COMM_NODE_TYPE\n   side blue\n   route\n       position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_b COMM_NODE_TYPE\n   side blue\n   route\n       position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_c COMM_NODE_TYPE\n   side blue\n   route\n       position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nevent_pipe\n   file output/ad_hoc.aer\nend_event_pipe\n\nevent_output\n   enable all\n   file output/ad_hoc.evt\nend_event_output\n\nend_time 240 sec\nend_platform\nend_platform\nend_platform\n"
+  },
+  "repair_plan_after_safe_repair": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-016.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-016.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 27,
+          "message": "end_platform closes network from line 26"
+        },
+        {
+          "error_id": "E002",
+          "line": 35,
+          "message": "end_platform closes network from line 34"
+        },
+        {
+          "error_id": "E002",
+          "line": 43,
+          "message": "end_platform closes network from line 42"
+        },
+        {
+          "error_id": "E007",
+          "line": 5,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 26,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 34,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 42,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 54,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 8,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 8,
+      "target_layers": [
+        "platform_layer",
+        "scenario_scaffold"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 27,
+        "issue": "end_platform closes network from line 26",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 35,
+        "issue": "end_platform closes network from line 34",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-003",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 43,
+        "issue": "end_platform closes network from line 42",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 5,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 26,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 34,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-007",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 42,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   network ad_hoc_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "ad_hoc_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-008",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 54,
+        "issue": "end_time must appear at top level, not inside another block",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "end_time 240 sec",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "node_c"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 0,
+      "applied_actions": [],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E002",
+        "static_error_ids": [
+          "E002",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E002",
+            "line": 27,
+            "message": "end_platform closes network from line 26"
+          },
+          {
+            "error_id": "E002",
+            "line": 35,
+            "message": "end_platform closes network from line 34"
+          },
+          {
+            "error_id": "E002",
+            "line": 43,
+            "message": "end_platform closes network from line 42"
+          },
+          {
+            "error_id": "E007",
+            "line": 5,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 26,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 34,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 42,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 54,
+            "message": "end_time must appear at top level, not inside another block"
+          }
+        ]
+      },
+      "improved_finding_count": 0
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-016.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nnetwork ad_hoc_net\n   protocol WSF_COMM_ROUTER_PROTOCOL_AD_HOC\n   transceiver\n       WSF_COMM_TRANSCEIVER\n       frequency 300 mhz\n       power 10 kw\n   end_transceiver\nend_network\n\nplatform_type COMM_NODE_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n       maximum_speed 1 m/sec\n       minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform node_a COMM_NODE_TYPE\n   side blue\n   route\n       position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_b COMM_NODE_TYPE\n   side blue\n   route\n       position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_c COMM_NODE_TYPE\n   side blue\n   route\n       position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nevent_pipe\n   file output/ad_hoc.aer\nend_event_pipe\n\nevent_output\n   enable all\n   file output/ad_hoc.evt\nend_event_output\n\nend_time 240 sec\nend_platform\nend_platform\nend_platform\n"
+  },
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "error": "Expecting value: line 1 column 1 (char 0)",
+    "static_analysis": {
+      "script": "BV1-016_layer_regeneration_error",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 27,
+          "message": "end_platform closes network from line 26"
+        },
+        {
+          "error_id": "E002",
+          "line": 35,
+          "message": "end_platform closes network from line 34"
+        },
+        {
+          "error_id": "E002",
+          "line": 43,
+          "message": "end_platform closes network from line 42"
+        },
+        {
+          "error_id": "E007",
+          "line": 5,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 26,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 34,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 42,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 54,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
+    }
+  },
+  "full_script_fallback_used": false,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nnetwork ad_hoc_net\n   protocol WSF_COMM_ROUTER_PROTOCOL_AD_HOC\n   transceiver\n       WSF_COMM_TRANSCEIVER\n       frequency 300 mhz\n       power 10 kw\n   end_transceiver\nend_network\n\nplatform_type COMM_NODE_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n       maximum_speed 1 m/sec\n       minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform node_a COMM_NODE_TYPE\n   side blue\n   route\n       position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_b COMM_NODE_TYPE\n   side blue\n   route\n       position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nplatform node_c COMM_NODE_TYPE\n   side blue\n   route\n       position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\n   network ad_hoc_net\nend_platform\n\nevent_pipe\n   file output/ad_hoc.aer\nend_event_pipe\n\nevent_output\n   enable all\n   file output/ad_hoc.evt\nend_event_output\n\nend_time 240 sec\nend_platform\nend_platform\nend_platform\n",
+  "static_analysis": {
+    "script": "BV1-016_static_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 27,
+        "message": "end_platform closes network from line 26"
+      },
+      {
+        "error_id": "E002",
+        "line": 35,
+        "message": "end_platform closes network from line 34"
+      },
+      {
+        "error_id": "E002",
+        "line": 43,
+        "message": "end_platform closes network from line 42"
+      },
+      {
+        "error_id": "E007",
+        "line": 5,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 26,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 34,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 42,
+        "message": "network block must declare a backing WSF_* type"
+      },
+      {
+        "error_id": "E007",
+        "line": 54,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  }
+}

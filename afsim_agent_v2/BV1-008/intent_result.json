@@ -1,0 +1,160 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-008",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 alv_routing/alv_demo，生成自动发射车辆路由场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"alv_routing_demo\",\n    \"description\": \"自动发射车辆路由场景。ALV follows a ground route.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"ground\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"蓝方\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"红方\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"alv_start\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.67n\",\n        \"lon\": \"104.07e\",\n        \"altitude\": {\n          \"value\": 0,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"alv_end\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.75n\",\n        \"lon\": \"104.10e\",\n        \"altitude\": {\n          \"value\": 0,\n          \"unit\": \"m\"\n        }\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"alv_ground_route\",\n      \"kind\": \"transit\",\n      \"waypoints\": [\n        {\n          \"location_ref\": \"alv_start\",\n          \"speed\": {\n            \"value\": 15,\n            \"unit\": \"m/sec\"\n          }\n        },\n        {\n          \"location_ref\": \"alv_end\",\n          \"speed\": {\n    ",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "alv_routing_demo",
+      "description": "自动发射车辆路由场景。ALV follows a ground route.",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "蓝方"
+      },
+      {
+        "id": "red",
+        "display_name": "红方"
+      }
+    ],
+    "locations": [
+      {
+        "id": "alv_start",
+        "kind": "point",
+        "position": {
+          "lat": "30.67n",
+          "lon": "104.07e",
+          "altitude": {
+            "value": 0,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "alv_end",
+        "kind": "point",
+        "position": {
+          "lat": "30.75n",
+          "lon": "104.10e",
+          "altitude": {
+            "value": 0,
+            "unit": "m"
+          }
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "alv_ground_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "alv_start",
+            "speed": {
+              "value": 15,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "alv_end",
+            "speed": {
+              "value": 15,
+              "unit": "m/sec"
+            }
+          }
+        ]
+      }
+    ],
+    "components": {
+      "movers": [
+        {
+          "id": "ground_mover",
+          "role": "ground_mover",
+          "type_hint": "wheeled_vehicle_mover"
+        }
+      ],
+      "weapons": [
+        {
+          "id": "launcher",
+          "role": "missile_launcher",
+          "type_hint": "vehicle_launcher"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "alv_vehicle",
+        "role": "launcher_vehicle",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "auto_launch_vehicle",
+        "component_refs": [
+          "ground_mover",
+          "launcher"
+        ],
+        "initial_location_ref": "alv_start",
+        "route_ref": "alv_ground_route"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "alv_move_task",
+        "type": "move",
+        "assignee_refs": [
+          "alv_vehicle"
+        ],
+        "location_refs": [
+          "alv_end"
+        ]
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "entities.quantity",
+        "entities.side",
+        "routes",
+        "tasks"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "alv_reaches_destination",
+        "type": "movement_complete",
+        "actor_refs": [
+          "alv_vehicle"
+        ],
+        "success_condition": "ALV vehicle reaches the final waypoint."
+      }
+    ]
+  }
+}

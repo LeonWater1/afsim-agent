@@ -1,0 +1,173 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "heatmap_coverage_demo",
+    "description": "基于 heatmap/heatmap_demo 生成的热力图覆盖场景，展示传感器覆盖热力图输出。",
+    "duration": {
+      "value": 600,
+      "unit": "sec"
+    },
+    "domains": [
+      "air"
+    ],
+    "outputs": [
+      "csv_event_output",
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    }
+  ],
+  "locations": [
+    {
+      "id": "platform_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.5n",
+        "lon": "104.0e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "coverage_zone",
+      "kind": "area",
+      "position": {
+        "lat": "30.7n",
+        "lon": "104.1e"
+      },
+      "radius": {
+        "value": 50,
+        "unit": "km"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "coverage_patrol",
+      "kind": "patrol",
+      "loop": true,
+      "waypoints": [
+        {
+          "location_ref": "platform_start",
+          "speed": {
+            "value": 200,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "position": {
+            "lat": "30.9n",
+            "lon": "104.3e",
+            "altitude": {
+              "value": 5000,
+              "unit": "m"
+            }
+          },
+          "speed": {
+            "value": 200,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "platform_templates": [],
+  "components": {
+    "movers": [
+      {
+        "id": "air_mover",
+        "role": "air_mover",
+        "type_hint": "air_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "radar_sensor",
+        "role": "coverage_sensor",
+        "type_hint": "radar_sensor",
+        "parameters": {
+          "mode": "active"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "id": "coverage_processor",
+        "role": "coverage_computation",
+        "type_hint": "coverage_processor",
+        "parameters": {
+          "output_type": "heatmap"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_coverage_platform",
+      "role": "coverage_platform",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "coverage_aircraft",
+      "component_refs": [
+        "air_mover",
+        "radar_sensor",
+        "coverage_processor"
+      ],
+      "initial_location_ref": "platform_start",
+      "route_ref": "coverage_patrol"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "generate_coverage_heatmap",
+      "type": "area_coverage",
+      "assignee_refs": [
+        "blue_coverage_platform"
+      ],
+      "location_refs": [
+        "coverage_zone"
+      ],
+      "parameters": {
+        "coverage_metric": "detection",
+        "output_format": "heatmap"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "scenario.duration",
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "heatmap_output_generated",
+      "type": "coverage_event",
+      "actor_refs": [
+        "blue_coverage_platform"
+      ],
+      "success_condition": "Heatmap data is generated and written to CSV output."
+    }
+  ],
+  "grounding_hints": [
+    {
+      "label": "coverage_processor",
+      "target_kind": "processor",
+      "candidate_types": [
+        "coverage_processor"
+      ],
+      "notes": "Generates heatmap coverage data."
+    }
+  ]
+}

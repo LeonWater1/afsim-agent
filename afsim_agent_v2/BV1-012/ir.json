@@ -1,0 +1,164 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "brawler_demo_1v1",
+    "description": "Brawler one-on-one air combat approximate model scenario.",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_spawn",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e",
+        "altitude": {
+          "value": 3000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_spawn",
+      "kind": "point",
+      "position": {
+        "lat": "30.92n",
+        "lon": "104.37e",
+        "altitude": {
+          "value": 3000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "fighter_mover",
+        "role": "air_mover",
+        "type_hint": "air_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "fighter_radar",
+        "role": "air_intercept_radar",
+        "type_hint": "radar_sensor"
+      }
+    ],
+    "weapons": [
+      {
+        "id": "aam_basic",
+        "role": "air_to_air_weapon",
+        "type_hint": "air_to_air_missile"
+      }
+    ],
+    "processors": [
+      {
+        "id": "brawler_engage",
+        "role": "brawler_engagement",
+        "type_hint": "brawler_processor",
+        "parameters": {}
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_fighter",
+      "role": "fighter",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "fighter_aircraft",
+      "component_refs": [
+        "fighter_mover",
+        "fighter_radar",
+        "aam_basic",
+        "brawler_engage"
+      ],
+      "initial_location_ref": "blue_spawn"
+    },
+    {
+      "id": "red_fighter",
+      "role": "fighter",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "fighter_aircraft",
+      "component_refs": [
+        "fighter_mover",
+        "fighter_radar",
+        "aam_basic",
+        "brawler_engage"
+      ],
+      "initial_location_ref": "red_spawn"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "blue_engage_red",
+      "type": "air_engage",
+      "assignee_refs": [
+        "blue_fighter"
+      ],
+      "target_refs": [
+        "red_fighter"
+      ],
+      "parameters": {
+        "engagement_style": "intercept"
+      }
+    },
+    {
+      "id": "red_engage_blue",
+      "type": "air_engage",
+      "assignee_refs": [
+        "red_fighter"
+      ],
+      "target_refs": [
+        "blue_fighter"
+      ],
+      "parameters": {
+        "engagement_style": "intercept"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.quantity",
+      "entities.side",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "brawler_engagement",
+      "type": "engagement",
+      "actor_refs": [
+        "blue_fighter",
+        "red_fighter"
+      ],
+      "success_condition": "Both fighters engage using Brawler approximate model."
+    }
+  ]
+}

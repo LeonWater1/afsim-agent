@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Refresh baseline evaluation artifacts with the current static checker.
+Task-009: Refresh Baseline Evaluation Artifacts
 
 This script keeps the original generated scripts and mission logs, but rewrites
 derived evaluation files so they reflect the current evaluation protocol:

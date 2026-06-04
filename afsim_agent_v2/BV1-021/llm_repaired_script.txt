@@ -1,0 +1,64 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type TEST_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 1 m/sec
+      minimum_speed 0 m/sec
+      maximum_altitude 50000 ft
+      minimum_altitude 0 ft
+      at_end_of_path stop
+   end_mover
+   processor mover_ctrl WSF_SCRIPT_PROCESSOR
+      update_interval 0.1 sec
+      script_variables
+         double speed = 200.0;
+         int idx = 0;
+      end_script_variables
+      on_update
+         WsfRoute rowt = PLATFORM.Route();
+         if (!rowt.IsValid()) {
+            return;
+         }
+         if (idx >= rowt.Size()) {
+            return;
+         }
+         double delta = PROCESSOR.UpdateInterval();
+         double myDist = delta * speed;
+         WsfGeoPoint a = PLATFORM.Location();
+         WsfGeoPoint b = rowt.Get(idx).Location();
+         double dist = a.SlantRangeTo(b);
+         Vec3 direction = Vec3.Subtract(b.LocationWCS(), a.LocationWCS());
+         if (myDist >= dist) {
+            idx += 1;
+            if (idx >= rowt.Size()) {
+               PLATFORM.SetLocation(b);
+               return;
+            }
+            myDist -= dist;
+            a = b;
+            b = rowt.Get(idx).Location();
+            direction = Vec3.Subtract(b.LocationWCS(), a.LocationWCS());
+         }
+         Vec3 deltaPos = Vec3.Normalize(direction);
+         deltaPos = Vec3.Scale(deltaPos, myDist);
+         WsfGeoPoint finalPos = WsfGeoPoint(a.LocationWCS() + deltaPos, a.LLA());
+         PLATFORM.SetLocation(finalPos);
+   end_on_update
+   end_processor
+end_platform_type
+
+platform scripted_platform TEST_TYPE
+   side blue
+   route
+      position 30.0n 120.0e altitude 10000 ft msl speed 200 m/sec
+      position 30.5n 120.5e altitude 10000 ft msl speed 200 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/proc_mover_demo.aer
+end_event_pipe
+
+end_time 120 sec

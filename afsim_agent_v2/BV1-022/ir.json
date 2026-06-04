@@ -1,0 +1,173 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "fires_time_on_target_demo",
+    "description": "Fires time-on-target scenario with coordinated artillery and missile fire.",
+    "duration": {
+      "value": 600,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_artillery_position",
+      "kind": "point",
+      "position": {
+        "lat": "30.60N",
+        "lon": "104.00E",
+        "altitude": {
+          "value": 500,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "blue_missile_position",
+      "kind": "point",
+      "position": {
+        "lat": "30.65N",
+        "lon": "104.02E",
+        "altitude": {
+          "value": 500,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_target_position",
+      "kind": "point",
+      "position": {
+        "lat": "30.80N",
+        "lon": "104.20E",
+        "altitude": {
+          "value": 600,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "components": {
+    "weapons": [
+      {
+        "id": "artillery_shell",
+        "role": "artillery_projectile",
+        "type_hint": "artillery_shell"
+      },
+      {
+        "id": "cruise_missile",
+        "role": "standoff_weapon",
+        "type_hint": "cruise_missile"
+      }
+    ],
+    "processors": [
+      {
+        "id": "fires_tot_coordinator",
+        "role": "fires_coordination",
+        "type_hint": "fires_tot_processor"
+      }
+    ],
+    "comms": [
+      {
+        "id": "fires_comms",
+        "role": "fires_network",
+        "type_hint": "comm_system"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_artillery_battery",
+      "role": "artillery",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "artillery_platform",
+      "component_refs": [
+        "artillery_shell",
+        "fires_tot_coordinator",
+        "fires_comms"
+      ],
+      "initial_location_ref": "blue_artillery_position"
+    },
+    {
+      "id": "blue_missile_launcher",
+      "role": "missile_launcher",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "missile_launcher_platform",
+      "component_refs": [
+        "cruise_missile",
+        "fires_tot_coordinator",
+        "fires_comms"
+      ],
+      "initial_location_ref": "blue_missile_position"
+    },
+    {
+      "id": "red_target",
+      "role": "target",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_vehicle_or_building",
+      "initial_location_ref": "red_target_position"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "coordinated_fires",
+      "type": "fires",
+      "assignee_refs": [
+        "blue_artillery_battery",
+        "blue_missile_launcher"
+      ],
+      "target_refs": [
+        "red_target"
+      ],
+      "parameters": {
+        "time_on_target": {
+          "value": 120,
+          "unit": "sec"
+        }
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "scenario.duration",
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "target_destroyed_on_tot",
+      "type": "weapon_impact",
+      "actor_refs": [
+        "blue_artillery_battery",
+        "blue_missile_launcher",
+        "red_target"
+      ],
+      "success_condition": "Target is hit by coordinated fires at the specified time on target (120 seconds into the scenario)."
+    }
+  ]
+}

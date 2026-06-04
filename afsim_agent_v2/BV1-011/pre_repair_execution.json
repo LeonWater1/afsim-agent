@@ -1,0 +1,51 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-011\\generated_script.txt",
+    "mission_status": "FAIL",
+    "return_code": 1
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-011\\generated_script.txt",
+    "syntax_correct": true,
+    "static_pass": false,
+    "primary_error": "E003",
+    "static_error_ids": [
+      "E003"
+    ],
+    "findings": [
+      {
+        "error_id": "E003",
+        "line": 14,
+        "message": "unknown advanced_behavior planned_route"
+      }
+    ]
+  },
+  "execution_analysis": {
+    "mission_pass": false,
+    "primary_error": "E003",
+    "classifier": "execution_failure_with_static_precursor",
+    "route": "return_to_grounding_or_ir",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "repair unresolved references from grounded IR before rerun",
+    "evidence_lines": [
+      "***** FATAL: Could not process input files.",
+      "***** ERROR: Could not find advanced_behavior planned_route"
+    ]
+  },
+  "repair_recommendation": {
+    "primary_error": "E003",
+    "route": "return_to_grounding_or_ir",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "repair unresolved references from grounded IR before rerun"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "refresh grounding outputs before regenerating the affected block or layer",
+      "rerun mission.exe only after the regenerated script passes static verification"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-011\\generated_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

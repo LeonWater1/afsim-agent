@@ -1,0 +1,45 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nweapon aam_basic WSF_AIR_TO_AIR_MISSILE\nend_weapon\n\nplatform_type FIGHTER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor launch_comp WSF_AIR_TO_AIR_LAUNCH_COMPUTER\n   end_processor\n   processor engage WSF_WEAPONS_MANAGER_AI\n   end_processor\nend_platform_type\n\nplatform blue_fighter FIGHTER_TYPE\n   side blue\n   heading 120 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\n   add_weapon aam_basic 6\nend_platform\n\nplatform red_fighter FIGHTER_TYPE\n   side red\n   heading 300 deg\n   route\n      position 30.92n 104.37e alt",
+      "static_analysis": {
+        "script": "BV1-003",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 13,
+            "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nweapon aam_basic WSF_AIR_TO_AIR_MISSILE\nend_weapon\n\nplatform_type FIGHTER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor launch_comp WSF_AIR_TO_AIR_LAUNCH_COMPUTER\n   end_processor\n   processor engage WSF_WEAPONS_MANAGER_AI\n   end_processor\nend_platform_type\n\nplatform blue_fighter FIGHTER_TYPE\n   side blue\n   heading 120 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\n   add_weapon aam_basic 6\nend_platform\n\nplatform red_fighter FIGHTER_TYPE\n   side red\n   heading 300 deg\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec\n      position 30.75n 104.15e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\n   add_weapon aam_basic 6\nend_platform\n\nevent_pipe\n   file output/air_to_air_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-003",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 13,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      }
+    ]
+  }
+}

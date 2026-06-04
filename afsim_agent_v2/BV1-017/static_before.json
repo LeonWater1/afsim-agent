@@ -1,0 +1,31 @@
+{
+  "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\generated_script.txt",
+  "syntax_correct": false,
+  "static_pass": false,
+  "primary_error": "E007",
+  "static_error_ids": [
+    "E007"
+  ],
+  "findings": [
+    {
+      "error_id": "E007",
+      "line": 20,
+      "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP1\",\"g_template\");"
+    },
+    {
+      "error_id": "E007",
+      "line": 21,
+      "message": "unknown command: WsfSimulation.CreateGroup(\"GROUP2\",\"g_template\");"
+    },
+    {
+      "error_id": "E007",
+      "line": 39,
+      "message": "unknown command: on_message"
+    },
+    {
+      "error_id": "E007",
+      "line": 48,
+      "message": "unknown command: end_on_message"
+    }
+  ]
+}

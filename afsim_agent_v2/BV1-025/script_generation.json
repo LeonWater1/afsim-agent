@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type GROUND_RADAR_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANT\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_ANT\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform_type INTRUDER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\nend_platform_type\n\nplatform radar_site GROUND_RADAR_TYPE\n   side red\n   route\n      position 30.84n 104.29e speed 0 m/sec\n   end_route\n   sensor acq_radar\n      on\n   end_sensor\nend_platform\n\nplatform blue_intruder INTRUDER_TYPE\n   side blue\n   heading 230 deg\n   route\n      position 31.00n 104.50e altitude 5000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 5000 m msl speed 180 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/basic_iads_c2.aer\nend_event_pipe\n\neve",
+      "static_analysis": {
+        "script": "BV1-025",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type GROUND_RADAR_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANT\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_ANT\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform_type INTRUDER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\nend_platform_type\n\nplatform radar_site GROUND_RADAR_TYPE\n   side red\n   route\n      position 30.84n 104.29e speed 0 m/sec\n   end_route\n   sensor acq_radar\n      on\n   end_sensor\nend_platform\n\nplatform blue_intruder INTRUDER_TYPE\n   side blue\n   heading 230 deg\n   route\n      position 31.00n 104.50e altitude 5000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 5000 m msl speed 180 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/basic_iads_c2.aer\nend_event_pipe\n\nevent_output\n   file output/basic_iads_c2.evt\nend_event_output\n\nend_time 480 sec\n",
+  "static_analysis": {
+    "script": "BV1-025",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

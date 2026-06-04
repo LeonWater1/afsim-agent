@@ -1,0 +1,359 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-024",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 iads/strike，生成 IADS 打击场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 2,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"iads_strike\",\n    \"description\": \"IADS strike scenario based on iads/strike demo.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"ground\",\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"iads_core\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.80n\",\n        \"lon\": \"104.25e\"\n      }\n    },\n    {\n      \"id\": \"radar_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.82n\",\n        \"lon\": \"104.28e\"\n      }\n    },\n    {\n      \"id\": \"sam_site_1\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.84n\",\n        \"lon\": \"104.30e\"\n      }\n    },\n    {\n      \"id\": \"sam_site_2\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.86n\",\n        \"lon\": \"104.32e\"\n      }\n    },\n    {\n      \"id\": \"blue_ingress\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.90n\",\n        \"lon\": \"104.00e\",\n        \"altitude\": {",
+      "validation": {
+        "ok": false,
+        "error_count": 1,
+        "errors": [
+          {
+            "path": "$",
+            "message": "Expecting ',' delimiter: line 136 column 4 (char 2618)"
+          }
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"iads_strike\",\n    \"description\": \"IADS strike scenario with blue strike package against red IADS.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\",\n      \"ground\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"blue_base\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.50n\",\n        \"lon\": \"103.90e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"red_iads_core\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.80n\",\n        \"lon\": \"104.25e\"\n      }\n    },\n    {\n      \"id\": \"red_radar_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.84n\",\n        \"lon\": \"104.29e\"\n      }\n    },\n    {\n      \"id\": \"red_sam_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.86n\",\n        \"lon\": \"104.31e\"\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"strike_",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "iads_strike",
+      "description": "IADS strike scenario with blue strike package against red IADS.",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "air",
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "Blue"
+      },
+      {
+        "id": "red",
+        "display_name": "Red"
+      }
+    ],
+    "locations": [
+      {
+        "id": "blue_base",
+        "kind": "point",
+        "position": {
+          "lat": "30.50n",
+          "lon": "103.90e",
+          "altitude": {
+            "value": 3000,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "red_iads_core",
+        "kind": "point",
+        "position": {
+          "lat": "30.80n",
+          "lon": "104.25e"
+        }
+      },
+      {
+        "id": "red_radar_site",
+        "kind": "point",
+        "position": {
+          "lat": "30.84n",
+          "lon": "104.29e"
+        }
+      },
+      {
+        "id": "red_sam_site",
+        "kind": "point",
+        "position": {
+          "lat": "30.86n",
+          "lon": "104.31e"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "strike_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "blue_base"
+          },
+          {
+            "position": {
+              "lat": "30.78n",
+              "lon": "104.20e",
+              "altitude": {
+                "value": 5000,
+                "unit": "m"
+              }
+            },
+            "speed": {
+              "value": 250,
+              "unit": "m/s"
+            }
+          },
+          {
+            "location_ref": "red_iads_core"
+          }
+        ],
+        "loop": false
+      }
+    ],
+    "platform_templates": [
+      {
+        "id": "blue_strike_aircraft",
+        "domain": "air",
+        "type_hint": "strike_aircraft",
+        "component_refs": [
+          "strike_mover",
+          "strike_radar",
+          "strike_weapon",
+          "strike_processor"
+        ]
+      },
+      {
+        "id": "red_iads_platform",
+        "domain": "ground",
+        "type_hint": "iads_command_platform",
+        "component_refs": [
+          "battle_manager",
+          "iads_datalink"
+        ]
+      }
+    ],
+    "components": {
+      "movers": [
+        {
+          "id": "strike_mover",
+          "role": "air_mover",
+          "type_hint": "air_mover"
+        }
+      ],
+      "sensors": [
+        {
+          "id": "strike_radar",
+          "role": "strike_sensor",
+          "type_hint": "radar_sensor"
+        },
+        {
+          "id": "acq_radar",
+          "role": "acquisition_radar",
+          "type_hint": "radar_sensor"
+        },
+        {
+          "id": "track_radar",
+          "role": "tracking_radar",
+          "type_hint": "radar_sensor"
+        }
+      ],
+      "weapons": [
+        {
+          "id": "strike_weapon",
+          "role": "strike_weapon",
+          "type_hint": "anti_radiation_missile"
+        },
+        {
+          "id": "sam_weapon",
+          "role": "surface_to_air_missile",
+          "type_hint": "sam_weapon"
+        }
+      ],
+      "processors": [
+        {
+          "id": "strike_processor",
+          "role": "strike_engagement",
+          "type_hint": "strike_engagement_processor"
+        },
+        {
+          "id": "battle_manager",
+          "role": "iads_c2",
+          "type_hint": "battle_manager_processor"
+        },
+        {
+          "id": "sensor_manager",
+          "role": "sensor_management",
+          "type_hint": "sensor_manager_processor"
+        }
+      ],
+      "comms": [
+        {
+          "id": "iads_datalink",
+          "role": "iads_network",
+          "type_hint": "datalink"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "blue_strike_package",
+        "role": "striker",
+        "side": "blue",
+        "quantity": 2,
+        "domain": "air",
+        "template_ref": "blue_strike_aircraft",
+        "initial_location_ref": "blue_base",
+        "route_ref": "strike_route"
+      },
+      {
+        "id": "red_iads_commander",
+        "role": "iads_commander",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "iads_command_platform",
+        "component_refs": [
+          "battle_manager",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "red_iads_core"
+      },
+      {
+        "id": "red_radar_company",
+        "role": "radar_company",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "radar_platform",
+        "component_refs": [
+          "acq_radar",
+          "track_radar",
+          "sensor_manager",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "red_radar_site"
+      },
+      {
+        "id": "red_sam_battery",
+        "role": "sam_battery",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "sam_platform",
+        "component_refs": [
+          "sam_weapon",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "red_sam_site"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "blue_strike_task",
+        "type": "destroy",
+        "assignee_refs": [
+          "blue_strike_package"
+        ],
+        "target_refs": [
+          "red_iads_commander"
+        ],
+        "location_refs": [
+          "red_iads_core"
+        ],
+        "parameters": {
+          "weapon_release_authority": "self_defense"
+        }
+      },
+      {
+        "id": "red_area_air_defense",
+        "type": "area_air_defense",
+        "assignee_refs": [
+          "red_iads_commander",
+          "red_radar_company",
+          "red_sam_battery"
+        ],
+        "target_refs": [
+          "blue_strike_package"
+        ],
+        "location_refs": [
+          "red_iads_core",
+          "red_radar_site",
+          "red_sam_site"
+        ],
+        "parameters": {
+          "assignment_logic": "centralized_c2"
+        }
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "entities.side",
+        "entities.quantity",
+        "tasks",
+        "components.sensors",
+        "components.weapons"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "iads_detection",
+        "type": "detection",
+        "actor_refs": [
+          "red_radar_company",
+          "blue_strike_package"
+        ],
+        "success_condition": "Red radar detects the strike package."
+      },
+      {
+        "id": "strike_engagement",
+        "type": "engagement",
+        "actor_refs": [
+          "blue_strike_package",
+          "red_iads_commander"
+        ],
+        "success_condition": "Blue strike engages the IADS command node."
+      }
+    ],
+    "grounding_hints": [
+      {
+        "label": "Blue strike aircraft type",
+        "target_kind": "platform",
+        "candidate_types": [
+          "F-16",
+          "F/A-18",
+          "Su-24"
+        ],
+        "notes": "Select a strike-capable aircraft."
+      },
+      {
+        "label": "Red IADS commander platform",
+        "target_kind": "platform",
+        "candidate_types": [
+          "battle_manager_station",
+          "command_post"
+        ],
+        "notes": "IADS command element."
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "BV1-026",
+  "difficulty": "easy",
+  "input": "基于 kinematic_mover/kinematic_mover_demo，生成运动学 mover 场景。",
+  "covered_components": [
+    "Platform",
+    "Mover",
+    "Route"
+  ],
+  "expected_ir_focus": [
+    "mover.kinematic",
+    "routes"
+  ],
+  "evaluation_focus": [
+    "kinematic mover",
+    "motion constraints"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/kinematic_mover/kinematic_mover_demo.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C029"
+}

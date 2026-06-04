@@ -1,0 +1,27 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type KINEMATIC_MOVER_PLATFORM WSF_PLATFORM
+   icon ground_vehicle
+   side blue
+   spatial_domain land
+   mover WSF_KINEMATIC_MOVER
+      maximum_speed 20 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+platform mover_1 KINEMATIC_MOVER_PLATFORM
+   side blue
+   route
+      position 30.50n 100.00e altitude 100 ft msl speed 15 m/sec
+      position 30.55n 100.10e altitude 100 ft msl speed 15 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/kinematic_mover_demo.aer
+end_event_pipe
+
+end_time 600 sec

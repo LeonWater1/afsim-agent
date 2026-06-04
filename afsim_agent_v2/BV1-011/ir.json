@@ -1,0 +1,141 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "behavior_tree_demo",
+    "description": "基于 behavior_tree/run_tree 生成行为树控制场景。",
+    "duration": {
+      "value": 180,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.670n",
+        "lon": "104.070e"
+      }
+    },
+    {
+      "id": "red_target",
+      "kind": "point",
+      "position": {
+        "lat": "30.690n",
+        "lon": "104.110e"
+      }
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "ground_mover",
+        "role": "ground_mover",
+        "type_hint": "ground_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "detection_sensor",
+        "role": "target_detection",
+        "type_hint": "radar_sensor"
+      }
+    ],
+    "processors": [
+      {
+        "id": "behavior_tree_processor",
+        "role": "behavior_tree_control",
+        "type_hint": "behavior_tree_processor",
+        "parameters": {
+          "tree": "run_tree"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_unit",
+      "role": "controlled_platform",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_vehicle",
+      "component_refs": [
+        "ground_mover",
+        "detection_sensor",
+        "behavior_tree_processor"
+      ],
+      "initial_location_ref": "blue_start"
+    },
+    {
+      "id": "red_target",
+      "role": "target",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_target",
+      "initial_location_ref": "red_target"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "detect_target",
+      "type": "detect",
+      "assignee_refs": [
+        "blue_unit"
+      ],
+      "target_refs": [
+        "red_target"
+      ],
+      "parameters": {
+        "priority": "primary"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.quantity",
+      "entities.side",
+      "components.processors",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "behavior_tree_activated",
+      "type": "processor_state",
+      "actor_refs": [
+        "blue_unit"
+      ],
+      "success_condition": "Behavior tree processor controls the entity to detect the target."
+    }
+  ],
+  "grounding_hints": [
+    {
+      "label": "run_tree",
+      "target_kind": "processor",
+      "candidate_types": [
+        "behavior_tree"
+      ],
+      "notes": "Reference to behavior tree definition"
+    }
+  ]
+}

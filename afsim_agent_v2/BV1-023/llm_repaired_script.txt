@@ -1,0 +1,62 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern SAR_ANT
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 3 deg
+      elevation_beamwidth 3 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type drone_type WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 200 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor sar_sensor WSF_RADAR_SENSOR
+      frame_time 5 sec
+      minimum_range 0 nm
+      maximum_range 20 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern SAR_ANT
+         power 10 kw
+         pulse_width 1e-6 sec
+         pulse_repetition_frequency 1000 hz
+         frequency 10000 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SAR_ANT
+         bandwidth 5 mhz
+      end_receiver
+   end_sensor
+end_platform_type
+
+platform blue_drone drone_type
+   side blue
+   route
+      position 30.5n 104.0e altitude 5000 m msl speed 150 m/sec
+      position 30.8n 104.2e altitude 5000 m msl speed 150 m/sec
+   end_route
+   sensor sar_sensor
+      on
+   end_sensor
+end_platform
+
+event_pipe
+   file output/heatmap_demo.aer
+end_event_pipe
+
+event_output
+   file output/heatmap_demo.evt
+end_event_output
+
+csv_event_output
+   file output/heatmap_demo.csv
+end_csv_event_output
+
+end_time 600 sec

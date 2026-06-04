@@ -1,0 +1,23 @@
+{
+  "id": "BV1-007",
+  "difficulty": "medium",
+  "input": "基于 alternate_locations/run_course，生成带备选位置的航线运行场景。",
+  "covered_components": [
+    "Platform",
+    "Route",
+    "Location"
+  ],
+  "expected_ir_focus": [
+    "locations.alternates",
+    "routes"
+  ],
+  "evaluation_focus": [
+    "alternate locations",
+    "route execution"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/alternate_locations/run_course.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C008"
+}

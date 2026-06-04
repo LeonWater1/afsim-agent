@@ -86,6 +86,26 @@
       "minLength": 1,
       "pattern": "^[A-Za-z0-9_.-]+$"
     },
+    "domain_name": {
+      "type": "string",
+      "enum": [
+        "air",
+        "ground",
+        "surface",
+        "subsurface",
+        "space",
+        "cyber",
+        "mixed"
+      ]
+    },
+    "output_name": {
+      "type": "string",
+      "enum": [
+        "event_pipe",
+        "event_output",
+        "csv_event_output"
+      ]
+    },
     "quantity_value": {
       "type": "integer",
       "minimum": 1
@@ -147,14 +167,14 @@
         "domains": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/domain_name"
           },
           "default": []
         },
         "outputs": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/output_name"
           },
           "default": []
         }
@@ -287,7 +307,7 @@
           "$ref": "#/$defs/id_string"
         },
         "domain": {
-          "type": "string"
+          "$ref": "#/$defs/domain_name"
         },
         "type_hint": {
           "type": "string"
@@ -389,7 +409,7 @@
           "$ref": "#/$defs/quantity_value"
         },
         "domain": {
-          "type": "string"
+          "$ref": "#/$defs/domain_name"
         },
         "template_ref": {
           "$ref": "#/$defs/id_string"

@@ -1,0 +1,46 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type acoustic_sensor_platform_basic WSF_PLATFORM
+   icon surface_sensor
+   mover WSF_GROUND_MOVER
+      maximum_speed 0.1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor acoustic_sensor WSF_ACOUSTIC_SENSOR
+      frame_time 10.0 sec
+   end_sensor
+end_platform_type
+
+platform_type acoustic_target_basic WSF_PLATFORM
+   icon surface_target
+   mover WSF_GROUND_MOVER
+      maximum_speed 10 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+platform blue_sensor acoustic_sensor_platform_basic
+   side blue
+   route
+      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec
+   end_route
+   sensor acoustic_sensor
+      on
+   end_sensor
+end_platform
+
+platform red_target acoustic_target_basic
+   side red
+   route
+      position 30.69n 104.11e altitude 0 m msl speed 2 m/sec
+      position 30.70n 104.12e altitude 0 m msl speed 2 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/acoustic_simple_demo.aer
+end_event_pipe
+
+end_time 120 sec

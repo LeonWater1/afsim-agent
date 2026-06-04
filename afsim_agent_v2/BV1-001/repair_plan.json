@@ -1,0 +1,44 @@
+{
+  "version": "repair_workflow_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-001\\generated_script.txt",
+    "has_ir_context": true,
+    "has_generation_plan": true
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-001\\generated_script.txt",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  },
+  "repair_summary": {
+    "finding_count": 0,
+    "auto_repairable_count": 0,
+    "manual_or_regeneration_count": 0,
+    "target_layers": [],
+    "recommended_next_action": "no_repair_needed"
+  },
+  "repair_steps": [],
+  "safe_repair_attempt": {
+    "attempted": true,
+    "applied_action_count": 0,
+    "applied_actions": [],
+    "post_repair_analysis": {
+      "script": "",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "improved_finding_count": 0
+  },
+  "revalidation_plan": {
+    "tool": "static_checker_v1",
+    "command_hint": "python scripts/static_checker_v1.py C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-001\\generated_script.txt",
+    "success_condition": "static_pass == true"
+  },
+  "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nsensor ACOUSTIC_SENSOR_BASIC_BASE WSF_ACOUSTIC_SENSOR\n   on\n   frame_time 1 sec\n   scan_mode both\n   reports_bearing\n   reports_elevation\n   reports_signal_to_noise\nend_sensor\n\nplatform_type BLUE_SENSOR_UNIT_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 60 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acoustic_sensor_basic ACOUSTIC_SENSOR_BASIC_BASE\n   end_sensor\nend_platform_type\n\nplatform_type RED_TARGET_UNIT_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 60 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform blue_sensor_unit BLUE_SENSOR_UNIT_TYPE\n   side blue\n   route\n      position 30.67n 104.07e speed 20 knots\n   end_route\n   sensor acoustic_sensor_basic\n      on\n   end_sensor\nend_platform\n\nplatform red_target_unit RED_TARGET_UNIT_TYPE\n   side red\n   route\n      position 30.69n 104.11e speed 20 knots\n   end_route\nend_platform\n\nevent_pipe\n   file output/acoustic_simple_demo.aer\nend_event_pipe\n\nend_time 120 sec\n"
+}

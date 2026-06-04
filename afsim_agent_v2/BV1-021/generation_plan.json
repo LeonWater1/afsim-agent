@@ -1,0 +1,254 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-021",
+    "source_task_id": "BV1-021"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "proc_mover_demo",
+      "description": "Processor-controlled mover demo scenario. The platform uses a script processor to command its mover movements.",
+      "duration": {
+        "value": 120,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue"
+      ],
+      "location_ids": [
+        "start_pt",
+        "dest_pt"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "mover_demo_platform",
+          "role": "mover_platform",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "mover_platform"
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "start_pt",
+          "route_ref": "demo_route",
+          "component_refs": [
+            "demo_mover",
+            "mover_script_processor"
+          ],
+          "component_families": {
+            "mover": [
+              "demo_mover"
+            ],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "mover_script_processor"
+            ],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "mover_demo_platform",
+              "role": "mover_platform",
+              "platform_type_hint": "generic_air_platform"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "mover_demo_platform",
+          "role": "mover_platform",
+          "platform_type_hint": "generic_air_platform"
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "mover_script_processor",
+          "family": "processor",
+          "role": "mover_controller",
+          "type_hint": "script_processor",
+          "parameters": {
+            "script_source": "proc_mover_demo.lua"
+          },
+          "grounding": {
+            "matched": true,
+            "mapping_type": "processor",
+            "canonical_id": "script_processor_basic",
+            "row": {
+              "canonical_id": "script_processor_basic",
+              "match_labels": [
+                "script_processor",
+                "脚本处理器"
+              ],
+              "type_hints": [
+                "script_processor"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_SCRIPT_PROCESSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "comms": [],
+      "routes": [
+        {
+          "route_id": "demo_route",
+          "kind": "transit",
+          "waypoint_count": 2,
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "execute_mover_script",
+          "task_type": "mover_control",
+          "grounding": {
+            "matched": false,
+            "mapping_type": "task",
+            "input": "mover_control"
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "mover_demo_platform"
+          ],
+          "target_refs": [],
+          "location_refs": [],
+          "parameters": {
+            "trigger": "on_start"
+          },
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "execute_mover_script",
+              "task_type": "mover_control"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "task_grounding",
+          "task_id": "execute_mover_script",
+          "task_type": "mover_control"
+        }
+      ]
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 120,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": false
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "mover_demo_platform",
+      "role": "mover_platform",
+      "platform_type_hint": "generic_air_platform"
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "execute_mover_script",
+      "task_type": "mover_control"
+    }
+  ],
+  "ready_for_generation": false
+}

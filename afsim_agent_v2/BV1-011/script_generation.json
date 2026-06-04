@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANT\n   constant_pattern\n      peak_gain 20 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BLUE_GROUND_VEHICLE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 20 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor search_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 20 nm\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANT\n         power 10 kw\n         pulse_width 1.0e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_ANT\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor task_mgr WSF_BRAWLER_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type RED_TARGET WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform blue_unit BLUE_GROUND_VEHICLE\n   side blue\n   route\n      position 30.670n 104.070e altitude 0 m msl speed 10 m/sec\n      position 30.690n 104.110e altitude 0 m msl speed 10 m/sec\n   end_route\n   sensor search_radar\n      on\n   end_sensor\n   edit processor task_mgr\n      advanced_behavior_tree\n         selector\n            behavior_node planned_route\n            behavior_node choose_tree\n         end_selector\n      end_advanced_behavior_tree\n ",
+      "static_analysis": {
+        "script": "BV1-011",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_ANT\n   constant_pattern\n      peak_gain 20 dB\n      azimuth_beamwidth 10 deg\n      elevation_beamwidth 10 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BLUE_GROUND_VEHICLE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 20 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor search_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 20 nm\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_ANT\n         power 10 kw\n         pulse_width 1.0e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_ANT\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor task_mgr WSF_BRAWLER_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type RED_TARGET WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform blue_unit BLUE_GROUND_VEHICLE\n   side blue\n   route\n      position 30.670n 104.070e altitude 0 m msl speed 10 m/sec\n      position 30.690n 104.110e altitude 0 m msl speed 10 m/sec\n   end_route\n   sensor search_radar\n      on\n   end_sensor\n   edit processor task_mgr\n      advanced_behavior_tree\n         selector\n            behavior_node planned_route\n            behavior_node choose_tree\n         end_selector\n      end_advanced_behavior_tree\n   end_processor\nend_platform\n\nplatform red_target RED_TARGET\n   side red\n   route\n      position 30.690n 104.110e altitude 0 m msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/behavior_tree_demo.aer\nend_event_pipe\n\nend_time 180 sec\n",
+  "static_analysis": {
+    "script": "BV1-011",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

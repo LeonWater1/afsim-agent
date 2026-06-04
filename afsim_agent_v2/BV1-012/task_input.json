@@ -1,0 +1,24 @@
+{
+  "id": "BV1-012",
+  "difficulty": "hard",
+  "input": "基于 brawler/brawler_demo_1v1，生成 Brawler 一对一空战近似模型场景。",
+  "covered_components": [
+    "Platform",
+    "Brawler",
+    "Weapon",
+    "Task"
+  ],
+  "expected_ir_focus": [
+    "brawler",
+    "tasks.air_to_air"
+  ],
+  "evaluation_focus": [
+    "Brawler plugin",
+    "air combat"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C014"
+}

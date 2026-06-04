@@ -48,6 +48,13 @@ VALIDATION_CASES = [
         "expected": {"primary_error": "E005", "route": "return_to_grounding"},
     },
     {
+        "name": "weapon_profile_missing_from_runtime",
+        "log_text": "ERROR: Could not find weapon WSF_AIR_TO_AIR_MISSILE",
+        "return_code": 1,
+        "static_analysis": {"primary_error": ""},
+        "expected": {"primary_error": "E005", "route": "return_to_grounding"},
+    },
+    {
         "name": "fallback_to_static",
         "log_text": "ERROR: unknown command: processorx",
         "return_code": 1,
@@ -60,6 +67,34 @@ VALIDATION_CASES = [
         "return_code": 1,
         "static_analysis": {"primary_error": ""},
         "expected": {"primary_error": "E007", "route": "return_to_layer_regeneration"},
+    },
+    {
+        "name": "context_forbidden_keyword",
+        "log_text": "ERROR: 'mode' cannot be used in this context",
+        "return_code": 1,
+        "static_analysis": {"primary_error": ""},
+        "expected": {"primary_error": "E007", "route": "return_to_layer_regeneration"},
+    },
+    {
+        "name": "behavior_reference_missing",
+        "log_text": "ERROR: Could not find behavior planned_route",
+        "return_code": 1,
+        "static_analysis": {"primary_error": ""},
+        "expected": {"primary_error": "E003", "route": "return_to_grounding_or_ir"},
+    },
+    {
+        "name": "unexpected_end_of_data",
+        "log_text": "ERROR: Unexpected End Of Data",
+        "return_code": 1,
+        "static_analysis": {"primary_error": ""},
+        "expected": {"primary_error": "E002", "route": "return_to_self_repair"},
+    },
+    {
+        "name": "brawler_component_requirement",
+        "log_text": "ERROR: WSF_BRAWLER_PLATFORM must have a WSF_BRAWLER_MOVER defined!",
+        "return_code": 1,
+        "static_analysis": {"primary_error": ""},
+        "expected": {"primary_error": "E006", "route": "return_to_layer_regeneration"},
     },
 ]
 
@@ -174,18 +209,54 @@ def classify_execution(log_text: str, static_analysis: dict, return_code: int | 
             primary_error = "E007"
             route = "return_to_layer_regeneration"
             suggested_action = "regenerate the affected layer or component template"
-    elif has(r"could not find mover"):
+    elif has(r"cannot be used in this context"):
+        primary_error = "E007"
+        classifier = "context_forbidden_keyword"
+        route = "return_to_layer_regeneration"
+        stage = "static_or_generation"
+        suggested_action = "remove the context-forbidden command and regenerate the affected block with verified syntax"
+    elif has(r"could not find comm|unknown comm"):
+        primary_error = "E003"
+        classifier = "missing_comm_definition_or_reference"
+        route = "return_to_grounding_or_ir"
+        stage = "mission_layer"
+        suggested_action = "define the referenced comm/network type in the self-contained script or regenerate the communication layer from grounded IR"
+    elif has(r"could not find behavior"):
+        primary_error = "E003"
+        classifier = "missing_behavior_definition"
+        route = "return_to_grounding_or_ir"
+        stage = "mission_layer"
+        suggested_action = "define the referenced advanced_behavior in the self-contained script or remove the unsupported behavior-tree reference"
+    elif has(r"unexpected end of data"):
+        primary_error = "E002"
+        classifier = "unterminated_custom_block"
+        route = "return_to_self_repair"
+        stage = "static_or_generation"
+        suggested_action = "close every opened custom block and nested table explicitly before rerunning mission.exe"
+    elif has(r"could not find mover|could not find weapon"):
         primary_error = "E005"
         classifier = "ungrounded_component_type"
         route = "return_to_grounding"
         stage = "grounding"
-        suggested_action = "replace the unresolved mover or component type with a verified grounded target"
+        suggested_action = "replace the unresolved mover, weapon, or component type with a verified grounded target"
     elif has(r"bad value for:"):
         primary_error = "E006"
         classifier = "invalid_required_value"
         route = "return_to_ir"
         stage = "ir_or_generation"
         suggested_action = "repair the invalid parameter value from IR or regenerate the affected block"
+    elif has(r"expected value '.*' to be > 0"):
+        primary_error = "E001"
+        classifier = "invalid_positive_numeric_value"
+        route = "return_to_self_repair"
+        stage = "static_or_generation"
+        suggested_action = "replace zero or negative physical parameters that must be positive and rerun static verification"
+    elif has(r"wsf_brawler_platform must have a wsf_brawler_mover|wsf_brawler_platform must have a wsf_threat_processor"):
+        primary_error = "E006"
+        classifier = "missing_brawler_required_components"
+        route = "return_to_layer_regeneration"
+        stage = "component_generation"
+        suggested_action = "when using a Brawler family platform, include the verified Brawler mover and threat processor pattern rather than approximating with generic air-platform components"
     elif has(r"no .* defined|failed phase one initialization|initialization of simulation failed"):
         primary_error = "E006"
         classifier = "missing_required_component_or_initialization"

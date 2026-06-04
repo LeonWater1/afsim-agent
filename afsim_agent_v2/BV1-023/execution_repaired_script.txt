@@ -1,0 +1,46 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type UAV_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 60 m/sec
+      minimum_speed 20 m/sec
+   end_mover
+   sensor gimbal WSF_EOIR_SENSOR
+      frame_time 1 sec
+      maximum_range 20 nm
+      reports_location
+      angular_resolution 1 deg
+   end_sensor
+end_platform_type
+
+platform blue_uav UAV_TYPE
+   side blue
+   route
+      position 30.70n 104.10e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.12e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.14e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.16e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.18e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.20e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.18e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.16e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.14e altitude 1000 m msl speed 50 m/sec
+      position 30.70n 104.12e altitude 1000 m msl speed 50 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/heatmap_demo.aer
+end_event_pipe
+
+event_output
+   file output/heatmap_demo.evt
+end_event_output
+
+csv_event_output
+   file output/heatmap_demo.csv
+end_csv_event_output
+
+end_time 600 sec

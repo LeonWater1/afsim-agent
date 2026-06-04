@@ -1,0 +1,45 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nplatform_type CYBER_EFFECTOR WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor cyber_script WSF_CYBER_SCRIPT_EFFECT\n   end_processor\nend_platform_type\n\nplatform_type GROUND_TARGET WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor target_proc WSF_SCRIPT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform blue_cyber CYBER_EFFECTOR\n   side blue\n   route\n      position 30.68n 104.08e altitude 0 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform red_target GROUND_TARGET\n   side red\n   route\n      position 30.71n 104.13e altitude 0 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_output file output/cyber_script_effect_demo.evt\n   enable CYBER_ATTACK_INITIATED\n   enable CYBER_ATTACK_SUCCEEDED\n   enable CYBER_ATTACK_FAILED\n   enable MESSAGE_TRANSMITTED\n   enable MESSAGE_RECEIVED\nend_event_output\n\nevent_pipe file output/cyber_script_effect_demo.aer\nend_event_pipe\n\nend_time 120 sec\n",
+      "static_analysis": {
+        "script": "BV1-018",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 10,
+            "message": "WSF_CYBER_SCRIPT_EFFECT is a cyber_effect type, not a processor type"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type CYBER_EFFECTOR WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor cyber_script WSF_CYBER_SCRIPT_EFFECT\n   end_processor\nend_platform_type\n\nplatform_type GROUND_TARGET WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor target_proc WSF_SCRIPT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform blue_cyber CYBER_EFFECTOR\n   side blue\n   route\n      position 30.68n 104.08e altitude 0 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform red_target GROUND_TARGET\n   side red\n   route\n      position 30.71n 104.13e altitude 0 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_output file output/cyber_script_effect_demo.evt\n   enable CYBER_ATTACK_INITIATED\n   enable CYBER_ATTACK_SUCCEEDED\n   enable CYBER_ATTACK_FAILED\n   enable MESSAGE_TRANSMITTED\n   enable MESSAGE_RECEIVED\nend_event_output\n\nevent_pipe file output/cyber_script_effect_demo.aer\nend_event_pipe\n\nend_time 120 sec\n",
+  "static_analysis": {
+    "script": "BV1-018",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 10,
+        "message": "WSF_CYBER_SCRIPT_EFFECT is a cyber_effect type, not a processor type"
+      }
+    ]
+  }
+}

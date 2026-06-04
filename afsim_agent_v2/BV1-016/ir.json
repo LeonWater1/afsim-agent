@@ -1,0 +1,145 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "ad_hoc_network_demo",
+    "description": "Ad hoc communication network example scenario.",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    }
+  ],
+  "locations": [
+    {
+      "id": "node_a_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e"
+      }
+    },
+    {
+      "id": "node_b_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.70n",
+        "lon": "104.10e"
+      }
+    },
+    {
+      "id": "node_c_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.73n",
+        "lon": "104.13e"
+      }
+    }
+  ],
+  "components": {
+    "comms": [
+      {
+        "id": "ad_hoc_network",
+        "role": "ad_hoc_comm",
+        "type_hint": "comm_system",
+        "parameters": {
+          "network_mode": "ad_hoc"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "id": "message_processor",
+        "role": "messaging",
+        "type_hint": "message_processor"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_node_1",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_a_site"
+    },
+    {
+      "id": "blue_node_2",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_b_site"
+    },
+    {
+      "id": "blue_node_3",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_c_site"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "form_ad_hoc_network",
+      "type": "ad_hoc_communication",
+      "assignee_refs": [
+        "blue_node_1",
+        "blue_node_2",
+        "blue_node_3"
+      ],
+      "parameters": {
+        "message_flow": "ad_hoc_multicast"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.side",
+      "entities.quantity",
+      "tasks"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "ad_hoc_message_exchange",
+      "type": "communication",
+      "actor_refs": [
+        "blue_node_1",
+        "blue_node_2",
+        "blue_node_3"
+      ],
+      "success_condition": "Nodes form an ad hoc network and exchange messages."
+    }
+  ]
+}

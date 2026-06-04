@@ -1,0 +1,25 @@
+{
+  "id": "BV1-002",
+  "difficulty": "medium",
+  "input": "基于 acoustic/acoustic_demo，生成包含声学传感器与目标运动的示例场景。",
+  "covered_components": [
+    "Platform",
+    "Sensor",
+    "Mover",
+    "Acoustic"
+  ],
+  "expected_ir_focus": [
+    "entities",
+    "sensors.acoustic",
+    "routes"
+  ],
+  "evaluation_focus": [
+    "acoustic detection",
+    "moving target"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C002"
+}

@@ -1,0 +1,96 @@
+script_interface
+   debug
+end_script_interface
+
+comm GROUP_COMM WSF_COMM_TRANSCEIVER
+   internal_link REPORT_PROC
+end_comm
+
+processor REPORT_PROC WSF_TRACK_PROCESSOR
+   report_interval 2 sec
+   circular_report_rejection on
+   update_interval 10 sec
+   on_message
+      type WSF_TRACK_MESSAGE
+      script
+         WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;
+         if(tmsg.Originator() != PLATFORM.Name())
+         {
+            print("T=",TIME_NOW," P=",PLATFORM.Name(),"  Track ",tmsg.Track().TargetName()," received from ",tmsg.Originator());
+         }
+      end_script
+   end_on_message
+end_processor
+
+platform_type DETECTOR_PLATFORM WSF_PLATFORM
+   icon radar_site
+   mover WSF_GROUND_MOVER
+      max_speed 1 m/sec
+      min_speed 0 m/sec
+   end_mover
+   comm GROUP_COMM
+   processor REPORT_PROC
+end_platform_type
+
+platform_type RELAY_PLATFORM WSF_PLATFORM
+   icon radio_tower
+   mover WSF_GROUND_MOVER
+      max_speed 1 m/sec
+      min_speed 0 m/sec
+   end_mover
+   comm GROUP_COMM
+end_platform_type
+
+platform_type OBSERVER_PLATFORM WSF_PLATFORM
+   icon observer
+   mover WSF_GROUND_MOVER
+      max_speed 1 m/sec
+      min_speed 0 m/sec
+   end_mover
+   comm GROUP_COMM
+end_platform_type
+
+group group_template WSF_GROUP
+end_group
+
+observer
+   enable SIMULATION_INITIALIZING CreateGroup
+end_observer
+
+script void CreateGroup()
+   WsfSimulation.CreateGroup("COMM_GROUP","group_template");
+end_script
+
+platform detector_unit DETECTOR_PLATFORM
+   side blue
+   group COMM_GROUP
+   route
+      position 30.67n 104.07e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+platform relay_unit RELAY_PLATFORM
+   side blue
+   group COMM_GROUP
+   route
+      position 30.70n 104.10e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+platform observer_unit OBSERVER_PLATFORM
+   side blue
+   group COMM_GROUP
+   route
+      position 30.73n 104.13e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/group_comm_example.aer
+end_event_pipe
+
+event_output
+   file output/group_comm_example.evt
+end_event_output
+
+end_time 240 sec

@@ -1,0 +1,226 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-025",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 iads_c2_demos/basic_iads，生成基础 IADS C2 场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"basic_iads_c2\",\n    \"description\": \"Basic IADS command-and-control scenario.\",\n    \"duration\": {\n      \"value\": 480,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"ground\",\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"iads_core\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.80n\",\n        \"lon\": \"104.25e\"\n      }\n    },\n    {\n      \"id\": \"radar_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.84n\",\n        \"lon\": \"104.29e\"\n      }\n    },\n    {\n      \"id\": \"sam_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.86n\",\n        \"lon\": \"104.31e\"\n      }\n    },\n    {\n      \"id\": \"intruder_axis\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"31.00n\",\n        \"lon\": \"104.50e\",\n        \"altitude\": {\n          \"value\": 5000,\n          \"unit\": \"m\"\n        }\n      }\n    }\n  ],\n  \"components\": {\n    \"sensors\": [\n      {\n        \"id\": \"acq_radar\",",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "basic_iads_c2",
+      "description": "Basic IADS command-and-control scenario.",
+      "duration": {
+        "value": 480,
+        "unit": "sec"
+      },
+      "domains": [
+        "ground",
+        "air"
+      ],
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "Blue"
+      },
+      {
+        "id": "red",
+        "display_name": "Red"
+      }
+    ],
+    "locations": [
+      {
+        "id": "iads_core",
+        "kind": "point",
+        "position": {
+          "lat": "30.80n",
+          "lon": "104.25e"
+        }
+      },
+      {
+        "id": "radar_site",
+        "kind": "point",
+        "position": {
+          "lat": "30.84n",
+          "lon": "104.29e"
+        }
+      },
+      {
+        "id": "sam_site",
+        "kind": "point",
+        "position": {
+          "lat": "30.86n",
+          "lon": "104.31e"
+        }
+      },
+      {
+        "id": "intruder_axis",
+        "kind": "point",
+        "position": {
+          "lat": "31.00n",
+          "lon": "104.50e",
+          "altitude": {
+            "value": 5000,
+            "unit": "m"
+          }
+        }
+      }
+    ],
+    "components": {
+      "sensors": [
+        {
+          "id": "acq_radar",
+          "role": "acquisition_radar",
+          "type_hint": "radar_sensor"
+        },
+        {
+          "id": "track_radar",
+          "role": "tracking_radar",
+          "type_hint": "radar_sensor"
+        }
+      ],
+      "weapons": [
+        {
+          "id": "sam_weapon",
+          "role": "surface_to_air_missile",
+          "type_hint": "sam_weapon"
+        }
+      ],
+      "processors": [
+        {
+          "id": "battle_manager",
+          "role": "iads_c2",
+          "type_hint": "battle_manager_processor"
+        },
+        {
+          "id": "sensor_manager",
+          "role": "sensor_management",
+          "type_hint": "sensor_manager_processor"
+        }
+      ],
+      "comms": [
+        {
+          "id": "iads_datalink",
+          "role": "iads_network",
+          "type_hint": "datalink"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "iads_commander",
+        "role": "iads_commander",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "iads_command_platform",
+        "component_refs": [
+          "battle_manager",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "iads_core"
+      },
+      {
+        "id": "radar_company",
+        "role": "radar_company",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "radar_platform",
+        "component_refs": [
+          "acq_radar",
+          "track_radar",
+          "sensor_manager",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "radar_site"
+      },
+      {
+        "id": "sam_battery",
+        "role": "sam_battery",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "sam_platform",
+        "component_refs": [
+          "sam_weapon",
+          "iads_datalink"
+        ],
+        "initial_location_ref": "sam_site"
+      },
+      {
+        "id": "blue_intruder",
+        "role": "intruder",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "air",
+        "platform_type_hint": "intruder_aircraft",
+        "initial_location_ref": "intruder_axis"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "defend_iads_area",
+        "type": "area_air_defense",
+        "assignee_refs": [
+          "iads_commander",
+          "radar_company",
+          "sam_battery"
+        ],
+        "target_refs": [
+          "blue_intruder"
+        ],
+        "location_refs": [
+          "iads_core",
+          "radar_site",
+          "sam_site"
+        ],
+        "parameters": {
+          "assignment_logic": "centralized_c2"
+        }
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "entities.side",
+        "entities.quantity",
+        "tasks",
+        "components.sensors",
+        "components.weapons"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "iads_detect_and_assign",
+        "type": "detection_assignment",
+        "actor_refs": [
+          "iads_commander",
+          "radar_company",
+          "sam_battery",
+          "blue_intruder"
+        ],
+        "success_condition": "The IADS detects the intruder and assigns engagement through the command chain."
+      }
+    ]
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "kinematic_mover_demo",
+    "description": "Kinematic mover demonstration based on kinematic_mover_demo.",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.60n",
+        "lon": "105.00e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "blue_mid",
+      "kind": "point",
+      "position": {
+        "lat": "30.80n",
+        "lon": "105.50e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.50n",
+        "lon": "105.10e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_mid",
+      "kind": "point",
+      "position": {
+        "lat": "30.70n",
+        "lon": "104.90e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "blue_route",
+      "kind": "transit",
+      "waypoints": [
+        {
+          "location_ref": "blue_start",
+          "speed": {
+            "value": 200,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "location_ref": "blue_mid",
+          "speed": {
+            "value": 200,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    },
+    {
+      "id": "red_route",
+      "kind": "transit",
+      "waypoints": [
+        {
+          "location_ref": "red_start",
+          "speed": {
+            "value": 180,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "location_ref": "red_mid",
+          "speed": {
+            "value": 180,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "kinematic_mover_blue",
+        "role": "air_mover",
+        "type_hint": "kinematic_mover",
+        "parameters": {
+          "max_speed": {
+            "value": 300,
+            "unit": "m/sec"
+          },
+          "max_turn_rate": {
+            "value": 10,
+            "unit": "deg/sec"
+          }
+        }
+      },
+      {
+        "id": "kinematic_mover_red",
+        "role": "air_mover",
+        "type_hint": "kinematic_mover",
+        "parameters": {
+          "max_speed": {
+            "value": 280,
+            "unit": "m/sec"
+          },
+          "max_turn_rate": {
+            "value": 8,
+            "unit": "deg/sec"
+          }
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_aircraft",
+      "role": "mover_platform",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "kinematic_aircraft",
+      "component_refs": [
+        "kinematic_mover_blue"
+      ],
+      "initial_location_ref": "blue_start",
+      "route_ref": "blue_route"
+    },
+    {
+      "id": "red_aircraft",
+      "role": "mover_platform",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "kinematic_aircraft",
+      "component_refs": [
+        "kinematic_mover_red"
+      ],
+      "initial_location_ref": "red_start",
+      "route_ref": "red_route"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "blue_transit",
+      "type": "transit",
+      "assignee_refs": [
+        "blue_aircraft"
+      ],
+      "parameters": {
+        "route_ref": "blue_route"
+      }
+    },
+    {
+      "id": "red_transit",
+      "type": "transit",
+      "assignee_refs": [
+        "red_aircraft"
+      ],
+      "parameters": {
+        "route_ref": "red_route"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "scenario.duration",
+      "entities.side",
+      "entities.quantity",
+      "components.movers",
+      "routes"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "platforms_move_along_routes",
+      "type": "movement",
+      "actor_refs": [
+        "blue_aircraft",
+        "red_aircraft"
+      ],
+      "success_condition": "Both platforms follow their kinematic routes within motion constraints."
+    }
+  ]
+}

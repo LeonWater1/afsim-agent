@@ -1,0 +1,194 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-024.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-024_execution_repair",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 158,
+          "message": "end_platform closes sensor from line 157"
+        },
+        {
+          "error_id": "E002",
+          "line": 168,
+          "message": "end_platform closes sensor from line 167"
+        },
+        {
+          "error_id": "E002",
+          "line": 176,
+          "message": "end_platform closes comm from line 175"
+        },
+        {
+          "error_id": "E002",
+          "line": 186,
+          "message": "end_platform closes comm from line 185"
+        },
+        {
+          "error_id": "E002",
+          "line": 194,
+          "message": "end_platform closes comm from line 193"
+        },
+        {
+          "error_id": "E002",
+          "line": 150,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 160,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 170,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 178,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 183,
+          "message": "missing end_sensor"
+        },
+        {
+          "error_id": "E002",
+          "line": 184,
+          "message": "missing end_sensor"
+        },
+        {
+          "error_id": "E002",
+          "line": 188,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E007",
+          "line": 204,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E002",
+      "classifier": "execution_failure_with_static_precursor",
+      "route": "return_to_self_repair",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "repair block structure and closing tags before mission.exe",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Could not find processor WSF_ATG_LAUNCH_COMPUTER"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E002",
+      "route": "return_to_self_repair",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "repair block structure and closing tags before mission.exe"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-024.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_WEAPONS_MANAGER_AI\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n   end_weapon\n   processor sam_manager WSF_WEAPONS_MANAGER_SAM\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\nend_platform\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-024_execution_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 158,
+        "message": "end_platform closes sensor from line 157"
+      },
+      {
+        "error_id": "E002",
+        "line": 168,
+        "message": "end_platform closes sensor from line 167"
+      },
+      {
+        "error_id": "E002",
+        "line": 176,
+        "message": "end_platform closes comm from line 175"
+      },
+      {
+        "error_id": "E002",
+        "line": 186,
+        "message": "end_platform closes comm from line 185"
+      },
+      {
+        "error_id": "E002",
+        "line": 194,
+        "message": "end_platform closes comm from line 193"
+      },
+      {
+        "error_id": "E002",
+        "line": 150,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 160,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 170,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 178,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 183,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 184,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 188,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E007",
+        "line": 204,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  }
+}

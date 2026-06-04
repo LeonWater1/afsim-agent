@@ -1,0 +1,67 @@
+start_date aug 29 2019
+random_seed 1
+
+script_interface
+   debug
+end_script_interface
+
+platform_type COMM_NODE_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   comm ad_hoc_radio WSF_COMM_TRANSCEIVER
+      network_name "ad_hoc_net"
+   end_comm
+end_platform_type
+
+platform node_1 COMM_NODE_TYPE
+   side blue
+   route
+      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec
+   end_route
+   comm ad_hoc_radio
+      on
+   end_comm
+end_platform
+
+platform node_2 COMM_NODE_TYPE
+   side blue
+   route
+      position 30.69n 104.10e altitude 0 m msl speed 0 m/sec
+   end_route
+   comm ad_hoc_radio
+      on
+   end_comm
+end_platform
+
+platform node_3 COMM_NODE_TYPE
+   side blue
+   route
+      position 30.65n 104.12e altitude 0 m msl speed 0 m/sec
+   end_route
+   comm ad_hoc_radio
+      on
+   end_comm
+end_platform
+
+platform node_4 COMM_NODE_TYPE
+   side blue
+   route
+      position 30.71n 104.08e altitude 0 m msl speed 0 m/sec
+   end_route
+   comm ad_hoc_radio
+      on
+   end_comm
+end_platform
+
+event_pipe
+   file output/ad_hoc.aer
+end_event_pipe
+
+event_output
+   enable all
+   file output/ad_hoc.evt
+end_event_output
+
+end_time 600 sec

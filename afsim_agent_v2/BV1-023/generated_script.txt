@@ -1,0 +1,58 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type COVERAGE_AIRCRAFT WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   sensor radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern RADAR_ANTENNA
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern RADAR_ANTENNA
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+end_platform_type
+
+platform blue_coverage_platform COVERAGE_AIRCRAFT
+   side blue
+   route
+      position 30.5n 104.0e altitude 5000 m msl speed 200 m/sec
+      position 30.9n 104.3e altitude 5000 m msl speed 200 m/sec
+   end_route
+   sensor radar
+      on
+   end_sensor
+end_platform
+
+event_pipe
+   file output/heatmap_coverage_demo.aer
+end_event_pipe
+
+csv_event_output
+   file output/heatmap_coverage_demo.csv
+end_csv_event_output
+
+end_time 600 sec

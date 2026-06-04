@@ -1,0 +1,25 @@
+{
+  "id": "BV1-020",
+  "difficulty": "hard",
+  "input": "基于 electronic_warfare/spot_jamming，生成点频压制干扰场景。",
+  "covered_components": [
+    "Platform",
+    "Sensor",
+    "Weapon",
+    "ElectronicWarfare"
+  ],
+  "expected_ir_focus": [
+    "jamming.spot",
+    "radar",
+    "jammer"
+  ],
+  "evaluation_focus": [
+    "spot jamming",
+    "EW interaction"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/electronic_warfare/spot_jamming.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C022"
+}

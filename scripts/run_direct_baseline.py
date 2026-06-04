@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Run a direct-prompt baseline for AFSIM benchmark tasks.
+Task-004: Direct Prompt Baseline
 
 This baseline intentionally does not use IR, retrieval, or demo grounding.
 It asks DeepSeek to generate scripts from task text alone, then performs static

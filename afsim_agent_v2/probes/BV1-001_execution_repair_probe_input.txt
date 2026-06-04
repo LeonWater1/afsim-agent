@@ -1,0 +1,52 @@
+# Generated scaffold for acoustic_simple_demo
+script_interface
+   debug
+end_script_interface
+
+sensor ACOUSTIC_SENSOR_BASE WSF_ACOUSTIC_SENSOR
+   on
+   frame_time 1 sec
+   scan_mode both
+   reports_bearing
+   reports_elevation
+   reports_signal_to_noise
+end_sensor
+
+platform_type BLUE_SONAR_SHIP_TYPE WSF_PLATFORM
+   mover WSF_STATIONARY_MOVER
+      maximum_speed 60 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor acoustic_sensor ACOUSTIC_SENSOR_BASE
+   end_sensor
+end_platform_type
+
+platform_type RED_SUB_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 60 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+platform blue_sonar_ship BLUE_SONAR_SHIP_TYPE
+   side blue
+   route
+      position 30.0n 120.0w speed 20 knots
+   end_route
+   sensor acoustic_sensor
+      on
+   end_sensor
+end_platform
+
+platform red_sub RED_SUB_TYPE
+   side red
+   route
+      position 31.0n 121.0w speed 20 knots
+   end_route
+end_platform
+
+event_pipe
+   file output/acoustic_simple_demo.aer
+end_event_pipe
+
+end_time 7200 sec

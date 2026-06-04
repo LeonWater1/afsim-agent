@@ -1,0 +1,202 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_safe_direct_edit",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-013.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-013.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 45,
+          "message": "unknown command: 100"
+        },
+        {
+          "error_id": "E007",
+          "line": 46,
+          "message": "unknown command: 500"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 2,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 2,
+      "target_layers": [
+        "scenario_scaffold"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 45,
+        "issue": "unknown command: 100",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      100 71",
+          "nearest_block_kind": "frequency_maximum_rcs_table",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 46,
+        "issue": "unknown command: 500",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      500 57",
+          "nearest_block_kind": "frequency_maximum_rcs_table",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 0,
+      "applied_actions": [],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 45,
+            "message": "unknown command: 100"
+          },
+          {
+            "error_id": "E007",
+            "line": 46,
+            "message": "unknown command: 500"
+          }
+        ]
+      },
+      "improved_finding_count": 0
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-013.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BLUE_SHIP_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor ship_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nchaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL\n   terminal_velocity 1.0 m/s\n   expiration_time 10 sec\n   number_dipoles 2000000\n   frequency_maximum_rcs_table\n      independent_variable units mhz extrapolate\n      100 71\n      500 57\n   end_frequency_maximum_rcs_table\nend_chaff_parcel\n\nweapon CHAFF_WEAPON WSF_CHAFF_WEAPON\n   launched_platform_type BLUE_SHIP_TYPE\n   ejector eject_1\n      quantity 15\n      parcel_type CHAFF_PARCEL\n      location 0 5 0 m\n      ejection_velocity 25 m/s\n   end_ejector\nend_weapon\n\nplatform blue_ship BLUE_SHIP_TYPE\n   side blue\n   route\n      position 30.50n 104.00e speed 0 m/sec\n   end_route\n   sensor ship_radar\n      on\n   end_sensor\nend_platform\n\nplatform_type RED_AIRCRAFT_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\nend_platform_type\n\nplatform red_attacker RED_AIRCRAFT_TYPE\n   side red\n   heading 270 deg\n   route\n      position 30.30n 104.50e altitude 5000 m msl speed 250 m/sec\n      position 30.55n 104.10e altitude 5000 m msl speed 250 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/chaff_jamming_example.aer\nend_event_pipe\n\nend_time 300 sec\n"
+  },
+  "repair_plan_after_safe_repair": null,
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 1,
+    "targets": [
+      {
+        "start_line": 43,
+        "end_line": 47,
+        "kind": "frequency_maximum_rcs_table",
+        "layer_scope": "scenario_scaffold",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 45,
+            "message": "unknown command: 100"
+          },
+          {
+            "error_id": "E007",
+            "line": 46,
+            "message": "unknown command: 500"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 1,
+    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 43,\n      \"end_line\": 47,\n      \"text\": \"   frequency_maximum_rcs_table\\n      independent_variable frequency units mhz extrapolate\\n      frequency_maximum_rcs_data\\n         frequency 100 mhz\\n         rcs 71 db\\n      end_frequency_maximum_rcs_data\\n      frequency_maximum_rcs_data\\n         frequency 500 mhz\\n         rcs 57 db\\n      end_frequency_maximum_rcs_data\\n   end_frequency_maximum_rcs_table\"\n    }\n  ]\n}",
+    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BLUE_SHIP_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor ship_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nchaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL\n   terminal_velocity 1.0 m/s\n   expiration_time 10 sec\n   number_dipoles 2000000\n   frequency_maximum_rcs_table\n      independent_variable frequency units mhz extrapolate\n      frequency_maximum_rcs_data\n         frequency 100 mhz\n         rcs 71 db\n      end_frequency_maximum_rcs_data\n      frequency_maximum_rcs_data\n         frequency 500 mhz\n         rcs 57 db\n      end_frequency_maximum_rcs_data\n   end_frequency_maximum_rcs_table\nend_chaff_parcel\n\nweapon CHAFF_WEAPON WSF_CHAFF_WEAPON\n   launched_platform_type BLUE_SHIP_TYPE\n   ejector eject_1\n      quantity 15\n      parcel_type CHAFF_PARCEL\n      location 0 5 0 m\n      ejection_velocity 25 m/s\n   end_ejector\nend_weapon\n\nplatform blue_ship BLUE_SHIP_TYPE\n   side blue\n   route\n      position 30.50n 104.00e speed 0 m/sec\n   end_route\n   sensor ship_radar\n      on\n   end_sensor\nend_platform\n\nplatform_type RED_AIRCRAFT_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\nend_platform_type\n\nplatform red_attacker RED_AIRCRAFT_TYPE\n   side red\n   heading 270 deg\n   route\n      position 30.30n 104.50e altitude 5000 m msl speed 250 m/sec\n      position 30.55n 104.10e altitude 5000 m msl speed 250 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/chaff_jamming_example.aer\nend_event_pipe\n\nend_time 300 sec\n",
+    "static_analysis": {
+      "script": "BV1-013_layer_regeneration",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 45,
+          "message": "unknown command: frequency_maximum_rcs_data"
+        },
+        {
+          "error_id": "E007",
+          "line": 48,
+          "message": "unknown command: end_frequency_maximum_rcs_data"
+        },
+        {
+          "error_id": "E007",
+          "line": 49,
+          "message": "unknown command: frequency_maximum_rcs_data"
+        },
+        {
+          "error_id": "E007",
+          "line": 52,
+          "message": "unknown command: end_frequency_maximum_rcs_data"
+        }
+      ]
+    }
+  },
+  "full_script_fallback_used": false,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BLUE_SHIP_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor ship_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nchaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL\n   terminal_velocity 1.0 m/s\n   expiration_time 10 sec\n   number_dipoles 2000000\n   frequency_maximum_rcs_table\n      independent_variable units mhz extrapolate\n      100 71\n      500 57\n   end_frequency_maximum_rcs_table\nend_chaff_parcel\n\nweapon CHAFF_WEAPON WSF_CHAFF_WEAPON\n   launched_platform_type BLUE_SHIP_TYPE\n   ejector eject_1\n      quantity 15\n      parcel_type CHAFF_PARCEL\n      location 0 5 0 m\n      ejection_velocity 25 m/s\n   end_ejector\nend_weapon\n\nplatform blue_ship BLUE_SHIP_TYPE\n   side blue\n   route\n      position 30.50n 104.00e speed 0 m/sec\n   end_route\n   sensor ship_radar\n      on\n   end_sensor\nend_platform\n\nplatform_type RED_AIRCRAFT_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\nend_platform_type\n\nplatform red_attacker RED_AIRCRAFT_TYPE\n   side red\n   heading 270 deg\n   route\n      position 30.30n 104.50e altitude 5000 m msl speed 250 m/sec\n      position 30.55n 104.10e altitude 5000 m msl speed 250 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/chaff_jamming_example.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-013_static_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 45,
+        "message": "unknown command: 100"
+      },
+      {
+        "error_id": "E007",
+        "line": 46,
+        "message": "unknown command: 500"
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-013\\llm_repaired_script.txt",
+    "mission_status": "PASS",
+    "return_code": 0
+  },
+  "static_analysis": {
+    "script": "BV1-013_static_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 45,
+        "message": "unknown command: 100"
+      },
+      {
+        "error_id": "E007",
+        "line": 46,
+        "message": "unknown command: 500"
+      }
+    ]
+  },
+  "execution_analysis": {
+    "mission_pass": true,
+    "primary_error": "",
+    "classifier": "pass",
+    "route": "no_repair_needed",
+    "inferred_stage": "none",
+    "suggested_action": "mission execution passed",
+    "evidence_lines": []
+  },
+  "repair_recommendation": {
+    "primary_error": "",
+    "route": "no_repair_needed",
+    "inferred_stage": "none",
+    "suggested_action": "mission execution passed"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "no repair required"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-013\\llm_repaired_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

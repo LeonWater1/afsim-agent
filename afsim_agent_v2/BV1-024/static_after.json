@@ -1,0 +1,77 @@
+{
+  "script": "BV1-024_execution_repair",
+  "syntax_correct": false,
+  "static_pass": false,
+  "primary_error": "E002",
+  "static_error_ids": [
+    "E002",
+    "E007"
+  ],
+  "findings": [
+    {
+      "error_id": "E002",
+      "line": 158,
+      "message": "end_platform closes sensor from line 157"
+    },
+    {
+      "error_id": "E002",
+      "line": 168,
+      "message": "end_platform closes sensor from line 167"
+    },
+    {
+      "error_id": "E002",
+      "line": 176,
+      "message": "end_platform closes comm from line 175"
+    },
+    {
+      "error_id": "E002",
+      "line": 186,
+      "message": "end_platform closes comm from line 185"
+    },
+    {
+      "error_id": "E002",
+      "line": 194,
+      "message": "end_platform closes comm from line 193"
+    },
+    {
+      "error_id": "E002",
+      "line": 150,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 160,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 170,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 178,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E002",
+      "line": 183,
+      "message": "missing end_sensor"
+    },
+    {
+      "error_id": "E002",
+      "line": 184,
+      "message": "missing end_sensor"
+    },
+    {
+      "error_id": "E002",
+      "line": 188,
+      "message": "missing end_platform"
+    },
+    {
+      "error_id": "E007",
+      "line": 204,
+      "message": "end_time must appear at top level, not inside another block"
+    }
+  ]
+}

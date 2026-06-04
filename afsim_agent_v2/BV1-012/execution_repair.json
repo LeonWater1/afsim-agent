@@ -1,0 +1,42 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
+    "mission_status": "FAIL",
+    "return_code": 1
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  },
+  "execution_analysis": {
+    "mission_pass": false,
+    "primary_error": "E009",
+    "classifier": "environment_or_dependency_error",
+    "route": "fix_execution_environment",
+    "inferred_stage": "execution_environment",
+    "suggested_action": "run from a mirrored writable directory, ensure dependent include/terrain files exist, and rerun mission.exe with a resolved absolute script path",
+    "evidence_lines": [
+      "***** FATAL: Could not process input files.",
+      "***** ERROR: Cannot open file: platforms/ACFT_BD.FXW"
+    ]
+  },
+  "repair_recommendation": {
+    "primary_error": "E009",
+    "route": "fix_execution_environment",
+    "inferred_stage": "execution_environment",
+    "suggested_action": "run from a mirrored writable directory, ensure dependent include/terrain files exist, and rerun mission.exe with a resolved absolute script path"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "verify mission.exe path, mirrored workspace, dependent include files, and writable output directories"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\generated_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

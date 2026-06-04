@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern DEF_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type DEFENDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n   end_mover\n   sensor defender_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern DEF_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern DEF_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform_type BALLISTIC_TYPE WSF_PLATFORM\n   mover WSF_GUIDED_MOVER\n      maximum_speed 2000 m/sec\n   end_mover\nend_platform_type\n\nplatform defender_unit DEFENDER_TYPE\n   side blue\n   route\n      position 30.60n 104.00e speed 0 m/sec\n   end_route\n   sensor defender_radar\n      on\n   end_sensor\nend_platform\n\nplatform target_missile BALLISTIC_TYPE\n   side red\n   route\n      position 30.90n 104.40e altitude 50000 ft msl speed 1500 m/sec\n      position 30.60n 104.20e altitude 50000 ft msl speed 1500 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/ballistic_shootdown.aer\nend_event_pipe\n\nend_time 300 sec\n",
+      "static_analysis": {
+        "script": "BV1-009",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern DEF_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type DEFENDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n   end_mover\n   sensor defender_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern DEF_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern DEF_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform_type BALLISTIC_TYPE WSF_PLATFORM\n   mover WSF_GUIDED_MOVER\n      maximum_speed 2000 m/sec\n   end_mover\nend_platform_type\n\nplatform defender_unit DEFENDER_TYPE\n   side blue\n   route\n      position 30.60n 104.00e speed 0 m/sec\n   end_route\n   sensor defender_radar\n      on\n   end_sensor\nend_platform\n\nplatform target_missile BALLISTIC_TYPE\n   side red\n   route\n      position 30.90n 104.40e altitude 50000 ft msl speed 1500 m/sec\n      position 30.60n 104.20e altitude 50000 ft msl speed 1500 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/ballistic_shootdown.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-009",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

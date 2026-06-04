@@ -1,0 +1,88 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt",
+    "mission_status": "FAIL",
+    "return_code": 1
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E001",
+    "static_error_ids": [
+      "E001",
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E001",
+        "line": 7,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E001",
+        "line": 14,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E001",
+        "line": 24,
+        "message": "maximum_speed must be greater than 0"
+      },
+      {
+        "error_id": "E002",
+        "line": 20,
+        "message": "end_platform_type closes weapon from line 17"
+      },
+      {
+        "error_id": "E002",
+        "line": 58,
+        "message": "end_weapon closes launch_computer from line 57"
+      },
+      {
+        "error_id": "E002",
+        "line": 12,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 56,
+        "message": "missing end_weapon"
+      },
+      {
+        "error_id": "E007",
+        "line": 83,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  },
+  "execution_analysis": {
+    "mission_pass": false,
+    "primary_error": "E001",
+    "classifier": "input_parse_or_structure_error",
+    "route": "return_to_self_repair",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "fill missing units and rerun static verification before mission.exe",
+    "evidence_lines": [
+      "***** FATAL: Could not process input files.",
+      "***** ERROR: Unknown command: end_platform"
+    ]
+  },
+  "repair_recommendation": {
+    "primary_error": "E001",
+    "route": "return_to_self_repair",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "fill missing units and rerun static verification before mission.exe"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "rerun static_checker_v1 after the repair changes the script text",
+      "rerun mission.exe only after the regenerated script passes static verification"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

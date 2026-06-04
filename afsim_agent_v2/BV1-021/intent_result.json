@@ -1,0 +1,183 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-021",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 example_scripts/proc_mover_demo，生成处理器控制 mover 的脚本场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"proc_mover_demo\",\n    \"description\": \"Processor-controlled mover demo scenario. The platform uses a script processor to command its mover movements.\",\n    \"duration\": {\n      \"value\": 120,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"start_pt\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.67n\",\n        \"lon\": \"104.07e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"dest_pt\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.72n\",\n        \"lon\": \"104.12e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"demo_route\",\n      \"kind\": \"transit\",\n      \"waypoints\": [\n        {\n          \"location_ref\": \"start_pt\",\n          \"speed\": {\n            \"value\": 100,\n            \"unit\": \"m/sec\"\n          }\n        },\n        {\n          \"position\": {\n            \"lat\": \"30.72n\",",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "proc_mover_demo",
+      "description": "Processor-controlled mover demo scenario. The platform uses a script processor to command its mover movements.",
+      "duration": {
+        "value": 120,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "event_pipe"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "Blue"
+      }
+    ],
+    "locations": [
+      {
+        "id": "start_pt",
+        "kind": "point",
+        "position": {
+          "lat": "30.67n",
+          "lon": "104.07e",
+          "altitude": {
+            "value": 3000,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "dest_pt",
+        "kind": "point",
+        "position": {
+          "lat": "30.72n",
+          "lon": "104.12e",
+          "altitude": {
+            "value": 3000,
+            "unit": "m"
+          }
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "demo_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "start_pt",
+            "speed": {
+              "value": 100,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "position": {
+              "lat": "30.72n",
+              "lon": "104.12e",
+              "altitude": {
+                "value": 3000,
+                "unit": "m"
+              }
+            },
+            "speed": {
+              "value": 100,
+              "unit": "m/sec"
+            }
+          }
+        ]
+      }
+    ],
+    "components": {
+      "movers": [
+        {
+          "id": "demo_mover",
+          "role": "air_mover",
+          "type_hint": "air_mover"
+        }
+      ],
+      "processors": [
+        {
+          "id": "mover_script_processor",
+          "role": "mover_controller",
+          "type_hint": "script_processor",
+          "parameters": {
+            "script_source": "proc_mover_demo.lua"
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "mover_demo_platform",
+        "role": "mover_platform",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "air",
+        "platform_type_hint": "generic_air_platform",
+        "component_refs": [
+          "demo_mover",
+          "mover_script_processor"
+        ],
+        "initial_location_ref": "start_pt",
+        "route_ref": "demo_route"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "execute_mover_script",
+        "type": "mover_control",
+        "assignee_refs": [
+          "mover_demo_platform"
+        ],
+        "parameters": {
+          "trigger": "on_start"
+        }
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "entities.quantity",
+        "entities.side",
+        "tasks"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "mover_controlled_by_script",
+        "type": "mover_event",
+        "actor_refs": [
+          "mover_demo_platform"
+        ],
+        "success_condition": "The platform's mover receives commands from the processor script and moves accordingly."
+      }
+    ],
+    "grounding_hints": [
+      {
+        "label": "mover_demo_mover",
+        "target_kind": "mover",
+        "candidate_types": [
+          "air_mover"
+        ],
+        "notes": "Basic mover for demo."
+      },
+      {
+        "label": "mover_demo_processor",
+        "target_kind": "processor",
+        "candidate_types": [
+          "script_processor"
+        ],
+        "notes": "Processor running the mover control script."
+      }
+    ]
+  }
+}

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Task-012: Self Repair Workflow v1
+
 Build a self-repair workflow plan from static checker findings.
 
 Task-012 focuses on turning static findings into an ordered repair plan:
@@ -32,23 +34,41 @@ from static_checker_v1 import (
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Sourced from AFSIM 2.9.0 official documentation:
+# wsf_air_mover.html, wsf_ground_mover.html, wsf_surface_mover.html,
+# wsf_subsurface_mover.html, chaff_parcel commands, sensor commands.
 SAFE_UNIT_DEFAULTS = {
+    # Mover commands (wsf_air_mover.html etc.)
     "maximum_speed": "m/sec",
     "minimum_speed": "m/sec",
     "default_radial_acceleration": "g",
     "default_linear_acceleration": "g",
+    "altitude": "m",
+    "heading": "deg",
+    "speed": "m/sec",
+    # Mover timing
     "frame_time": "sec",
     "update_interval": "sec",
+    "start_time": "sec",
+    # Sensor commands
     "frequency": "ghz",
     "power": "kw",
     "bandwidth": "khz",
     "one_m2_detect_range": "km",
-    "altitude": "m",
-    "heading": "deg",
-    "speed": "m/sec",
-    "end_time": "sec",
     "maximum_range": "km",
     "minimum_range": "km",
+    "pulse_width": "sec",
+    "pulse_repetition_frequency": "hz",
+    # Chaff parcel commands
+    "terminal_velocity": "m/s",
+    "bloom_diameter": "m",
+    "expansion_time_constant": "sec",
+    "deceleration_rate": "m/s2",
+    "expiration_time": "sec",
+    "ejection_velocity": "m/s",
+    # Scenario
+    "end_time": "sec",
+    "duration": "sec",
 }
 
 REPAIR_PRIORITY = {
@@ -163,7 +183,7 @@ def summarize_context(finding: dict, lines: list[str], contexts: dict[int, dict]
 
 
 def build_reference_candidates(lines: list[str]) -> dict:
-    platform_types, antenna_patterns = extract_defined_symbols(lines)
+    platform_types, antenna_patterns, comm_definitions, advanced_behaviors = extract_defined_symbols(lines)
     return {
         "platform_types": sorted(platform_types),
         "antenna_patterns": sorted(antenna_patterns.keys()),
@@ -343,6 +363,74 @@ def attempt_safe_repair(
             }
         )
 
+    # Fix missing end tags (E002: "missing end_xxx") — stack-based insertion
+    # that places each end tag after its closest following block content,
+    # rather than blindly appending to the end of the file.
+    missing_end_tags = []
+    for finding in findings:
+        if finding["error_id"] != "E002":
+            continue
+        match = re.match(r"missing (end_\w+)", finding["message"])
+        if match:
+            missing_end_tags.append((finding["line"], match.group(1)))
+
+    # Deduplicate and sort: insert deepest-first so nesting stays correct
+    seen_tags = set()
+    unique_missing = []
+    for line_no, end_tag in missing_end_tags:
+        if end_tag not in seen_tags:
+            seen_tags.add(end_tag)
+            unique_missing.append((line_no, end_tag))
+    # Find end_time line — insert missing end tags BEFORE end_time
+    end_time_idx = None
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip().startswith("end_time"):
+            end_time_idx = i
+            break
+    insert_at = end_time_idx if end_time_idx is not None else len(lines)
+    for _, end_tag in sorted(unique_missing, key=lambda item: item[0], reverse=True):
+        lines.insert(insert_at, end_tag)
+        applied_actions.append(
+            {
+                "error_id": "E002",
+                "action": "insert_line",
+                "target_line": insert_at + 1,
+                "replacement": end_tag,
+            }
+        )
+
+    # Fix cross-closed blocks (E002: "end_X closes Y from line N").
+    # Source: AFSIM 2.9.0 platform_part_commands.html defines 8 platform part types,
+    # each with its own end_xxx that must not be interchanged.
+    cross_close_findings = []
+    for finding in findings:
+        if finding["error_id"] != "E002":
+            continue
+        match = re.match(r"(\w+) closes (\w+) from line (\d+)", finding["message"])
+        if match:
+            wrong_end = match.group(1)
+            closed_kind = match.group(2)
+            cross_close_findings.append((finding["line"], wrong_end, closed_kind))
+
+    cross_close_findings.sort(key=lambda item: item[0])
+    for line_no, wrong_end, closed_kind in cross_close_findings:
+        if line_no <= 0 or line_no > len(lines):
+            continue
+        correct_end = BLOCK_STARTS.get(closed_kind, f"end_{closed_kind}")
+        if wrong_end == correct_end:
+            continue
+        old_line = lines[line_no - 1]
+        lines[line_no - 1] = old_line.replace(wrong_end, correct_end)
+        applied_actions.append(
+            {
+                "error_id": "E002",
+                "action": "replace_line",
+                "target_line": line_no,
+                "replacement": lines[line_no - 1],
+                "reason": f"cross-close: {wrong_end} -> {correct_end} (closes {closed_kind})",
+            }
+        )
+
     duration = extract_ir_duration(ir_context, plan_context)
     if any(item["error_id"] == "E006" and item["message"] == "missing end_time" for item in findings) and duration:
         lines.append(f"end_time {duration}")
@@ -352,25 +440,6 @@ def attempt_safe_repair(
                 "action": "append_line",
                 "target_line": len(lines),
                 "replacement": f"end_time {duration}",
-            }
-        )
-
-    missing_end_tags = []
-    for finding in findings:
-        if finding["error_id"] != "E002":
-            continue
-        match = re.match(r"missing (end_\w+)", finding["message"])
-        if match:
-            missing_end_tags.append((finding["line"], match.group(1)))
-
-    for _, end_tag in sorted(missing_end_tags, key=lambda item: item[0], reverse=True):
-        lines.append(end_tag)
-        applied_actions.append(
-            {
-                "error_id": "E002",
-                "action": "append_line",
-                "target_line": len(lines),
-                "replacement": end_tag,
             }
         )
 

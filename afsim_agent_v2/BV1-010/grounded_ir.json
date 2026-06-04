@@ -1,0 +1,294 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "bearing_only_detection_tracking",
+    "description": "基于 bearing_only/test_run 生成的仅方位探测/跟踪场景。Bearing-only detection and tracking demo.",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    },
+    {
+      "id": "red",
+      "display_name": "Red",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.92n",
+        "lon": "104.37e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [],
+  "components": {
+    "sensor": [
+      {
+        "id": "esm_sensor",
+        "role": "bearing_only_detection",
+        "type_hint": "esm_receiver",
+        "parameters": {
+          "mode": "passive",
+          "measurements": [
+            "azimuth"
+          ]
+        },
+        "grounding": {
+          "matched": false,
+          "mapping_type": "sensor",
+          "input": "bearing_only_detection"
+        }
+      },
+      {
+        "id": "red_radar",
+        "role": "emitter",
+        "type_hint": "airborne_radar",
+        "parameters": {
+          "mode": "active"
+        },
+        "grounding": {
+          "matched": false,
+          "mapping_type": "sensor",
+          "input": "emitter"
+        }
+      }
+    ],
+    "processor": [
+      {
+        "id": "bearing_tracker",
+        "role": "bearing_only_tracking",
+        "type_hint": "bearing_only_tracker",
+        "parameters": {
+          "algorithm": "MHT",
+          "fusion_mode": "passive_only"
+        },
+        "grounding": {
+          "matched": false,
+          "mapping_type": "processor",
+          "input": "bearing_only_tracking"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_sensor_platform",
+      "role": "reconnaissance",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "electronic_surveillance_aircraft",
+      "component_refs": [
+        "esm_sensor",
+        "bearing_tracker"
+      ],
+      "initial_location_ref": "blue_start",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "reconnaissance"
+      }
+    },
+    {
+      "id": "red_target_emitter",
+      "role": "emitter_target",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "fighter_aircraft",
+      "component_refs": [
+        "red_radar"
+      ],
+      "initial_location_ref": "red_start",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "fighter_aircraft_basic",
+        "row": {
+          "canonical_id": "fighter_aircraft_basic",
+          "canonical_role": "fighter",
+          "match_labels": [
+            "fighter",
+            "fighter_aircraft",
+            "战斗机",
+            "截击机",
+            "歼击机"
+          ],
+          "platform_type_hints": [
+            "fighter_aircraft",
+            "escort_fighter",
+            "intruder_aircraft"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "fighter_aircraft_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [
+            "air_mover_basic",
+            "fighter_radar_basic",
+            "air_to_air_missile_basic",
+            "track_processor_basic"
+          ],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
+            "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+          ]
+        },
+        "implementation_constraints": {
+          "grounding_target_kind": "platform_template",
+          "wsf_context_rules": [],
+          "preferred_declarations": [],
+          "default_component_bundle": [
+            "air_mover_basic",
+            "fighter_radar_basic",
+            "air_to_air_missile_basic",
+            "track_processor_basic"
+          ]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "track_red_emitter",
+      "type": "track",
+      "assignee_refs": [
+        "blue_sensor_platform"
+      ],
+      "target_refs": [
+        "red_target_emitter"
+      ],
+      "parameters": {
+        "mode": "bearing_only",
+        "priority": "primary"
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "task",
+        "input": "track"
+      }
+    }
+  ],
+  "all_grounded": false,
+  "unresolved_items": [
+    {
+      "kind": "component",
+      "family": "sensor",
+      "component_id": "esm_sensor"
+    },
+    {
+      "kind": "component",
+      "family": "sensor",
+      "component_id": "red_radar"
+    },
+    {
+      "kind": "component",
+      "family": "processor",
+      "component_id": "bearing_tracker"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_sensor_platform"
+    },
+    {
+      "kind": "task",
+      "task_id": "track_red_emitter"
+    }
+  ]
+}

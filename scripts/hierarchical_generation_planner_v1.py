@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Task-011: Hierarchical Generation Planner v1
+
 Build a layered generation plan from AFSIM-IR plus grounding helpers.
 """
 
@@ -21,7 +23,7 @@ IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
 
 
 def load_ir_from_examples(example_id: str):
-    for line in IR_EXAMPLES_PATH.read_text(encoding="utf-8").splitlines():
+    for line in IR_EXAMPLES_PATH.read_text(encoding="utf-8-sig").splitlines():
         if not line.strip():
             continue
         row = json.loads(line)
@@ -83,6 +85,7 @@ def summarize_component_plan(component_id: str, family: str, item: dict):
         "type_hint": item.get("type_hint"),
         "parameters": item.get("parameters", {}),
         "grounding": grounding,
+        "implementation_constraints": grounding.get("implementation_constraints", {}),
         "unresolved_items": unresolved,
     }
 
@@ -151,6 +154,7 @@ def build_platform_layer(ir: dict, component_index: dict):
                 "quantity": entity.get("quantity"),
                 "side": side,
                 "platform_grounding": platform,
+                "platform_constraints": platform.get("implementation_constraints", {}),
                 "initial_location_ref": entity.get("initial_location_ref"),
                 "route_ref": entity.get("route_ref"),
                 "component_refs": referenced_components,
@@ -233,6 +237,7 @@ def build_mission_layer(ir: dict, component_index: dict):
                 "task_id": task["id"],
                 "task_type": task.get("type"),
                 "grounding": task_grounding,
+                "implementation_constraints": task_grounding.get("implementation_constraints", {}),
                 "assignee_refs": task.get("assignee_refs", []),
                 "target_refs": task.get("target_refs", []),
                 "location_refs": task.get("location_refs", []),

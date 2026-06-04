@@ -1,0 +1,26 @@
+{
+  "id": "BV1-009",
+  "difficulty": "hard",
+  "input": "基于 ballistic_missile_shootdown/ballistic_shootdown，生成弹道导弹拦截场景。",
+  "covered_components": [
+    "Platform",
+    "Mover",
+    "Weapon",
+    "Sensor",
+    "Task"
+  ],
+  "expected_ir_focus": [
+    "tasks.intercept",
+    "ballistic_target",
+    "defender"
+  ],
+  "evaluation_focus": [
+    "missile shootdown",
+    "intercept chain"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/ballistic_missile_shootdown/ballistic_shootdown.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C011"
+}

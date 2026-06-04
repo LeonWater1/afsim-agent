@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Minimal grounding library for Task-010.
+Task-010: Grounding Library v1
 
 This module loads docs/machine/entity_mapping_v1.json and provides lookup helpers for side,
 platform, task, and component grounding.
@@ -9,6 +9,8 @@ platform, task, and component grounding.
 import argparse
 import json
 from pathlib import Path
+
+from afsim_context_rules_v1 import derive_grounding_constraints
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -57,9 +59,21 @@ def resolve_platform(label: str = "", platform_type_hint: str = ""):
         label_aliases = [platform_id, *row.get("match_labels", [])]
         hint_aliases = [platform_id, *row.get("platform_type_hints", [])]
         if label and _matches(label, label_aliases):
-            return {"matched": True, "mapping_type": "platform", "canonical_id": row["canonical_id"], "row": row}
+            return {
+                "matched": True,
+                "mapping_type": "platform",
+                "canonical_id": row["canonical_id"],
+                "row": row,
+                "implementation_constraints": derive_grounding_constraints(row),
+            }
         if platform_type_hint and _matches(platform_type_hint, hint_aliases):
-            return {"matched": True, "mapping_type": "platform", "canonical_id": row["canonical_id"], "row": row}
+            return {
+                "matched": True,
+                "mapping_type": "platform",
+                "canonical_id": row["canonical_id"],
+                "row": row,
+                "implementation_constraints": derive_grounding_constraints(row),
+            }
     return {"matched": False, "mapping_type": "platform", "input": label or platform_type_hint}
 
 
@@ -68,7 +82,13 @@ def resolve_task(label: str):
     for task_id, row in mapping.items():
         aliases = [task_id, *row.get("match_labels", []), *row.get("ir_task_types", [])]
         if _matches(label, aliases):
-            return {"matched": True, "mapping_type": "task", "canonical_id": row["canonical_id"], "row": row}
+            return {
+                "matched": True,
+                "mapping_type": "task",
+                "canonical_id": row["canonical_id"],
+                "row": row,
+                "implementation_constraints": derive_grounding_constraints(row),
+            }
     return {"matched": False, "mapping_type": "task", "input": label}
 
 
@@ -81,12 +101,24 @@ def resolve_component(component_family: str, label: str = "", type_hint: str = "
         for component_id, row in rows.items():
             aliases = [component_id, *row.get("match_labels", []), *row.get("type_hints", [])]
             if _matches(label, aliases):
-                return {"matched": True, "mapping_type": family, "canonical_id": row["canonical_id"], "row": row}
+                return {
+                    "matched": True,
+                    "mapping_type": family,
+                    "canonical_id": row["canonical_id"],
+                    "row": row,
+                    "implementation_constraints": derive_grounding_constraints(row),
+                }
 
     for component_id, row in rows.items():
         aliases = [component_id, *row.get("match_labels", []), *row.get("type_hints", [])]
         if type_hint and _matches(type_hint, aliases):
-            return {"matched": True, "mapping_type": family, "canonical_id": row["canonical_id"], "row": row}
+            return {
+                "matched": True,
+                "mapping_type": family,
+                "canonical_id": row["canonical_id"],
+                "row": row,
+                "implementation_constraints": derive_grounding_constraints(row),
+            }
     return {"matched": False, "mapping_type": family, "input": label or type_hint}
 
 

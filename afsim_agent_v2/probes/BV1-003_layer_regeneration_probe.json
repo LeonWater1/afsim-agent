@@ -1,0 +1,129 @@
+﻿{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_layer_regeneration",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-003.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-003.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 37,
+          "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 1,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 1,
+      "target_layers": [
+        "weapon_layer"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 37,
+        "issue": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block",
+        "layer_scope": "weapon_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "   weapon aam_basic WSF_AIR_TO_AIR_MISSILE",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "aam_basic"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 0,
+      "applied_actions": [],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 37,
+            "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+          }
+        ]
+      },
+      "improved_finding_count": 0
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-003.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type FIGHTER WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   weapon aam_basic WSF_AIR_TO_AIR_MISSILE\n   end_weapon\nend_platform_type\n\nplatform blue_fighter FIGHTER\n   side blue\n   heading 45 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nplatform red_fighter FIGHTER\n   side red\n   heading 225 deg\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nevent_pipe\n   file output/air_to_air_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n"
+  },
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 1,
+    "targets": [
+      {
+        "start_line": 37,
+        "end_line": 38,
+        "kind": "weapon",
+        "layer_scope": "weapon_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 37,
+            "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 1,
+    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 37,\n      \"end_line\": 38,\n      \"text\": \"\"\n    }\n  ]\n}",
+    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type FIGHTER WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform blue_fighter FIGHTER\n   side blue\n   heading 45 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nplatform red_fighter FIGHTER\n   side red\n   heading 225 deg\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nevent_pipe\n   file output/air_to_air_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+    "static_analysis": {
+      "script": "BV1-003_layer_regeneration",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    }
+  },
+  "full_script_fallback_used": false,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type FIGHTER WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform blue_fighter FIGHTER\n   side blue\n   heading 45 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nplatform red_fighter FIGHTER\n   side red\n   heading 225 deg\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nevent_pipe\n   file output/air_to_air_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-003_layer_regeneration",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

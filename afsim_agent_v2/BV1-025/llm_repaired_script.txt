@@ -1,0 +1,10 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern STANDARD_RAD
+  constant_pattern
+    gain 35.0 db
+  end_constant_pattern
+end_antenna_pattern
+end_time 480 sec

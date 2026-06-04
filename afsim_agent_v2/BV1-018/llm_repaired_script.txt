@@ -1,0 +1,48 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type CYBER_EFFECTOR WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0.1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   processor cyber_script WSF_SCRIPT_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type GROUND_TARGET WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 0.1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   processor target_proc WSF_SCRIPT_PROCESSOR
+   end_processor
+end_platform_type
+
+platform blue_cyber CYBER_EFFECTOR
+   side blue
+   route
+      position 30.68n 104.08e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+platform red_target GROUND_TARGET
+   side red
+   route
+      position 30.71n 104.13e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+event_output file output/cyber_script_effect_demo.evt
+   enable CYBER_ATTACK_INITIATED
+   enable CYBER_ATTACK_SUCCEEDED
+   enable CYBER_ATTACK_FAILED
+   enable MESSAGE_TRANSMITTED
+   enable MESSAGE_RECEIVED
+end_event_output
+
+event_pipe file output/cyber_script_effect_demo.aer
+end_event_pipe
+
+end_time 120 sec

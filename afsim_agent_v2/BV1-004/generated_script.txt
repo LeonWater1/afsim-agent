@@ -1,0 +1,91 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern FIGHTER_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 db
+      azimuth_beamwidth 10 deg
+      elevation_beamwidth 10 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type FIGHTER WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 500 m/sec
+      minimum_speed 50 m/sec
+   end_mover
+   sensor radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern FIGHTER_RADAR_ANTENNA
+         power 10 kw
+         pulse_width 1.0e-6 sec
+         pulse_repetition_frequency 1000 hz
+         frequency 10000 mhz
+      end_transmitter
+      receiver
+         antenna_pattern FIGHTER_RADAR_ANTENNA
+         bandwidth 10 mhz
+      end_receiver
+   end_sensor
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
+   processor wm_ai WSF_WEAPONS_MANAGER_AI
+      track_processor_name "track_proc"
+      weapons_free true
+   end_processor
+end_platform_type
+
+weapon aim120 WSF_AIR_TO_AIR_MISSILE
+
+platform blue_1 FIGHTER
+   side blue
+   route
+      position 30.67n 104.07e altitude 3000 m msl speed 200 m/sec
+      position 30.67n 104.60e altitude 3000 m msl speed 200 m/sec
+   end_route
+   sensor radar on
+   weapon aim120 4
+end_platform
+
+platform blue_2 FIGHTER
+   side blue
+   route
+      position 30.67n 104.08e altitude 3000 m msl speed 200 m/sec
+      position 30.67n 104.61e altitude 3000 m msl speed 200 m/sec
+   end_route
+   sensor radar on
+   weapon aim120 4
+end_platform
+
+platform red_1 FIGHTER
+   side red
+   route
+      position 30.92n 104.37e altitude 3000 m msl speed 200 m/sec
+      position 30.92n 103.80e altitude 3000 m msl speed 200 m/sec
+   end_route
+   sensor radar on
+   weapon aim120 4
+end_platform
+
+platform red_2 FIGHTER
+   side red
+   route
+      position 30.92n 104.38e altitude 3000 m msl speed 200 m/sec
+      position 30.92n 103.81e altitude 3000 m msl speed 200 m/sec
+   end_route
+   sensor radar on
+   weapon aim120 4
+end_platform
+
+event_pipe
+   file output/air_to_air_2v2.aer
+end_event_pipe
+
+end_time 600 sec

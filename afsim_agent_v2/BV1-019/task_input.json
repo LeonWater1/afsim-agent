@@ -1,0 +1,23 @@
+{
+  "id": "BV1-019",
+  "difficulty": "medium",
+  "input": "基于 electronic_warfare/esm_detect_radar，生成 ESM 探测雷达辐射源场景。",
+  "covered_components": [
+    "Platform",
+    "Sensor",
+    "ElectronicWarfare"
+  ],
+  "expected_ir_focus": [
+    "sensors.esm",
+    "radar_emitter"
+  ],
+  "evaluation_focus": [
+    "ESM detection",
+    "RF emitter"
+  ],
+  "oracle_status": "source_available",
+  "source_hint": "benchmarks/benchmark_v1/demo_sources/electronic_warfare/esm_detect_radar.txt",
+  "mission_status": "PASS",
+  "source_type": "afsim_demo",
+  "demo_id": "DEMO-C021"
+}

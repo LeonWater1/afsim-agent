@@ -1,0 +1,61 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type FIRES_UNIT_TYPE WSF_PLATFORM
+   mover WSF_FIRES_MOVER
+   end_mover
+   weapon coordinated_weapon WSF_EXPLICIT_WEAPON
+      mover WSF_UNGUIDED_MOVER
+      end_mover
+      warhead WSF_SPHERICAL_LETHALITY
+         lethal_radius 100 m
+      end_warhead
+      fuse WSF_GROUND_TARGET_FUSE
+      end_fuse
+      launch_computer WSF_FIRES_LAUNCH_COMPUTER
+      end_launch_computer
+   end_weapon
+end_platform_type
+
+platform_type TARGET_TYPE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+   end_mover
+end_platform_type
+
+platform blue_fires_unit FIRES_UNIT_TYPE
+   side blue
+   route
+      position 30.65n 104.05e altitude 0 ft msl speed 0 m/sec
+   end_route
+   comm perfect WSF_COMM_TRANSCEIVER
+   end_comm
+   processor time_on_target_processor WSF_TASK_PROCESSOR
+      script_variables
+         string targetPlatformName;
+      end_script_variables
+      execute at_time 1.0 sec absolute
+         WsfPlatform target = WsfSimulation.FindPlatform("red_target");
+         WsfTrack targetTrack = target.MakeTrack();
+         targetTrack.SetAuxData("IMPACT_TIME", 300.0);
+         WsfWeaponTask task = WsfWeaponTask.Create("TIME_ON_TARGET", "coordinated_weapon");
+         task.SetQuantity(1);
+         task.SetCommDevice("perfect");
+         task.SetAssignee("blue_fires_unit");
+         AssignTask(targetTrack, task);
+      end_execute
+   end_processor
+end_platform
+
+platform red_target TARGET_TYPE
+   side red
+   route
+      position 30.70n 104.12e altitude 0 ft msl speed 0 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/time_on_target_fires.aer
+end_event_pipe
+
+end_time 600 sec

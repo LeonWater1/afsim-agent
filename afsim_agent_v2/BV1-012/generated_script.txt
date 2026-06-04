@@ -1,0 +1,54 @@
+script_interface
+   debug
+end_script_interface
+
+platform_type BRAWLER_PLATFORM WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 300 m/sec
+      minimum_speed 100 m/sec
+   end_mover
+   sensor radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      maximum_range 80 nm
+      reports_range
+      reports_bearing
+      transmitter
+         power 100 kw
+         frequency 10000 mhz
+      end_transmitter
+      receiver
+      end_receiver
+   end_sensor
+   weapon aam
+   processor thinker WSF_BRAWLER_PROCESSOR
+   end_processor
+   processor threat_proc WSF_THREAT_PROCESSOR
+   end_processor
+end_platform_type
+
+weapon aam WSF_AIR_TO_AIR_MISSILE
+end_weapon
+
+platform blue_fighter BRAWLER_PLATFORM
+   side blue
+   indestructible
+   route
+      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec
+      position 30.80n 104.20e altitude 3000 m msl speed 180 m/sec
+   end_route
+end_platform
+
+platform red_fighter BRAWLER_PLATFORM
+   side red
+   indestructible
+   route
+      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec
+      position 30.80n 104.20e altitude 3000 m msl speed 180 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/brawler_1v1_air_combat.aer
+end_event_pipe
+
+end_time 300 sec

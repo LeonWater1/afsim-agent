@@ -1,0 +1,307 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-023",
+    "source_task_id": "BV1-023"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "heatmap_coverage_demo",
+      "description": "基于 heatmap/heatmap_demo 生成的热力图覆盖场景，展示传感器覆盖热力图输出。",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "csv_event_output",
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue"
+      ],
+      "location_ids": [
+        "platform_start",
+        "coverage_zone"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_coverage_platform",
+          "role": "coverage_platform",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "coverage_platform"
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "platform_start",
+          "route_ref": "coverage_patrol",
+          "component_refs": [
+            "air_mover",
+            "radar_sensor",
+            "coverage_processor"
+          ],
+          "component_families": {
+            "mover": [
+              "air_mover"
+            ],
+            "sensor": [
+              "radar_sensor"
+            ],
+            "weapon": [],
+            "processor": [
+              "coverage_processor"
+            ],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_coverage_platform",
+              "role": "coverage_platform",
+              "platform_type_hint": "coverage_aircraft"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_coverage_platform",
+          "role": "coverage_platform",
+          "platform_type_hint": "coverage_aircraft"
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [
+        {
+          "component_id": "radar_sensor",
+          "family": "sensor",
+          "role": "coverage_sensor",
+          "type_hint": "radar_sensor",
+          "parameters": {
+            "mode": "active"
+          },
+          "grounding": {
+            "matched": true,
+            "mapping_type": "sensor",
+            "canonical_id": "radar_sensor_basic",
+            "row": {
+              "canonical_id": "radar_sensor_basic",
+              "match_labels": [
+                "radar",
+                "radar_sensor",
+                "aesa_radar",
+                "雷达",
+                "AESA雷达"
+              ],
+              "type_hints": [
+                "radar_sensor",
+                "air_intercept_radar",
+                "acquisition_radar",
+                "tracking_radar"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_RADAR_SENSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "coverage_processor",
+          "family": "processor",
+          "role": "coverage_computation",
+          "type_hint": "coverage_processor",
+          "parameters": {
+            "output_type": "heatmap"
+          },
+          "grounding": {
+            "matched": false,
+            "mapping_type": "processor",
+            "input": "coverage_computation"
+          },
+          "implementation_constraints": {},
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "coverage_processor",
+              "family": "processor",
+              "type_hint": "coverage_processor",
+              "role": "coverage_computation"
+            }
+          ]
+        }
+      ],
+      "comms": [],
+      "routes": [
+        {
+          "route_id": "coverage_patrol",
+          "kind": "patrol",
+          "waypoint_count": 2,
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "generate_coverage_heatmap",
+          "task_type": "area_coverage",
+          "grounding": {
+            "matched": false,
+            "mapping_type": "task",
+            "input": "area_coverage"
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "blue_coverage_platform"
+          ],
+          "target_refs": [],
+          "location_refs": [
+            "coverage_zone"
+          ],
+          "parameters": {
+            "coverage_metric": "detection",
+            "output_format": "heatmap"
+          },
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "generate_coverage_heatmap",
+              "task_type": "area_coverage"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "component_grounding",
+          "component_id": "coverage_processor",
+          "family": "processor",
+          "type_hint": "coverage_processor",
+          "role": "coverage_computation"
+        },
+        {
+          "kind": "task_grounding",
+          "task_id": "generate_coverage_heatmap",
+          "task_type": "area_coverage"
+        }
+      ]
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "outputs": [
+        "csv_event_output",
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": false
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_coverage_platform",
+      "role": "coverage_platform",
+      "platform_type_hint": "coverage_aircraft"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "coverage_processor",
+      "family": "processor",
+      "type_hint": "coverage_processor",
+      "role": "coverage_computation"
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "generate_coverage_heatmap",
+      "task_type": "area_coverage"
+    }
+  ],
+  "ready_for_generation": false
+}

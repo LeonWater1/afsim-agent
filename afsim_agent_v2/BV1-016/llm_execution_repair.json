@@ -1,0 +1,56 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-016.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-016_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E007",
+      "classifier": "input_parse_or_structure_error",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unknown command: router_protocol"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E007",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-016.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type GROUND_COMM_NODE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   comm ad_hoc_network WSF_COMM_NETWORK_AD_HOC\n      network_name \"ad_hoc_network\"\n   end_comm\nend_platform_type\n\nplatform blue_node_1 GROUND_COMM_NODE\n   side blue\n   heading 0 deg\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_node_2 GROUND_COMM_NODE\n   side blue\n   heading 0 deg\n   route\n      position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_node_3 GROUND_COMM_NODE\n   side blue\n   heading 0 deg\n   route\n      position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/ad_hoc_network_demo.aer\nend_event_pipe\n\nevent_output\n   enable all\n   file output/ad_hoc_network_demo.evt\nend_event_output\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-016_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

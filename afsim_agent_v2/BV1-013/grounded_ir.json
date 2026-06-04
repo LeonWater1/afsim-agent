@@ -1,0 +1,402 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "chaff_jamming_example",
+    "description": "基于 chaff/chaff_example 的箔条干扰示例场景，展示蓝方舰船在受到红方反舰导弹攻击时部署箔条干扰的过程。",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "surface",
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    },
+    {
+      "id": "red",
+      "display_name": "Red",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "blue_ship_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.50n",
+        "lon": "104.00e"
+      }
+    },
+    {
+      "id": "red_attacker_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.30n",
+        "lon": "104.50e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_attacker_end",
+      "kind": "point",
+      "position": {
+        "lat": "30.55n",
+        "lon": "104.10e",
+        "altitude": {
+          "value": 5000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "red_attack_route",
+      "kind": "intercept",
+      "waypoints": [
+        {
+          "location_ref": "red_attacker_start",
+          "speed": {
+            "value": 250,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "location_ref": "red_attacker_end",
+          "speed": {
+            "value": 250,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "mover": [
+      {
+        "id": "red_air_mover",
+        "role": "air_mover",
+        "type_hint": "fighter_aircraft_mover",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "mover",
+          "canonical_id": "air_mover_basic",
+          "row": {
+            "canonical_id": "air_mover_basic",
+            "match_labels": [
+              "air_mover",
+              "fighter_mover",
+              "aircraft_mover",
+              "空中机动"
+            ],
+            "type_hints": [
+              "air_mover"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_AIR_MOVER"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+            ]
+          }
+        }
+      },
+      {
+        "id": "blue_ship_mover",
+        "role": "surface_mover",
+        "type_hint": "ship_mover",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "mover",
+          "canonical_id": "surface_mover_basic",
+          "row": {
+            "canonical_id": "surface_mover_basic",
+            "match_labels": [
+              "surface_mover",
+              "ship_mover",
+              "水面机动"
+            ],
+            "type_hints": [
+              "surface_mover"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_GROUND_MOVER"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/ciws/platforms/ship.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "sensor": [
+      {
+        "id": "blue_ship_radar",
+        "role": "air_surveillance_radar",
+        "type_hint": "radar_sensor",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "sensor",
+          "canonical_id": "radar_sensor_basic",
+          "row": {
+            "canonical_id": "radar_sensor_basic",
+            "match_labels": [
+              "radar",
+              "radar_sensor",
+              "aesa_radar",
+              "雷达",
+              "AESA雷达"
+            ],
+            "type_hints": [
+              "radar_sensor",
+              "air_intercept_radar",
+              "acquisition_radar",
+              "tracking_radar"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_RADAR_SENSOR"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "weapon": [
+      {
+        "id": "anti_ship_missile",
+        "role": "primary_weapon",
+        "type_hint": "anti_ship_missile",
+        "grounding": {
+          "matched": false,
+          "mapping_type": "weapon",
+          "input": "primary_weapon"
+        }
+      },
+      {
+        "id": "chaff_launcher",
+        "role": "chaff_countermeasure",
+        "type_hint": "chaff",
+        "grounding": {
+          "matched": true,
+          "mapping_type": "weapon",
+          "canonical_id": "chaff_weapon_basic",
+          "row": {
+            "canonical_id": "chaff_weapon_basic",
+            "match_labels": [
+              "chaff",
+              "箔条",
+              "干扰箔条"
+            ],
+            "type_hints": [
+              "chaff_weapon"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_CHAFF_WEAPON"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/chaff/chaff_example.txt"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_ship",
+      "role": "defender",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "surface",
+      "platform_type_hint": "surface_combatant",
+      "component_refs": [
+        "blue_ship_mover",
+        "blue_ship_radar",
+        "chaff_launcher"
+      ],
+      "initial_location_ref": "blue_ship_start",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "defender"
+      }
+    },
+    {
+      "id": "red_attacker",
+      "role": "attacker",
+      "side": "red",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "fighter_bomber",
+      "component_refs": [
+        "red_air_mover",
+        "anti_ship_missile"
+      ],
+      "initial_location_ref": "red_attacker_start",
+      "route_ref": "red_attack_route",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "attacker"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "attack_ship",
+      "type": "air_attack",
+      "assignee_refs": [
+        "red_attacker"
+      ],
+      "target_refs": [
+        "blue_ship"
+      ],
+      "parameters": {
+        "weapon_ref": "anti_ship_missile"
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "task",
+        "canonical_id": "strike",
+        "row": {
+          "canonical_id": "strike",
+          "match_labels": [
+            "strike",
+            "打击",
+            "攻击"
+          ],
+          "ir_task_types": [
+            "strike",
+            "air_attack"
+          ],
+          "grounding_target": {
+            "target_kind": "behavior_bundle",
+            "target_id": "strike_behavior"
+          },
+          "script_realization": [
+            "route",
+            "processor",
+            "weapon"
+          ]
+        }
+      }
+    },
+    {
+      "id": "deploy_chaff",
+      "type": "deploy_chaff",
+      "assignee_refs": [
+        "blue_ship"
+      ],
+      "parameters": {
+        "trigger": "incoming_missile",
+        "pattern": "seduction"
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "task",
+        "input": "deploy_chaff"
+      }
+    }
+  ],
+  "all_grounded": false,
+  "unresolved_items": [
+    {
+      "kind": "component",
+      "family": "weapon",
+      "component_id": "anti_ship_missile"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_ship"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "red_attacker"
+    },
+    {
+      "kind": "task",
+      "task_id": "deploy_chaff"
+    }
+  ]
+}

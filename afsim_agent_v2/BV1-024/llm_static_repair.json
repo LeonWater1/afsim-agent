@@ -1,0 +1,2834 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_full_script",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-024.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-024.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E001",
+      "static_error_ids": [
+        "E001",
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E001",
+          "line": 96,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E001",
+          "line": 117,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E001",
+          "line": 169,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E002",
+          "line": 109,
+          "message": "end_processor closes weapon from line 101"
+        },
+        {
+          "error_id": "E002",
+          "line": 112,
+          "message": "end_comm closes network from line 111"
+        },
+        {
+          "error_id": "E002",
+          "line": 113,
+          "message": "end_platform_type closes comm from line 110"
+        },
+        {
+          "error_id": "E002",
+          "line": 164,
+          "message": "end_comm closes network from line 163"
+        },
+        {
+          "error_id": "E002",
+          "line": 165,
+          "message": "end_platform_type closes comm from line 162"
+        },
+        {
+          "error_id": "E002",
+          "line": 185,
+          "message": "end_comm closes network from line 184"
+        },
+        {
+          "error_id": "E002",
+          "line": 186,
+          "message": "end_platform_type closes comm from line 183"
+        },
+        {
+          "error_id": "E002",
+          "line": 196,
+          "message": "end_platform closes sensor from line 195"
+        },
+        {
+          "error_id": "E002",
+          "line": 206,
+          "message": "end_platform closes sensor from line 205"
+        },
+        {
+          "error_id": "E002",
+          "line": 214,
+          "message": "end_platform closes comm from line 213"
+        },
+        {
+          "error_id": "E002",
+          "line": 224,
+          "message": "end_platform closes comm from line 223"
+        },
+        {
+          "error_id": "E002",
+          "line": 232,
+          "message": "end_platform closes comm from line 231"
+        },
+        {
+          "error_id": "E002",
+          "line": 94,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 99,
+          "message": "missing end_processor"
+        },
+        {
+          "error_id": "E002",
+          "line": 115,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 167,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 188,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 198,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 208,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 216,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 221,
+          "message": "missing end_sensor"
+        },
+        {
+          "error_id": "E002",
+          "line": 222,
+          "message": "missing end_sensor"
+        },
+        {
+          "error_id": "E002",
+          "line": 226,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E007",
+          "line": 111,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 163,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 184,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 242,
+          "message": "end_time must appear at top level, not inside another block"
+        },
+        {
+          "error_id": "E007",
+          "line": 76,
+          "message": "unknown command: end_node"
+        },
+        {
+          "error_id": "E007",
+          "line": 77,
+          "message": "unknown command: end_behavior_node"
+        },
+        {
+          "error_id": "E007",
+          "line": 90,
+          "message": "unknown command: end_launcher"
+        },
+        {
+          "error_id": "E007",
+          "line": 100,
+          "message": "unknown command: weapon_table"
+        },
+        {
+          "error_id": "E007",
+          "line": 102,
+          "message": "unknown command: end_weapon_table"
+        },
+        {
+          "error_id": "E007",
+          "line": 103,
+          "message": "unknown command: scoring_factors"
+        },
+        {
+          "error_id": "E007",
+          "line": 105,
+          "message": "unknown command: end_scoring_factors"
+        },
+        {
+          "error_id": "E007",
+          "line": 106,
+          "message": "unknown command: engage_iff_permissions"
+        },
+        {
+          "error_id": "E007",
+          "line": 108,
+          "message": "unknown command: end_engage_iff_permissions"
+        },
+        {
+          "error_id": "E007",
+          "line": 181,
+          "message": "unknown command: end_launcher"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 40,
+      "auto_repairable_count": 11,
+      "manual_or_regeneration_count": 29,
+      "target_layers": [
+        "platform_layer",
+        "mission_layer",
+        "weapon_layer"
+      ],
+      "recommended_next_action": "apply_safe_repairs_then_regenerate_flagged_layers"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 94,
+        "issue": "missing end_platform_type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type IADS_COMMAND_PLATFORM WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "IADS_COMMAND_PLATFORM"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 99,
+        "issue": "missing end_processor",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   processor battle_manager WSF_UNCLASS_BM",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "battle_manager"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_processor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_processor"
+        }
+      },
+      {
+        "step_id": "SR-003",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 109,
+        "issue": "end_processor closes weapon from line 101",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   end_processor",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 112,
+        "issue": "end_comm closes network from line 111",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   end_comm",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 113,
+        "issue": "end_platform_type closes comm from line 110",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform_type",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 115,
+        "issue": "missing end_platform_type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type GROUND_RADAR_SITE WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "GROUND_RADAR_SITE"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-007",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 164,
+        "issue": "end_comm closes network from line 163",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   end_comm",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-008",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 165,
+        "issue": "end_platform_type closes comm from line 162",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform_type",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-009",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 167,
+        "issue": "missing end_platform_type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type SAM_SITE WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "SAM_SITE"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-010",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 185,
+        "issue": "end_comm closes network from line 184",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   end_comm",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-011",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 186,
+        "issue": "end_platform_type closes comm from line 183",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform_type",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-012",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 188,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform blue_strike_1 BLUE_STRIKE_AIRCRAFT",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "blue_strike_1"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-013",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 196,
+        "issue": "end_platform closes sensor from line 195",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "radar"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-014",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 198,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform blue_strike_2 BLUE_STRIKE_AIRCRAFT",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "blue_strike_2"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-015",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 206,
+        "issue": "end_platform closes sensor from line 205",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "radar"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-016",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 208,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform red_iads_commander IADS_COMMAND_PLATFORM",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_iads_commander"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-017",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 214,
+        "issue": "end_platform closes comm from line 213",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-018",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 216,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform red_radar_company GROUND_RADAR_SITE",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_radar_company"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-019",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 221,
+        "issue": "missing end_sensor",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   sensor acq_radar on",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "acq_radar"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_sensor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_sensor"
+        }
+      },
+      {
+        "step_id": "SR-020",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 222,
+        "issue": "missing end_sensor",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   sensor track_radar on",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "track_radar"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_sensor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_sensor"
+        }
+      },
+      {
+        "step_id": "SR-021",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 224,
+        "issue": "end_platform closes comm from line 223",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-022",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 226,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform red_sam_battery SAM_SITE",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_sam_battery"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-023",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 232,
+        "issue": "end_platform closes comm from line 231",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "comm",
+          "nearest_block_name": "datalink"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-024",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 96,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-025",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 117,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-026",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 169,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-027",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 76,
+        "issue": "unknown command: end_node",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "               end_node",
+          "nearest_block_kind": "parallel",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-028",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 77,
+        "issue": "unknown command: end_behavior_node",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "            end_behavior_node",
+          "nearest_block_kind": "parallel",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-029",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 90,
+        "issue": "unknown command: end_launcher",
+        "layer_scope": "weapon_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_launcher",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "agm88"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-030",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 100,
+        "issue": "unknown command: weapon_table",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      weapon_table",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "battle_manager"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-031",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 102,
+        "issue": "unknown command: end_weapon_table",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_weapon_table",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-032",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 103,
+        "issue": "unknown command: scoring_factors",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      scoring_factors",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-033",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 105,
+        "issue": "unknown command: end_scoring_factors",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_scoring_factors",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-034",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 106,
+        "issue": "unknown command: engage_iff_permissions",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      engage_iff_permissions",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-035",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 108,
+        "issue": "unknown command: end_engage_iff_permissions",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_engage_iff_permissions",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-036",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 111,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-037",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 163,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-038",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 181,
+        "issue": "unknown command: end_launcher",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_launcher",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-039",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 184,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-040",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 242,
+        "issue": "end_time must appear at top level, not inside another block",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "end_time 600 sec",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_sam_battery"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 16,
+      "applied_actions": [
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 242,
+          "replacement": "end_sensor"
+        },
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 242,
+          "replacement": "end_platform"
+        },
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 242,
+          "replacement": "end_processor"
+        },
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 242,
+          "replacement": "end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 109,
+          "replacement": "   end_weapon",
+          "reason": "cross-close: end_processor -> end_weapon (closes weapon)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 112,
+          "replacement": "   end_network",
+          "reason": "cross-close: end_comm -> end_network (closes network)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 113,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 164,
+          "replacement": "   end_network",
+          "reason": "cross-close: end_comm -> end_network (closes network)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 165,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 185,
+          "replacement": "   end_network",
+          "reason": "cross-close: end_comm -> end_network (closes network)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 186,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform_type -> end_comm (closes comm)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 196,
+          "replacement": "end_sensor",
+          "reason": "cross-close: end_platform -> end_sensor (closes sensor)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 206,
+          "replacement": "end_sensor",
+          "reason": "cross-close: end_platform -> end_sensor (closes sensor)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 214,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform -> end_comm (closes comm)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 224,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform -> end_comm (closes comm)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 232,
+          "replacement": "end_comm",
+          "reason": "cross-close: end_platform -> end_comm (closes comm)"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E001",
+        "static_error_ids": [
+          "E001",
+          "E002",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 96,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 117,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 169,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E002",
+            "line": 242,
+            "message": "end_platform_type closes platform from line 226"
+          },
+          {
+            "error_id": "E002",
+            "line": 243,
+            "message": "end_processor closes sensor from line 222"
+          },
+          {
+            "error_id": "E002",
+            "line": 244,
+            "message": "end_platform closes sensor from line 221"
+          },
+          {
+            "error_id": "E002",
+            "line": 245,
+            "message": "end_sensor closes platform from line 216"
+          },
+          {
+            "error_id": "E002",
+            "line": 94,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 99,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 115,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 167,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 188,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 198,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 208,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 246,
+            "message": "end_time must appear at top level, not inside another block"
+          },
+          {
+            "error_id": "E007",
+            "line": 76,
+            "message": "unknown command: end_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 77,
+            "message": "unknown command: end_behavior_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 90,
+            "message": "unknown command: end_launcher"
+          },
+          {
+            "error_id": "E007",
+            "line": 100,
+            "message": "unknown command: weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 102,
+            "message": "unknown command: end_weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 103,
+            "message": "unknown command: scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 105,
+            "message": "unknown command: end_scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 106,
+            "message": "unknown command: engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 108,
+            "message": "unknown command: end_engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 181,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      },
+      "improved_finding_count": 12
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-024.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 600 m/sec\n      minimum_speed 200 m/sec\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 800 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_ATG_LAUNCH_COMPUTER\n   end_processor\n   processor strike_task WSF_TASK_PROCESSOR\n      advanced_behavior_tree\n         parallel\n            behavior_node choose_tree\n               node engage\n                  target_criteria side red type ground\n                  launch_weapon agm88\n               end_node\n            end_behavior_node\n         end_parallel\n      end_advanced_behavior_tree\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n      weapon_table\n         weapon sam_weapon\n      end_weapon_table\n      scoring_factors\n         enemy_aircraft 1.0\n      end_scoring_factors\n      engage_iff_permissions\n         blue engage\n      end_engage_iff_permissions\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_sensor\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_sensor\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_comm\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\nend_comm\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_comm\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_platform_type\nend_processor\nend_platform\nend_sensor\nend_time 600 sec\n",
+    "mission_errors": "mission:\n    WSF Version: 2.9.0 02-25-2022\n    Built: Feb 25 2022 08:12:40\nPlugin API version info:\n    Version: 2.9\n    Compiler: win_1916_64bit_release-hwe\nPlugins Loaded:\n    wsf_alternate_locations.dll, wsf_coverage.dll, wsf_iads_c2.dll, wsf_prompt.dll, wsf_scenario_analyzer.dll, wsf_scenario_analyzer_iads_c2.dll, wsf_air_combat.dll, wsf_annotation.dll, wsf_argo8.dll, wsf_brawler.dll, wsf_fires.dll, wsf_multiresolution.dll, wsf_oms_uci.dll, wsf_p6dof.dll, wsf_six_dof.dll, wsf_sosm.dll\nExtensions Included: \n    sensor_plot_lib, wsf_cyber, wsf_grammar_check, wsf_l16, wsf_mil, wsf_mil_parser, wsf_mtt, wsf_nx, wsf_parser, wsf_ripr, wsf_space, wsf_weapon_server, wsf_simdis\n\nLoading simulation input.\n\nLoading simulation input complete.\n    Elapsed Wall Clock Time: 0.0613539\n    Elapsed Processor Time : 0.0625\n***** FATAL: Could not process input files.\n    ***** ERROR: Unknown command: maximum_speed\n             'C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-024\\generated_script.txt', line 23, near column 20\n\nReading of simulation input failed\n"
+  },
+  "repair_plan_after_safe_repair": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-024.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-024.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E001",
+      "static_error_ids": [
+        "E001",
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E001",
+          "line": 96,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E001",
+          "line": 117,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E001",
+          "line": 169,
+          "message": "maximum_speed must be greater than 0"
+        },
+        {
+          "error_id": "E002",
+          "line": 242,
+          "message": "end_platform_type closes platform from line 226"
+        },
+        {
+          "error_id": "E002",
+          "line": 243,
+          "message": "end_processor closes sensor from line 222"
+        },
+        {
+          "error_id": "E002",
+          "line": 244,
+          "message": "end_platform closes sensor from line 221"
+        },
+        {
+          "error_id": "E002",
+          "line": 245,
+          "message": "end_sensor closes platform from line 216"
+        },
+        {
+          "error_id": "E002",
+          "line": 94,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 99,
+          "message": "missing end_processor"
+        },
+        {
+          "error_id": "E002",
+          "line": 115,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 167,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 188,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 198,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 208,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E007",
+          "line": 111,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 163,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 184,
+          "message": "network block must declare a backing WSF_* type"
+        },
+        {
+          "error_id": "E007",
+          "line": 246,
+          "message": "end_time must appear at top level, not inside another block"
+        },
+        {
+          "error_id": "E007",
+          "line": 76,
+          "message": "unknown command: end_node"
+        },
+        {
+          "error_id": "E007",
+          "line": 77,
+          "message": "unknown command: end_behavior_node"
+        },
+        {
+          "error_id": "E007",
+          "line": 90,
+          "message": "unknown command: end_launcher"
+        },
+        {
+          "error_id": "E007",
+          "line": 100,
+          "message": "unknown command: weapon_table"
+        },
+        {
+          "error_id": "E007",
+          "line": 102,
+          "message": "unknown command: end_weapon_table"
+        },
+        {
+          "error_id": "E007",
+          "line": 103,
+          "message": "unknown command: scoring_factors"
+        },
+        {
+          "error_id": "E007",
+          "line": 105,
+          "message": "unknown command: end_scoring_factors"
+        },
+        {
+          "error_id": "E007",
+          "line": 106,
+          "message": "unknown command: engage_iff_permissions"
+        },
+        {
+          "error_id": "E007",
+          "line": 108,
+          "message": "unknown command: end_engage_iff_permissions"
+        },
+        {
+          "error_id": "E007",
+          "line": 181,
+          "message": "unknown command: end_launcher"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 28,
+      "auto_repairable_count": 7,
+      "manual_or_regeneration_count": 21,
+      "target_layers": [
+        "platform_layer",
+        "mission_layer",
+        "weapon_layer"
+      ],
+      "recommended_next_action": "apply_safe_repairs_then_regenerate_flagged_layers"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 94,
+        "issue": "missing end_platform_type",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type IADS_COMMAND_PLATFORM WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "IADS_COMMAND_PLATFORM"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-002",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 99,
+        "issue": "missing end_processor",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "   processor battle_manager WSF_UNCLASS_BM",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "battle_manager"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_processor`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_processor"
+        }
+      },
+      {
+        "step_id": "SR-003",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 115,
+        "issue": "missing end_platform_type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type GROUND_RADAR_SITE WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "GROUND_RADAR_SITE"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 167,
+        "issue": "missing end_platform_type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform_type SAM_SITE WSF_PLATFORM",
+          "nearest_block_kind": "platform_type",
+          "nearest_block_name": "SAM_SITE"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform_type`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform_type"
+        }
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 188,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform blue_strike_1 BLUE_STRIKE_AIRCRAFT",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "blue_strike_1"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 198,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform blue_strike_2 BLUE_STRIKE_AIRCRAFT",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "blue_strike_2"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-007",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 208,
+        "issue": "missing end_platform",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "platform red_iads_commander IADS_COMMAND_PLATFORM",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_iads_commander"
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "append missing closing tag `end_platform`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 246,
+          "replacement": "end_platform"
+        }
+      },
+      {
+        "step_id": "SR-008",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 242,
+        "issue": "end_platform_type closes platform from line 226",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform_type",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_sam_battery"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-009",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 243,
+        "issue": "end_processor closes sensor from line 222",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_processor",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "track_radar"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-010",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 244,
+        "issue": "end_platform closes sensor from line 221",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_platform",
+          "nearest_block_kind": "sensor",
+          "nearest_block_name": "acq_radar"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-011",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 245,
+        "issue": "end_sensor closes platform from line 216",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+        "evidence": {
+          "line_text": "end_sensor",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_radar_company"
+        },
+        "repair_mode": "manual_block_stack_repair",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "repair block nesting first, then rerun static verification",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-012",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 96,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "platform_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-013",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 117,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-014",
+        "priority": 20,
+        "error_id": "E001",
+        "line": 169,
+        "issue": "maximum_speed must be greater than 0",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Fill unit from IR; if absent, use component default unit and mark repair_assumed_unit.",
+        "evidence": {
+          "line_text": "      maximum_speed 0 m/sec",
+          "nearest_block_kind": "mover",
+          "nearest_block_name": "WSF_GROUND_MOVER"
+        },
+        "repair_mode": "regenerate_from_ir",
+        "auto_repairable": false,
+        "needs_ir_context": true,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the numeric command from IR or a verified demo template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-015",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 76,
+        "issue": "unknown command: end_node",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "               end_node",
+          "nearest_block_kind": "parallel",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-016",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 77,
+        "issue": "unknown command: end_behavior_node",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "            end_behavior_node",
+          "nearest_block_kind": "parallel",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-017",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 90,
+        "issue": "unknown command: end_launcher",
+        "layer_scope": "weapon_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_launcher",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "agm88"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-018",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 100,
+        "issue": "unknown command: weapon_table",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      weapon_table",
+          "nearest_block_kind": "processor",
+          "nearest_block_name": "battle_manager"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-019",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 102,
+        "issue": "unknown command: end_weapon_table",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_weapon_table",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-020",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 103,
+        "issue": "unknown command: scoring_factors",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      scoring_factors",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-021",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 105,
+        "issue": "unknown command: end_scoring_factors",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_scoring_factors",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-022",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 106,
+        "issue": "unknown command: engage_iff_permissions",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      engage_iff_permissions",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-023",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 108,
+        "issue": "unknown command: end_engage_iff_permissions",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_engage_iff_permissions",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-024",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 111,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-025",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 163,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-026",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 181,
+        "issue": "unknown command: end_launcher",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      end_launcher",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "sam_weapon"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-027",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 184,
+        "issue": "network block must declare a backing WSF_* type",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "      network iads_net",
+          "nearest_block_kind": "network",
+          "nearest_block_name": "iads_net"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-028",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 246,
+        "issue": "end_time must appear at top level, not inside another block",
+        "layer_scope": "mission_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "end_time 600 sec",
+          "nearest_block_kind": "platform",
+          "nearest_block_name": "red_iads_commander"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 7,
+      "applied_actions": [
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 246,
+          "replacement": "end_platform"
+        },
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 246,
+          "replacement": "end_processor"
+        },
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 246,
+          "replacement": "end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 242,
+          "replacement": "end_platform",
+          "reason": "cross-close: end_platform_type -> end_platform (closes platform)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 243,
+          "replacement": "end_sensor",
+          "reason": "cross-close: end_processor -> end_sensor (closes sensor)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 244,
+          "replacement": "end_sensor",
+          "reason": "cross-close: end_platform -> end_sensor (closes sensor)"
+        },
+        {
+          "error_id": "E002",
+          "action": "replace_line",
+          "target_line": 245,
+          "replacement": "end_platform",
+          "reason": "cross-close: end_sensor -> end_platform (closes platform)"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E001",
+        "static_error_ids": [
+          "E001",
+          "E002",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 96,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 117,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 169,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E002",
+            "line": 246,
+            "message": "end_platform_type closes platform from line 208"
+          },
+          {
+            "error_id": "E002",
+            "line": 247,
+            "message": "end_processor closes platform from line 198"
+          },
+          {
+            "error_id": "E002",
+            "line": 94,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 99,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 115,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 167,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 249,
+            "message": "end_time must appear at top level, not inside another block"
+          },
+          {
+            "error_id": "E007",
+            "line": 76,
+            "message": "unknown command: end_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 77,
+            "message": "unknown command: end_behavior_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 90,
+            "message": "unknown command: end_launcher"
+          },
+          {
+            "error_id": "E007",
+            "line": 100,
+            "message": "unknown command: weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 102,
+            "message": "unknown command: end_weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 103,
+            "message": "unknown command: scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 105,
+            "message": "unknown command: end_scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 106,
+            "message": "unknown command: engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 108,
+            "message": "unknown command: end_engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 181,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      },
+      "improved_finding_count": 5
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-024.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 600 m/sec\n      minimum_speed 200 m/sec\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 800 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_ATG_LAUNCH_COMPUTER\n   end_processor\n   processor strike_task WSF_TASK_PROCESSOR\n      advanced_behavior_tree\n         parallel\n            behavior_node choose_tree\n               node engage\n                  target_criteria side red type ground\n                  launch_weapon agm88\n               end_node\n            end_behavior_node\n         end_parallel\n      end_advanced_behavior_tree\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n      weapon_table\n         weapon sam_weapon\n      end_weapon_table\n      scoring_factors\n         enemy_aircraft 1.0\n      end_scoring_factors\n      engage_iff_permissions\n         blue engage\n      end_engage_iff_permissions\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n      launcher launcher_1\n      end_launcher\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net\n   end_network\nend_comm\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_sensor\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_sensor\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_comm\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\nend_comm\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_comm\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_platform\nend_sensor\nend_sensor\nend_platform\nend_platform_type\nend_processor\nend_platform\nend_time 600 sec\n"
+  },
+  "layer_regeneration_attempt": {
+    "attempted": true,
+    "model": "deepseek-v4-pro",
+    "target_count": 8,
+    "targets": [
+      {
+        "start_line": 69,
+        "end_line": 80,
+        "kind": "processor",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 76,
+            "message": "unknown command: end_node"
+          },
+          {
+            "error_id": "E007",
+            "line": 77,
+            "message": "unknown command: end_behavior_node"
+          }
+        ]
+      },
+      {
+        "start_line": 81,
+        "end_line": 91,
+        "kind": "weapon",
+        "layer_scope": "weapon_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 90,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      },
+      {
+        "start_line": 94,
+        "end_line": 246,
+        "kind": "platform_type",
+        "layer_scope": "platform_layer",
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 96,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 117,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 169,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E002",
+            "line": 242,
+            "message": "end_platform_type closes platform from line 226"
+          },
+          {
+            "error_id": "E002",
+            "line": 243,
+            "message": "end_processor closes sensor from line 222"
+          },
+          {
+            "error_id": "E002",
+            "line": 244,
+            "message": "end_platform closes sensor from line 221"
+          },
+          {
+            "error_id": "E002",
+            "line": 245,
+            "message": "end_sensor closes platform from line 216"
+          },
+          {
+            "error_id": "E002",
+            "line": 94,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 99,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 115,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 167,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 188,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 198,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 208,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 246,
+            "message": "end_time must appear at top level, not inside another block"
+          },
+          {
+            "error_id": "E007",
+            "line": 100,
+            "message": "unknown command: weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 102,
+            "message": "unknown command: end_weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 103,
+            "message": "unknown command: scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 105,
+            "message": "unknown command: end_scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 106,
+            "message": "unknown command: engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 108,
+            "message": "unknown command: end_engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 181,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      },
+      {
+        "start_line": 95,
+        "end_line": 98,
+        "kind": "mover",
+        "layer_scope": "platform_layer",
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 96,
+            "message": "maximum_speed must be greater than 0"
+          }
+        ]
+      },
+      {
+        "start_line": 99,
+        "end_line": 246,
+        "kind": "processor",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E001",
+            "line": 117,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E001",
+            "line": 169,
+            "message": "maximum_speed must be greater than 0"
+          },
+          {
+            "error_id": "E002",
+            "line": 242,
+            "message": "end_platform_type closes platform from line 226"
+          },
+          {
+            "error_id": "E002",
+            "line": 243,
+            "message": "end_processor closes sensor from line 222"
+          },
+          {
+            "error_id": "E002",
+            "line": 244,
+            "message": "end_platform closes sensor from line 221"
+          },
+          {
+            "error_id": "E002",
+            "line": 245,
+            "message": "end_sensor closes platform from line 216"
+          },
+          {
+            "error_id": "E002",
+            "line": 99,
+            "message": "missing end_processor"
+          },
+          {
+            "error_id": "E002",
+            "line": 115,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 167,
+            "message": "missing end_platform_type"
+          },
+          {
+            "error_id": "E002",
+            "line": 188,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 198,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E002",
+            "line": 208,
+            "message": "missing end_platform"
+          },
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          },
+          {
+            "error_id": "E007",
+            "line": 246,
+            "message": "end_time must appear at top level, not inside another block"
+          },
+          {
+            "error_id": "E007",
+            "line": 100,
+            "message": "unknown command: weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 102,
+            "message": "unknown command: end_weapon_table"
+          },
+          {
+            "error_id": "E007",
+            "line": 103,
+            "message": "unknown command: scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 105,
+            "message": "unknown command: end_scoring_factors"
+          },
+          {
+            "error_id": "E007",
+            "line": 106,
+            "message": "unknown command: engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 108,
+            "message": "unknown command: end_engage_iff_permissions"
+          },
+          {
+            "error_id": "E007",
+            "line": 181,
+            "message": "unknown command: end_launcher"
+          }
+        ]
+      },
+      {
+        "start_line": 110,
+        "end_line": 113,
+        "kind": "comm",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 111,
+            "message": "network block must declare a backing WSF_* type"
+          }
+        ]
+      },
+      {
+        "start_line": 162,
+        "end_line": 165,
+        "kind": "comm",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 163,
+            "message": "network block must declare a backing WSF_* type"
+          }
+        ]
+      },
+      {
+        "start_line": 183,
+        "end_line": 186,
+        "kind": "comm",
+        "layer_scope": "mission_layer",
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 184,
+            "message": "network block must declare a backing WSF_* type"
+          }
+        ]
+      }
+    ],
+    "replacement_count": 3,
+    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 69,\n      \"end_line\": 80,\n      \"text\": \"   processor strike_task WSF_TASK_PROCESSOR\\n   end_processor\"\n    },\n    {\n      \"start_line\": 81,\n      \"end_line\": 91,\n      \"text\": \"   weapon agm88 WSF_EXPLICIT_WEAPON\\n      weapon_effects\\n         casualty_range 20 m\\n      end_weapon_effects\\n      spawned_platform_type AGM88_MISSILE\\n      quantity 2\\n      firing_delay 1 sec\\n      salvo_interval 0.5 sec\\n      launcher launcher_1\\n   end_weapon\"\n    },\n    {\n      \"start_line\": 94,\n      \"end_line\": 246,\n      \"text\": \"platform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\\n   mover WSF_GROUND_MOVER\\n      maximum_speed 0.1 m/sec\\n      minimum_speed 0 m/sec\\n   end_mover\\n   processor battle_manager WSF_UNCLASS_BM\\n   end_processor\\n   comm datalink WSF_COMM_TRANSCEIVER\\n      network iads_net WSF_COMM_NETWORK_AD_HOC\\n   end_network\\n   end_comm\\nend_platform_type\\n\\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\\n   mover WSF_GROUND_MOVER\\n      maximum_speed 0.1 m/sec\\n      minimum_speed 0 m/sec\\n   end_mover\\n   sensor acq_radar WSF_RADAR_SENSOR\\n      frame_time 2 sec\\n      maximum_range 100 nm\\n      minimum_range 0 nm\\n      ",
+    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 600 m/sec\n      minimum_speed 200 m/sec\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n      maximum_speed 800 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 100 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_ATG_LAUNCH_COMPUTER\n   end_processor\n   processor strike_task WSF_TASK_PROCESSOR\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n      launcher launcher_1\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net WSF_COMM_NETWORK_AD_HOC\n   end_network\n   end_comm\nend_platform_type\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net WSF_COMM_NETWORK_AD_HOC\n   end_network\n   end_comm\nend_platform_type\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 0.1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n      launcher launcher_1\n   end_weapon\n   comm datalink WSF_COMM_TRANSCEIVER\n      network iads_net WSF_COMM_NETWORK_AD_HOC\n   end_network\n   end_comm\nend_platform_type\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\n   end_sensor\nend_platform\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\n   end_sensor\nend_platform\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\n   end_comm\nend_platform\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\n   end_comm\nend_platform\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\n   end_comm\nend_platform\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_time 600 sec\n",
+    "static_analysis": {
+      "script": "BV1-024_layer_regeneration",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 210,
+          "message": "end_platform closes sensor from line 207"
+        },
+        {
+          "error_id": "E002",
+          "line": 201,
+          "message": "missing end_platform"
+        },
+        {
+          "error_id": "E002",
+          "line": 206,
+          "message": "missing end_sensor"
+        },
+        {
+          "error_id": "E007",
+          "line": 229,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
+    }
+  },
+  "full_script_fallback_used": true,
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern STRIKE_RADAR_ANT\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 5 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nantenna_pattern RED_RADAR_ANT\n   constant_pattern\n      peak_gain 35 dB\n      azimuth_beamwidth 2 deg\n      elevation_beamwidth 5 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type AGM88_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n   end_mover\n   processor fuse WSF_GROUND_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type SAM_MISSILE WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n   end_mover\n   processor fuse WSF_AIR_TARGET_FUSE\n   end_processor\n   processor seeker WSF_PERFECT_TRACKER\n   end_processor\nend_platform_type\n\nplatform_type BLUE_STRIKE_AIRCRAFT WSF_PLATFORM\n   mover WSF_AIR_MOVER\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 1 sec\n      maximum_range 60 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern STRIKE_RADAR_ANT\n         power 20 kw\n         pulse_width 1e-6 sec\n         pulse_repetition_frequency 2000 hz\n         frequency 10000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern STRIKE_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor agm_launch WSF_ATG_LAUNCH_COMPUTER\n   end_processor\n   weapon agm88 WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 20 m\n      end_weapon_effects\n      spawned_platform_type AGM88_MISSILE\n      quantity 2\n      firing_delay 1 sec\n      salvo_interval 0.5 sec\n   end_weapon\nend_platform_type\n\nplatform_type IADS_COMMAND_PLATFORM WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   processor battle_manager WSF_UNCLASS_BM\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform_type GROUND_RADAR_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   sensor acq_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      maximum_range 100 nm\n      minimum_range 0 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 100 kw\n         pulse_width 5e-6 sec\n         pulse_repetition_frequency 300 hz\n         frequency 3000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 5 mhz\n      end_receiver\n   end_sensor\n   sensor track_radar WSF_RADAR_SENSOR\n      frame_time 0.5 sec\n      maximum_range 50 nm\n      minimum_range 0.5 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern RED_RADAR_ANT\n         power 50 kw\n         pulse_width 2e-6 sec\n         pulse_repetition_frequency 1000 hz\n         frequency 9000 mhz\n      end_transmitter\n      receiver\n         antenna_pattern RED_RADAR_ANT\n         bandwidth 10 mhz\n      end_receiver\n   end_sensor\n   processor track_processor WSF_TRACK_PROCESSOR\n   end_processor\n   processor sensor_manager WSF_TASK_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform_type SAM_SITE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\n   weapon sam_weapon WSF_EXPLICIT_WEAPON\n      weapon_effects\n         casualty_range 50 m\n      end_weapon_effects\n      spawned_platform_type SAM_MISSILE\n      quantity 4\n      firing_delay 2 sec\n      salvo_interval 1 sec\n   end_weapon\n   processor sam_manager WSF_WEAPONS_MANAGER_SAM\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_strike_1 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform blue_strike_2 BLUE_STRIKE_AIRCRAFT\n   side blue\n   route\n      position 30.50n 103.90e altitude 3000 m msl speed 180 m/sec\n      position 30.78n 104.20e altitude 5000 m msl speed 250 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor radar on\nend_platform\n\nplatform red_iads_commander IADS_COMMAND_PLATFORM\n   side red\n   route\n      position 30.80n 104.25e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nplatform red_radar_company GROUND_RADAR_SITE\n   side red\n   route\n      position 30.84n 104.29e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor acq_radar on\n   sensor track_radar on\n   comm datalink on\nend_platform\n\nplatform red_sam_battery SAM_SITE\n   side red\n   route\n      position 30.86n 104.31e altitude 0 m msl speed 0 m/sec\n   end_route\n   comm datalink on\nend_platform\n\nevent_pipe\n   file output/iads_strike.aer\nend_event_pipe\n\nevent_output\n   file output/iads_strike.evt\nend_event_output\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-024_static_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 158,
+        "message": "end_platform closes sensor from line 157"
+      },
+      {
+        "error_id": "E002",
+        "line": 168,
+        "message": "end_platform closes sensor from line 167"
+      },
+      {
+        "error_id": "E002",
+        "line": 176,
+        "message": "end_platform closes comm from line 175"
+      },
+      {
+        "error_id": "E002",
+        "line": 186,
+        "message": "end_platform closes comm from line 185"
+      },
+      {
+        "error_id": "E002",
+        "line": 194,
+        "message": "end_platform closes comm from line 193"
+      },
+      {
+        "error_id": "E002",
+        "line": 150,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 160,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 170,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 178,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 183,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 184,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 188,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E007",
+        "line": 204,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  }
+}

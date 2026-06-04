@@ -1,0 +1,55 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-002.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-002_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E005",
+      "classifier": "ungrounded_component_type",
+      "route": "return_to_grounding",
+      "inferred_stage": "grounding",
+      "suggested_action": "replace the unresolved mover, weapon, or component type with a verified grounded target",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Could not find mover WSF_STATIONARY_MOVER"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E005",
+      "route": "return_to_grounding",
+      "inferred_stage": "grounding",
+      "suggested_action": "replace the unresolved mover, weapon, or component type with a verified grounded target"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "refresh grounding outputs before regenerating the affected block or layer"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-002.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nacoustic_signature ACOUSTIC_SIGNATURE # MADE UP NUMBERS\n   data_reference_range 10 feet\n   state default\n   spectrum_data\n        freq    31.5 hz   noise_pressure 20.3 dB_20uPa\n        freq    40.0 hz   noise_pressure 20.3 dB_20uPa\n        freq    50.0 hz   noise_pressure 20.3 dB_20uPa\n        freq    63.0 hz   noise_pressure 20.3 dB_20uPa\n        freq    80.0 hz   noise_pressure 20.3 dB_20uPa\n        freq    100.0 hz  noise_pressure 20.3 dB_20uPa\n        freq    200.0 hz  noise_pressure 20.3 dB_20uPa\n        freq    400.0 hz  noise_pressure 20.3 dB_20uPa\n        freq    800.0 hz  noise_pressure 20.3 dB_20uPa\n        freq    900.0 hz  noise_pressure 20.3 dB_20uPa\n        freq   1000.0 hz  noise_pressure 20.3 dB_20uPa\n        freq   2000.0 hz  noise_pressure 78.3 dB_20uPa\n        freq   2500.0 hz  noise_pressure 30.3 dB_20uPa\n        freq   3000.0 hz  noise_pressure 20.3 dB_20uPa\n        freq   4000.0 hz  noise_pressure 20.3 dB_20uPa\n        freq   5000.0 hz  noise_pressure 20.3 dB_20uPa\n        freq   6000.0 hz  noise_pressure 20.3 dB_20uPa\n   end_spectrum_data\nend_acoustic_signature\n\nplatform_type ACOUSTIC_SENSOR_PLATFORM WSF_PLATFORM\n   mover WSF_STRAIGHT_LINE_MOVER\n   end_mover\n   sensor acoustic_sensor WSF_ACOUSTIC_SENSOR\n      acoustic_type human\n      frame_time 1 sec\n      scan_mode both\n      azimuth_scan_limits -180 deg 180 deg\n      elevation_scan_limits 0 deg 90 deg\n      detection_threshold 0.0\n      hits_to_establish_track 2 3\n      hits_to_maintain_track 1 2\n   end_sensor\nend_platform_type\n\nplatform_type ACOUSTIC_TARGET WSF_PLATFORM\n   icon c-130\n   mover WSF_AIR_MOVER\n   end_mover\n   acoustic_signature ACOUSTIC_SIGNATURE\nend_platform_type\n\nplatform blue_sensor_unit ACOUSTIC_SENSOR_PLATFORM\n   side blue\n   route\n      position 30.67n 104.07e altitude -50 m msl speed 0 m/sec\n   end_route\n   sensor acoustic_sensor\n      on\n   end_sensor\nend_platform\n\nplatform red_target_unit ACOUSTIC_TARGET\n   side red\n   route\n      position 30.69n 104.11e altitude -40 m msl speed 5 m/sec\n      position 30.75n 104.15e altitude -45 m msl speed 5 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/acoustic_demo.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-002_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

@@ -1,0 +1,84 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern FIGHTER_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type FIGHTER WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 300 m/sec
+      minimum_speed 100 m/sec
+   end_mover
+
+   sensor radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern FIGHTER_RADAR_ANTENNA
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern FIGHTER_RADAR_ANTENNA
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+
+
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform blue_fighter1 FIGHTER
+   side blue
+   heading 45 deg
+   route
+      position 30.67n 104.07e altitude 3000 m msl speed 200 m/sec
+      position 30.92n 104.37e altitude 3000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+platform blue_fighter2 FIGHTER
+   side blue
+   heading 45 deg
+   route
+      position 30.67n 104.07e altitude 3000 m msl speed 200 m/sec
+      position 30.92n 104.37e altitude 3000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+platform red_fighter1 FIGHTER
+   side red
+   heading 225 deg
+   route
+      position 30.92n 104.37e altitude 3000 m msl speed 200 m/sec
+      position 30.67n 104.07e altitude 3000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+platform red_fighter2 FIGHTER
+   side red
+   heading 225 deg
+   route
+      position 30.92n 104.37e altitude 3000 m msl speed 200 m/sec
+      position 30.67n 104.07e altitude 3000 m msl speed 200 m/sec
+   end_route
+end_platform
+
+event_pipe
+   file output/air_to_air_2v2.aer
+end_event_pipe
+
+end_time 300 sec

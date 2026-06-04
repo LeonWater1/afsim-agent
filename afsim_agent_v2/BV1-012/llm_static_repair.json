@@ -1,0 +1,103 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "static_repair_safe_direct_edit",
+  "repair_plan": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-012.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-012.txt",
+      "syntax_correct": true,
+      "static_pass": false,
+      "primary_error": "E006",
+      "static_error_ids": [
+        "E006"
+      ],
+      "findings": [
+        {
+          "error_id": "E006",
+          "line": 0,
+          "message": "missing end_time"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 1,
+      "auto_repairable_count": 1,
+      "manual_or_regeneration_count": 0,
+      "target_layers": [
+        "scenario_assembly"
+      ],
+      "recommended_next_action": "apply_safe_repairs_then_revalidate"
+    },
+    "repair_steps": [
+      {
+        "step_id": "SR-001",
+        "priority": 30,
+        "error_id": "E006",
+        "line": 0,
+        "issue": "missing end_time",
+        "layer_scope": "scenario_assembly",
+        "default_severity": "blocking",
+        "repair_hint": "Fill minimal required fields from IR or nearest demo template; route semantic gaps back to IR repair.",
+        "evidence": {
+          "line_text": "",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "insert top-level `end_time 300 sec` from IR or generation plan",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 2,
+          "replacement": "end_time 300 sec"
+        }
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 1,
+      "applied_actions": [
+        {
+          "error_id": "E006",
+          "action": "append_line",
+          "target_line": 2,
+          "replacement": "end_time 300 sec"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      },
+      "improved_finding_count": 1
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-012.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "\nend_time 300 sec\n"
+  },
+  "repair_plan_after_safe_repair": null,
+  "layer_regeneration_attempt": null,
+  "full_script_fallback_used": false,
+  "repaired_text": "\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

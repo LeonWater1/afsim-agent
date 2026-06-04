@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-AFSIM Mission Executor
+Shared Utility: mission.exe Runner
+
+Used by Task-002, Task-004, Task-005, Task-014, and Task-015.
+
 Wrapper script to execute AFSIM mission.exe with proper error handling and output capture.
 Reads configuration from config.txt for AFSIM installation directory.
 """
@@ -117,7 +120,8 @@ def run_mission(script_file, options=None, config=None):
             text=True,
             encoding="utf-8",
             errors="replace",
-            cwd=os.path.dirname(script_file) or "."
+            cwd=os.path.dirname(script_file) or ".",
+            timeout=60,
         )
 
         # Print output

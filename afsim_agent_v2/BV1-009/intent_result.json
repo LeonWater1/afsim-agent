@@ -1,0 +1,212 @@
+{
+  "version": "llm_intent_parser_v1",
+  "task_id": "BV1-009",
+  "parser_mode": "llm_schema_retry",
+  "supported": true,
+  "input": "基于 ballistic_missile_shootdown/ballistic_shootdown，生成弹道导弹拦截场景。",
+  "few_shot_example_count": 3,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"ballistic_missile_shootdown\",\n    \"description\": \"弹道导弹拦截场景，基于ballistic_shootdown示例。\",\n    \"duration\": {\n      \"value\": 300,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\",\n      \"ground\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"defender_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.60n\",\n        \"lon\": \"104.00e\"\n      }\n    },\n    {\n      \"id\": \"target_launch\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.90n\",\n        \"lon\": \"104.40e\"\n      }\n    },\n    {\n      \"id\": \"target_impact\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.60n\",\n        \"lon\": \"104.20e\"\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"target_route\",\n      \"kind\": \"transit\",\n      \"waypoints\": [\n        {\n          \"location_ref\": \"target_launch\",\n          \"speed\": {\n            \"value\": 1500,\n            \"unit\": \"m/sec\"\n          }\n        },\n        {\n          \"location_ref\": \"target_impac",
+      "validation": {
+        "ok": true,
+        "error_count": 0,
+        "errors": []
+      }
+    }
+  ],
+  "ir": {
+    "schema_version": "afsim_ir_v1",
+    "scenario": {
+      "name": "ballistic_missile_shootdown",
+      "description": "弹道导弹拦截场景，基于ballistic_shootdown示例。",
+      "duration": {
+        "value": 300,
+        "unit": "sec"
+      },
+      "domains": [
+        "air",
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe"
+      ]
+    },
+    "sides": [
+      {
+        "id": "blue",
+        "display_name": "Blue"
+      },
+      {
+        "id": "red",
+        "display_name": "Red"
+      }
+    ],
+    "locations": [
+      {
+        "id": "defender_site",
+        "kind": "point",
+        "position": {
+          "lat": "30.60n",
+          "lon": "104.00e"
+        }
+      },
+      {
+        "id": "target_launch",
+        "kind": "point",
+        "position": {
+          "lat": "30.90n",
+          "lon": "104.40e"
+        }
+      },
+      {
+        "id": "target_impact",
+        "kind": "point",
+        "position": {
+          "lat": "30.60n",
+          "lon": "104.20e"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "target_route",
+        "kind": "transit",
+        "waypoints": [
+          {
+            "location_ref": "target_launch",
+            "speed": {
+              "value": 1500,
+              "unit": "m/sec"
+            }
+          },
+          {
+            "location_ref": "target_impact",
+            "speed": {
+              "value": 1500,
+              "unit": "m/sec"
+            }
+          }
+        ]
+      }
+    ],
+    "components": {
+      "movers": [
+        {
+          "id": "defender_mover",
+          "role": "ground_defender_mover",
+          "type_hint": "stationary_or_ground_mover"
+        },
+        {
+          "id": "target_mover",
+          "role": "ballistic_mover",
+          "type_hint": "ballistic_missile_mover"
+        }
+      ],
+      "sensors": [
+        {
+          "id": "defender_sensor",
+          "role": "fire_control_radar",
+          "type_hint": "tracking_radar",
+          "parameters": {
+            "mode": "active"
+          }
+        }
+      ],
+      "weapons": [
+        {
+          "id": "defender_weapon",
+          "role": "interceptor",
+          "type_hint": "interceptor_missile"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "defender_unit",
+        "role": "defender",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "air_defense_system",
+        "component_refs": [
+          "defender_mover",
+          "defender_sensor",
+          "defender_weapon"
+        ],
+        "initial_location_ref": "defender_site"
+      },
+      {
+        "id": "target_missile",
+        "role": "ballistic_target",
+        "side": "red",
+        "quantity": 1,
+        "domain": "air",
+        "platform_type_hint": "ballistic_missile",
+        "component_refs": [
+          "target_mover"
+        ],
+        "initial_location_ref": "target_launch",
+        "route_ref": "target_route"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "detect_target",
+        "type": "detect",
+        "assignee_refs": [
+          "defender_unit"
+        ],
+        "target_refs": [
+          "target_missile"
+        ]
+      },
+      {
+        "id": "intercept_target",
+        "type": "intercept",
+        "assignee_refs": [
+          "defender_unit"
+        ],
+        "target_refs": [
+          "target_missile"
+        ],
+        "parameters": {
+          "engagement_mode": "terminal"
+        }
+      }
+    ],
+    "constraints": {
+      "unit_system": "afsim_mixed",
+      "coordinate_format": "lat_lon_dir",
+      "required_fields": [
+        "entities.quantity",
+        "entities.side",
+        "routes",
+        "tasks"
+      ]
+    },
+    "expected_events": [
+      {
+        "id": "target_detected",
+        "type": "detection",
+        "actor_refs": [
+          "defender_unit",
+          "target_missile"
+        ],
+        "success_condition": "Defender radar detects the incoming ballistic missile."
+      },
+      {
+        "id": "target_intercepted",
+        "type": "intercept",
+        "actor_refs": [
+          "defender_unit",
+          "target_missile"
+        ],
+        "success_condition": "Interceptor missile destroys the ballistic target before impact."
+      }
+    ]
+  }
+}

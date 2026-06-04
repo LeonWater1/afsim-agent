@@ -1,0 +1,52 @@
+# Generated scaffold for minimal_acoustic_demo
+script_interface
+   debug
+end_script_interface
+
+sensor PASSIVE_SONAR_BASE WSF_ACOUSTIC_SENSOR
+   on
+   frame_time 1 sec
+   scan_mode both
+   reports_bearing
+   reports_elevation
+   reports_signal_to_noise
+end_sensor
+
+platform_type BLUE_SHIP_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 60 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor passive_sonar PASSIVE_SONAR_BASE end_sensor
+end_platform_type
+
+platform_type RED_SUB_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 60 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+platform blue_ship BLUE_SHIP_TYPE
+   side blue
+   route
+      position 30.0n 120.0e speed 20 knots
+   end_route
+   sensor passive_sonar
+      on
+   end_sensor
+end_platform
+
+platform red_sub RED_SUB_TYPE
+   side red
+   route
+      position 30.5n 120.0e speed 20 knots
+   end_route
+end_platform
+
+event_pipe
+   file output/minimal_acoustic_demo.aer
+end_event_pipe
+
+end_time 600 sec
+end_platform_type

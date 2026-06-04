@@ -1,0 +1,247 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n\n      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)\n         string weaponName = aPlatform.WeaponEntry(0).Name();\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(aPlatform.Name());\n         AssignTask(aTrack, task);\n      end_script\n\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);\n         PLATFORM.SetCurrentTarget(targetTrack);\n         WsfPlatform arty = WsfSimulation.FindPlatform(\"blue_artillery_battery\");\n         if (arty.IsValid())\n            SetTask(arty, targetTrack);\n         endif\n         WsfPlatform missile = WsfSimulation.FindPlatform(\"blue_missile_launcher\");\n         if (missile.IsValid())\n            SetTask(missile, targetTrack);\n         endif\n      end_execute\n\n      script void on_task_complete(WsfTask aTask)\n         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");\n      end_scrip",
+      "static_analysis": {
+        "script": "BV1-022",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E004",
+        "static_error_ids": [
+          "E004",
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E004",
+            "line": 111,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 118,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 127,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 136,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E007",
+            "line": 55,
+            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+          },
+          {
+            "error_id": "E007",
+            "line": 81,
+            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+          },
+          {
+            "error_id": "E007",
+            "line": 21,
+            "message": "unknown command: task.SetQuantity(1);"
+          },
+          {
+            "error_id": "E007",
+            "line": 22,
+            "message": "unknown command: task.SetCommDevice(\"perfect\");"
+          },
+          {
+            "error_id": "E007",
+            "line": 23,
+            "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+          },
+          {
+            "error_id": "E007",
+            "line": 24,
+            "message": "unknown command: AssignTask(aTrack,"
+          },
+          {
+            "error_id": "E007",
+            "line": 30,
+            "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+          },
+          {
+            "error_id": "E007",
+            "line": 31,
+            "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
+          },
+          {
+            "error_id": "E007",
+            "line": 34,
+            "message": "unknown command: SetTask(arty,"
+          },
+          {
+            "error_id": "E007",
+            "line": 35,
+            "message": "unknown command: endif"
+          },
+          {
+            "error_id": "E007",
+            "line": 38,
+            "message": "unknown command: SetTask(missile,"
+          },
+          {
+            "error_id": "E007",
+            "line": 39,
+            "message": "unknown command: endif"
+          },
+          {
+            "error_id": "E007",
+            "line": 43,
+            "message": "unknown command: writeln(\"Task"
+          },
+          {
+            "error_id": "E007",
+            "line": 69,
+            "message": "unknown command: mLC.Launch(task);"
+          },
+          {
+            "error_id": "E007",
+            "line": 70,
+            "message": "unknown command: endif"
+          },
+          {
+            "error_id": "E007",
+            "line": 95,
+            "message": "unknown command: mLC.Launch(task);"
+          },
+          {
+            "error_id": "E007",
+            "line": 96,
+            "message": "unknown command: endif"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n\n      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)\n         string weaponName = aPlatform.WeaponEntry(0).Name();\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(aPlatform.Name());\n         AssignTask(aTrack, task);\n      end_script\n\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);\n         PLATFORM.SetCurrentTarget(targetTrack);\n         WsfPlatform arty = WsfSimulation.FindPlatform(\"blue_artillery_battery\");\n         if (arty.IsValid())\n            SetTask(arty, targetTrack);\n         endif\n         WsfPlatform missile = WsfSimulation.FindPlatform(\"blue_missile_launcher\");\n         if (missile.IsValid())\n            SetTask(missile, targetTrack);\n         endif\n      end_execute\n\n      script void on_task_complete(WsfTask aTask)\n         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");\n      end_script\n\n   end_processor\nend_platform_type\n\nplatform_type ARTILLERY_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon artillery_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type artillery_shell\n      quantity 10\n   end_weapon\n   processor artillery_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_LAUNCHER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon missile_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type cruise_missile\n      quantity 5\n   end_weapon\n   processor missile_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform command_post COMMANDER_TYPE\n   side blue\n   route\n      position 30.50N 104.00E altitude 500 m speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_artillery_battery ARTILLERY_TYPE\n   side blue\n   route\n      position 30.60N 104.00E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform blue_missile_launcher MISSILE_LAUNCHER_TYPE\n   side blue\n   route\n      position 30.65N 104.02E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.80N 104.20E altitude 600 m speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/fires_time_on_target_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-022",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E004",
+    "static_error_ids": [
+      "E004",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E004",
+        "line": 111,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 118,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 127,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 136,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E007",
+        "line": 55,
+        "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+      },
+      {
+        "error_id": "E007",
+        "line": 81,
+        "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+      },
+      {
+        "error_id": "E007",
+        "line": 21,
+        "message": "unknown command: task.SetQuantity(1);"
+      },
+      {
+        "error_id": "E007",
+        "line": 22,
+        "message": "unknown command: task.SetCommDevice(\"perfect\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 23,
+        "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+      },
+      {
+        "error_id": "E007",
+        "line": 24,
+        "message": "unknown command: AssignTask(aTrack,"
+      },
+      {
+        "error_id": "E007",
+        "line": 30,
+        "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+      },
+      {
+        "error_id": "E007",
+        "line": 31,
+        "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
+      },
+      {
+        "error_id": "E007",
+        "line": 34,
+        "message": "unknown command: SetTask(arty,"
+      },
+      {
+        "error_id": "E007",
+        "line": 35,
+        "message": "unknown command: endif"
+      },
+      {
+        "error_id": "E007",
+        "line": 38,
+        "message": "unknown command: SetTask(missile,"
+      },
+      {
+        "error_id": "E007",
+        "line": 39,
+        "message": "unknown command: endif"
+      },
+      {
+        "error_id": "E007",
+        "line": 43,
+        "message": "unknown command: writeln(\"Task"
+      },
+      {
+        "error_id": "E007",
+        "line": 69,
+        "message": "unknown command: mLC.Launch(task);"
+      },
+      {
+        "error_id": "E007",
+        "line": 70,
+        "message": "unknown command: endif"
+      },
+      {
+        "error_id": "E007",
+        "line": 95,
+        "message": "unknown command: mLC.Launch(task);"
+      },
+      {
+        "error_id": "E007",
+        "line": 96,
+        "message": "unknown command: endif"
+      }
+    ]
+  }
+}

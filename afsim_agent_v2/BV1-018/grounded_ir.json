@@ -1,0 +1,239 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "cyber_script_effect_demo",
+    "description": "Minimal cyber script effect scenario.",
+    "duration": {
+      "value": 120,
+      "unit": "sec"
+    },
+    "domains": [
+      "cyber",
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    },
+    {
+      "id": "red",
+      "display_name": "Red",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "cyber_origin",
+      "kind": "point",
+      "position": {
+        "lat": "30.68n",
+        "lon": "104.08e"
+      }
+    },
+    {
+      "id": "target_location",
+      "kind": "point",
+      "position": {
+        "lat": "30.71n",
+        "lon": "104.13e"
+      }
+    }
+  ],
+  "routes": [],
+  "components": {
+    "processor": [
+      {
+        "id": "cyber_script",
+        "role": "cyber_effect",
+        "type_hint": "cyber_script_processor",
+        "parameters": {},
+        "grounding": {
+          "matched": false,
+          "mapping_type": "processor",
+          "input": "cyber_effect"
+        }
+      },
+      {
+        "id": "target_processor",
+        "role": "target_processing",
+        "type_hint": "generic_processor",
+        "parameters": {},
+        "grounding": {
+          "matched": false,
+          "mapping_type": "processor",
+          "input": "target_processing"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_cyber_unit",
+      "role": "cyber_effector",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "cyber",
+      "platform_type_hint": "cyber_platform",
+      "component_refs": [
+        "cyber_script"
+      ],
+      "initial_location_ref": "cyber_origin",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "cyber_effector"
+      }
+    },
+    {
+      "id": "red_target_unit",
+      "role": "target",
+      "side": "red",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_station",
+      "component_refs": [
+        "target_processor"
+      ],
+      "initial_location_ref": "target_location",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": true,
+        "mapping_type": "platform",
+        "canonical_id": "acoustic_target_basic",
+        "row": {
+          "canonical_id": "acoustic_target_basic",
+          "canonical_role": "target",
+          "match_labels": [
+            "target",
+            "acoustic_target",
+            "被探测目标",
+            "声学目标"
+          ],
+          "platform_type_hints": [
+            "acoustic_target",
+            "surface_target"
+          ],
+          "grounding_target": {
+            "target_kind": "platform_template",
+            "target_id": "acoustic_target_basic",
+            "wsf_base_type": "WSF_PLATFORM"
+          },
+          "default_component_bundle": [],
+          "provenance": [
+            "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+          ]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "launch_cyber_effect",
+      "type": "cyber_effect",
+      "assignee_refs": [
+        "blue_cyber_unit"
+      ],
+      "target_refs": [
+        "red_target_unit"
+      ],
+      "parameters": {
+        "script": "degrade_processor"
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "task",
+        "input": "cyber_effect"
+      }
+    }
+  ],
+  "all_grounded": false,
+  "unresolved_items": [
+    {
+      "kind": "component",
+      "family": "processor",
+      "component_id": "cyber_script"
+    },
+    {
+      "kind": "component",
+      "family": "processor",
+      "component_id": "target_processor"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_cyber_unit"
+    },
+    {
+      "kind": "task",
+      "task_id": "launch_cyber_effect"
+    }
+  ]
+}

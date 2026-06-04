@@ -1,0 +1,26 @@
+{
+  "script": "BV1-027_execution_repair",
+  "syntax_correct": false,
+  "static_pass": false,
+  "primary_error": "E007",
+  "static_error_ids": [
+    "E007"
+  ],
+  "findings": [
+    {
+      "error_id": "E007",
+      "line": 20,
+      "message": "WSF_RADAR_SENSOR missing transmitter block"
+    },
+    {
+      "error_id": "E007",
+      "line": 39,
+      "message": "task must be nested under processor"
+    },
+    {
+      "error_id": "E007",
+      "line": 48,
+      "message": "task must be nested under processor"
+    }
+  ]
+}

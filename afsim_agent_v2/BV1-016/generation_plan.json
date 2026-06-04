@@ -1,0 +1,429 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-016",
+    "source_task_id": "BV1-016"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "ad_hoc_network_demo",
+      "description": "Ad hoc communication network example scenario.",
+      "duration": {
+        "value": 300,
+        "unit": "sec"
+      },
+      "domains": [
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ],
+      "side_ids": [
+        "blue"
+      ],
+      "location_ids": [
+        "node_a_site",
+        "node_b_site",
+        "node_c_site"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_node_1",
+          "role": "communication_node",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "communication_node"
+          },
+          "initial_location_ref": "node_a_site",
+          "route_ref": null,
+          "component_refs": [
+            "ad_hoc_network",
+            "message_processor"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "message_processor"
+            ],
+            "comm": [
+              "ad_hoc_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_node_1",
+              "role": "communication_node",
+              "platform_type_hint": "ground_comm_node"
+            }
+          ]
+        },
+        {
+          "entity_id": "blue_node_2",
+          "role": "communication_node",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "communication_node"
+          },
+          "initial_location_ref": "node_b_site",
+          "route_ref": null,
+          "component_refs": [
+            "ad_hoc_network",
+            "message_processor"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "message_processor"
+            ],
+            "comm": [
+              "ad_hoc_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_node_2",
+              "role": "communication_node",
+              "platform_type_hint": "ground_comm_node"
+            }
+          ]
+        },
+        {
+          "entity_id": "blue_node_3",
+          "role": "communication_node",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "communication_node"
+          },
+          "initial_location_ref": "node_c_site",
+          "route_ref": null,
+          "component_refs": [
+            "ad_hoc_network",
+            "message_processor"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "message_processor"
+            ],
+            "comm": [
+              "ad_hoc_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_node_3",
+              "role": "communication_node",
+              "platform_type_hint": "ground_comm_node"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_node_1",
+          "role": "communication_node",
+          "platform_type_hint": "ground_comm_node"
+        },
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_node_2",
+          "role": "communication_node",
+          "platform_type_hint": "ground_comm_node"
+        },
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_node_3",
+          "role": "communication_node",
+          "platform_type_hint": "ground_comm_node"
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "message_processor",
+          "family": "processor",
+          "role": "messaging",
+          "type_hint": "message_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": false,
+            "mapping_type": "processor",
+            "input": "messaging"
+          },
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "message_processor",
+              "family": "processor",
+              "type_hint": "message_processor",
+              "role": "messaging"
+            }
+          ]
+        }
+      ],
+      "comms": [
+        {
+          "component_id": "ad_hoc_network",
+          "family": "comm",
+          "role": "ad_hoc_comm",
+          "type_hint": "comm_system",
+          "parameters": {
+            "network_mode": "ad_hoc"
+          },
+          "grounding": {
+            "matched": true,
+            "mapping_type": "comm",
+            "canonical_id": "datalink_basic",
+            "row": {
+              "canonical_id": "datalink_basic",
+              "match_labels": [
+                "datalink",
+                "comm_system",
+                "network",
+                "通信链路",
+                "数据链"
+              ],
+              "type_hints": [
+                "datalink",
+                "comm_system"
+              ],
+              "grounding_target": {
+                "target_kind": "comm_profile",
+                "target_id": "datalink_profile",
+                "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+                "network_pattern": "peer_to_peer_or_hierarchical",
+                "required_directives": [
+                  "network_name"
+                ],
+                "optional_directives": [
+                  "internal_link"
+                ],
+                "message_pattern": "report_to_via_named_comm"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+              ]
+            }
+          },
+          "unresolved_items": []
+        }
+      ],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "form_ad_hoc_network",
+          "task_type": "ad_hoc_communication",
+          "grounding": {
+            "matched": false,
+            "mapping_type": "task",
+            "input": "ad_hoc_communication"
+          },
+          "assignee_refs": [
+            "blue_node_1",
+            "blue_node_2",
+            "blue_node_3"
+          ],
+          "target_refs": [],
+          "location_refs": [],
+          "parameters": {
+            "message_flow": "ad_hoc_multicast"
+          },
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "form_ad_hoc_network",
+              "task_type": "ad_hoc_communication"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "component_grounding",
+          "component_id": "message_processor",
+          "family": "processor",
+          "type_hint": "message_processor",
+          "role": "messaging"
+        },
+        {
+          "kind": "task_grounding",
+          "task_id": "form_ad_hoc_network",
+          "task_type": "ad_hoc_communication"
+        }
+      ]
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 300,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": false
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_node_1",
+      "role": "communication_node",
+      "platform_type_hint": "ground_comm_node"
+    },
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_node_2",
+      "role": "communication_node",
+      "platform_type_hint": "ground_comm_node"
+    },
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_node_3",
+      "role": "communication_node",
+      "platform_type_hint": "ground_comm_node"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "message_processor",
+      "family": "processor",
+      "type_hint": "message_processor",
+      "role": "messaging"
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "form_ad_hoc_network",
+      "task_type": "ad_hoc_communication"
+    }
+  ],
+  "ready_for_generation": false
+}

@@ -1,0 +1,209 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "alv_routing_demo",
+    "description": "自动发射车辆路由场景。ALV follows a ground route.",
+    "duration": {
+      "value": 600,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "蓝方",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    },
+    {
+      "id": "red",
+      "display_name": "红方",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "red",
+        "row": {
+          "canonical_id": "red",
+          "aliases": [
+            "red",
+            "hostile",
+            "enemy",
+            "敌方",
+            "红方",
+            "目标方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "alv_start",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e",
+        "altitude": {
+          "value": 0,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "alv_end",
+      "kind": "point",
+      "position": {
+        "lat": "30.75n",
+        "lon": "104.10e",
+        "altitude": {
+          "value": 0,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "alv_ground_route",
+      "kind": "transit",
+      "waypoints": [
+        {
+          "location_ref": "alv_start",
+          "speed": {
+            "value": 15,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "location_ref": "alv_end",
+          "speed": {
+            "value": 15,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "mover": [
+      {
+        "id": "ground_mover",
+        "role": "ground_mover",
+        "type_hint": "wheeled_vehicle_mover",
+        "grounding": {
+          "matched": false,
+          "mapping_type": "mover",
+          "input": "ground_mover"
+        }
+      }
+    ],
+    "weapon": [
+      {
+        "id": "launcher",
+        "role": "missile_launcher",
+        "type_hint": "vehicle_launcher",
+        "grounding": {
+          "matched": false,
+          "mapping_type": "weapon",
+          "input": "missile_launcher"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "alv_vehicle",
+      "role": "launcher_vehicle",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "auto_launch_vehicle",
+      "component_refs": [
+        "ground_mover",
+        "launcher"
+      ],
+      "initial_location_ref": "alv_start",
+      "route_ref": "alv_ground_route",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "launcher_vehicle"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "alv_move_task",
+      "type": "move",
+      "assignee_refs": [
+        "alv_vehicle"
+      ],
+      "location_refs": [
+        "alv_end"
+      ],
+      "grounding": {
+        "matched": false,
+        "mapping_type": "task",
+        "input": "move"
+      }
+    }
+  ],
+  "all_grounded": false,
+  "unresolved_items": [
+    {
+      "kind": "component",
+      "family": "mover",
+      "component_id": "ground_mover"
+    },
+    {
+      "kind": "component",
+      "family": "weapon",
+      "component_id": "launcher"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "alv_vehicle"
+    },
+    {
+      "kind": "task",
+      "task_id": "alv_move_task"
+    }
+  ]
+}

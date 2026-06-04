@@ -1,0 +1,122 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-004\\generated_script.txt",
+    "mission_status": "FAIL",
+    "return_code": 1
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-004\\generated_script.txt",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 55,
+        "message": "end_platform closes weapon from line 54"
+      },
+      {
+        "error_id": "E002",
+        "line": 65,
+        "message": "end_platform closes weapon from line 64"
+      },
+      {
+        "error_id": "E002",
+        "line": 75,
+        "message": "end_platform closes weapon from line 74"
+      },
+      {
+        "error_id": "E002",
+        "line": 85,
+        "message": "end_platform closes weapon from line 84"
+      },
+      {
+        "error_id": "E002",
+        "line": 45,
+        "message": "missing end_weapon"
+      },
+      {
+        "error_id": "E002",
+        "line": 47,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 53,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 57,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 63,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 67,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 73,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E002",
+        "line": 77,
+        "message": "missing end_platform"
+      },
+      {
+        "error_id": "E002",
+        "line": 83,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E007",
+        "line": 45,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      },
+      {
+        "error_id": "E007",
+        "line": 91,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
+  },
+  "execution_analysis": {
+    "mission_pass": false,
+    "primary_error": "E002",
+    "classifier": "unterminated_custom_block",
+    "route": "return_to_self_repair",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "close every opened custom block and nested table explicitly before rerunning mission.exe",
+    "evidence_lines": [
+      "***** FATAL: Could not process input files.",
+      "***** ERROR: Unexpected End Of Data"
+    ]
+  },
+  "repair_recommendation": {
+    "primary_error": "E002",
+    "route": "return_to_self_repair",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "close every opened custom block and nested table explicitly before rerunning mission.exe"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "rerun static_checker_v1 after the repair changes the script text",
+      "rerun mission.exe only after the regenerated script passes static verification"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-004\\generated_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

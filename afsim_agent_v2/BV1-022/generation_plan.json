@@ -1,0 +1,505 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-022",
+    "source_task_id": "BV1-022"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "fires_time_on_target_demo",
+      "description": "Fires time-on-target scenario with coordinated artillery and missile fire.",
+      "duration": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "domains": [
+        "ground"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue",
+        "red"
+      ],
+      "location_ids": [
+        "blue_artillery_position",
+        "blue_missile_position",
+        "red_target_position"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_artillery_battery",
+          "role": "artillery",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "artillery"
+          },
+          "initial_location_ref": "blue_artillery_position",
+          "route_ref": null,
+          "component_refs": [
+            "artillery_shell",
+            "fires_tot_coordinator",
+            "fires_comms"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [
+              "artillery_shell"
+            ],
+            "processor": [
+              "fires_tot_coordinator"
+            ],
+            "comm": [
+              "fires_comms"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_artillery_battery",
+              "role": "artillery",
+              "platform_type_hint": "artillery_platform"
+            }
+          ]
+        },
+        {
+          "entity_id": "blue_missile_launcher",
+          "role": "missile_launcher",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": false,
+            "mapping_type": "platform",
+            "input": "missile_launcher"
+          },
+          "initial_location_ref": "blue_missile_position",
+          "route_ref": null,
+          "component_refs": [
+            "cruise_missile",
+            "fires_tot_coordinator",
+            "fires_comms"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [
+              "cruise_missile"
+            ],
+            "processor": [
+              "fires_tot_coordinator"
+            ],
+            "comm": [
+              "fires_comms"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "platform_grounding",
+              "entity_id": "blue_missile_launcher",
+              "role": "missile_launcher",
+              "platform_type_hint": "missile_launcher_platform"
+            }
+          ]
+        },
+        {
+          "entity_id": "red_target",
+          "role": "target",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "red",
+            "row": {
+              "canonical_id": "red",
+              "aliases": [
+                "red",
+                "hostile",
+                "enemy",
+                "敌方",
+                "红方",
+                "目标方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "acoustic_target_basic",
+            "row": {
+              "canonical_id": "acoustic_target_basic",
+              "canonical_role": "target",
+              "match_labels": [
+                "target",
+                "acoustic_target",
+                "被探测目标",
+                "声学目标"
+              ],
+              "platform_type_hints": [
+                "acoustic_target",
+                "surface_target"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "acoustic_target_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [],
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+              ]
+            }
+          },
+          "initial_location_ref": "red_target_position",
+          "route_ref": null,
+          "component_refs": [],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_artillery_battery",
+          "role": "artillery",
+          "platform_type_hint": "artillery_platform"
+        },
+        {
+          "kind": "platform_grounding",
+          "entity_id": "blue_missile_launcher",
+          "role": "missile_launcher",
+          "platform_type_hint": "missile_launcher_platform"
+        }
+      ]
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [
+        {
+          "component_id": "artillery_shell",
+          "family": "weapon",
+          "role": "artillery_projectile",
+          "type_hint": "artillery_shell",
+          "parameters": {},
+          "grounding": {
+            "matched": false,
+            "mapping_type": "weapon",
+            "input": "artillery_projectile"
+          },
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "artillery_shell",
+              "family": "weapon",
+              "type_hint": "artillery_shell",
+              "role": "artillery_projectile"
+            }
+          ]
+        },
+        {
+          "component_id": "cruise_missile",
+          "family": "weapon",
+          "role": "standoff_weapon",
+          "type_hint": "cruise_missile",
+          "parameters": {},
+          "grounding": {
+            "matched": false,
+            "mapping_type": "weapon",
+            "input": "standoff_weapon"
+          },
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "cruise_missile",
+              "family": "weapon",
+              "type_hint": "cruise_missile",
+              "role": "standoff_weapon"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "component_grounding",
+          "component_id": "artillery_shell",
+          "family": "weapon",
+          "type_hint": "artillery_shell",
+          "role": "artillery_projectile"
+        },
+        {
+          "kind": "component_grounding",
+          "component_id": "cruise_missile",
+          "family": "weapon",
+          "type_hint": "cruise_missile",
+          "role": "standoff_weapon"
+        }
+      ]
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "fires_tot_coordinator",
+          "family": "processor",
+          "role": "fires_coordination",
+          "type_hint": "fires_tot_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": false,
+            "mapping_type": "processor",
+            "input": "fires_coordination"
+          },
+          "unresolved_items": [
+            {
+              "kind": "component_grounding",
+              "component_id": "fires_tot_coordinator",
+              "family": "processor",
+              "type_hint": "fires_tot_processor",
+              "role": "fires_coordination"
+            }
+          ]
+        }
+      ],
+      "comms": [
+        {
+          "component_id": "fires_comms",
+          "family": "comm",
+          "role": "fires_network",
+          "type_hint": "comm_system",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "comm",
+            "canonical_id": "datalink_basic",
+            "row": {
+              "canonical_id": "datalink_basic",
+              "match_labels": [
+                "datalink",
+                "comm_system",
+                "network",
+                "通信链路",
+                "数据链"
+              ],
+              "type_hints": [
+                "datalink",
+                "comm_system"
+              ],
+              "grounding_target": {
+                "target_kind": "comm_profile",
+                "target_id": "datalink_profile",
+                "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+                "network_pattern": "peer_to_peer_or_hierarchical",
+                "required_directives": [
+                  "network_name"
+                ],
+                "optional_directives": [
+                  "internal_link"
+                ],
+                "message_pattern": "report_to_via_named_comm"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+              ]
+            }
+          },
+          "unresolved_items": []
+        }
+      ],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "coordinated_fires",
+          "task_type": "fires",
+          "grounding": {
+            "matched": false,
+            "mapping_type": "task",
+            "input": "fires"
+          },
+          "assignee_refs": [
+            "blue_artillery_battery",
+            "blue_missile_launcher"
+          ],
+          "target_refs": [
+            "red_target"
+          ],
+          "location_refs": [],
+          "parameters": {
+            "time_on_target": {
+              "value": 120,
+              "unit": "sec"
+            }
+          },
+          "ready": false,
+          "unresolved_items": [
+            {
+              "kind": "task_grounding",
+              "task_id": "coordinated_fires",
+              "task_type": "fires"
+            }
+          ]
+        }
+      ],
+      "ready": false,
+      "unresolved_items": [
+        {
+          "kind": "component_grounding",
+          "component_id": "fires_tot_coordinator",
+          "family": "processor",
+          "type_hint": "fires_tot_processor",
+          "role": "fires_coordination"
+        },
+        {
+          "kind": "task_grounding",
+          "task_id": "coordinated_fires",
+          "task_type": "fires"
+        }
+      ]
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 600,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": false,
+        "sensor_layer": true,
+        "weapon_layer": false,
+        "mission_layer": false
+      },
+      "ready": false,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_artillery_battery",
+      "role": "artillery",
+      "platform_type_hint": "artillery_platform"
+    },
+    {
+      "kind": "platform_grounding",
+      "entity_id": "blue_missile_launcher",
+      "role": "missile_launcher",
+      "platform_type_hint": "missile_launcher_platform"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "artillery_shell",
+      "family": "weapon",
+      "type_hint": "artillery_shell",
+      "role": "artillery_projectile"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "cruise_missile",
+      "family": "weapon",
+      "type_hint": "cruise_missile",
+      "role": "standoff_weapon"
+    },
+    {
+      "kind": "component_grounding",
+      "component_id": "fires_tot_coordinator",
+      "family": "processor",
+      "type_hint": "fires_tot_processor",
+      "role": "fires_coordination"
+    },
+    {
+      "kind": "task_grounding",
+      "task_id": "coordinated_fires",
+      "task_type": "fires"
+    }
+  ],
+  "ready_for_generation": false
+}

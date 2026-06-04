@@ -1,0 +1,104 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern RADAR_ANT
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type CHAFF WSF_PLATFORM
+   mover WSF_STATIONARY_MOVER
+      maximum_speed 0 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+end_platform_type
+
+chaff_parcel CHAFF_PARCEL WSF_CHAFF_PARCEL
+   terminal_velocity 1.0 m/s
+   expiration_time 10 sec
+   number_dipoles 2000000
+   frequency_maximum_rcs_table
+      independent_variable units mhz extrapolate
+      100 71
+      500 57
+   end_frequency_maximum_rcs_table
+end_chaff_parcel
+
+weapon CHAFF_WEAPON WSF_CHAFF_WEAPON
+   launched_platform_type CHAFF
+   ejector eject_1
+      quantity 4
+      parcel_type CHAFF_PARCEL
+      ejection_velocity 25 m/s
+   end_ejector
+end_weapon
+
+platform_type BLUE_FIGHTER WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+end_platform_type
+
+platform_type RED_FIGHTER WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   sensor targeting_radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      maximum_range 80 nm
+      reports_location
+      transmitter
+         antenna_pattern RADAR_ANT
+         power 150 kw
+         frequency 10000 MHz
+      end_transmitter
+      receiver
+         antenna_pattern RADAR_ANT
+         bandwidth 5 MHz
+      end_receiver
+   end_sensor
+end_platform_type
+
+weapon radar_missile WSF_AIR_TO_AIR_MISSILE
+end_weapon
+
+platform blue_defender BLUE_FIGHTER
+   side blue
+   route
+      position 30.60n 104.00e altitude 5000 m msl speed 200 m/sec
+      position 30.75n 104.15e altitude 5000 m msl speed 200 m/sec
+   end_route
+   on_platform
+      if (SimulationTime() > 30 and SimulationTime() < 31)
+      {
+         LaunchWeapon("CHAFF_WEAPON");
+      }
+   end_on_platform
+end_platform
+
+platform red_attacker RED_FIGHTER
+   side red
+   route
+      position 30.90n 104.30e altitude 6000 m msl speed 220 m/sec
+      position 30.78n 104.18e altitude 6000 m msl speed 220 m/sec
+   end_route
+   sensor targeting_radar on
+   on_platform
+      if (SimulationTime() > 10 and SimulationTime() < 11)
+      {
+         LaunchWeapon("radar_missile", TargetPlatform("blue_defender"));
+      }
+   end_on_platform
+end_platform
+
+event_pipe
+   file output/chaff_example.aer
+end_event_pipe
+
+end_time 180 sec

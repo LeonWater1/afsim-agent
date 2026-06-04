@@ -1,0 +1,97 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern ESM_ANTENNA
+   constant_pattern
+      peak_gain 0 db
+   end_constant_pattern
+end_antenna_pattern
+
+antenna_pattern SEARCH_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 db
+      azimuth_beamwidth 20 deg
+      elevation_beamwidth 20 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type BLUE_ESM_AIRCRAFT WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 250 m/sec
+      minimum_speed 60 m/sec
+   end_mover
+   sensor esm_sensor WSF_ESM_SENSOR
+      frame_time 4 sec
+      slew_mode fixed
+      maximum_range 200 km
+      frequency_band 0.1 ghz 20 ghz
+      reports_bearing
+      reports_frequency
+      receiver
+         antenna_pattern ESM_ANTENNA
+         detection_threshold 5 db
+         noise_power -180 dbw
+         internal_loss 0 db
+      end_receiver
+      reported_emitter_type
+         default_type
+            time_to_declare 10 sec
+            report_truth
+         end_reported_emitter_type
+   end_sensor
+end_platform_type
+
+platform_type RED_RADAR_SITE WSF_PLATFORM
+   mover WSF_GROUND_MOVER
+      maximum_speed 1 m/sec
+      minimum_speed 0 m/sec
+   end_mover
+   sensor search_radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 80 nm
+      reports_location
+      reports_range
+      reports_bearing
+      transmitter
+         antenna_pattern SEARCH_RADAR_ANTENNA
+         power 150 kw
+         pulse_width 2.0e-6 sec
+         pulse_repetition_frequency 400 hz
+         frequency 1285 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SEARCH_RADAR_ANTENNA
+         bandwidth 1 mhz
+      end_receiver
+   end_sensor
+end_platform_type
+
+platform blue_esm_aircraft BLUE_ESM_AIRCRAFT
+   side blue
+   heading 90 deg
+   route
+      position 30.67n 104.07e altitude 5000 m msl speed 180 m/sec
+      position 30.80n 104.20e altitude 5000 m msl speed 180 m/sec
+   end_route
+   sensor esm_sensor
+      on
+   end_sensor
+end_platform
+
+platform red_radar RED_RADAR_SITE
+   side red
+   route
+      position 30.70n 104.10e speed 0 m/sec
+   end_route
+   sensor search_radar
+      on
+   end_sensor
+end_platform
+
+event_pipe
+   file output/esm_detect_radar.aer
+end_event_pipe
+
+end_time 200 sec

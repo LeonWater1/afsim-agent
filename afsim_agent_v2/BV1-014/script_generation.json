@@ -1,0 +1,75 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_fail",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nplatform_type LUNAR_ORBITER_TYPE WSF_PLATFORM\n   mover WSF_INTEGRATING_SPACE_MOVER\n      maximum_speed 10000 m/sec\n      minimum_speed 1000 m/sec\n   end_mover\nend_platform_type\n\nplatform lunar_orbiter LUNAR_ORBITER_TYPE\n   side blue\n   route\n      position 0n 0e altitude 100 km msl speed 1500 m/sec\n      position 0n 90e altitude 100 km msl speed 1500 m/sec\n      position 0n 180e altitude 100 km msl speed 1500 m/sec\n      position 0n 90w altitude 100 km msl speed 1500 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/lunar_orbiter_scenario.aer\nend_event_pipe\n\nend_time 3600 sec\n",
+      "static_analysis": {
+        "script": "BV1-014",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E004",
+        "static_error_ids": [
+          "E004"
+        ],
+        "findings": [
+          {
+            "error_id": "E004",
+            "line": 15,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 16,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 17,
+            "message": "invalid altitude format"
+          },
+          {
+            "error_id": "E004",
+            "line": 18,
+            "message": "invalid altitude format"
+          }
+        ]
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type LUNAR_ORBITER_TYPE WSF_PLATFORM\n   mover WSF_INTEGRATING_SPACE_MOVER\n      maximum_speed 10000 m/sec\n      minimum_speed 1000 m/sec\n   end_mover\nend_platform_type\n\nplatform lunar_orbiter LUNAR_ORBITER_TYPE\n   side blue\n   route\n      position 0n 0e altitude 100 km msl speed 1500 m/sec\n      position 0n 90e altitude 100 km msl speed 1500 m/sec\n      position 0n 180e altitude 100 km msl speed 1500 m/sec\n      position 0n 90w altitude 100 km msl speed 1500 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/lunar_orbiter_scenario.aer\nend_event_pipe\n\nend_time 3600 sec\n",
+  "static_analysis": {
+    "script": "BV1-014",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E004",
+    "static_error_ids": [
+      "E004"
+    ],
+    "findings": [
+      {
+        "error_id": "E004",
+        "line": 15,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 16,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 17,
+        "message": "invalid altitude format"
+      },
+      {
+        "error_id": "E004",
+        "line": 18,
+        "message": "invalid altitude format"
+      }
+    ]
+  }
+}

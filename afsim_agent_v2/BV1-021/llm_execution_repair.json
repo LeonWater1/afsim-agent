@@ -1,0 +1,61 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-021.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-021_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E008",
+      "classifier": "script_compile_or_api_error",
+      "route": "return_to_script_logic_repair",
+      "inferred_stage": "mission_layer",
+      "suggested_action": "rewrite processor or script blocks using verified API and rerun static + mission verification",
+      "evidence_lines": [
+        "***** ERROR: Static method 'FromLocationWCS' does not exist on type WsfGeoPoint",
+        "***** ERROR: Invalid method call",
+        "***** ERROR: Static method 'FromLocationWCS' does not exist on type WsfGeoPoint",
+        "***** ERROR: Invalid method call",
+        "***** ERROR: Error in script.",
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unable to compile script."
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E008",
+      "route": "return_to_script_logic_repair",
+      "inferred_stage": "mission_layer",
+      "suggested_action": "rewrite processor or script blocks using verified API and rerun static + mission verification"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-021.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type MY_STRIKER WSF_PLATFORM\n   side blue\n   mover WSF_AIR_MOVER\n      maximum_speed 0.000000001 knots\n      minimum_speed 0 knots\n      maximum_altitude 50000 ft\n      minimum_altitude 0 ft\n      at_end_of_path stop\n   end_mover\n   processor mover_script WSF_SCRIPT_PROCESSOR\n      update_interval 0.1 sec\n      script_variables\n         int routeIndex = 0;\n         double speedMPS = 200.0;\n      end_script_variables\n      on_update\n         WsfRoute rowt = PLATFORM.Route();\n         if (!rowt.IsValid()) {\n            return;\n         }\n         if (routeIndex >= rowt.Size()) {\n            return;\n         }\n         double delta = PROCESSOR.UpdateInterval();\n         double myDist = delta * speedMPS;\n         WsfGeoPoint a = PLATFORM.Location();\n         WsfGeoPoint b = rowt.Get(routeIndex).Location();\n         double dist = a.SlantRangeTo(b);\n         double heading = a.HeadingTo(b);\n         if (myDist >= dist) {\n            routeIndex = routeIndex + 1;\n            if (routeIndex >= rowt.Size()) {\n               PLATFORM.SetLocation(b);\n               return;\n            }\n            double remaining = myDist - dist;\n            WsfGeoPoint c = rowt.Get(routeIndex).Location();\n            heading = b.HeadingTo(c);\n            WsfGeoPoint newPos = b.Offset(heading, remaining);\n            PLATFORM.SetLocation(newPos);\n         } else {\n            WsfGeoPoint newPos = a.Offset(heading, myDist);\n            PLATFORM.SetLocation(newPos);\n         }\n      end_on_update\n   end_processor\nend_platform_type\n\nplatform mover_demo_platform MY_STRIKER\n   side blue\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 100 m/sec\n      position 30.72n 104.12e altitude 3000 m msl speed 100 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/proc_mover_demo.aer\nend_event_pipe\n\nend_time 120 sec\n",
+  "static_analysis": {
+    "script": "BV1-021_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

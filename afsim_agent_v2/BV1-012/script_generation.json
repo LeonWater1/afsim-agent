@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nplatform_type BRAWLER_PLATFORM WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type BRAWLER_FLIGHT_LEAD WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_cmdr BRAWLER_FLIGHT_LEAD\n   side blue\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform blue_1 BRAWLER_PLATFORM\n   side blue\n   commander blue_cmdr\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_cmdr BRAWLER_FLIGHT_LEAD\n   side red\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_1 BRAWLER_PLATFORM\n   side red\n   commander red_cmdr\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/brawler_demo_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+      "static_analysis": {
+        "script": "BV1-012",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type BRAWLER_PLATFORM WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type BRAWLER_FLIGHT_LEAD WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_cmdr BRAWLER_FLIGHT_LEAD\n   side blue\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform blue_1 BRAWLER_PLATFORM\n   side blue\n   commander blue_cmdr\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_cmdr BRAWLER_FLIGHT_LEAD\n   side red\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_1 BRAWLER_PLATFORM\n   side red\n   commander red_cmdr\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/brawler_demo_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-012",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "version": "llm_script_generator_v1",
+  "generator_mode": "llm_only_static_pass",
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "deepseek-v4-pro",
+      "script_preview": "script_interface\n   debug\nend_script_interface\n\nplatform_type ALV_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 15 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform alv_vehicle ALV_TYPE\n   side blue\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 15 m/sec\n      position 30.75n 104.10e altitude 0 m msl speed 15 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/alv_routing_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
+      "static_analysis": {
+        "script": "BV1-008",
+        "syntax_correct": true,
+        "static_pass": true,
+        "primary_error": "",
+        "static_error_ids": [],
+        "findings": []
+      }
+    }
+  ],
+  "script_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type ALV_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 15 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform alv_vehicle ALV_TYPE\n   side blue\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 15 m/sec\n      position 30.75n 104.10e altitude 0 m msl speed 15 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/alv_routing_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-008",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

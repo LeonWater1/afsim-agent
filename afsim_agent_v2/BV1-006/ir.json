@@ -1,0 +1,259 @@
+{
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "hvaa_dca_scenario",
+    "description": "高价值资产防御反空场景 (High Value Asset defense counter-air scenario)",
+    "duration": {
+      "value": 600,
+      "unit": "sec"
+    },
+    "domains": [
+      "air"
+    ],
+    "outputs": [
+      "event_pipe"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue"
+    },
+    {
+      "id": "red",
+      "display_name": "Red"
+    }
+  ],
+  "locations": [
+    {
+      "id": "hva_origin",
+      "kind": "point",
+      "position": {
+        "lat": "30.60n",
+        "lon": "104.05e",
+        "altitude": {
+          "value": 10000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "blue_cap_center",
+      "kind": "orbit_anchor",
+      "position": {
+        "lat": "30.62n",
+        "lon": "104.07e",
+        "altitude": {
+          "value": 10000,
+          "unit": "m"
+        }
+      }
+    },
+    {
+      "id": "red_spawn",
+      "kind": "point",
+      "position": {
+        "lat": "30.80n",
+        "lon": "104.20e",
+        "altitude": {
+          "value": 10000,
+          "unit": "m"
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "blue_cap_orbit",
+      "kind": "orbit",
+      "waypoints": [
+        {
+          "location_ref": "blue_cap_center",
+          "speed": {
+            "value": 200,
+            "unit": "m/sec"
+          }
+        }
+      ],
+      "loop": true
+    },
+    {
+      "id": "red_ingress",
+      "kind": "transit",
+      "waypoints": [
+        {
+          "location_ref": "red_spawn",
+          "speed": {
+            "value": 220,
+            "unit": "m/sec"
+          }
+        },
+        {
+          "position": {
+            "lat": "30.60n",
+            "lon": "104.05e",
+            "altitude": {
+              "value": 10000,
+              "unit": "m"
+            }
+          },
+          "speed": {
+            "value": 220,
+            "unit": "m/sec"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "movers": [
+      {
+        "id": "air_mover",
+        "role": "air_mover",
+        "type_hint": "air_mover"
+      }
+    ],
+    "sensors": [
+      {
+        "id": "fighter_radar",
+        "role": "air_intercept_radar",
+        "type_hint": "radar_sensor"
+      }
+    ],
+    "weapons": [
+      {
+        "id": "aam",
+        "role": "air_to_air_weapon",
+        "type_hint": "air_to_air_missile"
+      }
+    ],
+    "processors": [
+      {
+        "id": "engage_processor",
+        "role": "air_engagement",
+        "type_hint": "fighter_engagement_processor"
+      },
+      {
+        "id": "dca_processor",
+        "role": "dca_behavior",
+        "type_hint": "dca_processor"
+      }
+    ],
+    "comms": [
+      {
+        "id": "datalink",
+        "role": "coordination",
+        "type_hint": "datalink"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_defender_group",
+      "role": "defender",
+      "side": "blue",
+      "quantity": 2,
+      "domain": "air",
+      "platform_type_hint": "fighter_aircraft",
+      "component_refs": [
+        "air_mover",
+        "fighter_radar",
+        "aam",
+        "dca_processor",
+        "datalink"
+      ],
+      "initial_location_ref": "blue_cap_center",
+      "route_ref": "blue_cap_orbit"
+    },
+    {
+      "id": "blue_hva",
+      "role": "hvaa",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "air",
+      "platform_type_hint": "high_value_aircraft",
+      "component_refs": [
+        "air_mover",
+        "datalink"
+      ],
+      "initial_location_ref": "hva_origin"
+    },
+    {
+      "id": "red_attackers",
+      "role": "attacker",
+      "side": "red",
+      "quantity": 4,
+      "domain": "air",
+      "platform_type_hint": "fighter_aircraft",
+      "component_refs": [
+        "air_mover",
+        "fighter_radar",
+        "aam",
+        "engage_processor"
+      ],
+      "initial_location_ref": "red_spawn",
+      "route_ref": "red_ingress"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "defend_hva",
+      "type": "dca",
+      "assignee_refs": [
+        "blue_defender_group"
+      ],
+      "target_refs": [
+        "blue_hva"
+      ],
+      "parameters": {
+        "protection_radius": {
+          "value": 50,
+          "unit": "km"
+        }
+      }
+    },
+    {
+      "id": "attack_hva",
+      "type": "air_attack",
+      "assignee_refs": [
+        "red_attackers"
+      ],
+      "target_refs": [
+        "blue_hva"
+      ],
+      "parameters": {
+        "intent": "destroy"
+      }
+    }
+  ],
+  "constraints": {
+    "unit_system": "afsim_mixed",
+    "coordinate_format": "lat_lon_dir",
+    "required_fields": [
+      "entities.quantity",
+      "entities.side",
+      "tasks",
+      "routes"
+    ]
+  },
+  "expected_events": [
+    {
+      "id": "hva_protected",
+      "type": "engagement",
+      "actor_refs": [
+        "blue_defender_group",
+        "red_attackers"
+      ],
+      "success_condition": "Blue defenders successfully prevent red attackers from destroying the HVA."
+    },
+    {
+      "id": "attack_attempt",
+      "type": "engagement",
+      "actor_refs": [
+        "red_attackers",
+        "blue_hva"
+      ],
+      "success_condition": "Red attackers attempt to engage the HVA."
+    }
+  ]
+}

@@ -1,0 +1,275 @@
+{
+  "version": "grounded_ir_v1",
+  "schema_version": "afsim_ir_v1",
+  "scenario": {
+    "name": "ad_hoc_network_demo",
+    "description": "Ad hoc communication network example scenario.",
+    "duration": {
+      "value": 300,
+      "unit": "sec"
+    },
+    "domains": [
+      "ground"
+    ],
+    "outputs": [
+      "event_pipe",
+      "event_output"
+    ]
+  },
+  "sides": [
+    {
+      "id": "blue",
+      "display_name": "Blue",
+      "grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "node_a_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.67n",
+        "lon": "104.07e"
+      }
+    },
+    {
+      "id": "node_b_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.70n",
+        "lon": "104.10e"
+      }
+    },
+    {
+      "id": "node_c_site",
+      "kind": "point",
+      "position": {
+        "lat": "30.73n",
+        "lon": "104.13e"
+      }
+    }
+  ],
+  "routes": [],
+  "components": {
+    "comm": [
+      {
+        "id": "ad_hoc_network",
+        "role": "ad_hoc_comm",
+        "type_hint": "comm_system",
+        "parameters": {
+          "network_mode": "ad_hoc"
+        },
+        "grounding": {
+          "matched": true,
+          "mapping_type": "comm",
+          "canonical_id": "datalink_basic",
+          "row": {
+            "canonical_id": "datalink_basic",
+            "match_labels": [
+              "datalink",
+              "comm_system",
+              "network",
+              "通信链路",
+              "数据链"
+            ],
+            "type_hints": [
+              "datalink",
+              "comm_system"
+            ],
+            "grounding_target": {
+              "target_kind": "comm_profile",
+              "target_id": "datalink_profile",
+              "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+              "network_pattern": "peer_to_peer_or_hierarchical",
+              "required_directives": [
+                "network_name"
+              ],
+              "optional_directives": [
+                "internal_link"
+              ],
+              "message_pattern": "report_to_via_named_comm"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+            ]
+          }
+        }
+      }
+    ],
+    "processor": [
+      {
+        "id": "message_processor",
+        "role": "messaging",
+        "type_hint": "message_processor",
+        "grounding": {
+          "matched": false,
+          "mapping_type": "processor",
+          "input": "messaging"
+        }
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "blue_node_1",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_a_site",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "communication_node"
+      }
+    },
+    {
+      "id": "blue_node_2",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_b_site",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "communication_node"
+      }
+    },
+    {
+      "id": "blue_node_3",
+      "role": "communication_node",
+      "side": "blue",
+      "quantity": 1,
+      "domain": "ground",
+      "platform_type_hint": "ground_comm_node",
+      "component_refs": [
+        "ad_hoc_network",
+        "message_processor"
+      ],
+      "initial_location_ref": "node_c_site",
+      "side_grounding": {
+        "matched": true,
+        "mapping_type": "side",
+        "canonical_id": "blue",
+        "row": {
+          "canonical_id": "blue",
+          "aliases": [
+            "blue",
+            "friendly",
+            "allied",
+            "我方",
+            "蓝方",
+            "友方"
+          ]
+        }
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "platform",
+        "input": "communication_node"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "form_ad_hoc_network",
+      "type": "ad_hoc_communication",
+      "assignee_refs": [
+        "blue_node_1",
+        "blue_node_2",
+        "blue_node_3"
+      ],
+      "parameters": {
+        "message_flow": "ad_hoc_multicast"
+      },
+      "grounding": {
+        "matched": false,
+        "mapping_type": "task",
+        "input": "ad_hoc_communication"
+      }
+    }
+  ],
+  "all_grounded": false,
+  "unresolved_items": [
+    {
+      "kind": "component",
+      "family": "processor",
+      "component_id": "message_processor"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_node_1"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_node_2"
+    },
+    {
+      "kind": "entity",
+      "entity_id": "blue_node_3"
+    },
+    {
+      "kind": "task",
+      "task_id": "form_ad_hoc_network"
+    }
+  ]
+}

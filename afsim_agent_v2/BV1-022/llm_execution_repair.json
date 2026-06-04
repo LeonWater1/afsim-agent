@@ -1,0 +1,114 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-022.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-022_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E007",
+      "classifier": "input_parse_or_structure_error",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template",
+      "evidence_lines": [
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unknown command: maximum_speed"
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E007",
+      "route": "return_to_layer_regeneration",
+      "inferred_stage": "static_or_generation",
+      "suggested_action": "regenerate the affected layer or component template"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-022.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type FIRES_UNIT_TYPE WSF_PLATFORM\n   mover WSF_FIRES_MOVER\n   end_mover\n   weapon coordinated_weapon WSF_EXPLICIT_WEAPON\n      mover WSF_UNGUIDED_MOVER\n      end_mover\n      warhead WSF_SPHERICAL_LETHALITY\n         lethal_radius 100 m\n      end_warhead\n      fuse WSF_GROUND_TARGET_FUSE\n      end_fuse\n      launch_computer WSF_FIRES_LAUNCH_COMPUTER\n      end_launch_computer\n   end_weapon\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n   end_mover\nend_platform_type\n\nplatform blue_fires_unit FIRES_UNIT_TYPE\n   side blue\n   route\n      position 30.65n 104.05e altitude 0 ft msl speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\n   processor time_on_target_processor WSF_TASK_PROCESSOR\n      script_variables\n         string targetPlatformName;\n      end_script_variables\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 300.0);\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", \"coordinated_weapon\");\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(\"blue_fires_unit\");\n         AssignTask(targetTrack, task);\n      end_execute\n   end_processor\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.70n 104.12e altitude 0 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/time_on_target_fires.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "static_analysis": {
+    "script": "BV1-022_execution_repair",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 9,
+        "message": "mover is not a valid nested block inside weapon blocks in this project corpus"
+      },
+      {
+        "error_id": "E007",
+        "line": 14,
+        "message": "fuse is not a valid nested command inside weapon blocks in this project corpus"
+      },
+      {
+        "error_id": "E007",
+        "line": 13,
+        "message": "unknown command: end_warhead"
+      },
+      {
+        "error_id": "E007",
+        "line": 15,
+        "message": "unknown command: end_fuse"
+      },
+      {
+        "error_id": "E007",
+        "line": 17,
+        "message": "unknown command: end_launch_computer"
+      },
+      {
+        "error_id": "E007",
+        "line": 40,
+        "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+      },
+      {
+        "error_id": "E007",
+        "line": 42,
+        "message": "unknown command: task.SetQuantity(1);"
+      },
+      {
+        "error_id": "E007",
+        "line": 43,
+        "message": "unknown command: task.SetCommDevice(\"perfect\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 44,
+        "message": "unknown command: task.SetAssignee(\"blue_fires_unit\");"
+      },
+      {
+        "error_id": "E007",
+        "line": 45,
+        "message": "unknown command: AssignTask(targetTrack,"
+      },
+      {
+        "error_id": "E007",
+        "line": 46,
+        "message": "unknown command: end_execute"
+      }
+    ]
+  }
+}

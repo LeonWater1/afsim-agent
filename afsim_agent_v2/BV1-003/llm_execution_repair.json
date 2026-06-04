@@ -1,0 +1,58 @@
+{
+  "version": "llm_repair_executor_v1",
+  "mode": "execution_repair",
+  "execution_plan": {
+    "version": "execution_repair_spec_v1",
+    "input": {
+      "script_path": "BV1-003.txt",
+      "mission_status": "FAIL",
+      "return_code": 1
+    },
+    "static_analysis": {
+      "script": "BV1-003_execution_repair",
+      "syntax_correct": true,
+      "static_pass": true,
+      "primary_error": "",
+      "static_error_ids": [],
+      "findings": []
+    },
+    "execution_analysis": {
+      "mission_pass": false,
+      "primary_error": "E008",
+      "classifier": "script_compile_or_api_error",
+      "route": "return_to_script_logic_repair",
+      "inferred_stage": "mission_layer",
+      "suggested_action": "rewrite processor or script blocks using verified API and rerun static + mission verification",
+      "evidence_lines": [
+        "***** ERROR: \";\" expected",
+        "***** ERROR: Error in script.",
+        "***** FATAL: Could not process input files.",
+        "***** ERROR: Unable to compile script."
+      ]
+    },
+    "repair_recommendation": {
+      "primary_error": "E008",
+      "route": "return_to_script_logic_repair",
+      "inferred_stage": "mission_layer",
+      "suggested_action": "rewrite processor or script blocks using verified API and rerun static + mission verification"
+    },
+    "rerun_plan": {
+      "preconditions": [
+        "apply the recommended repair at the routed stage",
+        "rerun static_checker_v1 after the repair changes the script text",
+        "rerun mission.exe only after the regenerated script passes static verification"
+      ],
+      "command_hint": "python scripts/run_mission.py -es -fio BV1-003.txt",
+      "success_condition": "mission_status == PASS"
+    }
+  },
+  "repaired_text": "antenna_pattern SEARCH_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type FIGHTER WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 250 m/sec\n      minimum_speed 60 m/sec\n   end_mover\n   sensor fighter_radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern SEARCH_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor engage_proc WSF_SCRIPT_PROCESSOR\n      execute at_interval_of 10 s\n         writeln(\"Fighter engaging\");\n      end_execute\n   end_processor\nend_platform_type\n\nplatform blue_fighter FIGHTER\n   side blue\n   heading 45 deg\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nplatform red_fighter FIGHTER\n   side red\n   heading 225 deg\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 180 m/sec\n      position 30.80n 104.25e altitude 3000 m msl speed 180 m/sec\n   end_route\n   sensor fighter_radar\n      on\n   end_sensor\nend_platform\n\nevent_pipe\n   file output/air_to_air_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "static_analysis": {
+    "script": "BV1-003_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  }
+}

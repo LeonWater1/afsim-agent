@@ -1,0 +1,64 @@
+script_interface
+   debug
+end_script_interface
+
+antenna_pattern SIMPLE_RADAR_ANTENNA
+   constant_pattern
+      peak_gain 30 dB
+      azimuth_beamwidth 10 deg
+      elevation_beamwidth 10 deg
+   end_constant_pattern
+end_antenna_pattern
+
+platform_type FIGHTER_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 350 m/sec
+      minimum_speed 100 m/sec
+   end_mover
+   sensor radar WSF_RADAR_SENSOR
+      frame_time 2 sec
+      minimum_range 0 nm
+      maximum_range 60 nm
+      transmitter
+         antenna_pattern SIMPLE_RADAR_ANTENNA
+         power 100 kw
+         pulse_width 1e-6 sec
+         pulse_repetition_frequency 2000 hz
+         frequency 9500 mhz
+      end_transmitter
+      receiver
+         antenna_pattern SIMPLE_RADAR_ANTENNA
+         bandwidth 2 mhz
+      end_receiver
+   end_sensor
+   processor track_proc WSF_TRACK_PROCESSOR
+   end_processor
+   processor weapon_mgr WSF_WEAPONS_MANAGER_AI
+   end_processor
+   comm datalink WSF_COMM_TRANSCEIVER
+      network_name hva_datalink
+   end_comm
+end_platform_type
+
+platform_type HVA_TYPE WSF_PLATFORM
+   mover WSF_AIR_MOVER
+      maximum_speed 220 m/sec
+      minimum_speed 80 m/sec
+   end_mover
+   comm datalink WSF_COMM_TRANSCEIVER
+      network_name hva_datalink
+   end_comm
+end_platform_type
+
+
+platform blue_dca_1 FIGHTER_TYPE
+   side blue
+   heading 120 deg
+   route
+      position 30.60n 104.00e altitude 5000 m msl speed 250 m/sec
+      orbit
+         center 30.70n 104.10e radius 10 nm speed 250 m/sec
+      end_orbit
+end_route
+end_platform
+end_time 600 sec
