@@ -20,17 +20,15 @@ from datetime import datetime
 from pathlib import Path
 
 from run_direct_baseline import (
-    BLOCK_STARTS,
     DEEPSEEK_API_URL,
-    END_TO_START,
     infer_primary_error,
     load_tasks,
     mission_error_to_taxonomy,
     semantic_match,
-    static_analysis,
     strip_code_fences,
 )
 from run_mission import load_config
+from static_checker_v1 import analyze_script_text
 
 # ── Reference files included in the corpus ──────────────────────────────────
 
@@ -626,12 +624,9 @@ def main():
         (script_path.parent / "output").mkdir(parents=True, exist_ok=True)
         script_path.write_text(script_text, encoding="utf-8")
 
-        findings = static_analysis(script_text)
-        static_error_ids = sorted({item["error_id"] for item in findings})
-        static_blocking = any(
-            item["error_id"] in {"E001", "E002", "E003", "E004", "E005", "E006", "E007", "E008"}
-            for item in findings
-        )
+        static_result = analyze_script_text(script_text, script_label=str(script_path))
+        findings = static_result["findings"]
+        static_error_ids = static_result["static_error_ids"]
 
         cmd = [str(mission_exe), "-es", "-sm", str(script_path)]
         mission_status = "NOT_RUN"
@@ -683,10 +678,8 @@ def main():
             "retrieved_sources": [item["source"] for item in chunks],
             "static_errors": findings,
             "static_error_ids": static_error_ids,
-            "syntax_correct": not any(
-                item["error_id"] in {"E001", "E002", "E004", "E007", "E008"} for item in findings
-            ),
-            "static_pass": not static_blocking,
+            "syntax_correct": static_result["syntax_correct"],
+            "static_pass": static_result["static_pass"],
             "mission_status": mission_status,
             "return_code": return_code,
             "mission_log": str(log_path.relative_to(root)).replace("\\", "/"),

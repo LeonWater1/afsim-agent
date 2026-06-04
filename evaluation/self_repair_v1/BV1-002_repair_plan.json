@@ -1,0 +1,189 @@
+{
+  "version": "repair_workflow_v1",
+  "input": {
+    "script_path": "baseline_rag_v1\\generated_scripts\\BV1-002.txt",
+    "has_ir_context": false,
+    "has_generation_plan": false
+  },
+  "static_analysis": {
+    "script": "baseline_rag_v1\\generated_scripts\\BV1-002.txt",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 55,
+        "message": "end_platform_type closes mover from line 43"
+      },
+      {
+        "error_id": "E002",
+        "line": 71,
+        "message": "end_platform closes processor from line 70"
+      },
+      {
+        "error_id": "E002",
+        "line": 41,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 67,
+        "message": "missing end_platform"
+      }
+    ]
+  },
+  "repair_summary": {
+    "finding_count": 4,
+    "auto_repairable_count": 2,
+    "manual_or_regeneration_count": 2,
+    "target_layers": [
+      "platform_layer",
+      "mission_layer"
+    ],
+    "recommended_next_action": "apply_safe_repairs_then_regenerate_flagged_layers"
+  },
+  "repair_steps": [
+    {
+      "step_id": "SR-001",
+      "priority": 10,
+      "error_id": "E002",
+      "line": 41,
+      "issue": "missing end_platform_type",
+      "layer_scope": "platform_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+      "evidence": {
+        "line_text": "platform_type sensor_station WSF_PLATFORM",
+        "nearest_block_kind": "platform_type",
+        "nearest_block_name": "sensor_station"
+      },
+      "repair_mode": "safe_direct_edit",
+      "auto_repairable": true,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "append missing closing tag `end_platform_type`",
+      "proposed_edit": {
+        "action": "append_line",
+        "target_line": 77,
+        "replacement": "end_platform_type"
+      }
+    },
+    {
+      "step_id": "SR-002",
+      "priority": 10,
+      "error_id": "E002",
+      "line": 55,
+      "issue": "end_platform_type closes mover from line 43",
+      "layer_scope": "platform_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+      "evidence": {
+        "line_text": "end_platform_type",
+        "nearest_block_kind": "mover",
+        "nearest_block_name": "WSF_GROUND_MOVER"
+      },
+      "repair_mode": "manual_block_stack_repair",
+      "auto_repairable": false,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "repair block nesting first, then rerun static verification",
+      "proposed_edit": null
+    },
+    {
+      "step_id": "SR-003",
+      "priority": 10,
+      "error_id": "E002",
+      "line": 67,
+      "issue": "missing end_platform",
+      "layer_scope": "platform_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+      "evidence": {
+        "line_text": "platform sensor_post sensor_station",
+        "nearest_block_kind": "platform",
+        "nearest_block_name": "sensor_post"
+      },
+      "repair_mode": "safe_direct_edit",
+      "auto_repairable": true,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "append missing closing tag `end_platform`",
+      "proposed_edit": {
+        "action": "append_line",
+        "target_line": 77,
+        "replacement": "end_platform"
+      }
+    },
+    {
+      "step_id": "SR-004",
+      "priority": 10,
+      "error_id": "E002",
+      "line": 71,
+      "issue": "end_platform closes processor from line 70",
+      "layer_scope": "mission_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
+      "evidence": {
+        "line_text": "end_platform",
+        "nearest_block_kind": "processor",
+        "nearest_block_name": "status"
+      },
+      "repair_mode": "manual_block_stack_repair",
+      "auto_repairable": false,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "repair block nesting first, then rerun static verification",
+      "proposed_edit": null
+    }
+  ],
+  "safe_repair_attempt": {
+    "attempted": true,
+    "applied_action_count": 2,
+    "applied_actions": [
+      {
+        "error_id": "E002",
+        "action": "append_line",
+        "target_line": 78,
+        "replacement": "end_platform"
+      },
+      {
+        "error_id": "E002",
+        "action": "append_line",
+        "target_line": 79,
+        "replacement": "end_platform_type"
+      }
+    ],
+    "post_repair_analysis": {
+      "script": "",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 55,
+          "message": "end_platform_type closes mover from line 43"
+        },
+        {
+          "error_id": "E002",
+          "line": 71,
+          "message": "end_platform closes processor from line 70"
+        }
+      ]
+    },
+    "improved_finding_count": 2
+  },
+  "revalidation_plan": {
+    "tool": "static_checker_v1",
+    "command_hint": "python scripts/static_checker_v1.py baseline_rag_v1\\generated_scripts\\BV1-002.txt",
+    "success_condition": "static_pass == true"
+  },
+  "repaired_text_preview": "platform_type acoustic_target WSF_PLATFORM\n   icon aircraft\n   mover WSF_AIR_MOVER\n      maximum_speed 200 m/sec\n      minimum_speed 50 m/sec\n      default_radial_acceleration 3.0 g\n   end_mover\n   acoustic_signature TARGET_SIG\nend_platform_type\n\nacoustic_signature TARGET_SIG\n   constant 70 dB\nend_acoustic_signature\n\nantenna_pattern ACOUSTIC_ANT\n   constant_pattern\n      peak_gain 0 db\n      azimuth_beamwidth 360 deg\n      elevation_beamwidth 360 deg\n   end_constant_pattern\nend_antenna_pattern\n\nsensor ACOUSTIC_SENSOR WSF_ESM_SENSOR\n   selection_mode multiple\n\n   mode_template\n      receiver\n         antenna_pattern ACOUSTIC_ANT\n         noise_power -160 dBw\n         bandwidth 100.0 khz\n      end_receiver\n   end_mode_template\n\n   mode LISTEN\n      scan_mode fixed\n      azimuth_scan_limits 0 deg 0 deg\n      elevation_scan_limits 0 deg 0 deg\n   end_mode\nend_sensor\n\nplatform_type sensor_station WSF_PLATFORM\n   icon ground_sensor\n   mover WSF_GROUND_MOVER end_mover\n   sensor acoustic ACOUSTIC_SENSOR\n   end_sensor\n   processor status WSF_SCRIPT_PROCESSOR\n      update_interval 5.0 sec\n      on_initialize\n         print(\"Acoustic sensor station activated.\")\n      end_on_initialize\n      on_update\n         print(\"Time: \", TIME_NOW, \" sec\")\n      end_on_update\n   end_processor\nend_platform_type\n\nplatform moving_target acoustic_target\n   side blue\n   position 35.0n 120.0w altitude 5000 ft msl\n   route\n      position 35.0n 120.0w altitude 5000 ft msl speed 100 m/sec\n      position 36.0n 120.5w altitude 5000 ft msl speed 100 m/sec\n      position 36.5n 121.0w altitude 5000 ft msl speed 100 m/sec\n   end_route\nend_platform\n\nplatform sensor_post sensor_station\n   side red\n   position 35.2n 120.1w altitude 0 ft agl\n   processor status on end_processor\nend_platform\n\nevent_pipe\n   file output/acoustic_demo.aer\nend_event_pipe\n\nend_time 600 sec\nend_platform\nend_platform_type\n"
+}

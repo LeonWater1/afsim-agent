@@ -15,125 +15,12 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
 from run_mission import load_config
-
-
-BLOCK_STARTS = {
-    "script_interface": "end_script_interface",
-    "event_output": "end_event_output",
-    "dis_interface": "end_dis_interface",
-    "platform_type": "end_platform_type",
-    "platform": "end_platform",
-    "mover": "end_mover",
-    "route": "end_route",
-    "sensor": "end_sensor",
-    "weapon": "end_weapon",
-    "processor": "end_processor",
-    "antenna_pattern": "end_antenna_pattern",
-    "constant_pattern": "end_constant_pattern",
-    "transmitter": "end_transmitter",
-    "receiver": "end_receiver",
-    "script_variables": "end_script_variables",
-    "on_initialize": "end_on_initialize",
-    "on_update": "end_on_update",
-    "comm": "end_comm",
-}
-
-END_TO_START = {value: key for key, value in BLOCK_STARTS.items()}
-
-UNIT_COMMANDS = {
-    "maximum_speed",
-    "minimum_speed",
-    "default_radial_acceleration",
-    "default_linear_acceleration",
-    "frame_time",
-    "update_interval",
-    "pulse_width",
-    "pulse_repetition_frequency",
-    "frequency",
-    "power",
-    "bandwidth",
-    "one_m2_detect_range",
-    "altitude",
-    "heading",
-    "speed",
-    "end_time",
-    "maximum_range",
-    "minimum_range",
-}
-
-# Verified WSF_ types extracted from AFSIM 2.9.0 demo scripts that pass mission.exe.
-# Types are grouped by category for maintainability.
-VALID_WSFS = {
-    # Platform / base types
-    "WSF_PLATFORM", "WSF_BRAWLER_PLATFORM", "WSF_GROUP",
-    # Movers
-    "WSF_AIR_MOVER", "WSF_KINEMATIC_MOVER", "WSF_GUIDED_MOVER",
-    "WSF_GROUND_MOVER", "WSF_BRAWLER_MOVER", "WSF_SIX_DOF_MOVER",
-    "WSF_FIRES_MOVER", "WSF_STRAIGHT_LINE_MOVER", "WSF_OFFSET_MOVER",
-    "WSF_POINT_MASS_SIX_DOF_MOVER", "WSF_UNGUIDED_MOVER",
-    "WSF_STATIONARY_MOVER",
-    "WSF_INTEGRATING_SPACE_MOVER", "WSF_OLD_GUIDED_MOVER",
-    "WSF_AERO",
-    # Sensors
-    "WSF_RADAR_SENSOR", "WSF_ESM_SENSOR", "WSF_EOIR_SENSOR",
-    "WSF_GEOMETRIC_SENSOR", "WSF_SAR_SENSOR", "WSF_IRST_SENSOR",
-    "WSF_ACOUSTIC_SENSOR", "WSF_LASER_TRACKER",
-    "WSF_RF_JAMMER",
-    # Processors
-    "WSF_SCRIPT_PROCESSOR", "WSF_TRACK_PROCESSOR", "WSF_TASK_PROCESSOR",
-    "WSF_BRAWLER_PROCESSOR", "WSF_SA_PROCESSOR",
-    "WSF_QUANTUM_TASKER_PROCESSOR", "WSF_THREAT_PROCESSOR",
-    "WSF_PERCEPTION_PROCESSOR", "WSF_PERFECT_TRACKER",
-    "WSF_KALMAN_FILTER", "WSF_ALPHA_BETA_FILTER",
-    "WSF_LINKED_PROCESSOR", "WSF_IMAGE_PROCESSOR",
-    "WSF_DIRECTION_FINDER_PROCESSOR", "WSF_RIPR_PROCESSOR",
-    "WSF_WEAPON_TRACK_PROCESSOR", "WSF_STATE_MACHINE",
-    "WSF_FT_SCREENER", "WSF_SIMPLE_SENSORS_MANAGER",
-    "WSF_SENSORS_MANAGER_FOV", "WSF_WEAPONS_MANAGER_SAM",
-    "WSF_WEAPONS_MANAGER_AI", "WSF_UPLINK_PROCESSOR",
-    "WSF_UNCLASS_DISSEMINATE_C", "WSF_UNCLASS_BM",
-    "WSF_UNCLASS_ASSET_MANAGER", "WSF_SCRIPT_LAUNCH_COMPUTER",
-    # Weapons / lethality
-    "WSF_EXPLICIT_WEAPON", "WSF_IMPLICIT_WEAPON",
-    "WSF_AIR_TO_AIR_MISSILE", "WSF_CHAFF_WEAPON",
-    "WSF_GRADUATED_LETHALITY", "WSF_SPHERICAL_LETHALITY",
-    "WSF_AIR_TARGET_FUSE", "WSF_GROUND_TARGET_FUSE",
-    "WSF_WEAPON_FUSE",
-    # Launch computers
-    "WSF_GUIDANCE_COMPUTER", "WSF_AIR_TO_AIR_LAUNCH_COMPUTER",
-    "WSF_ATG_LAUNCH_COMPUTER", "WSF_ATA_LAUNCH_COMPUTER",
-    "WSF_FIRES_LAUNCH_COMPUTER", "WSF_OLD_GUIDANCE_COMPUTER",
-    "WSF_BALLISTIC_MISSILE_LAUNCH_COMPUTER",
-    # Comm / messages
-    "WSF_COMM_TRANSCEIVER", "WSF_COMM_XMTR", "WSF_COMM_RCVR",
-    "WSF_COMM_ROUTER", "WSF_RADIO_TRANSCEIVER", "WSF_RADIO_XMTR",
-    "WSF_RADIO_RCVR", "WSF_COMM_ROUTER_PROTOCOL_AD_HOC",
-    "WSF_COMM_NETWORK_AD_HOC",
-    "WSF_TRACK_MESSAGE", "WSF_CONTROL_MESSAGE", "WSF_ASSET_MESSAGE",
-    "WSF_TRACK_DROP_MESSAGE", "WSF_TRACK_NOTIFY_MESSAGE",
-    # Electronic warfare / effects
-    "WSF_ELECTRONIC_ATTACK", "WSF_ELECTRONIC_PROTECT",
-    "WSF_EA_TECHNIQUE", "WSF_EP_TECHNIQUE",
-    "WSF_SLB_EFFECT", "WSF_SLC_EFFECT", "WSF_RPJ_EFFECT",
-    "WSF_FALSE_TARGET_EFFECT", "WSF_FALSE_TARGET",
-    "WSF_JAMMER_POWER_EFFECT", "WSF_POWER_EFFECT",
-    "WSF_AGILITY_EFFECT", "WSF_TRACK_EFFECT",
-    "WSF_COVER_PULSE_EFFECT", "WSF_PULSE_SUPPRESS_EFFECT",
-    "WSF_SIMPLE_FT_EFFECT", "WSF_POL_MOD_EFFECT",
-    # Cyber
-    "WSF_CYBER_ATTACK", "WSF_CYBER_PROTECT",
-    "WSF_CYBER_SCRIPT_EFFECT", "WSF_CYBER_DETONATE_EFFECT",
-    "WSF_CYBER_MAN_IN_THE_MIDDLE_EFFECT", "WSF_CYBER_CONSTRAINT",
-    # Misc
-    "WSF_FUEL", "WSF_BRAWLER_FUEL", "WSF_TABULAR_RATE_FUEL",
-    "WSF_RADAR_SIGNATURE", "WSF_LASER_DESIGNATOR",
-    "WSF_CHAFF_PARCEL", "WSF_TRACK_MANAGER",
-}
+from static_checker_v1 import analyze_script_text
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 
@@ -205,184 +92,6 @@ def call_deepseek(task, api_key, model, api_timeout, max_retries):
             if attempt < max_retries:
                 time.sleep(2 * (attempt + 1))
     raise RuntimeError(f"DeepSeek generation failed for {task['id']}: {last_error}")
-
-
-def check_units(lines):
-    errors = []
-    unit_pattern = re.compile(
-        r"\b(m/sec|km/hr|knots|sec|min|hr|m|km|ft|nm|deg|rad|g|ghz|mhz|hz|kw|db|msl|agl)\b",
-        re.IGNORECASE,
-    )
-    numeric_pattern = re.compile(r"^-?\d+(\.\d+)?([eE][+-]?\d+)?$")
-    for line_no, raw in enumerate(lines, start=1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        parts = line.split()
-        if parts and parts[0] in UNIT_COMMANDS:
-            tokens = parts[1:]
-            if not tokens:
-                continue
-            if any(token.lower() == "microsec" for token in tokens):
-                errors.append((line_no, "unsupported unit microsec"))
-                continue
-            if numeric_pattern.match(tokens[0]) and not unit_pattern.search(" ".join(tokens[1:])):
-                errors.append((line_no, "numeric argument missing unit"))
-    return errors
-
-
-def is_block_start(head, parts, stack):
-    if head not in BLOCK_STARTS:
-        return False
-    if head == "antenna_pattern":
-        # antenna_pattern can also be a reference line inside transmitter/receiver.
-        if stack and stack[-1][0] in {"transmitter", "receiver"}:
-            return False
-    return True
-
-
-def check_blocks(lines):
-    stack = []
-    errors = []
-    for line_no, raw in enumerate(lines, start=1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        parts = line.split()
-        head = parts[0]
-        if is_block_start(head, parts, stack):
-            stack.append((head, line_no))
-        elif head in END_TO_START:
-            if not stack:
-                errors.append((line_no, f"unexpected {head}"))
-                continue
-            expected_start, start_line = stack.pop()
-            expected_end = BLOCK_STARTS[expected_start]
-            if head != expected_end:
-                errors.append((line_no, f"{head} closes {expected_start} from line {start_line}"))
-    for start, line_no in stack:
-        errors.append((line_no, f"missing {BLOCK_STARTS[start]}"))
-    return errors
-
-
-def extract_defined_symbols(lines):
-    platform_types = set()
-    antenna_patterns = set()
-    internal_components = defaultdict(set)
-    current_platform_type = None
-    for raw in lines:
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        parts = line.split()
-        if parts[0] == "platform_type" and len(parts) >= 2:
-            current_platform_type = parts[1]
-            platform_types.add(parts[1])
-        elif parts[0] == "end_platform_type":
-            current_platform_type = None
-        elif parts[0] == "antenna_pattern" and len(parts) >= 2:
-            antenna_patterns.add(parts[1])
-        elif current_platform_type and parts[0] in {"sensor", "weapon", "processor"} and len(parts) >= 2:
-            internal_components[current_platform_type].add(parts[1])
-    return platform_types, antenna_patterns, internal_components
-
-
-def check_references(lines):
-    platform_types, antenna_patterns, _ = extract_defined_symbols(lines)
-    errors = []
-    for line_no, raw in enumerate(lines, start=1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        parts = line.split()
-        if parts[0] == "platform" and len(parts) >= 3 and parts[2] not in platform_types:
-            errors.append((line_no, f"undefined platform type {parts[2]}"))
-        if parts[0] == "antenna_pattern" and len(parts) >= 2 and line_no > 1:
-            continue
-        if parts[0] == "antenna_pattern" and len(parts) >= 2 and parts[1] not in antenna_patterns:
-            errors.append((line_no, f"undefined antenna pattern {parts[1]}"))
-    return errors
-
-
-def check_coordinates(lines):
-    errors = []
-    for line_no, raw in enumerate(lines, start=1):
-        line = raw.strip()
-        if not line.startswith("position "):
-            continue
-        if "altitude" in line:
-            if not re.search(r"\b\d+(\.\d+)?\s+(m|ft)\s+(msl|agl)\b", line):
-                errors.append((line_no, "invalid altitude format"))
-        else:
-            parts = line.split()
-            if len(parts) < 4:
-                errors.append((line_no, "position too short"))
-        if not (
-            re.search(r"\b\d+(\.\d+)?[ns]\b", line.lower())
-            and re.search(r"\b\d+(\.\d+)?[ew]\b", line.lower())
-        ):
-            if not re.search(r"position\s+-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s+-?\d+(\.\d+)?", line.lower()):
-                errors.append((line_no, "invalid coordinate format"))
-    return errors
-
-
-def check_hallucinated_types(lines):
-    errors = []
-    for line_no, raw in enumerate(lines, start=1):
-        line = raw.strip()
-        for token in line.split():
-            if token.startswith("WSF_") and token not in VALID_WSFS:
-                errors.append((line_no, f"unknown or ungrounded type {token}"))
-    return errors
-
-
-def check_required_fields(lines):
-    text = "\n".join(lines)
-    errors = []
-    if "end_time" not in text:
-        errors.append((0, "missing end_time"))
-    if "platform " in text and "route" not in text and "position " not in text:
-        errors.append((0, "platforms missing route or position"))
-    return errors
-
-
-def check_script_language(lines):
-    errors = []
-    text = "\n".join(lines)
-    if "cout <<" in text:
-        errors.append((0, "unsupported cout"))
-    if re.search(r"\?.*:", text):
-        errors.append((0, "unsupported ternary operator"))
-    if "fmod(" in text:
-        errors.append((0, "unsupported fmod"))
-    return errors
-
-
-def static_analysis(script_text: str):
-    lines = script_text.splitlines()
-    findings = []
-
-    mapping = {
-        "E001": check_units(lines),
-        "E002": check_blocks(lines),
-        "E003": check_references(lines),
-        "E004": check_coordinates(lines),
-        "E005": check_hallucinated_types(lines),
-        "E006": check_required_fields(lines),
-        "E008": check_script_language(lines),
-    }
-
-    for error_id, items in mapping.items():
-        for line_no, message in items:
-            findings.append({"error_id": error_id, "line": line_no, "message": message})
-
-    # Heuristic component mismatch checks.
-    if "WSF_RADAR_SENSOR" in script_text and "transmitter" not in script_text:
-        findings.append({"error_id": "E007", "line": 0, "message": "radar sensor missing transmitter"})
-    if "antenna_pattern" in script_text and "constant_pattern" not in script_text:
-        findings.append({"error_id": "E007", "line": 0, "message": "antenna pattern missing constant_pattern"})
-
-    return findings
 
 
 def semantic_match(task, script_text, mission_status):
@@ -533,9 +242,9 @@ def main():
         (script_path.parent / "output").mkdir(parents=True, exist_ok=True)
         script_path.write_text(script_text, encoding="utf-8")
 
-        findings = static_analysis(script_text)
-        static_error_ids = sorted({item["error_id"] for item in findings})
-        static_blocking = any(item["error_id"] in {"E001", "E002", "E003", "E004", "E005", "E006", "E007", "E008"} for item in findings)
+        static_result = analyze_script_text(script_text, script_label=str(script_path))
+        findings = static_result["findings"]
+        static_error_ids = static_result["static_error_ids"]
 
         cmd = [str(mission_exe), "-es", "-sm", str(script_path)]
         mission_status = "NOT_RUN"
@@ -589,8 +298,8 @@ def main():
                 "generated_script": str(script_path.relative_to(root)).replace("\\", "/"),
                 "static_errors": findings,
                 "static_error_ids": static_error_ids,
-                "syntax_correct": not any(item["error_id"] in {"E001", "E002", "E004", "E007", "E008"} for item in findings),
-                "static_pass": not static_blocking,
+                "syntax_correct": static_result["syntax_correct"],
+                "static_pass": static_result["static_pass"],
                 "mission_status": mission_status,
                 "return_code": return_code,
                 "mission_log": str((logs_dir / f"{task['id']}.log").relative_to(root)).replace("\\", "/"),

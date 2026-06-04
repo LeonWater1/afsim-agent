@@ -1,0 +1,39 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\benchmarks\\benchmark_v1\\demo_sources\\acoustic\\simple_demo.txt",
+    "mission_status": "PASS",
+    "return_code": 0
+  },
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\benchmarks\\benchmark_v1\\demo_sources\\acoustic\\simple_demo.txt",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  },
+  "execution_analysis": {
+    "mission_pass": true,
+    "primary_error": "",
+    "classifier": "pass",
+    "route": "no_repair_needed",
+    "inferred_stage": "none",
+    "suggested_action": "mission execution passed",
+    "evidence_lines": []
+  },
+  "repair_recommendation": {
+    "primary_error": "",
+    "route": "no_repair_needed",
+    "inferred_stage": "none",
+    "suggested_action": "mission execution passed"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "rerun static_checker_v1 if the repair touched script structure or script logic"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\benchmarks\\benchmark_v1\\demo_sources\\acoustic\\simple_demo.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

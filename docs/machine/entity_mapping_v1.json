@@ -1,0 +1,668 @@
+{
+  "version": "entity_mapping_v1",
+  "description": "Minimal grounding library for Task-010. Covers benchmark_v1 and the minimal agent loop.",
+  "principles": {
+    "no_hallucinated_wsf_types": true,
+    "prefer_demo_backed_targets": true,
+    "allow_project_canonical_templates": true,
+    "unresolved_policy": "keep *_hint and emit grounding_hints instead of inventing AFSIM entities"
+  },
+  "sides": {
+    "blue": {
+      "canonical_id": "blue",
+      "aliases": ["blue", "friendly", "allied", "我方", "蓝方", "友方"]
+    },
+    "red": {
+      "canonical_id": "red",
+      "aliases": ["red", "hostile", "enemy", "敌方", "红方", "目标方"]
+    },
+    "neutral": {
+      "canonical_id": "neutral",
+      "aliases": ["neutral", "civilian", "中立", "平民"]
+    }
+  },
+  "platform_mappings": {
+    "aircraft": {
+      "canonical_id": "aircraft_basic",
+      "canonical_role": "aircraft",
+      "match_labels": ["aircraft", "飞机", "航空器"],
+      "platform_type_hints": ["aircraft", "fixed_wing_aircraft"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "aircraft_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["air_mover_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+      ]
+    },
+    "fighter": {
+      "canonical_id": "fighter_aircraft_basic",
+      "canonical_role": "fighter",
+      "match_labels": ["fighter", "fighter_aircraft", "战斗机", "截击机", "歼击机"],
+      "platform_type_hints": ["fighter_aircraft", "escort_fighter", "intruder_aircraft"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "fighter_aircraft_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": [
+        "air_mover_basic",
+        "fighter_radar_basic",
+        "air_to_air_missile_basic",
+        "track_processor_basic"
+      ],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
+        "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+      ]
+    },
+    "radar_site": {
+      "canonical_id": "ground_radar_site_basic",
+      "canonical_role": "radar_site",
+      "match_labels": ["radar_site", "radar_platform", "radar_company", "雷达站", "雷达阵地", "雷达平台"],
+      "platform_type_hints": ["radar_platform", "radar_site", "radar_company"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "ground_radar_site_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["radar_sensor_basic", "track_processor_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt",
+        "benchmarks/benchmark_v1/demo_sources/electronic_warfare/test_false_targets/platforms/red_radar.txt"
+      ]
+    },
+    "ship": {
+      "canonical_id": "surface_ship_basic",
+      "canonical_role": "ship",
+      "match_labels": ["ship", "surface_ship", "舰艇", "军舰", "水面舰"],
+      "platform_type_hints": ["ship", "surface_ship"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "surface_ship_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["surface_mover_basic", "radar_sensor_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/ciws/platforms/ship.txt"
+      ]
+    },
+    "missile_site": {
+      "canonical_id": "sam_site_basic",
+      "canonical_role": "missile_site",
+      "match_labels": ["missile_site", "sam_platform", "sam_battery", "missile_battery", "导弹阵地", "防空导弹阵地", "防空导弹连"],
+      "platform_type_hints": ["sam_platform", "sam_site", "sam_battery"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "sam_site_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["sam_weapon_basic", "radar_sensor_basic", "task_processor_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/sam_launcher.txt",
+        "benchmarks/benchmark_v1/demo_sources/electronic_warfare/test_false_targets/platforms/large_sam_battalion.txt"
+      ]
+    },
+    "hvaa": {
+      "canonical_id": "transport_or_hvaa_aircraft_basic",
+      "canonical_role": "hvaa",
+      "match_labels": ["hvaa", "high_value_air_asset", "预警机", "高价值空中资产", "运输机"],
+      "platform_type_hints": ["transport_or_hvaa_aircraft", "hvaa_aircraft"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "transport_or_hvaa_aircraft_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["air_mover_basic", "datalink_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/hvaa.txt"
+      ]
+    },
+    "sensor_platform": {
+      "canonical_id": "acoustic_sensor_platform_basic",
+      "canonical_role": "sensor_platform",
+      "match_labels": ["sensor_platform", "acoustic_sensor_platform", "探测平台", "传感器平台"],
+      "platform_type_hints": ["acoustic_sensor_platform", "sensor_platform"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "acoustic_sensor_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["acoustic_sensor_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+      ]
+    },
+    "acoustic_target": {
+      "canonical_id": "acoustic_target_basic",
+      "canonical_role": "target",
+      "match_labels": ["target", "acoustic_target", "被探测目标", "声学目标"],
+      "platform_type_hints": ["acoustic_target", "surface_target"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "acoustic_target_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": [],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+      ]
+    },
+    "detector": {
+      "canonical_id": "detector_platform_basic",
+      "canonical_role": "detector",
+      "match_labels": ["detector", "detector_platform", "探测节点", "探测车"],
+      "platform_type_hints": ["detector_platform"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "detector_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["datalink_basic", "track_processor_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt"
+      ]
+    },
+    "relay": {
+      "canonical_id": "relay_platform_basic",
+      "canonical_role": "relay",
+      "match_labels": ["relay", "relay_platform", "中继节点", "中继平台"],
+      "platform_type_hints": ["relay_platform"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "relay_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["group_comm_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+      ]
+    },
+    "observer": {
+      "canonical_id": "observer_platform_basic",
+      "canonical_role": "observer",
+      "match_labels": ["observer", "observer_platform", "观察节点", "观察员平台"],
+      "platform_type_hints": ["observer_platform"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "observer_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["group_comm_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+      ]
+    },
+    "iads_command": {
+      "canonical_id": "iads_command_platform_basic",
+      "canonical_role": "iads_commander",
+      "match_labels": ["iads_command", "iads_command_platform", "iads_commander", "防空指挥节点", "防空指挥平台"],
+      "platform_type_hints": ["iads_command_platform", "iads_commander"],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "iads_command_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "default_component_bundle": ["battle_manager_basic", "datalink_basic"],
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/processors/battle_manager.txt",
+        "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+      ]
+    }
+  },
+  "task_mappings": {
+    "cap": {
+      "canonical_id": "cap",
+      "match_labels": ["cap", "combat_air_patrol", "空中巡逻", "战斗空中巡逻"],
+      "ir_task_types": ["cap", "patrol"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "cap_patrol_behavior"
+      },
+      "script_realization": ["route", "processor"]
+    },
+    "patrol": {
+      "canonical_id": "patrol",
+      "match_labels": ["patrol", "巡逻", "巡航巡逻"],
+      "ir_task_types": ["patrol"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "patrol_behavior"
+      },
+      "script_realization": ["route", "processor"]
+    },
+    "intercept": {
+      "canonical_id": "intercept",
+      "match_labels": ["intercept", "拦截", "截击"],
+      "ir_task_types": ["intercept", "air_engage"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "intercept_behavior"
+      },
+      "script_realization": ["processor", "weapon", "sensor"]
+    },
+    "strike": {
+      "canonical_id": "strike",
+      "match_labels": ["strike", "打击", "攻击"],
+      "ir_task_types": ["strike", "air_attack"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "strike_behavior"
+      },
+      "script_realization": ["route", "processor", "weapon"]
+    },
+    "escort": {
+      "canonical_id": "escort",
+      "match_labels": ["escort", "护航", "伴随掩护"],
+      "ir_task_types": ["escort"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "escort_behavior"
+      },
+      "script_realization": ["processor", "comm", "route"]
+    },
+    "detect": {
+      "canonical_id": "detect",
+      "match_labels": ["detect", "探测", "发现"],
+      "ir_task_types": ["detect"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "detection_behavior"
+      },
+      "script_realization": ["sensor", "processor"]
+    },
+    "engage": {
+      "canonical_id": "engage",
+      "match_labels": ["engage", "交战", "攻击目标"],
+      "ir_task_types": ["engage", "air_engage"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "engage_behavior"
+      },
+      "script_realization": ["processor", "weapon", "sensor"]
+    },
+    "area_air_defense": {
+      "canonical_id": "area_air_defense",
+      "match_labels": ["area_air_defense", "iads_defense", "区域防空", "防空拦截"],
+      "ir_task_types": ["area_air_defense"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "iads_area_defense_behavior"
+      },
+      "script_realization": ["processor", "sensor", "weapon", "comm"]
+    },
+    "group_communication": {
+      "canonical_id": "group_communication",
+      "match_labels": ["group_communication", "group_comm", "群组通信", "组网通信"],
+      "ir_task_types": ["group_communication"],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "group_communication_behavior"
+      },
+      "script_realization": ["comm", "processor"]
+    }
+  },
+  "component_mappings": {
+    "mover": {
+      "air_mover": {
+        "canonical_id": "air_mover_basic",
+        "match_labels": ["air_mover", "fighter_mover", "aircraft_mover", "空中机动"],
+        "type_hints": ["air_mover"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_AIR_MOVER"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+        ]
+      },
+      "surface_mover": {
+        "canonical_id": "surface_mover_basic",
+        "match_labels": ["surface_mover", "ship_mover", "水面机动"],
+        "type_hints": ["surface_mover"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_GROUND_MOVER"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/ciws/platforms/ship.txt"
+        ]
+      },
+      "kinematic_mover": {
+        "canonical_id": "kinematic_mover_basic",
+        "match_labels": ["kinematic_mover", "运动学机动"],
+        "type_hints": ["kinematic_mover"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_KINEMATIC_MOVER"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/kinematic_mover/kinematic_mover_demo.txt"
+        ]
+      }
+    },
+    "sensor": {
+      "radar_sensor": {
+        "canonical_id": "radar_sensor_basic",
+        "match_labels": ["radar", "radar_sensor", "aesa_radar", "雷达", "AESA雷达"],
+        "type_hints": ["radar_sensor", "air_intercept_radar", "acquisition_radar", "tracking_radar"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_RADAR_SENSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+        ]
+      },
+      "acoustic_sensor": {
+        "canonical_id": "acoustic_sensor_basic",
+        "match_labels": ["acoustic_sensor", "声学传感器", "被动声学"],
+        "type_hints": ["acoustic_sensor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_ACOUSTIC_SENSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+        ]
+      },
+      "esm_sensor": {
+        "canonical_id": "esm_sensor_basic",
+        "match_labels": ["esm", "esm_sensor", "电子支援", "ESM传感器"],
+        "type_hints": ["esm_sensor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_ESM_SENSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/electronic_warfare/esm_detect_radar.txt"
+        ]
+      },
+      "laser_designator": {
+        "canonical_id": "laser_designator_basic",
+        "match_labels": ["laser_designator", "激光指示器", "激光照射器"],
+        "type_hints": ["laser_designator"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_LASER_DESIGNATOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/laser_designator/platforms/soldier_jtac.txt"
+        ]
+      }
+    },
+    "weapon": {
+      "air_to_air_missile": {
+        "canonical_id": "air_to_air_missile_basic",
+        "match_labels": ["missile", "aam", "air_to_air_missile", "空空导弹"],
+        "type_hints": ["air_to_air_missile"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_AIR_TO_AIR_MISSILE"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/weapons/aam/medium_range_radar_missile.txt"
+        ]
+      },
+      "sam_weapon": {
+        "canonical_id": "sam_weapon_basic",
+        "match_labels": ["sam", "sam_weapon", "surface_to_air_missile", "防空导弹"],
+        "type_hints": ["sam_weapon"],
+        "grounding_target": {
+          "target_kind": "weapon_profile",
+          "target_id": "sam_weapon_profile",
+          "backing_wsf_type": "WSF_EXPLICIT_WEAPON",
+          "script_pattern": "explicit_weapon_with_spawned_platform",
+          "launched_platform_type": "SAM",
+          "required_spawned_platform_blocks": [
+            "mover",
+            "processor fuse",
+            "processor seeker"
+          ],
+          "required_spawned_processor_types": [
+            "WSF_AIR_TARGET_FUSE",
+            "WSF_PERFECT_TRACKER"
+          ],
+          "required_weapon_blocks": [
+            "weapon_effects",
+            "quantity",
+            "firing_delay",
+            "salvo_interval"
+          ]
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt",
+          "benchmarks/benchmark_v1/demo_sources/alternate_locations/weapons/sam/large_sam.txt"
+        ]
+      },
+      "chaff": {
+        "canonical_id": "chaff_weapon_basic",
+        "match_labels": ["chaff", "箔条", "干扰箔条"],
+        "type_hints": ["chaff_weapon"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_CHAFF_WEAPON"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/chaff/chaff_example.txt"
+        ]
+      },
+      "agm": {
+        "canonical_id": "agm_basic",
+        "match_labels": ["agm", "air_to_ground_missile", "空地导弹", "hellfire"],
+        "type_hints": ["agm_weapon", "guided_weapon"],
+        "grounding_target": {
+          "target_kind": "platform_template",
+          "target_id": "agm_basic",
+          "wsf_base_type": "WSF_PLATFORM",
+          "backing_weapon_wsf_type": "WSF_EXPLICIT_WEAPON",
+          "script_pattern": "explicit_weapon_with_spawned_platform",
+          "launched_platform_type": "HELLFIRE",
+          "required_spawned_platform_blocks": [
+            "mover",
+            "processor hellfire_guidance",
+            "processor track_manager",
+            "processor hellfire_fuse",
+            "sensor laser_tracker"
+          ],
+          "required_spawned_processor_types": [
+            "WSF_GUIDANCE_COMPUTER",
+            "WSF_WEAPON_TRACK_PROCESSOR",
+            "WSF_GROUND_TARGET_FUSE"
+          ],
+          "required_spawned_sensor_types": [
+            "WSF_LASER_TRACKER"
+          ],
+          "required_weapon_blocks": [
+            "launched_platform_type",
+            "weapon_effects"
+          ]
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/laser_designator/weapons/agm/hellfire.txt"
+        ]
+      }
+    },
+    "processor": {
+      "track_processor": {
+        "canonical_id": "track_processor_basic",
+        "match_labels": ["track_processor", "tracking", "数据管理", "跟踪处理"],
+        "type_hints": ["track_processor", "message_or_report_processor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_TRACK_PROCESSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+        ]
+      },
+      "task_processor": {
+        "canonical_id": "task_processor_basic",
+        "match_labels": ["task_processor", "task_manager", "任务处理", "任务管理"],
+        "type_hints": ["task_processor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_TASK_PROCESSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/ciws/processors/gun_battery_tactics.txt"
+        ]
+      },
+      "script_processor": {
+        "canonical_id": "script_processor_basic",
+        "match_labels": ["script_processor", "脚本处理器"],
+        "type_hints": ["script_processor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_SCRIPT_PROCESSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+        ]
+      },
+      "battle_manager": {
+        "canonical_id": "battle_manager_basic",
+        "match_labels": ["battle_manager", "iads_c2", "战斗管理", "指挥控制"],
+        "type_hints": ["battle_manager_processor"],
+        "grounding_target": {
+          "target_kind": "processor_profile",
+          "target_id": "battle_manager_profile",
+          "backing_wsf_type": "WSF_UNCLASS_BM",
+          "script_pattern": "iads_battle_manager",
+          "required_blocks": [
+            "weapon_table",
+            "scoring_factors",
+            "engage_iff_permissions"
+          ],
+          "preferred_comm_profile": "datalink_profile"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/iads_c2_demos/processors/battle_manager.txt"
+        ]
+      },
+      "sensor_manager": {
+        "canonical_id": "sensor_manager_basic",
+        "match_labels": ["sensor_manager", "sensor_management", "传感器调度", "传感器管理"],
+        "type_hints": ["sensor_manager_processor"],
+        "grounding_target": {
+          "target_kind": "processor_profile",
+          "target_id": "sensor_manager_profile",
+          "backing_wsf_type": "WSF_TASK_PROCESSOR",
+          "script_pattern": "radar_company_task_manager",
+          "required_peer_components": [
+            "track_processor_basic",
+            "datalink_basic"
+          ],
+          "preferred_platform_context": "ground_radar_site_basic"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/aea_iads/platforms/red_radar_company.txt"
+        ]
+      },
+      "fighter_engagement": {
+        "canonical_id": "fighter_engagement_basic",
+        "match_labels": ["fighter_engagement", "air_engagement", "空战交战", "战斗机交战"],
+        "type_hints": ["fighter_engagement_processor"],
+        "grounding_target": {
+          "target_kind": "behavior_bundle",
+          "target_id": "fighter_engagement_behavior",
+          "script_pattern": "air_to_air_engagement_bundle",
+          "preferred_platform_template": "fighter_aircraft_basic",
+          "required_support_components": [
+            "radar_sensor_basic",
+            "air_to_air_missile_basic"
+          ],
+          "optional_support_components": [
+            "datalink_basic",
+            "track_processor_basic"
+          ]
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+        ]
+      },
+      "escort_processor": {
+        "canonical_id": "escort_processor_basic",
+        "match_labels": ["escort_processor", "escort_behavior", "护航编排", "护航控制"],
+        "type_hints": ["escort_processor"],
+        "grounding_target": {
+          "target_kind": "behavior_bundle",
+          "target_id": "escort_behavior_bundle",
+          "script_pattern": "escort_mission_bundle",
+          "preferred_platform_template": "fighter_aircraft_basic",
+          "required_support_components": [
+            "datalink_basic"
+          ],
+          "optional_support_components": [
+            "air_to_air_missile_basic",
+            "radar_sensor_basic"
+          ]
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt",
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/prdata/escort.txt"
+        ]
+      },
+      "brawler_processor": {
+        "canonical_id": "brawler_processor_basic",
+        "match_labels": ["brawler", "brawler_processor", "近似空战模型"],
+        "type_hints": ["brawler_processor"],
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_BRAWLER_PROCESSOR"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/brawler_test.txt"
+        ]
+      }
+    },
+    "comm": {
+      "datalink": {
+        "canonical_id": "datalink_basic",
+        "match_labels": ["datalink", "comm_system", "network", "通信链路", "数据链"],
+        "type_hints": ["datalink", "comm_system"],
+        "grounding_target": {
+          "target_kind": "comm_profile",
+          "target_id": "datalink_profile",
+          "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+          "network_pattern": "peer_to_peer_or_hierarchical",
+          "required_directives": [
+            "network_name"
+          ],
+          "optional_directives": [
+            "internal_link"
+          ],
+          "message_pattern": "report_to_via_named_comm"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+          "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+        ]
+      },
+      "group_comm": {
+        "canonical_id": "group_comm_basic",
+        "match_labels": ["group_comm", "group_communication", "群组通信"],
+        "type_hints": ["group_comm"],
+        "grounding_target": {
+          "target_kind": "comm_profile",
+          "target_id": "group_comm_profile",
+          "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+          "network_pattern": "group_broadcast",
+          "required_directives": [
+            "group_join"
+          ],
+          "optional_directives": [
+            "internal_link"
+          ],
+          "message_pattern": "report_to_group_via_named_comm"
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "version": "repair_workflow_v1",
+  "input": {
+    "script_path": "baseline_rag_v1\\generated_scripts\\BV1-003.txt",
+    "has_ir_context": false,
+    "has_generation_plan": false
+  },
+  "static_analysis": {
+    "script": "baseline_rag_v1\\generated_scripts\\BV1-003.txt",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 78,
+        "message": "task must be nested under processor"
+      },
+      {
+        "error_id": "E007",
+        "line": 91,
+        "message": "task must be nested under processor"
+      },
+      {
+        "error_id": "E007",
+        "line": 101,
+        "message": "task must be nested under processor"
+      }
+    ]
+  },
+  "repair_summary": {
+    "finding_count": 3,
+    "auto_repairable_count": 0,
+    "manual_or_regeneration_count": 3,
+    "target_layers": [
+      "scenario_scaffold",
+      "platform_layer"
+    ],
+    "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+  },
+  "repair_steps": [
+    {
+      "step_id": "SR-001",
+      "priority": 60,
+      "error_id": "E007",
+      "line": 78,
+      "issue": "task must be nested under processor",
+      "layer_scope": "scenario_scaffold",
+      "default_severity": "blocking",
+      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+      "evidence": {
+        "line_text": "task EngageEnemy",
+        "nearest_block_kind": "",
+        "nearest_block_name": ""
+      },
+      "repair_mode": "regenerate_layer",
+      "auto_repairable": false,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+      "proposed_edit": null
+    },
+    {
+      "step_id": "SR-002",
+      "priority": 60,
+      "error_id": "E007",
+      "line": 91,
+      "issue": "task must be nested under processor",
+      "layer_scope": "platform_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+      "evidence": {
+        "line_text": "   task EngageEnemy",
+        "nearest_block_kind": "platform",
+        "nearest_block_name": "blue_1"
+      },
+      "repair_mode": "regenerate_layer",
+      "auto_repairable": false,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+      "proposed_edit": null
+    },
+    {
+      "step_id": "SR-003",
+      "priority": 60,
+      "error_id": "E007",
+      "line": 101,
+      "issue": "task must be nested under processor",
+      "layer_scope": "platform_layer",
+      "default_severity": "blocking",
+      "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+      "evidence": {
+        "line_text": "   task EngageEnemy",
+        "nearest_block_kind": "platform",
+        "nearest_block_name": "red_1"
+      },
+      "repair_mode": "regenerate_layer",
+      "auto_repairable": false,
+      "needs_ir_context": false,
+      "needs_grounding_refresh": false,
+      "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+      "proposed_edit": null
+    }
+  ],
+  "safe_repair_attempt": {
+    "attempted": true,
+    "applied_action_count": 0,
+    "applied_actions": [],
+    "post_repair_analysis": {
+      "script": "",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 78,
+          "message": "task must be nested under processor"
+        },
+        {
+          "error_id": "E007",
+          "line": 91,
+          "message": "task must be nested under processor"
+        },
+        {
+          "error_id": "E007",
+          "line": 101,
+          "message": "task must be nested under processor"
+        }
+      ]
+    },
+    "improved_finding_count": 0
+  },
+  "revalidation_plan": {
+    "tool": "static_checker_v1",
+    "command_hint": "python scripts/static_checker_v1.py baseline_rag_v1\\generated_scripts\\BV1-003.txt",
+    "success_condition": "static_pass == true"
+  },
+  "repaired_text_preview": "platform_type Fighter WSF_PLATFORM\n   icon aircraft\n   mover WSF_AIR_MOVER\n      maximum_speed 500 m/sec\n      minimum_speed 100 m/sec\n      default_radial_acceleration 5.0 g\n   end_mover\n   sensor WSF_RADAR_SENSOR radar\n      antenna_pattern radar_pattern\n         constant_pattern\n            peak_gain 35 db\n            azimuth_beamwidth 60 deg\n            elevation_beamwidth 60 deg\n         end_constant_pattern\n      end_antenna_pattern\n      update_interval 1.0 sec\n      maximum_range 80 nm\n      pulse_width 1.0e-6 sec\n   end_sensor\n   weapon WSF_AIR_TO_AIR_MISSILE aim120\n      missile_type WSF_AIR_TO_AIR_MISSILE\n      number_of_rounds 4\n      range 40 nm\n      speed 1200 m/sec\n      guidance_type active_radar\n   end_weapon\n   processor WSF_SCRIPT_PROCESSOR engage_logic\n      script_variables \n         extern double TIME_NOW;\n         extern WsfPlatform SELF;\n         WsfPlatform target;\n      end_script_variables\n      on_initialize\n         print(\"Processor initialized for \" + SELF.Name());\n      end_on_initialize\n      on_update\n         # simple engagement logic: look for enemy in tracks, fire when in range\n         WsfSensor mySensor = SELF.Sensor(\"radar\");\n         if (mySensor.IsNull() || !mySensor.IsOn()) {\n            return;\n         }\n         int trackCount = mySensor.TrackCount();\n         if (trackCount <= 0) {\n            return;\n         }\n         double closestRange = 999999.0;\n         WsfTrack bestTrack;\n         for (int i = 0; i < trackCount; i = i + 1) {\n            WsfTrack trk = mySensor.TrackEntry(i);\n            if (trk.IsValid() && trk.Target().IsValid() && trk.Target().Side() != SELF.Side()) {\n               double rng = SELF.SlantRangeTo(trk.Target());\n               if (rng < closestRange) {\n                  closestRange = rng;\n                  bestTrack = trk;\n               }\n            }\n         }\n         if (bestTrack.IsValid()) {\n            if (closestRange < 40 nm) {\n               WsfWeapon wpn = SELF.Weapon(\"aim120\");\n               if (wpn.IsValid() && wpn.RoundsRemaining() > 0) {\n                  wpn.FireAtTrack(bestTrack);\n                  print(SELF.Name() + \" fired AIM-120 at \" + bestTrack.TargetName());\n               }\n            } else {\n               # approach target: set heading toward him\n               WsfGeoPoint myPos = SELF.Position();\n               WsfGeoPoint tgtPos = bestTrack.Target().Position();\n               double hdg = myPos.BearingTo(tgtPos);\n               SELF.Mover().SetHeadingCommand(hdg);\n               SELF.Mover().SetSpeedCommand(400 m/sec);\n            }\n         }\n      end_on_update\n   end_processor\nend_platform_type\n\ntask EngageEnemy\n   script\n      writeln(\"Task: Engage enemy aircraft\");\n   end_script\nend_task\n\nplatform blue_1 Fighter\n   side blue\n   position 35.0n 120.0w altitude 30000 ft msl\n   route\n      position 35.0n 120.0w altitude 30000 ft msl speed 300 m/sec heading 0 deg\n      position 36.0n 120.0w altitude 30000 ft msl speed 300 m/sec\n   end_route\n   task EngageEnemy\nend_platform\n\nplatform red_1 Fighter\n   side red\n   position 36.0n 120.0w altitude 30000 ft msl\n   route\n      position 36.0n 120.0w altitude 30000 ft msl speed 300 m/sec heading 180 deg\n      position 35.0n 120.0w altitude 30000 ft msl speed 300 m/sec\n   end_route\n   task EngageEnemy\nend_platform\n\nend_time 600 sec\n"
+}

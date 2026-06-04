@@ -83,6 +83,7 @@ def run_mission(script_file, options=None, config=None):
         config = load_config()
 
     mission_exe = config["mission_exe"]
+    script_file = os.path.abspath(script_file)
 
     if not os.path.exists(mission_exe):
         print(f"ERROR: mission.exe not found at {mission_exe}", file=sys.stderr)
@@ -116,7 +117,7 @@ def run_mission(script_file, options=None, config=None):
             text=True,
             encoding="utf-8",
             errors="replace",
-            cwd=os.path.dirname(os.path.abspath(script_file)) or "."
+            cwd=os.path.dirname(script_file) or "."
         )
 
         # Print output
