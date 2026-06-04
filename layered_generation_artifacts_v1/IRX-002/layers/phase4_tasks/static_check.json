@@ -1,0 +1,101 @@
+{
+  "static_pass": false,
+  "findings": [
+    {
+      "error_id": "E002",
+      "line": 19,
+      "message": "end_antenna_pattern closes transmitter from line 12"
+    },
+    {
+      "error_id": "E002",
+      "line": 21,
+      "message": "end_transmitter closes sensor from line 11"
+    },
+    {
+      "error_id": "E002",
+      "line": 24,
+      "message": "end_sensor closes platform_type from line 8"
+    },
+    {
+      "error_id": "E002",
+      "line": 27,
+      "message": "unexpected end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 57,
+      "message": "end_antenna_pattern closes transmitter from line 50"
+    },
+    {
+      "error_id": "E002",
+      "line": 59,
+      "message": "end_transmitter closes sensor from line 49"
+    },
+    {
+      "error_id": "E002",
+      "line": 62,
+      "message": "end_sensor closes platform_type from line 46"
+    },
+    {
+      "error_id": "E002",
+      "line": 65,
+      "message": "unexpected end_platform_type"
+    },
+    {
+      "error_id": "E003",
+      "line": 13,
+      "message": "undefined antenna pattern main_antenna"
+    },
+    {
+      "error_id": "E003",
+      "line": 51,
+      "message": "undefined antenna pattern main_antenna"
+    },
+    {
+      "error_id": "E007",
+      "line": 14,
+      "message": "constant_pattern must be nested under antenna_pattern"
+    },
+    {
+      "error_id": "E007",
+      "line": 22,
+      "message": "receiver is only valid inside a sensor block"
+    },
+    {
+      "error_id": "E007",
+      "line": 52,
+      "message": "constant_pattern must be nested under antenna_pattern"
+    },
+    {
+      "error_id": "E007",
+      "line": 60,
+      "message": "receiver is only valid inside a sensor block"
+    },
+    {
+      "error_id": "E007",
+      "line": 67,
+      "message": "task must be nested under processor"
+    },
+    {
+      "error_id": "E007",
+      "line": 74,
+      "message": "task must be nested under processor"
+    },
+    {
+      "error_id": "E007",
+      "line": 72,
+      "message": "unknown command: end_task"
+    },
+    {
+      "error_id": "E007",
+      "line": 79,
+      "message": "unknown command: end_task"
+    }
+  ],
+  "error_ids": [
+    "E002",
+    "E003",
+    "E007"
+  ],
+  "primary_error": "E002"
+}

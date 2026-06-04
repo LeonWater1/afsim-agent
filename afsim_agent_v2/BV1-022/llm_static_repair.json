@@ -1,6 +1,6 @@
 {
   "version": "llm_repair_executor_v1",
-  "mode": "static_repair_layer_regeneration",
+  "mode": "static_repair_llm",
   "repair_plan": {
     "version": "repair_workflow_v1",
     "input": {
@@ -12,227 +12,123 @@
       "script": "BV1-022.txt",
       "syntax_correct": false,
       "static_pass": false,
-      "primary_error": "E004",
+      "primary_error": "E002",
       "static_error_ids": [
-        "E004",
+        "E002",
         "E007"
       ],
       "findings": [
         {
-          "error_id": "E004",
-          "line": 111,
-          "message": "invalid altitude format"
+          "error_id": "E002",
+          "line": 168,
+          "message": "missing end_event_pipe"
         },
         {
-          "error_id": "E004",
+          "error_id": "E007",
+          "line": 113,
+          "message": "task must be nested under processor"
+        },
+        {
+          "error_id": "E007",
           "line": 118,
-          "message": "invalid altitude format"
-        },
-        {
-          "error_id": "E004",
-          "line": 127,
-          "message": "invalid altitude format"
-        },
-        {
-          "error_id": "E004",
-          "line": 136,
-          "message": "invalid altitude format"
+          "message": "task must be nested under processor"
         },
         {
           "error_id": "E007",
-          "line": 55,
-          "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+          "line": 123,
+          "message": "task must be nested under processor"
         },
         {
           "error_id": "E007",
-          "line": 81,
-          "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+          "line": 170,
+          "message": "end_time must appear at top level, not inside another block"
         },
         {
           "error_id": "E007",
-          "line": 21,
-          "message": "unknown command: task.SetQuantity(1);"
+          "line": 40,
+          "message": "unknown command: end_spherical_lethality"
         },
         {
           "error_id": "E007",
-          "line": 22,
-          "message": "unknown command: task.SetCommDevice(\"perfect\");"
+          "line": 63,
+          "message": "unknown command: end_spherical_lethality"
         },
         {
           "error_id": "E007",
-          "line": 23,
-          "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+          "line": 86,
+          "message": "unknown command: end_spherical_lethality"
         },
         {
           "error_id": "E007",
-          "line": 24,
-          "message": "unknown command: AssignTask(aTrack,"
+          "line": 116,
+          "message": "unknown command: end_task"
         },
         {
           "error_id": "E007",
-          "line": 30,
-          "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+          "line": 121,
+          "message": "unknown command: end_task"
         },
         {
           "error_id": "E007",
-          "line": 31,
-          "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
+          "line": 126,
+          "message": "unknown command: end_task"
         },
         {
           "error_id": "E007",
-          "line": 34,
-          "message": "unknown command: SetTask(arty,"
-        },
-        {
-          "error_id": "E007",
-          "line": 35,
-          "message": "unknown command: endif"
-        },
-        {
-          "error_id": "E007",
-          "line": 38,
-          "message": "unknown command: SetTask(missile,"
-        },
-        {
-          "error_id": "E007",
-          "line": 39,
-          "message": "unknown command: endif"
-        },
-        {
-          "error_id": "E007",
-          "line": 43,
-          "message": "unknown command: writeln(\"Task"
-        },
-        {
-          "error_id": "E007",
-          "line": 69,
-          "message": "unknown command: mLC.Launch(task);"
-        },
-        {
-          "error_id": "E007",
-          "line": 70,
-          "message": "unknown command: endif"
-        },
-        {
-          "error_id": "E007",
-          "line": 95,
-          "message": "unknown command: mLC.Launch(task);"
-        },
-        {
-          "error_id": "E007",
-          "line": 96,
-          "message": "unknown command: endif"
+          "line": 169,
+          "message": "unknown command: end_scenario"
         }
       ]
     },
     "repair_summary": {
-      "finding_count": 21,
-      "auto_repairable_count": 0,
-      "manual_or_regeneration_count": 21,
+      "finding_count": 12,
+      "auto_repairable_count": 1,
+      "manual_or_regeneration_count": 11,
       "target_layers": [
-        "mission_layer",
+        "scenario_scaffold",
         "weapon_layer"
       ],
-      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+      "recommended_next_action": "apply_safe_repairs_then_regenerate_flagged_layers"
     },
     "repair_steps": [
       {
         "step_id": "SR-001",
-        "priority": 50,
-        "error_id": "E004",
-        "line": 111,
-        "issue": "invalid altitude format",
-        "layer_scope": "mission_layer",
+        "priority": 10,
+        "error_id": "E002",
+        "line": 168,
+        "issue": "missing end_event_pipe",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
-        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
+        "repair_hint": "Use stack-based block matching and insert the matching end_xxx for the nearest unclosed block.",
         "evidence": {
-          "line_text": "      position 30.50N 104.00E altitude 500 m speed 0 m/sec",
-          "nearest_block_kind": "route",
-          "nearest_block_name": ""
+          "line_text": "  event_pipe event_output",
+          "nearest_block_kind": "event_pipe",
+          "nearest_block_name": "event_output"
         },
-        "repair_mode": "regenerate_from_ir",
-        "auto_repairable": false,
-        "needs_ir_context": true,
+        "repair_mode": "safe_direct_edit",
+        "auto_repairable": true,
+        "needs_ir_context": false,
         "needs_grounding_refresh": false,
-        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
-        "proposed_edit": null
+        "suggested_action": "append missing closing tag `end_event_pipe`",
+        "proposed_edit": {
+          "action": "append_line",
+          "target_line": 170,
+          "replacement": "end_event_pipe"
+        }
       },
       {
         "step_id": "SR-002",
-        "priority": 50,
-        "error_id": "E004",
-        "line": 118,
-        "issue": "invalid altitude format",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
-        "evidence": {
-          "line_text": "      position 30.60N 104.00E altitude 500 m speed 0 m/sec",
-          "nearest_block_kind": "route",
-          "nearest_block_name": ""
-        },
-        "repair_mode": "regenerate_from_ir",
-        "auto_repairable": false,
-        "needs_ir_context": true,
-        "needs_grounding_refresh": false,
-        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-003",
-        "priority": 50,
-        "error_id": "E004",
-        "line": 127,
-        "issue": "invalid altitude format",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
-        "evidence": {
-          "line_text": "      position 30.65N 104.02E altitude 500 m speed 0 m/sec",
-          "nearest_block_kind": "route",
-          "nearest_block_name": ""
-        },
-        "repair_mode": "regenerate_from_ir",
-        "auto_repairable": false,
-        "needs_ir_context": true,
-        "needs_grounding_refresh": false,
-        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-004",
-        "priority": 50,
-        "error_id": "E004",
-        "line": 136,
-        "issue": "invalid altitude format",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Normalize coordinates from structured IR fields and regenerate position lines.",
-        "evidence": {
-          "line_text": "      position 30.80N 104.20E altitude 600 m speed 0 m/sec",
-          "nearest_block_kind": "route",
-          "nearest_block_name": ""
-        },
-        "repair_mode": "regenerate_from_ir",
-        "auto_repairable": false,
-        "needs_ir_context": true,
-        "needs_grounding_refresh": false,
-        "suggested_action": "normalize coordinates from IR locations or route waypoints and rewrite the position line",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-005",
         "priority": 60,
         "error_id": "E007",
-        "line": 21,
-        "issue": "unknown command: task.SetQuantity(1);",
-        "layer_scope": "mission_layer",
+        "line": 40,
+        "issue": "unknown command: end_spherical_lethality",
+        "layer_scope": "weapon_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         task.SetQuantity(1);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "        end_spherical_lethality",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "artillery_155mm"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -242,18 +138,81 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-006",
+        "step_id": "SR-003",
         "priority": 60,
         "error_id": "E007",
-        "line": 22,
-        "issue": "unknown command: task.SetCommDevice(\"perfect\");",
-        "layer_scope": "mission_layer",
+        "line": 63,
+        "issue": "unknown command: end_spherical_lethality",
+        "layer_scope": "weapon_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         task.SetCommDevice(\"perfect\");",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "        end_spherical_lethality",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "mortar_120mm"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 86,
+        "issue": "unknown command: end_spherical_lethality",
+        "layer_scope": "weapon_layer",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "        end_spherical_lethality",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "rocket_122mm"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 113,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  task artillery_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 116,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -266,36 +225,36 @@
         "step_id": "SR-007",
         "priority": 60,
         "error_id": "E007",
-        "line": 23,
-        "issue": "unknown command: task.SetAssignee(aPlatform.Name());",
-        "layer_scope": "mission_layer",
+        "line": 118,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         task.SetAssignee(aPlatform.Name());",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "  task mortar_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
         "needs_ir_context": false,
         "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
         "proposed_edit": null
       },
       {
         "step_id": "SR-008",
         "priority": 60,
         "error_id": "E007",
-        "line": 24,
-        "issue": "unknown command: AssignTask(aTrack,",
-        "layer_scope": "mission_layer",
+        "line": 121,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         AssignTask(aTrack, task);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -308,36 +267,36 @@
         "step_id": "SR-009",
         "priority": 60,
         "error_id": "E007",
-        "line": 30,
-        "issue": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\",",
-        "layer_scope": "mission_layer",
+        "line": 123,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "  task rocket_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
         "needs_ir_context": false,
         "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
         "proposed_edit": null
       },
       {
         "step_id": "SR-010",
         "priority": 60,
         "error_id": "E007",
-        "line": 31,
-        "issue": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);",
-        "layer_scope": "mission_layer",
+        "line": 126,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         PLATFORM.SetCurrentTarget(targetTrack);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -350,15 +309,15 @@
         "step_id": "SR-011",
         "priority": 60,
         "error_id": "E007",
-        "line": 34,
-        "issue": "unknown command: SetTask(arty,",
-        "layer_scope": "mission_layer",
+        "line": 169,
+        "issue": "unknown command: end_scenario",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "            SetTask(arty, targetTrack);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "end_scenario",
+          "nearest_block_kind": "event_pipe",
+          "nearest_block_name": "event_output"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -371,15 +330,15 @@
         "step_id": "SR-012",
         "priority": 60,
         "error_id": "E007",
-        "line": 35,
-        "issue": "unknown command: endif",
-        "layer_scope": "mission_layer",
+        "line": 170,
+        "issue": "end_time must appear at top level, not inside another block",
+        "layer_scope": "scenario_scaffold",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         endif",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+          "line_text": "end_time 600 sec",
+          "nearest_block_kind": "event_pipe",
+          "nearest_block_name": "event_output"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -387,104 +346,181 @@
         "needs_grounding_refresh": false,
         "suggested_action": "regenerate the affected layer using a component-specific template",
         "proposed_edit": null
+      }
+    ],
+    "safe_repair_attempt": {
+      "attempted": true,
+      "applied_action_count": 1,
+      "applied_actions": [
+        {
+          "error_id": "E002",
+          "action": "insert_line",
+          "target_line": 170,
+          "replacement": "end_event_pipe"
+        }
+      ],
+      "post_repair_analysis": {
+        "script": "",
+        "syntax_correct": false,
+        "static_pass": false,
+        "primary_error": "E007",
+        "static_error_ids": [
+          "E007"
+        ],
+        "findings": [
+          {
+            "error_id": "E007",
+            "line": 113,
+            "message": "task must be nested under processor"
+          },
+          {
+            "error_id": "E007",
+            "line": 118,
+            "message": "task must be nested under processor"
+          },
+          {
+            "error_id": "E007",
+            "line": 123,
+            "message": "task must be nested under processor"
+          },
+          {
+            "error_id": "E007",
+            "line": 40,
+            "message": "unknown command: end_spherical_lethality"
+          },
+          {
+            "error_id": "E007",
+            "line": 63,
+            "message": "unknown command: end_spherical_lethality"
+          },
+          {
+            "error_id": "E007",
+            "line": 86,
+            "message": "unknown command: end_spherical_lethality"
+          },
+          {
+            "error_id": "E007",
+            "line": 116,
+            "message": "unknown command: end_task"
+          },
+          {
+            "error_id": "E007",
+            "line": 121,
+            "message": "unknown command: end_task"
+          },
+          {
+            "error_id": "E007",
+            "line": 126,
+            "message": "unknown command: end_task"
+          },
+          {
+            "error_id": "E007",
+            "line": 169,
+            "message": "unknown command: end_scenario"
+          }
+        ]
       },
-      {
-        "step_id": "SR-013",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 38,
-        "issue": "unknown command: SetTask(missile,",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "            SetTask(missile, targetTrack);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+      "improved_finding_count": 2
+    },
+    "revalidation_plan": {
+      "tool": "static_checker_v1",
+      "command_hint": "python scripts/static_checker_v1.py BV1-022.txt",
+      "success_condition": "static_pass == true"
+    },
+    "repaired_text_preview": "scenario time_on_target_fires\n  description \"Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.\"\n  duration 600 sec\n  side red\n    display_name \"Red\"\n  end_side\n  location artillery_position_1\n    kind point\n    position 51.53n 0.44e\n  end_location\n  location mortar_position\n    kind point\n    position 51.49n 0.37e\n  end_location\n  location rocket_position\n    kind point\n    position 51.50n 0.27e\n  end_location\n  location commander_position\n    kind point\n    position 51.58n 0.31e\n  end_location\n  location target_location\n    kind point\n    position 51.47n 0.35e\n  end_location\n\n  network datalink_network WSF_COMM_NETWORK_AD_HOC\n  end_network\n\n  platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM\n    weapon artillery_155mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 30 km\n        minimum_firing_range 3 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 50 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM\n    weapon mortar_120mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 8 km\n        minimum_firing_range 1 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 30 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM\n    weapon rocket_122mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 20 km\n        minimum_firing_range 5 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 70 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_FIRES_COMMANDER WSF_PLATFORM\n    processor commander_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_TARGET_UNIT WSF_PLATFORM\n  end_platform_type\n\n  task artillery_fire\n    start_time 270 sec\n    fire_at target_unit\n  end_task\n\n  task mortar_fire\n    start_time 285 sec\n    fire_at target_unit\n  end_task\n\n  task rocket_fire\n    start_time 287 sec\n    fire_at target_unit\n  end_task\n\n  platform artillery_launcher PT_ARTILLERY_LAUNCHER\n    side red\n    position 51.53n 0.44e\n    add weapon artillery_155mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task artillery_fire\n  end_platform\n\n  platform mortar_launcher PT_MORTAR_LAUNCHER\n    side red\n    position 51.49n 0.37e\n    altitude 0 m agl\n    add weapon mortar_120mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task mortar_fire\n  end_platform\n\n  platform rocket_launcher PT_ROCKET_LAUNCHER\n    side red\n    position 51.50n 0.27e\n    add weapon rocket_122mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task rocket_fire\n  end_platform\n\n  platform fires_commander PT_FIRES_COMMANDER\n    side red\n    position 51.58n 0.31e\n    add processor commander_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform target_unit PT_TARGET_UNIT\n    side red\n    position 51.47n 0.35e\n  end_platform\n\n  event_pipe event_output\nend_scenario\nend_event_pipe\nend_time 600 sec\n"
+  },
+  "repair_plan_after_safe_repair": {
+    "version": "repair_workflow_v1",
+    "input": {
+      "script_path": "BV1-022.txt",
+      "has_ir_context": true,
+      "has_generation_plan": true
+    },
+    "static_analysis": {
+      "script": "BV1-022.txt",
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 113,
+          "message": "task must be nested under processor"
         },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-014",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 39,
-        "issue": "unknown command: endif",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "         endif",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+        {
+          "error_id": "E007",
+          "line": 118,
+          "message": "task must be nested under processor"
         },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-015",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 43,
-        "issue": "unknown command: writeln(\"Task",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "coordinator"
+        {
+          "error_id": "E007",
+          "line": 123,
+          "message": "task must be nested under processor"
         },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
+        {
+          "error_id": "E007",
+          "line": 40,
+          "message": "unknown command: end_spherical_lethality"
+        },
+        {
+          "error_id": "E007",
+          "line": 63,
+          "message": "unknown command: end_spherical_lethality"
+        },
+        {
+          "error_id": "E007",
+          "line": 86,
+          "message": "unknown command: end_spherical_lethality"
+        },
+        {
+          "error_id": "E007",
+          "line": 116,
+          "message": "unknown command: end_task"
+        },
+        {
+          "error_id": "E007",
+          "line": 121,
+          "message": "unknown command: end_task"
+        },
+        {
+          "error_id": "E007",
+          "line": 126,
+          "message": "unknown command: end_task"
+        },
+        {
+          "error_id": "E007",
+          "line": 169,
+          "message": "unknown command: end_scenario"
+        }
+      ]
+    },
+    "repair_summary": {
+      "finding_count": 10,
+      "auto_repairable_count": 0,
+      "manual_or_regeneration_count": 10,
+      "target_layers": [
+        "weapon_layer",
+        "scenario_scaffold"
+      ],
+      "recommended_next_action": "regenerate_flagged_layers_or_refresh_grounding"
+    },
+    "repair_steps": [
       {
-        "step_id": "SR-016",
+        "step_id": "SR-001",
         "priority": 60,
         "error_id": "E007",
-        "line": 55,
-        "issue": "weapon_type is a pseudo keyword and cannot be used as a standalone command",
+        "line": 40,
+        "issue": "unknown command: end_spherical_lethality",
         "layer_scope": "weapon_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "      weapon_type artillery_shell",
+          "line_text": "        end_spherical_lethality",
           "nearest_block_kind": "weapon",
-          "nearest_block_name": "artillery_launcher"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "replace the pseudo keyword with a legal block generated from the component profile",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-017",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 69,
-        "issue": "unknown command: mLC.Launch(task);",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "            mLC.Launch(task);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "artillery_task"
+          "nearest_block_name": "artillery_155mm"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -494,60 +530,18 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-018",
+        "step_id": "SR-002",
         "priority": 60,
         "error_id": "E007",
-        "line": 70,
-        "issue": "unknown command: endif",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "         endif",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "artillery_task"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "regenerate the affected layer using a component-specific template",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-019",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 81,
-        "issue": "weapon_type is a pseudo keyword and cannot be used as a standalone command",
+        "line": 63,
+        "issue": "unknown command: end_spherical_lethality",
         "layer_scope": "weapon_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "      weapon_type cruise_missile",
+          "line_text": "        end_spherical_lethality",
           "nearest_block_kind": "weapon",
-          "nearest_block_name": "missile_launcher"
-        },
-        "repair_mode": "regenerate_layer",
-        "auto_repairable": false,
-        "needs_ir_context": false,
-        "needs_grounding_refresh": false,
-        "suggested_action": "replace the pseudo keyword with a legal block generated from the component profile",
-        "proposed_edit": null
-      },
-      {
-        "step_id": "SR-020",
-        "priority": 60,
-        "error_id": "E007",
-        "line": 95,
-        "issue": "unknown command: mLC.Launch(task);",
-        "layer_scope": "mission_layer",
-        "default_severity": "blocking",
-        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
-        "evidence": {
-          "line_text": "            mLC.Launch(task);",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "missile_task"
+          "nearest_block_name": "mortar_120mm"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -557,18 +551,165 @@
         "proposed_edit": null
       },
       {
-        "step_id": "SR-021",
+        "step_id": "SR-003",
         "priority": 60,
         "error_id": "E007",
-        "line": 96,
-        "issue": "unknown command: endif",
-        "layer_scope": "mission_layer",
+        "line": 86,
+        "issue": "unknown command: end_spherical_lethality",
+        "layer_scope": "weapon_layer",
         "default_severity": "blocking",
         "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
         "evidence": {
-          "line_text": "         endif",
-          "nearest_block_kind": "processor",
-          "nearest_block_name": "missile_task"
+          "line_text": "        end_spherical_lethality",
+          "nearest_block_kind": "weapon",
+          "nearest_block_name": "rocket_122mm"
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-004",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 113,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  task artillery_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-005",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 116,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-006",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 118,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  task mortar_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-007",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 121,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-008",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 123,
+        "issue": "task must be nested under processor",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  task rocket_fire",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "move the block into the legal parent scope and regenerate the owning layer",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-009",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 126,
+        "issue": "unknown command: end_task",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "  end_task",
+          "nearest_block_kind": "",
+          "nearest_block_name": ""
+        },
+        "repair_mode": "regenerate_layer",
+        "auto_repairable": false,
+        "needs_ir_context": false,
+        "needs_grounding_refresh": false,
+        "suggested_action": "regenerate the affected layer using a component-specific template",
+        "proposed_edit": null
+      },
+      {
+        "step_id": "SR-010",
+        "priority": 60,
+        "error_id": "E007",
+        "line": 169,
+        "issue": "unknown command: end_scenario",
+        "layer_scope": "scenario_scaffold",
+        "default_severity": "blocking",
+        "repair_hint": "Render components from type-specific templates and move parameters into legal sub-blocks.",
+        "evidence": {
+          "line_text": "end_scenario",
+          "nearest_block_kind": "event_pipe",
+          "nearest_block_name": "event_output"
         },
         "repair_mode": "regenerate_layer",
         "auto_repairable": false,
@@ -586,116 +727,60 @@
         "script": "",
         "syntax_correct": false,
         "static_pass": false,
-        "primary_error": "E004",
+        "primary_error": "E007",
         "static_error_ids": [
-          "E004",
           "E007"
         ],
         "findings": [
           {
-            "error_id": "E004",
-            "line": 111,
-            "message": "invalid altitude format"
+            "error_id": "E007",
+            "line": 113,
+            "message": "task must be nested under processor"
           },
           {
-            "error_id": "E004",
+            "error_id": "E007",
             "line": 118,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E004",
-            "line": 127,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E004",
-            "line": 136,
-            "message": "invalid altitude format"
+            "message": "task must be nested under processor"
           },
           {
             "error_id": "E007",
-            "line": 55,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+            "line": 123,
+            "message": "task must be nested under processor"
           },
           {
             "error_id": "E007",
-            "line": 81,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+            "line": 40,
+            "message": "unknown command: end_spherical_lethality"
           },
           {
             "error_id": "E007",
-            "line": 21,
-            "message": "unknown command: task.SetQuantity(1);"
+            "line": 63,
+            "message": "unknown command: end_spherical_lethality"
           },
           {
             "error_id": "E007",
-            "line": 22,
-            "message": "unknown command: task.SetCommDevice(\"perfect\");"
+            "line": 86,
+            "message": "unknown command: end_spherical_lethality"
           },
           {
             "error_id": "E007",
-            "line": 23,
-            "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+            "line": 116,
+            "message": "unknown command: end_task"
           },
           {
             "error_id": "E007",
-            "line": 24,
-            "message": "unknown command: AssignTask(aTrack,"
+            "line": 121,
+            "message": "unknown command: end_task"
           },
           {
             "error_id": "E007",
-            "line": 30,
-            "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+            "line": 126,
+            "message": "unknown command: end_task"
           },
           {
             "error_id": "E007",
-            "line": 31,
-            "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
-          },
-          {
-            "error_id": "E007",
-            "line": 34,
-            "message": "unknown command: SetTask(arty,"
-          },
-          {
-            "error_id": "E007",
-            "line": 35,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 38,
-            "message": "unknown command: SetTask(missile,"
-          },
-          {
-            "error_id": "E007",
-            "line": 39,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 43,
-            "message": "unknown command: writeln(\"Task"
-          },
-          {
-            "error_id": "E007",
-            "line": 69,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 70,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 95,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 96,
-            "message": "unknown command: endif"
+            "line": 169,
+            "message": "unknown command: end_scenario"
           }
         ]
       },
@@ -706,209 +791,13 @@
       "command_hint": "python scripts/static_checker_v1.py BV1-022.txt",
       "success_condition": "static_pass == true"
     },
-    "repaired_text_preview": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n\n      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)\n         string weaponName = aPlatform.WeaponEntry(0).Name();\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(aPlatform.Name());\n         AssignTask(aTrack, task);\n      end_script\n\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);\n         PLATFORM.SetCurrentTarget(targetTrack);\n         WsfPlatform arty = WsfSimulation.FindPlatform(\"blue_artillery_battery\");\n         if (arty.IsValid())\n            SetTask(arty, targetTrack);\n         endif\n         WsfPlatform missile = WsfSimulation.FindPlatform(\"blue_missile_launcher\");\n         if (missile.IsValid())\n            SetTask(missile, targetTrack);\n         endif\n      end_execute\n\n      script void on_task_complete(WsfTask aTask)\n         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");\n      end_script\n\n   end_processor\nend_platform_type\n\nplatform_type ARTILLERY_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon artillery_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type artillery_shell\n      quantity 10\n   end_weapon\n   processor artillery_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_LAUNCHER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon missile_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type cruise_missile\n      quantity 5\n   end_weapon\n   processor missile_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform command_post COMMANDER_TYPE\n   side blue\n   route\n      position 30.50N 104.00E altitude 500 m speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_artillery_battery ARTILLERY_TYPE\n   side blue\n   route\n      position 30.60N 104.00E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform blue_missile_launcher MISSILE_LAUNCHER_TYPE\n   side blue\n   route\n      position 30.65N 104.02E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.80N 104.20E altitude 600 m speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/fires_time_on_target_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
-    "mission_errors": "mission:\n    WSF Version: 2.9.0 02-25-2022\n    Built: Feb 25 2022 08:12:40\nPlugin API version info:\n    Version: 2.9\n    Compiler: win_1916_64bit_release-hwe\nPlugins Loaded:\n    wsf_alternate_locations.dll, wsf_coverage.dll, wsf_iads_c2.dll, wsf_prompt.dll, wsf_scenario_analyzer.dll, wsf_scenario_analyzer_iads_c2.dll, wsf_air_combat.dll, wsf_annotation.dll, wsf_argo8.dll, wsf_brawler.dll, wsf_fires.dll, wsf_multiresolution.dll, wsf_oms_uci.dll, wsf_p6dof.dll, wsf_six_dof.dll, wsf_sosm.dll\nExtensions Included: \n    sensor_plot_lib, wsf_cyber, wsf_grammar_check, wsf_l16, wsf_mil, wsf_mil_parser, wsf_mtt, wsf_nx, wsf_parser, wsf_ripr, wsf_space, wsf_weapon_server, wsf_simdis\n\nLoading simulation input.\n***** ERROR: Unknown identifier: 'endif'\n    File: C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt\n    Line: 35\n    Column: 10\n             endif\n             ^\n***** ERROR: Unknown identifier: 'missile'\n    File: C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt\n    Line: 37\n    Column: 14\n             if (missile.IsValid())\n                 ^\n***** ERROR: Cannot call a method on type-less object\n    File: C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt\n    Line: 37\n    Column: 29\n             if (missile.IsValid())\n                                ^\n***** ERROR: Unknown identifier: 'missile'\n    File: C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt\n    Line: 38\n    Column: 21\n                SetTask(missile, targetTrack);\n                        ^\n***** ERROR: Unknown identifier: 'endif'\n    File: C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt\n    Line: 39\n    Column: 10\n             endif\n             ^\n***** ERROR: Error in script.\n    Global context\n\nLoading simulation input complete.\n    Elapsed Wall Clock Time: 0.0558297\n    Elapsed Pro"
+    "repaired_text_preview": "scenario time_on_target_fires\n  description \"Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.\"\n  duration 600 sec\n  side red\n    display_name \"Red\"\n  end_side\n  location artillery_position_1\n    kind point\n    position 51.53n 0.44e\n  end_location\n  location mortar_position\n    kind point\n    position 51.49n 0.37e\n  end_location\n  location rocket_position\n    kind point\n    position 51.50n 0.27e\n  end_location\n  location commander_position\n    kind point\n    position 51.58n 0.31e\n  end_location\n  location target_location\n    kind point\n    position 51.47n 0.35e\n  end_location\n\n  network datalink_network WSF_COMM_NETWORK_AD_HOC\n  end_network\n\n  platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM\n    weapon artillery_155mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 30 km\n        minimum_firing_range 3 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 50 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM\n    weapon mortar_120mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 8 km\n        minimum_firing_range 1 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 30 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM\n    weapon rocket_122mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 20 km\n        minimum_firing_range 5 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 70 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_FIRES_COMMANDER WSF_PLATFORM\n    processor commander_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_TARGET_UNIT WSF_PLATFORM\n  end_platform_type\n\n  task artillery_fire\n    start_time 270 sec\n    fire_at target_unit\n  end_task\n\n  task mortar_fire\n    start_time 285 sec\n    fire_at target_unit\n  end_task\n\n  task rocket_fire\n    start_time 287 sec\n    fire_at target_unit\n  end_task\n\n  platform artillery_launcher PT_ARTILLERY_LAUNCHER\n    side red\n    position 51.53n 0.44e\n    add weapon artillery_155mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task artillery_fire\n  end_platform\n\n  platform mortar_launcher PT_MORTAR_LAUNCHER\n    side red\n    position 51.49n 0.37e\n    altitude 0 m agl\n    add weapon mortar_120mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task mortar_fire\n  end_platform\n\n  platform rocket_launcher PT_ROCKET_LAUNCHER\n    side red\n    position 51.50n 0.27e\n    add weapon rocket_122mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task rocket_fire\n  end_platform\n\n  platform fires_commander PT_FIRES_COMMANDER\n    side red\n    position 51.58n 0.31e\n    add processor commander_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform target_unit PT_TARGET_UNIT\n    side red\n    position 51.47n 0.35e\n  end_platform\n\n  event_pipe event_output\nend_scenario\nend_event_pipe\nend_time 600 sec\n"
   },
-  "repair_plan_after_safe_repair": null,
-  "layer_regeneration_attempt": {
-    "attempted": true,
-    "model": "deepseek-v4-pro",
-    "target_count": 9,
-    "targets": [
-      {
-        "start_line": 16,
-        "end_line": 46,
-        "kind": "processor",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E007",
-            "line": 21,
-            "message": "unknown command: task.SetQuantity(1);"
-          },
-          {
-            "error_id": "E007",
-            "line": 22,
-            "message": "unknown command: task.SetCommDevice(\"perfect\");"
-          },
-          {
-            "error_id": "E007",
-            "line": 23,
-            "message": "unknown command: task.SetAssignee(aPlatform.Name());"
-          },
-          {
-            "error_id": "E007",
-            "line": 24,
-            "message": "unknown command: AssignTask(aTrack,"
-          },
-          {
-            "error_id": "E007",
-            "line": 30,
-            "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
-          },
-          {
-            "error_id": "E007",
-            "line": 31,
-            "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
-          },
-          {
-            "error_id": "E007",
-            "line": 34,
-            "message": "unknown command: SetTask(arty,"
-          },
-          {
-            "error_id": "E007",
-            "line": 35,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 38,
-            "message": "unknown command: SetTask(missile,"
-          },
-          {
-            "error_id": "E007",
-            "line": 39,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 43,
-            "message": "unknown command: writeln(\"Task"
-          }
-        ]
-      },
-      {
-        "start_line": 54,
-        "end_line": 57,
-        "kind": "weapon",
-        "layer_scope": "weapon_layer",
-        "findings": [
-          {
-            "error_id": "E007",
-            "line": 55,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
-          }
-        ]
-      },
-      {
-        "start_line": 58,
-        "end_line": 72,
-        "kind": "processor",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E007",
-            "line": 69,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 70,
-            "message": "unknown command: endif"
-          }
-        ]
-      },
-      {
-        "start_line": 80,
-        "end_line": 83,
-        "kind": "weapon",
-        "layer_scope": "weapon_layer",
-        "findings": [
-          {
-            "error_id": "E007",
-            "line": 81,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
-          }
-        ]
-      },
-      {
-        "start_line": 84,
-        "end_line": 98,
-        "kind": "processor",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E007",
-            "line": 95,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 96,
-            "message": "unknown command: endif"
-          }
-        ]
-      },
-      {
-        "start_line": 110,
-        "end_line": 112,
-        "kind": "route",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E004",
-            "line": 111,
-            "message": "invalid altitude format"
-          }
-        ]
-      },
-      {
-        "start_line": 117,
-        "end_line": 119,
-        "kind": "route",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E004",
-            "line": 118,
-            "message": "invalid altitude format"
-          }
-        ]
-      },
-      {
-        "start_line": 126,
-        "end_line": 128,
-        "kind": "route",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E004",
-            "line": 127,
-            "message": "invalid altitude format"
-          }
-        ]
-      },
-      {
-        "start_line": 135,
-        "end_line": 137,
-        "kind": "route",
-        "layer_scope": "mission_layer",
-        "findings": [
-          {
-            "error_id": "E004",
-            "line": 136,
-            "message": "invalid altitude format"
-          }
-        ]
-      }
-    ],
-    "replacement_count": 9,
-    "raw_response_preview": "{\n  \"replacement_blocks\": [\n    {\n      \"start_line\": 16,\n      \"end_line\": 46,\n      \"text\": \"   processor coordinator WSF_TASK_PROCESSOR\\n   end_processor\"\n    },\n    {\n      \"start_line\": 54,\n      \"end_line\": 57,\n      \"text\": \"   weapon artillery_launcher WSF_EXPLICIT_WEAPON\\n   end_weapon\"\n    },\n    {\n      \"start_line\": 58,\n      \"end_line\": 72,\n      \"text\": \"   processor artillery_task WSF_TASK_PROCESSOR\\n   end_processor\"\n    },\n    {\n      \"start_line\": 80,\n      \"end_line\": 83,\n      \"text\": \"   weapon missile_launcher WSF_EXPLICIT_WEAPON\\n   end_weapon\"\n    },\n    {\n      \"start_line\": 84,\n      \"end_line\": 98,\n      \"text\": \"   processor missile_task WSF_TASK_PROCESSOR\\n   end_processor\"\n    },\n    {\n      \"start_line\": 110,\n      \"end_line\": 112,\n      \"text\": \"   route\\n      position 30.50n 104.00e altitude 500 ft msl speed 0 m/sec\\n   end_route\"\n    },\n    {\n      \"start_line\": 117,\n      \"end_line\": 119,\n      \"text\": \"   route\\n      position 30.60n 104.00e altitude 500 ft msl speed 0 m/sec\\n   end_route\"\n    },\n    {\n      \"start_line\": 126,\n      \"end_line\": 128,\n      \"text\": \"   route\\n      position 30.65n 104.02e altitude 500 ft msl speed 0 m/sec\\n   end_",
-    "repaired_text": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type ARTILLERY_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon artillery_launcher WSF_EXPLICIT_WEAPON\n   end_weapon\n   processor artillery_task WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_LAUNCHER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon missile_launcher WSF_EXPLICIT_WEAPON\n   end_weapon\n   processor missile_task WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform command_post COMMANDER_TYPE\n   side blue\n   route\n      position 30.50n 104.00e altitude 500 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_artillery_battery ARTILLERY_TYPE\n   side blue\n   route\n      position 30.60n 104.00e altitude 500 ft msl speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform blue_missile_launcher MISSILE_LAUNCHER_TYPE\n   side blue\n   route\n      position 30.65n 104.02e altitude 500 ft msl speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.80n 104.20e altitude 600 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/fires_time_on_target_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
-    "static_analysis": {
-      "script": "BV1-022_layer_regeneration",
-      "syntax_correct": true,
-      "static_pass": true,
-      "primary_error": "",
-      "static_error_ids": [],
-      "findings": []
-    }
-  },
+  "layer_regeneration_attempt": null,
   "full_script_fallback_used": false,
-  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type ARTILLERY_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon artillery_launcher WSF_EXPLICIT_WEAPON\n   end_weapon\n   processor artillery_task WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_LAUNCHER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon missile_launcher WSF_EXPLICIT_WEAPON\n   end_weapon\n   processor missile_task WSF_TASK_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform command_post COMMANDER_TYPE\n   side blue\n   route\n      position 30.50n 104.00e altitude 500 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_artillery_battery ARTILLERY_TYPE\n   side blue\n   route\n      position 30.60n 104.00e altitude 500 ft msl speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform blue_missile_launcher MISSILE_LAUNCHER_TYPE\n   side blue\n   route\n      position 30.65n 104.02e altitude 500 ft msl speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.80n 104.20e altitude 600 ft msl speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/fires_time_on_target_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "repaired_text": "scenario time_on_target_fires\n  description \"Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.\"\n  duration 600 sec\n  side red\n    display_name \"Red\"\n  end_side\n  location artillery_position_1\n    kind point\n    position 51.53n 0.44e\n  end_location\n  location mortar_position\n    kind point\n    position 51.49n 0.37e\n  end_location\n  location rocket_position\n    kind point\n    position 51.50n 0.27e\n  end_location\n  location commander_position\n    kind point\n    position 51.58n 0.31e\n  end_location\n  location target_location\n    kind point\n    position 51.47n 0.35e\n  end_location\n\n  network datalink_network WSF_COMM_NETWORK_AD_HOC\n  end_network\n\n  platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM\n    weapon artillery_155mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 30 km\n        minimum_firing_range 3 km\n      end_launch_computer\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM\n    weapon mortar_120mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 8 km\n        minimum_firing_range 1 km\n      end_launch_computer\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM\n    weapon rocket_122mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 20 km\n        minimum_firing_range 5 km\n      end_launch_computer\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_FIRES_COMMANDER WSF_PLATFORM\n    processor commander_task_proc WSF_TASK_PROCESSOR\n      script void FireMission()\n         WsfPlatform target = WsfSimulation.FindPlatform(\"target_unit\");\n         if (!target.IsValid())\n            return;\n         endif\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 300.0);\n\n         WsfPlatform launcher;\n         string weaponName;\n         WsfWeaponTask task;\n\n         launcher = WsfSimulation.FindPlatform(\"artillery_launcher\");\n         if (launcher.IsValid())\n            weaponName = launcher.WeaponEntry(0).Name();\n            task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n            task.SetQuantity(1);\n            task.SetCommDevice(\"fires_comm\");\n            task.SetAssignee(\"artillery_launcher\");\n            AssignTask(targetTrack, task);\n         endif\n\n         launcher = WsfSimulation.FindPlatform(\"mortar_launcher\");\n         if (launcher.IsValid())\n            weaponName = launcher.WeaponEntry(0).Name();\n            task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n            task.SetQuantity(1);\n            task.SetCommDevice(\"fires_comm\");\n            task.SetAssignee(\"mortar_launcher\");\n            AssignTask(targetTrack, task);\n         endif\n\n         launcher = WsfSimulation.FindPlatform(\"rocket_launcher\");\n         if (launcher.IsValid())\n            weaponName = launcher.WeaponEntry(0).Name();\n            task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n            task.SetQuantity(1);\n            task.SetCommDevice(\"fires_comm\");\n            task.SetAssignee(\"rocket_launcher\");\n            AssignTask(targetTrack, task);\n         endif\n      end_script\n\n      execute at_time 270 sec absolute\n         FireMission();\n      end_execute\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_TARGET_UNIT WSF_PLATFORM\n  end_platform_type\n\n  platform artillery_launcher PT_ARTILLERY_LAUNCHER\n    side red\n    position 51.53n 0.44e\n    add weapon artillery_155mm\n    add processor sub_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform mortar_launcher PT_MORTAR_LAUNCHER\n    side red\n    position 51.49n 0.37e\n    altitude 0 m agl\n    add weapon mortar_120mm\n    add processor sub_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform rocket_launcher PT_ROCKET_LAUNCHER\n    side red\n    position 51.50n 0.27e\n    add weapon rocket_122mm\n    add processor sub_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform fires_commander PT_FIRES_COMMANDER\n    side red\n    position 51.58n 0.31e\n    add processor commander_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform target_unit PT_TARGET_UNIT\n    side red\n    position 51.47n 0.35e\n  end_platform\n\n  event_pipe event_output\n  end_event_pipe\n\nend_time 600 sec\n",
   "static_analysis": {
-    "script": "BV1-022_layer_regeneration",
+    "script": "BV1-022_static_repair",
     "syntax_correct": true,
     "static_pass": true,
     "primary_error": "",

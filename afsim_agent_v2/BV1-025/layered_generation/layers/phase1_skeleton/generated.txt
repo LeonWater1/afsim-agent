@@ -1,0 +1,8 @@
+// basic_iads_c2 scenario
+side blue
+side red
+location iads_core position 38.0n 126.5e
+location radar_site position 37.5n 126.0e
+location sam_site position 38.2n 125.7e
+location intruder_axis position 38.5n 128.0e
+end_time 480 sec

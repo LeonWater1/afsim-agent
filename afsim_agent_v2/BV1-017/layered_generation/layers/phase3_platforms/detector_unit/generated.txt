@@ -1,0 +1,7 @@
+platform detector_unit
+  platform_type PT_DETECTOR_UNIT
+  side blue
+  position 30.67n 104.07e
+  component group_network
+  component report_processor
+end_platform

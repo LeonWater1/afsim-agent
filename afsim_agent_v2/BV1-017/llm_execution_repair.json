@@ -10,29 +10,73 @@
     },
     "static_analysis": {
       "script": "BV1-017_execution_repair",
-      "syntax_correct": true,
-      "static_pass": true,
-      "primary_error": "",
-      "static_error_ids": [],
-      "findings": []
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E002",
+      "static_error_ids": [
+        "E002",
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E002",
+          "line": 31,
+          "message": "end_platform_type closes comm from line 30"
+        },
+        {
+          "error_id": "E002",
+          "line": 35,
+          "message": "end_platform_type closes comm from line 34"
+        },
+        {
+          "error_id": "E002",
+          "line": 40,
+          "message": "end_platform_type closes processor from line 39"
+        },
+        {
+          "error_id": "E002",
+          "line": 29,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 33,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 37,
+          "message": "missing end_platform_type"
+        },
+        {
+          "error_id": "E002",
+          "line": 38,
+          "message": "missing end_comm"
+        },
+        {
+          "error_id": "E007",
+          "line": 68,
+          "message": "end_time must appear at top level, not inside another block"
+        }
+      ]
     },
     "execution_analysis": {
       "mission_pass": false,
-      "primary_error": "E007",
+      "primary_error": "E002",
       "classifier": "input_parse_or_structure_error",
-      "route": "return_to_layer_regeneration",
+      "route": "return_to_self_repair",
       "inferred_stage": "static_or_generation",
-      "suggested_action": "regenerate the affected layer or component template",
+      "suggested_action": "repair block structure and closing tags before mission.exe",
       "evidence_lines": [
         "***** FATAL: Could not process input files.",
-        "***** ERROR: Unknown command: end_platform"
+        "***** ERROR: Unknown command: side"
       ]
     },
     "repair_recommendation": {
-      "primary_error": "E007",
-      "route": "return_to_layer_regeneration",
+      "primary_error": "E002",
+      "route": "return_to_self_repair",
       "inferred_stage": "static_or_generation",
-      "suggested_action": "regenerate the affected layer or component template"
+      "suggested_action": "repair block structure and closing tags before mission.exe"
     },
     "rerun_plan": {
       "preconditions": [
@@ -44,77 +88,13 @@
       "success_condition": "mission_status == PASS"
     }
   },
-  "repaired_text": "script_interface\n   debug\nend_script_interface\n\ncomm BASIC_COMM WSF_COMM_TRANSCEIVER\nend_comm\n\nprocessor BASIC_TRACK_PROC WSF_TRACK_PROCESSOR\n   report_interval 2 sec\n   circular_report_rejection on\n   update_interval 10 sec\n   on_message\n      type WSF_TRACK_MESSAGE\n      script\n         WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;\n         if(tmsg.Originator() != PLATFORM.Name())\n         {\n            print(\"T=\", TIME_NOW, \" P=\", PLATFORM.Name(), \" received track from \", tmsg.Originator());\n         }\n      end_script\n   end_on_message\nend_processor\n\ngroup GROUP1 WSF_GROUP end_group\ngroup GROUP2 WSF_GROUP end_group\n\nplatform_type BASIC_STATION WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n\n   comm PLATFORM_COMM WSF_COMM_TRANSCEIVER\n      internal_link TRACK_PROC\n   end_comm\n\n   processor TRACK_PROC WSF_TRACK_PROCESSOR\n      report_interval 2 sec\n      circular_report_rejection on\n      update_interval 10 sec\n      on_message\n         type WSF_TRACK_MESSAGE\n         script\n            WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;\n            if(tmsg.Originator() != PLATFORM.Name())\n            {\n               print(\"T=\", TIME_NOW, \" P=\", PLATFORM.Name(), \" received track from \", tmsg.Originator());\n            }\n         end_script\n      end_on_message\n   end_processor\n\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      reports_location\n      transmitter\n         power 100 kw\n         frequency 1000 mhz\n         antenna_pattern\n            constant_pattern\n               peak_gain 30 db\n               azimuth_beamwidth 10 deg\n               elevation_beamwidth 10 deg\n            end_constant_pattern\n         end_antenna_pattern\n      end_transmitter\n      receiver\n         antenna_pattern\n            constant_pattern\n               peak_gain 30 db\n               azimuth_beamwidth 10 deg\n               elevation_beamwidth 10 deg\n            end_constant_pattern\n         end_antenna_pattern\n      end_receiver\n   end_sensor\nend_platform_type\n\nplatform detector BASIC_STATION\n   side blue\n   route\n      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      on\n   end_sensor\n   group add GROUP1\nend_platform\n\nplatform relay BASIC_STATION\n   side blue\n   route\n      position 30.70n 104.10e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      off\n   end_sensor\n   group add GROUP1\n   group add GROUP2\nend_platform\n\nplatform observer BASIC_STATION\n   side blue\n   route\n      position 30.73n 104.13e altitude 0 m msl speed 0 m/sec\n   end_route\n   sensor radar\n      off\n   end_sensor\n   group add GROUP2\nend_platform\n\nevent_pipe\n   file output/group_comm_example.aer\nend_event_pipe\n\nevent_output\n   file output/group_comm_example.evt\nend_event_output\n\nend_time 240 sec\n",
+  "repaired_text": "group report_group WSF_GROUP\nend_group\n\nplatform_type PT_OBSERVER_UNIT WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\n  end_comm\nend_platform_type\n\nplatform_type PT_RELAY_UNIT WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\n  end_comm\nend_platform_type\n\nplatform_type PT_DETECTOR_UNIT WSF_PLATFORM\n  comm group_network WSF_COMM_TRANSCEIVER\n  end_comm\n  processor report_processor WSF_TRACK_PROCESSOR\n    report_interval 2 sec\n    update_interval 10 sec\n  end_processor\nend_platform_type\n\nplatform detector_unit PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e altitude 0 ft msl\n  group report_group\nend_platform\n\nplatform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e altitude 0 ft msl\n  group report_group\nend_platform\n\nplatform observer_unit PT_OBSERVER_UNIT\n  side blue\n  position 30.73n 104.13e altitude 0 ft msl\n  group report_group\nend_platform\n\nevent_pipe group_event_pipe\n  file output/group_comm_example.aer\nend_event_pipe\n\nevent_output group_output\n  file output/group_comm_example.evt\nend_event_output\n\nend_time 240 sec\n",
   "static_analysis": {
     "script": "BV1-017_execution_repair",
-    "syntax_correct": false,
-    "static_pass": false,
-    "primary_error": "E002",
-    "static_error_ids": [
-      "E002",
-      "E007"
-    ],
-    "findings": [
-      {
-        "error_id": "E002",
-        "line": 65,
-        "message": "end_antenna_pattern closes transmitter from line 56"
-      },
-      {
-        "error_id": "E002",
-        "line": 66,
-        "message": "end_transmitter closes sensor from line 53"
-      },
-      {
-        "error_id": "E002",
-        "line": 74,
-        "message": "end_antenna_pattern closes receiver from line 67"
-      },
-      {
-        "error_id": "E002",
-        "line": 75,
-        "message": "end_receiver closes platform_type from line 27"
-      },
-      {
-        "error_id": "E002",
-        "line": 76,
-        "message": "unexpected end_sensor"
-      },
-      {
-        "error_id": "E002",
-        "line": 77,
-        "message": "unexpected end_platform_type"
-      },
-      {
-        "error_id": "E007",
-        "line": 60,
-        "message": "constant_pattern must be nested under antenna_pattern"
-      },
-      {
-        "error_id": "E007",
-        "line": 69,
-        "message": "constant_pattern must be nested under antenna_pattern"
-      },
-      {
-        "error_id": "E007",
-        "line": 12,
-        "message": "unknown command: on_message"
-      },
-      {
-        "error_id": "E007",
-        "line": 21,
-        "message": "unknown command: end_on_message"
-      },
-      {
-        "error_id": "E007",
-        "line": 41,
-        "message": "unknown command: on_message"
-      },
-      {
-        "error_id": "E007",
-        "line": 50,
-        "message": "unknown command: end_on_message"
-      }
-    ]
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
   }
 }

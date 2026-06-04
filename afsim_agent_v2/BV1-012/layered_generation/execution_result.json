@@ -1,0 +1,63 @@
+{
+  "version": "hierarchical_generation_executor_v1",
+  "plan_version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "afsim_agent_v2",
+    "source_id": "BV1-012",
+    "source_task_id": "BV1-012"
+  },
+  "mode": "independent_layers_then_merge",
+  "chunk_count": 8,
+  "parallel_groups": {
+    "platforms": 4,
+    "tasks": 1
+  },
+  "layers": [
+    {
+      "phase": "phase1_skeleton",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase1_skeleton",
+      "seconds": 20.662
+    },
+    {
+      "phase": "phase2_shared",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase2_shared",
+      "seconds": 120.592
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "blue_flight_lead",
+      "seconds": 18.223,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_flight_lead"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "blue_wingman",
+      "seconds": 28.929,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_wingman"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "red_flight_lead",
+      "seconds": 52.837,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_flight_lead"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "red_wingman",
+      "seconds": 18.222,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_wingman"
+    },
+    {
+      "phase": "phase4_tasks",
+      "item_id": "brawler_engagement",
+      "seconds": 137.948,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase4_tasks\\brawler_engagement"
+    },
+    {
+      "phase": "phase5_assembly",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase5_assembly",
+      "seconds": 89.372
+    }
+  ],
+  "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\final_script.txt"
+}

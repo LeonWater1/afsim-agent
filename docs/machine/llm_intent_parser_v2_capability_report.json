@@ -1,0 +1,374 @@
+{
+  "report": "llm_intent_parser_v2_capability_report",
+  "task": "Task-017",
+  "description": "Enhanced intent parsing slot coverage validation",
+  "generated_at": "2026-06-04T05:59:13.720421+00:00",
+  "total_tasks": 6,
+  "results": [
+    {
+      "task_id": "BV1-005",
+      "difficulty": "hard",
+      "input": "基于 air_to_air/escort，生成护航空战任务场景。",
+      "status": "success",
+      "attempt_count": 1,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 13,
+        "total_slots": 17,
+        "coverage_ratio": 0.765,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": true,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": true,
+          "components_movers": true,
+          "components_sensors": false,
+          "components_weapons": true,
+          "components_processors": true,
+          "components_comms": true,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "components_sensors",
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "escort_air_mission",
+        "sides_count": 2,
+        "entities_count": 3,
+        "tasks_count": 2,
+        "components_summary": {
+          "movers": 1,
+          "weapons": 1,
+          "processors": 1,
+          "comms": 1
+        },
+        "has_routes": true,
+        "expected_events_count": 1
+      }
+    },
+    {
+      "task_id": "BV1-006",
+      "difficulty": "hard",
+      "input": "基于 air_to_air/hvaa_dca，生成高价值资产防御反空场景。",
+      "status": "success",
+      "attempt_count": 1,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 14,
+        "total_slots": 17,
+        "coverage_ratio": 0.824,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": true,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": true,
+          "components_movers": true,
+          "components_sensors": true,
+          "components_weapons": true,
+          "components_processors": true,
+          "components_comms": true,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "hvaa_dca",
+        "sides_count": 2,
+        "entities_count": 3,
+        "tasks_count": 2,
+        "components_summary": {
+          "movers": 1,
+          "sensors": 1,
+          "weapons": 1,
+          "processors": 2,
+          "comms": 1
+        },
+        "has_routes": true,
+        "expected_events_count": 1
+      }
+    },
+    {
+      "task_id": "BV1-009",
+      "difficulty": "hard",
+      "input": "基于 ballistic_missile_shootdown/ballistic_shootdown，生成弹道导弹拦截场景。",
+      "status": "success",
+      "attempt_count": 2,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 11,
+        "total_slots": 17,
+        "coverage_ratio": 0.647,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": true,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": false,
+          "components_movers": true,
+          "components_sensors": true,
+          "components_weapons": true,
+          "components_processors": false,
+          "components_comms": false,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "routes",
+          "components_processors",
+          "components_comms",
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "ballistic_missile_intercept",
+        "sides_count": 2,
+        "entities_count": 2,
+        "tasks_count": 1,
+        "components_summary": {
+          "movers": 1,
+          "sensors": 1,
+          "weapons": 1
+        },
+        "has_routes": false,
+        "expected_events_count": 1
+      }
+    },
+    {
+      "task_id": "BV1-012",
+      "difficulty": "hard",
+      "input": "基于 brawler/brawler_demo_1v1，生成 Brawler 一对一空战近似模型场景。",
+      "status": "success",
+      "attempt_count": 1,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 13,
+        "total_slots": 17,
+        "coverage_ratio": 0.765,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": true,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": false,
+          "components_movers": true,
+          "components_sensors": true,
+          "components_weapons": true,
+          "components_processors": true,
+          "components_comms": true,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "routes",
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "brawler_1v1",
+        "sides_count": 2,
+        "entities_count": 4,
+        "tasks_count": 1,
+        "components_summary": {
+          "movers": 1,
+          "sensors": 1,
+          "weapons": 2,
+          "processors": 4,
+          "comms": 1
+        },
+        "has_routes": false,
+        "expected_events_count": 1
+      }
+    },
+    {
+      "task_id": "BV1-022",
+      "difficulty": "medium",
+      "input": "基于 fires/time_on_target，生成火力 time-on-target 场景。",
+      "status": "success",
+      "attempt_count": 1,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 10,
+        "total_slots": 17,
+        "coverage_ratio": 0.588,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": false,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": false,
+          "components_movers": false,
+          "components_sensors": false,
+          "components_weapons": true,
+          "components_processors": true,
+          "components_comms": true,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "sides",
+          "routes",
+          "components_movers",
+          "components_sensors",
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "time_on_target_fires",
+        "sides_count": 1,
+        "entities_count": 5,
+        "tasks_count": 1,
+        "components_summary": {
+          "weapons": 3,
+          "processors": 2,
+          "comms": 1
+        },
+        "has_routes": false,
+        "expected_events_count": 1
+      }
+    },
+    {
+      "task_id": "BV1-025",
+      "difficulty": "medium",
+      "input": "基于 iads_c2_demos/basic_iads，生成基础 IADS C2 场景。",
+      "status": "success",
+      "attempt_count": 1,
+      "few_shot_example_count": 5,
+      "slot_coverage": {
+        "filled_slots": 12,
+        "total_slots": 17,
+        "coverage_ratio": 0.706,
+        "slots": {
+          "scenario_name": true,
+          "scenario_duration": true,
+          "sides": true,
+          "adversarial_tasks": true,
+          "locations": true,
+          "routes": false,
+          "components_movers": false,
+          "components_sensors": true,
+          "components_weapons": true,
+          "components_processors": true,
+          "components_comms": true,
+          "entities": true,
+          "tasks": true,
+          "expected_events": true,
+          "constraints_resource_limits": false,
+          "constraints_roe": false,
+          "grounding_hints": false
+        },
+        "missing_slots": [
+          "routes",
+          "components_movers",
+          "constraints_resource_limits",
+          "constraints_roe",
+          "grounding_hints"
+        ]
+      },
+      "adversarial_relations_detected": true,
+      "ir_summary": {
+        "scenario_name": "basic_iads_c2",
+        "sides_count": 2,
+        "entities_count": 4,
+        "tasks_count": 1,
+        "components_summary": {
+          "sensors": 2,
+          "weapons": 1,
+          "processors": 2,
+          "comms": 1
+        },
+        "has_routes": false,
+        "expected_events_count": 1
+      }
+    }
+  ],
+  "success_count": 6,
+  "fail_count": 0,
+  "success_rate": 1.0,
+  "avg_slot_coverage": 0.716,
+  "common_missing_slots": [
+    [
+      "constraints_resource_limits",
+      6
+    ],
+    [
+      "constraints_roe",
+      6
+    ],
+    [
+      "grounding_hints",
+      6
+    ],
+    [
+      "routes",
+      4
+    ],
+    [
+      "components_sensors",
+      2
+    ],
+    [
+      "components_movers",
+      2
+    ],
+    [
+      "components_processors",
+      1
+    ],
+    [
+      "components_comms",
+      1
+    ],
+    [
+      "sides",
+      1
+    ]
+  ]
+}

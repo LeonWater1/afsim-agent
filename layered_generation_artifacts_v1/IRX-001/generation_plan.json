@@ -1,0 +1,334 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "ir_examples_v1",
+    "source_id": "IRX-001",
+    "source_task_id": "BV1-001"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "acoustic_simple_demo",
+      "description": "Minimal acoustic detection scenario.",
+      "duration": {
+        "value": 120,
+        "unit": "sec"
+      },
+      "domains": [
+        "surface"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue",
+        "red"
+      ],
+      "location_ids": [
+        "blue_start",
+        "red_contact"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_sensor_unit",
+          "role": "sensor_platform",
+          "domain": "surface",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "acoustic_sensor_platform_basic",
+            "row": {
+              "canonical_id": "acoustic_sensor_platform_basic",
+              "canonical_role": "sensor_platform",
+              "match_labels": [
+                "sensor_platform",
+                "acoustic_sensor_platform",
+                "探测平台",
+                "传感器平台"
+              ],
+              "platform_type_hints": [
+                "acoustic_sensor_platform",
+                "sensor_platform"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "acoustic_sensor_platform_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "acoustic_sensor_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "acoustic_sensor_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "acoustic_sensor_basic"
+            ]
+          },
+          "initial_location_ref": "blue_start",
+          "route_ref": null,
+          "component_refs": [
+            "acoustic_sensor_basic"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [
+              "acoustic_sensor_basic"
+            ],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "red_target_unit",
+          "role": "target",
+          "domain": "surface",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "red",
+            "row": {
+              "canonical_id": "red",
+              "aliases": [
+                "red",
+                "hostile",
+                "enemy",
+                "敌方",
+                "红方",
+                "目标方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "acoustic_target_basic",
+            "row": {
+              "canonical_id": "acoustic_target_basic",
+              "canonical_role": "target",
+              "match_labels": [
+                "target",
+                "acoustic_target",
+                "被探测目标",
+                "声学目标"
+              ],
+              "platform_type_hints": [
+                "acoustic_target",
+                "surface_target"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "acoustic_target_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [],
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/acoustic/acoustic_demo.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "platform_constraints": {},
+          "initial_location_ref": "red_contact",
+          "route_ref": null,
+          "component_refs": [],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [
+        {
+          "component_id": "acoustic_sensor_basic",
+          "family": "sensor",
+          "role": "acoustic_detection",
+          "type_hint": "acoustic_sensor",
+          "parameters": {
+            "mode": "passive"
+          },
+          "grounding": {
+            "matched": true,
+            "mapping_type": "sensor",
+            "canonical_id": "acoustic_sensor_basic",
+            "row": {
+              "canonical_id": "acoustic_sensor_basic",
+              "match_labels": [
+                "acoustic_sensor",
+                "声学传感器",
+                "被动声学"
+              ],
+              "type_hints": [
+                "acoustic_sensor"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_ACOUSTIC_SENSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/acoustic/simple_demo.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [],
+      "comms": [],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "detect_target",
+          "task_type": "detect",
+          "grounding": {
+            "matched": true,
+            "mapping_type": "task",
+            "canonical_id": "detect",
+            "row": {
+              "canonical_id": "detect",
+              "match_labels": [
+                "detect",
+                "探测",
+                "发现"
+              ],
+              "ir_task_types": [
+                "detect"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "detection_behavior"
+              },
+              "script_realization": [
+                "sensor",
+                "processor"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "blue_sensor_unit"
+          ],
+          "target_refs": [
+            "red_target_unit"
+          ],
+          "location_refs": [],
+          "parameters": {
+            "priority": "primary"
+          },
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 120,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": true,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": true
+      },
+      "ready": true,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [],
+  "ready_for_generation": true
+}

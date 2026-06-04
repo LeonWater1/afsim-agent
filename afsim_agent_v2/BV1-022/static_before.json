@@ -2,116 +2,71 @@
   "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\generated_script.txt",
   "syntax_correct": false,
   "static_pass": false,
-  "primary_error": "E004",
+  "primary_error": "E002",
   "static_error_ids": [
-    "E004",
+    "E002",
     "E007"
   ],
   "findings": [
     {
-      "error_id": "E004",
-      "line": 111,
-      "message": "invalid altitude format"
+      "error_id": "E002",
+      "line": 168,
+      "message": "missing end_event_pipe"
     },
     {
-      "error_id": "E004",
+      "error_id": "E007",
+      "line": 113,
+      "message": "task must be nested under processor"
+    },
+    {
+      "error_id": "E007",
       "line": 118,
-      "message": "invalid altitude format"
-    },
-    {
-      "error_id": "E004",
-      "line": 127,
-      "message": "invalid altitude format"
-    },
-    {
-      "error_id": "E004",
-      "line": 136,
-      "message": "invalid altitude format"
+      "message": "task must be nested under processor"
     },
     {
       "error_id": "E007",
-      "line": 55,
-      "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+      "line": 123,
+      "message": "task must be nested under processor"
     },
     {
       "error_id": "E007",
-      "line": 81,
-      "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+      "line": 170,
+      "message": "end_time must appear at top level, not inside another block"
     },
     {
       "error_id": "E007",
-      "line": 21,
-      "message": "unknown command: task.SetQuantity(1);"
+      "line": 40,
+      "message": "unknown command: end_spherical_lethality"
     },
     {
       "error_id": "E007",
-      "line": 22,
-      "message": "unknown command: task.SetCommDevice(\"perfect\");"
+      "line": 63,
+      "message": "unknown command: end_spherical_lethality"
     },
     {
       "error_id": "E007",
-      "line": 23,
-      "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+      "line": 86,
+      "message": "unknown command: end_spherical_lethality"
     },
     {
       "error_id": "E007",
-      "line": 24,
-      "message": "unknown command: AssignTask(aTrack,"
+      "line": 116,
+      "message": "unknown command: end_task"
     },
     {
       "error_id": "E007",
-      "line": 30,
-      "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+      "line": 121,
+      "message": "unknown command: end_task"
     },
     {
       "error_id": "E007",
-      "line": 31,
-      "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
+      "line": 126,
+      "message": "unknown command: end_task"
     },
     {
       "error_id": "E007",
-      "line": 34,
-      "message": "unknown command: SetTask(arty,"
-    },
-    {
-      "error_id": "E007",
-      "line": 35,
-      "message": "unknown command: endif"
-    },
-    {
-      "error_id": "E007",
-      "line": 38,
-      "message": "unknown command: SetTask(missile,"
-    },
-    {
-      "error_id": "E007",
-      "line": 39,
-      "message": "unknown command: endif"
-    },
-    {
-      "error_id": "E007",
-      "line": 43,
-      "message": "unknown command: writeln(\"Task"
-    },
-    {
-      "error_id": "E007",
-      "line": 69,
-      "message": "unknown command: mLC.Launch(task);"
-    },
-    {
-      "error_id": "E007",
-      "line": 70,
-      "message": "unknown command: endif"
-    },
-    {
-      "error_id": "E007",
-      "line": 95,
-      "message": "unknown command: mLC.Launch(task);"
-    },
-    {
-      "error_id": "E007",
-      "line": 96,
-      "message": "unknown command: endif"
+      "line": 169,
+      "message": "unknown command: end_scenario"
     }
   ]
 }

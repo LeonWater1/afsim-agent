@@ -1,247 +1,201 @@
 {
-  "version": "llm_script_generator_v1",
-  "generator_mode": "llm_only_static_fail",
-  "attempt_count": 1,
-  "attempts": [
-    {
-      "attempt": 1,
-      "model": "deepseek-v4-pro",
-      "script_preview": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n\n      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)\n         string weaponName = aPlatform.WeaponEntry(0).Name();\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(aPlatform.Name());\n         AssignTask(aTrack, task);\n      end_script\n\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);\n         PLATFORM.SetCurrentTarget(targetTrack);\n         WsfPlatform arty = WsfSimulation.FindPlatform(\"blue_artillery_battery\");\n         if (arty.IsValid())\n            SetTask(arty, targetTrack);\n         endif\n         WsfPlatform missile = WsfSimulation.FindPlatform(\"blue_missile_launcher\");\n         if (missile.IsValid())\n            SetTask(missile, targetTrack);\n         endif\n      end_execute\n\n      script void on_task_complete(WsfTask aTask)\n         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");\n      end_scrip",
-      "static_analysis": {
-        "script": "BV1-022",
-        "syntax_correct": false,
-        "static_pass": false,
-        "primary_error": "E004",
-        "static_error_ids": [
-          "E004",
-          "E007"
-        ],
-        "findings": [
-          {
-            "error_id": "E004",
-            "line": 111,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E004",
-            "line": 118,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E004",
-            "line": 127,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E004",
-            "line": 136,
-            "message": "invalid altitude format"
-          },
-          {
-            "error_id": "E007",
-            "line": 55,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
-          },
-          {
-            "error_id": "E007",
-            "line": 81,
-            "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
-          },
-          {
-            "error_id": "E007",
-            "line": 21,
-            "message": "unknown command: task.SetQuantity(1);"
-          },
-          {
-            "error_id": "E007",
-            "line": 22,
-            "message": "unknown command: task.SetCommDevice(\"perfect\");"
-          },
-          {
-            "error_id": "E007",
-            "line": 23,
-            "message": "unknown command: task.SetAssignee(aPlatform.Name());"
-          },
-          {
-            "error_id": "E007",
-            "line": 24,
-            "message": "unknown command: AssignTask(aTrack,"
-          },
-          {
-            "error_id": "E007",
-            "line": 30,
-            "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
-          },
-          {
-            "error_id": "E007",
-            "line": 31,
-            "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
-          },
-          {
-            "error_id": "E007",
-            "line": 34,
-            "message": "unknown command: SetTask(arty,"
-          },
-          {
-            "error_id": "E007",
-            "line": 35,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 38,
-            "message": "unknown command: SetTask(missile,"
-          },
-          {
-            "error_id": "E007",
-            "line": 39,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 43,
-            "message": "unknown command: writeln(\"Task"
-          },
-          {
-            "error_id": "E007",
-            "line": 69,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 70,
-            "message": "unknown command: endif"
-          },
-          {
-            "error_id": "E007",
-            "line": 95,
-            "message": "unknown command: mLC.Launch(task);"
-          },
-          {
-            "error_id": "E007",
-            "line": 96,
-            "message": "unknown command: endif"
-          }
-        ]
-      }
-    }
-  ],
-  "script_text": "script_interface\n   debug\nend_script_interface\n\nweapon artillery_shell WSF_IMPLICIT_WEAPON\nend_weapon\n\nweapon cruise_missile WSF_IMPLICIT_WEAPON\nend_weapon\n\nplatform_type COMMANDER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   processor coordinator WSF_TASK_PROCESSOR\n\n      script void SetTask(WsfPlatform aPlatform, WsfTrack aTrack)\n         string weaponName = aPlatform.WeaponEntry(0).Name();\n         WsfWeaponTask task = WsfWeaponTask.Create(\"TIME_ON_TARGET\", weaponName);\n         task.SetQuantity(1);\n         task.SetCommDevice(\"perfect\");\n         task.SetAssignee(aPlatform.Name());\n         AssignTask(aTrack, task);\n      end_script\n\n      execute at_time 1.0 sec absolute\n         WsfPlatform target = WsfSimulation.FindPlatform(\"red_target\");\n         WsfTrack targetTrack = target.MakeTrack();\n         targetTrack.SetAuxData(\"IMPACT_TIME\", 120.0);\n         PLATFORM.SetCurrentTarget(targetTrack);\n         WsfPlatform arty = WsfSimulation.FindPlatform(\"blue_artillery_battery\");\n         if (arty.IsValid())\n            SetTask(arty, targetTrack);\n         endif\n         WsfPlatform missile = WsfSimulation.FindPlatform(\"blue_missile_launcher\");\n         if (missile.IsValid())\n            SetTask(missile, targetTrack);\n         endif\n      end_execute\n\n      script void on_task_complete(WsfTask aTask)\n         writeln(\"Task \", aTask.TaskId(), \" assigned to \", aTask.Assignee(), \" complete.\");\n      end_script\n\n   end_processor\nend_platform_type\n\nplatform_type ARTILLERY_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon artillery_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type artillery_shell\n      quantity 10\n   end_weapon\n   processor artillery_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type MISSILE_LAUNCHER_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\n   weapon missile_launcher WSF_FIRES_LAUNCH_COMPUTER\n      weapon_type cruise_missile\n      quantity 5\n   end_weapon\n   processor missile_task WSF_TASK_PROCESSOR\n      script_variables\n         WsfLaunchComputer mLC;\n      end_script_variables\n\n      on_initialize\n         mLC = PLATFORM.WeaponEntry(0).LaunchComputer();\n      end_on_initialize\n\n      script void on_task_assigned(WsfTask task)\n         if (mLC.IsValid())\n            mLC.Launch(task);\n         endif\n      end_script\n   end_processor\nend_platform_type\n\nplatform_type TARGET_TYPE WSF_PLATFORM\n   mover WSF_GROUND_MOVER\n      maximum_speed 1 m/sec\n      minimum_speed 0 m/sec\n   end_mover\nend_platform_type\n\nplatform command_post COMMANDER_TYPE\n   side blue\n   route\n      position 30.50N 104.00E altitude 500 m speed 0 m/sec\n   end_route\nend_platform\n\nplatform blue_artillery_battery ARTILLERY_TYPE\n   side blue\n   route\n      position 30.60N 104.00E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform blue_missile_launcher MISSILE_LAUNCHER_TYPE\n   side blue\n   route\n      position 30.65N 104.02E altitude 500 m speed 0 m/sec\n   end_route\n   comm perfect WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform\n\nplatform red_target TARGET_TYPE\n   side red\n   route\n      position 30.80N 104.20E altitude 600 m speed 0 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/fires_time_on_target_demo.aer\nend_event_pipe\n\nend_time 600 sec\n",
+  "version": "hierarchical_generation_executor_v1",
+  "generator_mode": "layered_executor_v1",
+  "script_text": "scenario time_on_target_fires\n  description \"Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.\"\n  duration 600 sec\n  side red\n    display_name \"Red\"\n  end_side\n  location artillery_position_1\n    kind point\n    position 51.53n 0.44e\n  end_location\n  location mortar_position\n    kind point\n    position 51.49n 0.37e\n  end_location\n  location rocket_position\n    kind point\n    position 51.50n 0.27e\n  end_location\n  location commander_position\n    kind point\n    position 51.58n 0.31e\n  end_location\n  location target_location\n    kind point\n    position 51.47n 0.35e\n  end_location\n\n  network datalink_network WSF_COMM_NETWORK_AD_HOC\n  end_network\n\n  platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM\n    weapon artillery_155mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 30 km\n        minimum_firing_range 3 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 50 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM\n    weapon mortar_120mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 8 km\n        minimum_firing_range 1 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 30 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM\n    weapon rocket_122mm WSF_IMPLICIT_WEAPON\n      launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER\n        maximum_firing_range 20 km\n        minimum_firing_range 5 km\n      end_launch_computer\n      weapon_effects\n        spherical_lethality main_effect WSF_SPHERICAL_LETHALITY\n          lethal_radius 70 m\n        end_spherical_lethality\n      end_weapon_effects\n      quantity 1\n    end_weapon\n\n    processor sub_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_FIRES_COMMANDER WSF_PLATFORM\n    processor commander_task_proc WSF_TASK_PROCESSOR\n    end_processor\n\n    comm fires_comm WSF_COMM_TRANSCEIVER\n      network_name datalink_network\n      internal_link no\n    end_comm\n  end_platform_type\n\n  platform_type PT_TARGET_UNIT WSF_PLATFORM\n  end_platform_type\n\n  task artillery_fire\n    start_time 270 sec\n    fire_at target_unit\n  end_task\n\n  task mortar_fire\n    start_time 285 sec\n    fire_at target_unit\n  end_task\n\n  task rocket_fire\n    start_time 287 sec\n    fire_at target_unit\n  end_task\n\n  platform artillery_launcher PT_ARTILLERY_LAUNCHER\n    side red\n    position 51.53n 0.44e\n    add weapon artillery_155mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task artillery_fire\n  end_platform\n\n  platform mortar_launcher PT_MORTAR_LAUNCHER\n    side red\n    position 51.49n 0.37e\n    altitude 0 m agl\n    add weapon mortar_120mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task mortar_fire\n  end_platform\n\n  platform rocket_launcher PT_ROCKET_LAUNCHER\n    side red\n    position 51.50n 0.27e\n    add weapon rocket_122mm\n    add processor sub_task_proc\n    add comm fires_comm\n    add task rocket_fire\n  end_platform\n\n  platform fires_commander PT_FIRES_COMMANDER\n    side red\n    position 51.58n 0.31e\n    add processor commander_task_proc\n    add comm fires_comm\n  end_platform\n\n  platform target_unit PT_TARGET_UNIT\n    side red\n    position 51.47n 0.35e\n  end_platform\n\n  event_pipe event_output\nend_scenario\nend_time 600 sec",
   "static_analysis": {
-    "script": "BV1-022",
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\final_script.txt",
     "syntax_correct": false,
     "static_pass": false,
-    "primary_error": "E004",
+    "primary_error": "E002",
     "static_error_ids": [
-      "E004",
+      "E002",
       "E007"
     ],
     "findings": [
       {
-        "error_id": "E004",
-        "line": 111,
-        "message": "invalid altitude format"
+        "error_id": "E002",
+        "line": 168,
+        "message": "missing end_event_pipe"
       },
       {
-        "error_id": "E004",
+        "error_id": "E007",
+        "line": 113,
+        "message": "task must be nested under processor"
+      },
+      {
+        "error_id": "E007",
         "line": 118,
-        "message": "invalid altitude format"
-      },
-      {
-        "error_id": "E004",
-        "line": 127,
-        "message": "invalid altitude format"
-      },
-      {
-        "error_id": "E004",
-        "line": 136,
-        "message": "invalid altitude format"
+        "message": "task must be nested under processor"
       },
       {
         "error_id": "E007",
-        "line": 55,
-        "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+        "line": 123,
+        "message": "task must be nested under processor"
       },
       {
         "error_id": "E007",
-        "line": 81,
-        "message": "weapon_type is a pseudo keyword and cannot be used as a standalone command"
+        "line": 170,
+        "message": "end_time must appear at top level, not inside another block"
       },
       {
         "error_id": "E007",
-        "line": 21,
-        "message": "unknown command: task.SetQuantity(1);"
+        "line": 40,
+        "message": "unknown command: end_spherical_lethality"
       },
       {
         "error_id": "E007",
-        "line": 22,
-        "message": "unknown command: task.SetCommDevice(\"perfect\");"
+        "line": 63,
+        "message": "unknown command: end_spherical_lethality"
       },
       {
         "error_id": "E007",
-        "line": 23,
-        "message": "unknown command: task.SetAssignee(aPlatform.Name());"
+        "line": 86,
+        "message": "unknown command: end_spherical_lethality"
       },
       {
         "error_id": "E007",
-        "line": 24,
-        "message": "unknown command: AssignTask(aTrack,"
+        "line": 116,
+        "message": "unknown command: end_task"
       },
       {
         "error_id": "E007",
-        "line": 30,
-        "message": "unknown command: targetTrack.SetAuxData(\"IMPACT_TIME\","
+        "line": 121,
+        "message": "unknown command: end_task"
       },
       {
         "error_id": "E007",
-        "line": 31,
-        "message": "unknown command: PLATFORM.SetCurrentTarget(targetTrack);"
+        "line": 126,
+        "message": "unknown command: end_task"
       },
       {
         "error_id": "E007",
-        "line": 34,
-        "message": "unknown command: SetTask(arty,"
-      },
-      {
-        "error_id": "E007",
-        "line": 35,
-        "message": "unknown command: endif"
-      },
-      {
-        "error_id": "E007",
-        "line": 38,
-        "message": "unknown command: SetTask(missile,"
-      },
-      {
-        "error_id": "E007",
-        "line": 39,
-        "message": "unknown command: endif"
-      },
-      {
-        "error_id": "E007",
-        "line": 43,
-        "message": "unknown command: writeln(\"Task"
-      },
-      {
-        "error_id": "E007",
-        "line": 69,
-        "message": "unknown command: mLC.Launch(task);"
-      },
-      {
-        "error_id": "E007",
-        "line": 70,
-        "message": "unknown command: endif"
-      },
-      {
-        "error_id": "E007",
-        "line": 95,
-        "message": "unknown command: mLC.Launch(task);"
-      },
-      {
-        "error_id": "E007",
-        "line": 96,
-        "message": "unknown command: endif"
+        "line": 169,
+        "message": "unknown command: end_scenario"
       }
     ]
-  }
+  },
+  "attempt_count": 9,
+  "attempts": [
+    {
+      "phase": "phase1_skeleton",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase1_skeleton",
+      "seconds": 29.813
+    },
+    {
+      "phase": "phase2_shared",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase2_shared",
+      "seconds": 104.927
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "artillery_launcher",
+      "seconds": 39.281,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\artillery_launcher"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "fires_commander",
+      "seconds": 33.756,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\fires_commander"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "mortar_launcher",
+      "seconds": 29.076,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\mortar_launcher"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "rocket_launcher",
+      "seconds": 18.254,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\rocket_launcher"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "target_unit",
+      "seconds": 21.08,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\target_unit"
+    },
+    {
+      "phase": "phase4_tasks",
+      "item_id": "time_on_target_strike",
+      "seconds": 190.732,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase4_tasks\\time_on_target_strike"
+    },
+    {
+      "phase": "phase5_assembly",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase5_assembly",
+      "seconds": 136.718
+    }
+  ],
+  "execution_result": {
+    "version": "hierarchical_generation_executor_v1",
+    "plan_version": "hierarchical_generation_plan_v1",
+    "source": {
+      "source_type": "afsim_agent_v2",
+      "source_id": "BV1-022",
+      "source_task_id": "BV1-022"
+    },
+    "mode": "independent_layers_then_merge",
+    "chunk_count": 9,
+    "parallel_groups": {
+      "platforms": 5,
+      "tasks": 1
+    },
+    "layers": [
+      {
+        "phase": "phase1_skeleton",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase1_skeleton",
+        "seconds": 29.813
+      },
+      {
+        "phase": "phase2_shared",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase2_shared",
+        "seconds": 104.927
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "artillery_launcher",
+        "seconds": 39.281,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\artillery_launcher"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "fires_commander",
+        "seconds": 33.756,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\fires_commander"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "mortar_launcher",
+        "seconds": 29.076,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\mortar_launcher"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "rocket_launcher",
+        "seconds": 18.254,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\rocket_launcher"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "target_unit",
+        "seconds": 21.08,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase3_platforms\\target_unit"
+      },
+      {
+        "phase": "phase4_tasks",
+        "item_id": "time_on_target_strike",
+        "seconds": 190.732,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase4_tasks\\time_on_target_strike"
+      },
+      {
+        "phase": "phase5_assembly",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\layers\\phase5_assembly",
+        "seconds": 136.718
+      }
+    ],
+    "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-022\\layered_generation\\final_script.txt"
+  },
+  "artifact_dir": "afsim_agent_v2\\BV1-022\\layered_generation"
 }

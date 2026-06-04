@@ -1,29 +1,224 @@
 {
-  "version": "llm_script_generator_v1",
-  "generator_mode": "llm_only_static_pass",
-  "attempt_count": 1,
+  "version": "hierarchical_generation_executor_v1",
+  "generator_mode": "layered_executor_v1",
+  "script_text": "# Scenario: brawler_1v1\n# Description: One versus one Brawler air combat engagement with behavior tree decision logic.\n# Duration: 300 sec\n\nside blue\n  display_name Blue\nside red\n  display_name Red\n\nlocation blue_spawn\n  position 0.03s 0.01w\n  altitude 10000 ft msl\nend_location\n\nlocation red_spawn\n  position 0.03n 0.01e\n  altitude 10000 ft msl\nend_location\n\nnetwork brawler_network WSF_COMM_NETWORK_AD_HOC\nend_network\n\nplatform_type PT_BLUE_FLIGHT_LEAD WSF_PLATFORM\n  mover BrawlerMover WSF_BRAWLER_MOVER\n    max_speed 1.2 mach\n    climb_rate 50000 ft/min\n    turn_rate 15 deg/s\n  end_mover\n  processor BrawlerThinker WSF_BRAWLER_PROCESSOR\n  end_processor\n  comm BrawlerDatalink WSF_COMM_TRANSCEIVER\n    network_name brawler_network\n  end_comm\nend_platform_type\n\nplatform_type PT_BLUE_WINGMAN WSF_BRAWLER_PLATFORM\n  mover BrawlerMover WSF_BRAWLER_MOVER\n    max_speed 1.2 mach\n    climb_rate 50000 ft/min\n    turn_rate 15 deg/s\n  end_mover\n  sensor BrawlerSensor WSF_GEOMETRIC_SENSOR\n    azimuth_field_of_view 60 deg\n    elevation_field_of_view 30 deg\n    maximum_range 50 nm\n    frame_time 1 sec\n  end_sensor\n  weapon Sidewinder WSF_AIR_TO_AIR_MISSILE\n    quantity 2\n    salvo_interval 0.5 sec\n  end_weapon\n  weapon Gun WSF_EXPLICIT_WEAPON\n    quantity 500\n  end_weapon\n  processor BrawlerThinker WSF_BRAWLER_PROCESSOR\n  end_processor\n  processor Perception WSF_PERCEPTION_PROCESSOR\n  end_processor\n  processor IncomingThreats WSF_THREAT_PROCESSOR\n  end_processor\n  processor DataMgr WSF_TRACK_PROCESSOR\n  end_processor\n  comm BrawlerDatalink WSF_COMM_TRANSCEIVER\n    network_name brawler_network\n  end_comm\nend_platform_type\n\nplatform_type PT_RED_FLIGHT_LEAD WSF_PLATFORM\n  mover BrawlerMover WSF_BRAWLER_MOVER\n    max_speed 1.2 mach\n    climb_rate 50000 ft/min\n    turn_rate 15 deg/s\n  end_mover\n  processor BrawlerThinker WSF_BRAWLER_PROCESSOR\n  end_processor\n  comm BrawlerDatalink WSF_COMM_TRANSCEIVER\n    network_name brawler_network\n  end_comm\nend_platform_type\n\nplatform_type PT_RED_WINGMAN WSF_BRAWLER_PLATFORM\n  mover BrawlerMover WSF_BRAWLER_MOVER\n    max_speed 1.2 mach\n    climb_rate 50000 ft/min\n    turn_rate 15 deg/s\n  end_mover\n  sensor BrawlerSensor WSF_GEOMETRIC_SENSOR\n    azimuth_field_of_view 60 deg\n    elevation_field_of_view 30 deg\n    maximum_range 50 nm\n    frame_time 1 sec\n  end_sensor\n  weapon Sidewinder WSF_AIR_TO_AIR_MISSILE\n    quantity 2\n    salvo_interval 0.5 sec\n  end_weapon\n  weapon Gun WSF_EXPLICIT_WEAPON\n    quantity 500\n  end_weapon\n  processor BrawlerThinker WSF_BRAWLER_PROCESSOR\n  end_processor\n  processor Perception WSF_PERCEPTION_PROCESSOR\n  end_processor\n  processor IncomingThreats WSF_THREAT_PROCESSOR\n  end_processor\n  processor DataMgr WSF_TRACK_PROCESSOR\n  end_processor\n  comm BrawlerDatalink WSF_COMM_TRANSCEIVER\n    network_name brawler_network\n  end_comm\nend_platform_type\n\nplatform blue_flight_lead PT_BLUE_FLIGHT_LEAD\n  side blue\n  position 0.03s 0.01w\n  altitude 10000 ft msl\nend_platform\n\nplatform blue_wingman PT_BLUE_WINGMAN\n  side blue\n  position 0.03s 0.01w altitude 10000 ft msl\nend_platform\n\nplatform red_flight_lead PT_RED_FLIGHT_LEAD\n  side red\n  position 0.03n 0.01e\n  altitude 10000 ft msl\nend_platform\n\nplatform red_wingman PT_RED_WINGMAN\n  side red\n  position 0.03n 0.01e altitude 10000 ft msl\nend_platform\n\nbehavior intercept_behavior\n  type WSF_BRAWLER_PROCESSOR\n  weapon air_to_air_missile\n  sensor air_radar\n  engagement_style brawler_tactical\nend_behavior\n\ncomm_network brawler_net\n  type WSF_COMM_NETWORK_AD_HOC\n  frequency 123.0 mhz\nend_comm_network\n\ntask_group brawler_engagement\n  task blue_lead_engage\n    assignee blue_flight_lead\n    task_type intercept\n    target red_flight_lead\n    behavior intercept_behavior\n  end_task\n  task blue_wing_engage\n    assignee blue_wingman\n    task_type intercept\n    target red_wingman\n    behavior intercept_behavior\n  end_task\nend_task_group\n\nevent_output engagement_output\n  file_name \"brawler_engagement_events.txt\"\n  format text\nend_event_output\n\nevent_pipe brawler_pipe\n  event_type engagement\n  filter id == \"brawler_air_engagement\"\n  output engagement_output\nend_event_pipe\n\nend_time 300 sec",
+  "static_analysis": {
+    "script": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\final_script.txt",
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 137,
+        "message": "missing end_weapon"
+      },
+      {
+        "error_id": "E002",
+        "line": 138,
+        "message": "missing end_sensor"
+      },
+      {
+        "error_id": "E007",
+        "line": 23,
+        "message": "Brawler-family components require platform_type WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+      },
+      {
+        "error_id": "E007",
+        "line": 23,
+        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+      },
+      {
+        "error_id": "E007",
+        "line": 48,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      },
+      {
+        "error_id": "E007",
+        "line": 36,
+        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+      },
+      {
+        "error_id": "E007",
+        "line": 68,
+        "message": "Brawler-family components require platform_type WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+      },
+      {
+        "error_id": "E007",
+        "line": 68,
+        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+      },
+      {
+        "error_id": "E007",
+        "line": 93,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      },
+      {
+        "error_id": "E007",
+        "line": 81,
+        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+      },
+      {
+        "error_id": "E007",
+        "line": 142,
+        "message": "comm_network is not a validated AFSIM command in this project corpus; use supported comm blocks instead"
+      },
+      {
+        "error_id": "E007",
+        "line": 145,
+        "message": "end_comm_network closes an unsupported comm_network block"
+      },
+      {
+        "error_id": "E007",
+        "line": 148,
+        "message": "task must be nested under processor"
+      },
+      {
+        "error_id": "E007",
+        "line": 154,
+        "message": "task must be nested under processor"
+      },
+      {
+        "error_id": "E007",
+        "line": 170,
+        "message": "output is not a valid standalone AFSIM command in scenario scope"
+      },
+      {
+        "error_id": "E007",
+        "line": 173,
+        "message": "end_time must appear at top level, not inside another block"
+      },
+      {
+        "error_id": "E007",
+        "line": 153,
+        "message": "unknown command: end_task"
+      },
+      {
+        "error_id": "E007",
+        "line": 159,
+        "message": "unknown command: end_task"
+      },
+      {
+        "error_id": "E007",
+        "line": 160,
+        "message": "unknown command: end_task_group"
+      }
+    ]
+  },
+  "attempt_count": 8,
   "attempts": [
     {
-      "attempt": 1,
-      "model": "deepseek-v4-pro",
-      "script_preview": "script_interface\n   debug\nend_script_interface\n\nplatform_type BRAWLER_PLATFORM WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type BRAWLER_FLIGHT_LEAD WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_cmdr BRAWLER_FLIGHT_LEAD\n   side blue\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform blue_1 BRAWLER_PLATFORM\n   side blue\n   commander blue_cmdr\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_cmdr BRAWLER_FLIGHT_LEAD\n   side red\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_1 BRAWLER_PLATFORM\n   side red\n   commander red_cmdr\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/brawler_demo_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
-      "static_analysis": {
-        "script": "BV1-012",
-        "syntax_correct": true,
-        "static_pass": true,
-        "primary_error": "",
-        "static_error_ids": [],
-        "findings": []
-      }
+      "phase": "phase1_skeleton",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase1_skeleton",
+      "seconds": 20.662
+    },
+    {
+      "phase": "phase2_shared",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase2_shared",
+      "seconds": 120.592
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "blue_flight_lead",
+      "seconds": 18.223,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_flight_lead"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "blue_wingman",
+      "seconds": 28.929,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_wingman"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "red_flight_lead",
+      "seconds": 52.837,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_flight_lead"
+    },
+    {
+      "phase": "phase3_platforms",
+      "item_id": "red_wingman",
+      "seconds": 18.222,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_wingman"
+    },
+    {
+      "phase": "phase4_tasks",
+      "item_id": "brawler_engagement",
+      "seconds": 137.948,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase4_tasks\\brawler_engagement"
+    },
+    {
+      "phase": "phase5_assembly",
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase5_assembly",
+      "seconds": 89.372
     }
   ],
-  "script_text": "script_interface\n   debug\nend_script_interface\n\nplatform_type BRAWLER_PLATFORM WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform_type BRAWLER_FLIGHT_LEAD WSF_PLATFORM\n   mover WSF_BRAWLER_MOVER\n      aero_file platforms/ACFT_BD.FXW\n   end_mover\n   processor thinker WSF_BRAWLER_PROCESSOR\n   end_processor\n   processor incoming_threats WSF_THREAT_PROCESSOR\n   end_processor\n   comm datalink WSF_COMM_TRANSCEIVER\n   end_comm\nend_platform_type\n\nplatform blue_cmdr BRAWLER_FLIGHT_LEAD\n   side blue\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform blue_1 BRAWLER_PLATFORM\n   side blue\n   commander blue_cmdr\n   route\n      position 30.67n 104.07e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_cmdr BRAWLER_FLIGHT_LEAD\n   side red\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nplatform red_1 BRAWLER_PLATFORM\n   side red\n   commander red_cmdr\n   route\n      position 30.92n 104.37e altitude 3000 m msl speed 150 m/sec\n   end_route\nend_platform\n\nevent_pipe\n   file output/brawler_demo_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
-  "static_analysis": {
-    "script": "BV1-012",
-    "syntax_correct": true,
-    "static_pass": true,
-    "primary_error": "",
-    "static_error_ids": [],
-    "findings": []
-  }
+  "execution_result": {
+    "version": "hierarchical_generation_executor_v1",
+    "plan_version": "hierarchical_generation_plan_v1",
+    "source": {
+      "source_type": "afsim_agent_v2",
+      "source_id": "BV1-012",
+      "source_task_id": "BV1-012"
+    },
+    "mode": "independent_layers_then_merge",
+    "chunk_count": 8,
+    "parallel_groups": {
+      "platforms": 4,
+      "tasks": 1
+    },
+    "layers": [
+      {
+        "phase": "phase1_skeleton",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase1_skeleton",
+        "seconds": 20.662
+      },
+      {
+        "phase": "phase2_shared",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase2_shared",
+        "seconds": 120.592
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "blue_flight_lead",
+        "seconds": 18.223,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_flight_lead"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "blue_wingman",
+        "seconds": 28.929,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\blue_wingman"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "red_flight_lead",
+        "seconds": 52.837,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_flight_lead"
+      },
+      {
+        "phase": "phase3_platforms",
+        "item_id": "red_wingman",
+        "seconds": 18.222,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase3_platforms\\red_wingman"
+      },
+      {
+        "phase": "phase4_tasks",
+        "item_id": "brawler_engagement",
+        "seconds": 137.948,
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase4_tasks\\brawler_engagement"
+      },
+      {
+        "phase": "phase5_assembly",
+        "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\layers\\phase5_assembly",
+        "seconds": 89.372
+      }
+    ],
+    "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-012\\layered_generation\\final_script.txt"
+  },
+  "artifact_dir": "afsim_agent_v2\\BV1-012\\layered_generation"
 }

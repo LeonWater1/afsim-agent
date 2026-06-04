@@ -1,0 +1,177 @@
+PHASE 5: Merge all generated chunks into ONE complete AFSIM script.
+
+Manifest:
+{
+  "scenario_name": "group_comm_example",
+  "platform_types": {
+    "detector_unit": "PT_DETECTOR_UNIT",
+    "relay_unit": "PT_RELAY_UNIT",
+    "observer_unit": "PT_OBSERVER_UNIT"
+  },
+  "platform_instances": {
+    "detector_unit": "detector_unit",
+    "relay_unit": "relay_unit",
+    "observer_unit": "observer_unit"
+  },
+  "route_ids": [],
+  "task_ids": [
+    "share_group_reports"
+  ]
+}
+
+Requested outputs:
+["event_pipe", "event_output"]
+
+Expected events:
+[
+  {
+    "id": "group_message_exchange",
+    "type": "communication",
+    "actor_refs": [
+      "detector_unit",
+      "relay_unit",
+      "observer_unit"
+    ],
+    "success_condition": "Participants exchange reports across the communication group."
+  }
+]
+
+Evaluation:
+{}
+
+Duration / end_time:
+{"value": 240, "unit": "sec"}
+
+Chunk A - scenario skeleton:
+```afsim
+# Group communication scenario skeleton
+
+side blue display_name Blue
+
+location detector_site
+  kind point
+  position 30.67n 104.07e
+end_location
+
+location relay_site
+  kind point
+  position 30.70n 104.10e
+end_location
+
+location observer_site
+  kind point
+  position 30.73n 104.13e
+end_location
+```
+
+Chunk B - shared declarations:
+```afsim
+network group_broadcast
+  group_join
+  internal_link
+end_network
+
+platform_type PT_OBSERVER_UNIT
+  platform observer_platform_basic
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type
+
+platform_type PT_RELAY_UNIT
+  platform relay_platform_basic
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type
+
+platform_type PT_DETECTOR_UNIT
+  platform detector_platform_basic
+  processor report_processor WSF_TRACK_PROCESSOR
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type
+```
+
+Chunk C - platform instances:
+[
+  {
+    "item_id": "detector_unit",
+    "text": "platform detector_unit\n  platform_type PT_DETECTOR_UNIT\n  side blue\n  position 30.67n 104.07e\n  component group_network\n  component report_processor\nend_platform",
+    "record": {
+      "phase": "phase3_platforms",
+      "item_id": "detector_unit",
+      "seconds": 42.507,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\detector_unit"
+    }
+  },
+  {
+    "item_id": "observer_unit",
+    "text": "platform observer_unit\n  side blue\n  platform_type PT_OBSERVER_UNIT\n  position 30.73n 104.13e\n  comm group_network\nend_platform",
+    "record": {
+      "phase": "phase3_platforms",
+      "item_id": "observer_unit",
+      "seconds": 15.934,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\observer_unit"
+    }
+  },
+  {
+    "item_id": "relay_unit",
+    "text": "platform relay_unit PT_RELAY_UNIT\n  side blue\n  position 30.70n 104.10e\n  comm group_network\nend_platform",
+    "record": {
+      "phase": "phase3_platforms",
+      "item_id": "relay_unit",
+      "seconds": 15.202,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase3_platforms\\relay_unit"
+    }
+  }
+]
+
+Chunk D - task overlays:
+[
+  {
+    "item_id": "share_group_reports",
+    "text": "comm_network share_group_net\n  network_type WSF_COMM_NETWORK_AD_HOC\n  link_frequency 3000 MHz\n  bandwidth 1 MHz\n  range 50 km\nend_comm_network\n\n# Inside platform_instance detector_unit\nadd transceiver dtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager dtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\n# Inside platform_instance relay_unit\nadd transceiver rtx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager rtm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\n# Inside platform_instance observer_unit\nadd transceiver otx WSF_COMM_TRANSCEIVER\n  network share_group_net\nend_transceiver\nadd track_manager otm WSF_TRACK_MANAGER\n  track_transmitter share_group_net\n  track_receiver share_group_net\nend_track_manager\n\ngroup report_sharing_group\n  members detector_unit relay_unit observer_unit\nend_group\n\ntask share_group_reports\n  task_type group_communication\n  assigned_to report_sharing_group\n  parameter message_flow group_broadcast\nend_task",
+    "record": {
+      "phase": "phase4_tasks",
+      "item_id": "share_group_reports",
+      "seconds": 82.668,
+      "artifact_dir": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\layered_generation\\layers\\phase4_tasks\\share_group_reports"
+    }
+  }
+]
+
+Instructions:
+1. Merge all chunks into one complete script.
+2. Preserve the exact platform_type names and platform instance names from the manifest.
+3. Place route blocks and task-specific overlays in the correct final structure.
+4. Do minimal reference repair only:
+   - connect references that are already implied by the manifest
+   - do not invent new platforms, components, or tasks
+5. Add top-level event_pipe / event_output only if requested by outputs.
+6. Emit exactly one end_time line as the LAST line of the script.
+
+Return ONLY the final AFSIM script.
+
+AFSIM 2.9.0 hard rules:
+- Return ONLY AFSIM script text. No markdown, no explanation.
+- Use ONLY verified commands and verified WSF types.
+- ALL numbers must include units where AFSIM requires them.
+- Coordinates use n/s/e/w suffix, for example: position 30.67n 104.07e
+- Altitude format: altitude 10000 ft msl  or  altitude 500 m agl
+- side is a declaration, not a block. Never emit end_side.
+- Match every block with the correct end_* tag.
+- Do not invent DSL constructs outside the official command set.
+
+Verified WSF types:
+WSF_ACOUSTIC_SENSOR WSF_AERO WSF_AGILITY_EFFECT WSF_AIR_MOVER WSF_AIR_TARGET_FUSE WSF_AIR_TO_AIR_LAUNCH_COMPUTER WSF_AIR_TO_AIR_MISSILE WSF_ALPHA_BETA_FILTER
+WSF_ASSET_MESSAGE WSF_ATA_LAUNCH_COMPUTER WSF_ATG_LAUNCH_COMPUTER WSF_BALLISTIC_MISSILE_LAUNCH_COMPUTER WSF_BRAWLER_FUEL WSF_BRAWLER_MOVER WSF_BRAWLER_PLATFORM WSF_BRAWLER_PROCESSOR
+WSF_CHAFF_PARCEL WSF_CHAFF_WEAPON WSF_COMM_NETWORK_AD_HOC WSF_COMM_RCVR WSF_COMM_ROUTER WSF_COMM_ROUTER_PROTOCOL_AD_HOC WSF_COMM_TRANSCEIVER WSF_COMM_XMTR
+WSF_CONTROL_MESSAGE WSF_COVER_PULSE_EFFECT WSF_CYBER_ATTACK WSF_CYBER_CONSTRAINT WSF_CYBER_DETONATE_EFFECT WSF_CYBER_MAN_IN_THE_MIDDLE_EFFECT WSF_CYBER_PROTECT WSF_CYBER_SCRIPT_EFFECT
+WSF_DIRECTION_FINDER_PROCESSOR WSF_EA_TECHNIQUE WSF_ELECTRONIC_ATTACK WSF_ELECTRONIC_PROTECT WSF_EOIR_SENSOR WSF_EP_TECHNIQUE WSF_ESM_SENSOR WSF_EXPLICIT_WEAPON
+WSF_FALSE_TARGET WSF_FALSE_TARGET_EFFECT WSF_FIRES_LAUNCH_COMPUTER WSF_FIRES_MOVER WSF_FT_SCREENER WSF_FUEL WSF_GEOMETRIC_SENSOR WSF_GRADUATED_LETHALITY
+WSF_GROUND_MOVER WSF_GROUND_TARGET_FUSE WSF_GROUP WSF_GUIDANCE_COMPUTER WSF_GUIDED_MOVER WSF_IMAGE_PROCESSOR WSF_IMPLICIT_WEAPON WSF_INTEGRATING_SPACE_MOVER
+WSF_IRST_SENSOR WSF_JAMMER_POWER_EFFECT WSF_KALMAN_FILTER WSF_KINEMATIC_MOVER WSF_LASER_DESIGNATOR WSF_LASER_TRACKER WSF_LINKED_PROCESSOR WSF_OFFSET_MOVER
+WSF_OLD_GUIDANCE_COMPUTER WSF_OLD_GUIDED_MOVER WSF_PERCEPTION_PROCESSOR WSF_PERFECT_TRACKER WSF_PLATFORM WSF_POINT_MASS_SIX_DOF_MOVER WSF_POL_MOD_EFFECT WSF_POWER_EFFECT
+WSF_PULSE_SUPPRESS_EFFECT WSF_QUANTUM_TASKER_PROCESSOR WSF_RADAR_SENSOR WSF_RADAR_SIGNATURE WSF_RADIO_RCVR WSF_RADIO_TRANSCEIVER WSF_RADIO_XMTR WSF_RF_JAMMER
+WSF_RIPR_PROCESSOR WSF_RPJ_EFFECT WSF_SAR_SENSOR WSF_SA_PROCESSOR WSF_SCRIPT_LAUNCH_COMPUTER WSF_SCRIPT_PROCESSOR WSF_SENSORS_MANAGER_FOV WSF_SIMPLE_FT_EFFECT
+WSF_SIMPLE_SENSORS_MANAGER WSF_SIX_DOF_MOVER WSF_SLB_EFFECT WSF_SLC_EFFECT WSF_SPHERICAL_LETHALITY WSF_STATE_MACHINE WSF_STRAIGHT_LINE_MOVER WSF_TABULAR_RATE_FUEL
+WSF_TASK_PROCESSOR WSF_THREAT_PROCESSOR WSF_TRACK_DROP_MESSAGE WSF_TRACK_EFFECT WSF_TRACK_MANAGER WSF_TRACK_MESSAGE WSF_TRACK_NOTIFY_MESSAGE WSF_TRACK_PROCESSOR
+WSF_UNCLASS_ASSET_MANAGER WSF_UNCLASS_BM WSF_UNCLASS_DISSEMINATE_C WSF_UNGUIDED_MOVER WSF_UPLINK_PROCESSOR WSF_WEAPONS_MANAGER_AI WSF_WEAPONS_MANAGER_SAM WSF_WEAPON_FUSE
+WSF_WEAPON_TRACK_PROCESSOR
+

@@ -1,0 +1,18 @@
+# Group communication scenario skeleton
+
+side blue display_name Blue
+
+location detector_site
+  kind point
+  position 30.67n 104.07e
+end_location
+
+location relay_site
+  kind point
+  position 30.70n 104.10e
+end_location
+
+location observer_site
+  kind point
+  position 30.73n 104.13e
+end_location

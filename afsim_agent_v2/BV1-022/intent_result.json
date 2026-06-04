@@ -4,25 +4,26 @@
   "parser_mode": "llm_schema_retry",
   "supported": true,
   "input": "基于 fires/time_on_target，生成火力 time-on-target 场景。",
-  "few_shot_example_count": 3,
+  "few_shot_example_count": 5,
   "attempt_count": 1,
   "attempts": [
     {
       "attempt": 1,
       "model": "deepseek-v4-pro",
-      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"fires_time_on_target_demo\",\n    \"description\": \"Fires time-on-target scenario with coordinated artillery and missile fire.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"ground\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"blue_artillery_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.60N\",\n        \"lon\": \"104.00E\",\n        \"altitude\": {\n          \"value\": 500,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"blue_missile_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.65N\",\n        \"lon\": \"104.02E\",\n        \"altitude\": {\n          \"value\": 500,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"red_target_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.80N\",\n        \"lon\": \"104.20E\",\n        \"altitude\": {\n          \"value\": 600,\n          \"unit\": \"m\"\n        }\n      }\n    }\n  ],\n  \"compo",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v2\",\n  \"scenario\": {\n    \"name\": \"time_on_target_fires\",\n    \"description\": \"Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.\",\n    \"duration\": {\n      \"value\": 600,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"ground\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"artillery_position_1\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"51.53n\",\n        \"lon\": \"0.44e\"\n      }\n    },\n    {\n      \"id\": \"mortar_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"51.49n\",\n        \"lon\": \"0.37e\"\n      }\n    },\n    {\n      \"id\": \"rocket_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"51.50n\",\n        \"lon\": \"0.27e\"\n      }\n    },\n    {\n      \"id\": \"commander_position\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"51.58n\",\n        \"lon\": \"0.31e\"\n      }\n    },\n    {\n      \"id\": \"target_location\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"51.47n\",\n        \"lon\": \"0.35e\"\n     ",
       "validation": {
         "ok": true,
         "error_count": 0,
-        "errors": []
+        "errors": [],
+        "schema_version": "afsim_ir_v2"
       }
     }
   ],
   "ir": {
-    "schema_version": "afsim_ir_v1",
+    "schema_version": "afsim_ir_v2",
     "scenario": {
-      "name": "fires_time_on_target_demo",
-      "description": "Fires time-on-target scenario with coordinated artillery and missile fire.",
+      "name": "time_on_target_fires",
+      "description": "Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target.",
       "duration": {
         "value": 600,
         "unit": "sec"
@@ -31,14 +32,11 @@
         "ground"
       ],
       "outputs": [
-        "event_pipe"
+        "event_pipe",
+        "event_output"
       ]
     },
     "sides": [
-      {
-        "id": "blue",
-        "display_name": "Blue"
-      },
       {
         "id": "red",
         "display_name": "Red"
@@ -46,125 +44,175 @@
     ],
     "locations": [
       {
-        "id": "blue_artillery_position",
+        "id": "artillery_position_1",
         "kind": "point",
         "position": {
-          "lat": "30.60N",
-          "lon": "104.00E",
-          "altitude": {
-            "value": 500,
-            "unit": "m"
-          }
+          "lat": "51.53n",
+          "lon": "0.44e"
         }
       },
       {
-        "id": "blue_missile_position",
+        "id": "mortar_position",
         "kind": "point",
         "position": {
-          "lat": "30.65N",
-          "lon": "104.02E",
-          "altitude": {
-            "value": 500,
-            "unit": "m"
-          }
+          "lat": "51.49n",
+          "lon": "0.37e"
         }
       },
       {
-        "id": "red_target_position",
+        "id": "rocket_position",
         "kind": "point",
         "position": {
-          "lat": "30.80N",
-          "lon": "104.20E",
-          "altitude": {
-            "value": 600,
-            "unit": "m"
-          }
+          "lat": "51.50n",
+          "lon": "0.27e"
+        }
+      },
+      {
+        "id": "commander_position",
+        "kind": "point",
+        "position": {
+          "lat": "51.58n",
+          "lon": "0.31e"
+        }
+      },
+      {
+        "id": "target_location",
+        "kind": "point",
+        "position": {
+          "lat": "51.47n",
+          "lon": "0.35e"
         }
       }
     ],
     "components": {
       "weapons": [
         {
-          "id": "artillery_shell",
-          "role": "artillery_projectile",
-          "type_hint": "artillery_shell"
+          "id": "artillery_155mm",
+          "role": "indirect_fire_weapon",
+          "type_hint": "fires_implicit_weapon"
         },
         {
-          "id": "cruise_missile",
-          "role": "standoff_weapon",
-          "type_hint": "cruise_missile"
+          "id": "mortar_120mm",
+          "role": "indirect_fire_weapon",
+          "type_hint": "fires_implicit_weapon"
+        },
+        {
+          "id": "rocket_122mm",
+          "role": "indirect_fire_weapon",
+          "type_hint": "fires_implicit_weapon"
         }
       ],
       "processors": [
         {
-          "id": "fires_tot_coordinator",
+          "id": "commander_task_proc",
           "role": "fires_coordination",
-          "type_hint": "fires_tot_processor"
+          "type_hint": "task_processor"
+        },
+        {
+          "id": "sub_task_proc",
+          "role": "launch_timing",
+          "type_hint": "task_processor"
         }
       ],
       "comms": [
         {
-          "id": "fires_comms",
+          "id": "fires_comm",
           "role": "fires_network",
-          "type_hint": "comm_system"
+          "type_hint": "datalink"
         }
       ]
     },
     "entities": [
       {
-        "id": "blue_artillery_battery",
-        "role": "artillery",
-        "side": "blue",
+        "id": "artillery_launcher",
+        "role": "artillery_launcher",
+        "side": "red",
         "quantity": 1,
         "domain": "ground",
-        "platform_type_hint": "artillery_platform",
+        "platform_type_hint": "fires_launcher",
         "component_refs": [
-          "artillery_shell",
-          "fires_tot_coordinator",
-          "fires_comms"
+          "artillery_155mm",
+          "sub_task_proc",
+          "fires_comm"
         ],
-        "initial_location_ref": "blue_artillery_position"
+        "initial_location_ref": "artillery_position_1"
       },
       {
-        "id": "blue_missile_launcher",
-        "role": "missile_launcher",
-        "side": "blue",
+        "id": "mortar_launcher",
+        "role": "mortar_launcher",
+        "side": "red",
         "quantity": 1,
         "domain": "ground",
-        "platform_type_hint": "missile_launcher_platform",
+        "platform_type_hint": "fires_launcher",
         "component_refs": [
-          "cruise_missile",
-          "fires_tot_coordinator",
-          "fires_comms"
+          "mortar_120mm",
+          "sub_task_proc",
+          "fires_comm"
         ],
-        "initial_location_ref": "blue_missile_position"
+        "initial_location_ref": "mortar_position"
       },
       {
-        "id": "red_target",
+        "id": "rocket_launcher",
+        "role": "rocket_launcher",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "fires_launcher",
+        "component_refs": [
+          "rocket_122mm",
+          "sub_task_proc",
+          "fires_comm"
+        ],
+        "initial_location_ref": "rocket_position"
+      },
+      {
+        "id": "fires_commander",
+        "role": "fires_commander",
+        "side": "red",
+        "quantity": 1,
+        "domain": "ground",
+        "platform_type_hint": "commander_platform",
+        "component_refs": [
+          "commander_task_proc",
+          "fires_comm"
+        ],
+        "initial_location_ref": "commander_position"
+      },
+      {
+        "id": "target_unit",
         "role": "target",
         "side": "red",
         "quantity": 1,
         "domain": "ground",
-        "platform_type_hint": "ground_vehicle_or_building",
-        "initial_location_ref": "red_target_position"
+        "platform_type_hint": "static_target",
+        "initial_location_ref": "target_location"
       }
     ],
     "tasks": [
       {
-        "id": "coordinated_fires",
-        "type": "fires",
+        "id": "time_on_target_strike",
+        "type": "time_on_target",
         "assignee_refs": [
-          "blue_artillery_battery",
-          "blue_missile_launcher"
+          "fires_commander",
+          "artillery_launcher",
+          "mortar_launcher",
+          "rocket_launcher"
         ],
         "target_refs": [
-          "red_target"
+          "target_unit"
+        ],
+        "location_refs": [
+          "commander_position",
+          "artillery_position_1",
+          "mortar_position",
+          "rocket_position"
         ],
         "parameters": {
-          "time_on_target": {
+          "impact_time": {
             "value": 120,
             "unit": "sec"
-          }
+          },
+          "coordination_mode": "centralized_fire_direction"
         }
       }
     ],
@@ -172,23 +220,73 @@
       "unit_system": "afsim_mixed",
       "coordinate_format": "lat_lon_dir",
       "required_fields": [
-        "scenario.duration",
         "entities.side",
         "entities.quantity",
-        "tasks"
+        "tasks",
+        "components.weapons",
+        "components.processors"
       ]
     },
     "expected_events": [
       {
-        "id": "target_destroyed_on_tot",
+        "id": "coordinated_impact",
         "type": "weapon_impact",
         "actor_refs": [
-          "blue_artillery_battery",
-          "blue_missile_launcher",
-          "red_target"
+          "artillery_launcher",
+          "mortar_launcher",
+          "rocket_launcher",
+          "target_unit"
         ],
-        "success_condition": "Target is hit by coordinated fires at the specified time on target (120 seconds into the scenario)."
+        "success_condition": "Multiple launchers achieve simultaneous or near-simultaneous impact on the target via time-on-target coordination."
       }
+    ]
+  },
+  "slot_coverage": {
+    "filled_slots": 11,
+    "total_slots": 24,
+    "coverage_ratio": 0.458,
+    "baseline_slots": {
+      "scenario_name": true,
+      "scenario_duration": true,
+      "sides": false,
+      "adversarial_tasks": true,
+      "locations": true,
+      "routes": false,
+      "components_movers": false,
+      "components_sensors": false,
+      "components_weapons": true,
+      "components_processors": true,
+      "components_comms": true,
+      "entities": true,
+      "tasks": true,
+      "expected_events": true,
+      "grounding_hints": false
+    },
+    "new_slots": {
+      "commander_ref": false,
+      "impact_time": true,
+      "activation_delay": false,
+      "multi_phase_tasks": false,
+      "constraints_timing": false,
+      "constraints_triggers": false,
+      "constraints_resource_limits": false,
+      "constraints_roe": false,
+      "constraints_geographic_limits": false
+    },
+    "missing_slots": [
+      "sides",
+      "routes",
+      "components_movers",
+      "components_sensors",
+      "grounding_hints",
+      "commander_ref",
+      "activation_delay",
+      "multi_phase_tasks",
+      "constraints_timing",
+      "constraints_triggers",
+      "constraints_resource_limits",
+      "constraints_roe",
+      "constraints_geographic_limits"
     ]
   }
 }

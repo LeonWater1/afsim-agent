@@ -1,0 +1,50 @@
+{
+  "static_pass": false,
+  "findings": [
+    {
+      "error_id": "E002",
+      "line": 19,
+      "message": "end_sensor closes antenna_pattern from line 17"
+    },
+    {
+      "error_id": "E002",
+      "line": 24,
+      "message": "end_platform_type closes sensor from line 16"
+    },
+    {
+      "error_id": "E002",
+      "line": 13,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E007",
+      "line": 17,
+      "message": "antenna_pattern missing constant_pattern block"
+    },
+    {
+      "error_id": "E007",
+      "line": 20,
+      "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+    },
+    {
+      "error_id": "E007",
+      "line": 16,
+      "message": "WSF_RADAR_SENSOR missing transmitter block"
+    },
+    {
+      "error_id": "E007",
+      "line": 26,
+      "message": "antenna_pattern missing constant_pattern block"
+    },
+    {
+      "error_id": "E007",
+      "line": 32,
+      "message": "end_time must appear at top level, not inside another block"
+    }
+  ],
+  "error_ids": [
+    "E002",
+    "E007"
+  ],
+  "primary_error": "E002"
+}

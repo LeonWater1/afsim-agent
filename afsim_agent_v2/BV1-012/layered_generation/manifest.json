@@ -1,0 +1,19 @@
+{
+  "scenario_name": "brawler_1v1",
+  "platform_types": {
+    "blue_flight_lead": "PT_BLUE_FLIGHT_LEAD",
+    "blue_wingman": "PT_BLUE_WINGMAN",
+    "red_flight_lead": "PT_RED_FLIGHT_LEAD",
+    "red_wingman": "PT_RED_WINGMAN"
+  },
+  "platform_instances": {
+    "blue_flight_lead": "blue_flight_lead",
+    "blue_wingman": "blue_wingman",
+    "red_flight_lead": "red_flight_lead",
+    "red_wingman": "red_wingman"
+  },
+  "route_ids": [],
+  "task_ids": [
+    "brawler_engagement"
+  ]
+}

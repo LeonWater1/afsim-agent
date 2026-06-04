@@ -1,0 +1,21 @@
+{
+  "scenario_name": "time_on_target_fires",
+  "platform_types": {
+    "artillery_launcher": "PT_ARTILLERY_LAUNCHER",
+    "mortar_launcher": "PT_MORTAR_LAUNCHER",
+    "rocket_launcher": "PT_ROCKET_LAUNCHER",
+    "fires_commander": "PT_FIRES_COMMANDER",
+    "target_unit": "PT_TARGET_UNIT"
+  },
+  "platform_instances": {
+    "artillery_launcher": "artillery_launcher",
+    "mortar_launcher": "mortar_launcher",
+    "rocket_launcher": "rocket_launcher",
+    "fires_commander": "fires_commander",
+    "target_unit": "target_unit"
+  },
+  "route_ids": [],
+  "task_ids": [
+    "time_on_target_strike"
+  ]
+}

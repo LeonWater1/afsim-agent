@@ -1,0 +1,7 @@
+platform blue_flight_lead PT_BLUE_FLIGHT_LEAD
+  side blue
+  position 0.03s 0.01w
+  altitude 10000 ft msl
+  processor brawler_thinker
+  comm brawler_datalink
+end_platform

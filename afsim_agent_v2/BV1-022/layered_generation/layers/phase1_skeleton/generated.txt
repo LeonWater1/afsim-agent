@@ -1,0 +1,29 @@
+// Time on target fires scenario skeleton
+
+scenario time_on_target_fires
+  description "Indirect fires mission with time-on-target coordination — multiple launcher types firing on a single target."
+  duration 600 sec
+  side red
+    display_name "Red"
+  end_side
+  location artillery_position_1
+    kind point
+    position 51.53n 0.44e
+  end_location
+  location mortar_position
+    kind point
+    position 51.49n 0.37e
+  end_location
+  location rocket_position
+    kind point
+    position 51.50n 0.27e
+  end_location
+  location commander_position
+    kind point
+    position 51.58n 0.31e
+  end_location
+  location target_location
+    kind point
+    position 51.47n 0.35e
+  end_location
+end_scenario

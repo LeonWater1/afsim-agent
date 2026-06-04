@@ -1,0 +1,8 @@
+platform fires_commander PT_FIRES_COMMANDER
+  side red
+  position 51.58n 0.31e
+  component commander_task_proc task_processor_basic
+  end_component
+  component fires_comm datalink_basic
+  end_component
+end_platform

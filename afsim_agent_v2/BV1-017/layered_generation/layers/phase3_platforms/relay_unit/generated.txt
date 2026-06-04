@@ -1,0 +1,5 @@
+platform relay_unit PT_RELAY_UNIT
+  side blue
+  position 30.70n 104.10e
+  comm group_network
+end_platform

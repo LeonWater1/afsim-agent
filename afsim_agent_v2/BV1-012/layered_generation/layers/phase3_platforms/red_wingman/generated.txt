@@ -1,0 +1,5 @@
+platform red_wingman
+  side red
+  type PT_RED_WINGMAN
+  position 0.03n 0.01e altitude 10000 ft msl
+end_platform

@@ -1,0 +1,6 @@
+platform observer_unit
+  side blue
+  platform_type PT_OBSERVER_UNIT
+  position 30.73n 104.13e
+  comm group_network
+end_platform

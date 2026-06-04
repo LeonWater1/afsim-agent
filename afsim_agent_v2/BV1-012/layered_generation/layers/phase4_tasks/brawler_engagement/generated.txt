@@ -1,0 +1,26 @@
+behavior intercept_behavior
+  type WSF_BRAWLER_PROCESSOR
+  weapon air_to_air_missile
+  sensor air_radar
+  engagement_style brawler_tactical
+end_behavior
+
+comm_network brawler_net
+  type WSF_COMM_NETWORK_AD_HOC
+  frequency 123.0 mhz
+end_comm_network
+
+task_group brawler_engagement
+  task blue_lead_engage
+    assignee blue_flight_lead
+    task_type intercept
+    target red_flight_lead
+    behavior intercept_behavior
+  end_task
+  task blue_wing_engage
+    assignee blue_wingman
+    task_type intercept
+    target red_wingman
+    behavior intercept_behavior
+  end_task
+end_task_group

@@ -1,0 +1,18 @@
+// acoustic_simple_demo
+side blue
+side red
+location blue_start position 30.0n 150.0e
+location red_contact position 30.5n 150.5e
+platform_type blue_sensor_type WSF_PLATFORM
+  mover WSF_GROUND_MOVER ground_mover
+    speed 0 m/sec
+  end_mover
+  sensor WSF_ACOUSTIC_SENSOR acoustic_sensor_basic
+  end_sensor
+end_platform_type
+platform_type red_target_type WSF_PLATFORM
+  mover WSF_GROUND_MOVER ground_mover
+    speed 0 m/sec
+  end_mover
+end_platform_type
+end_time 120 sec

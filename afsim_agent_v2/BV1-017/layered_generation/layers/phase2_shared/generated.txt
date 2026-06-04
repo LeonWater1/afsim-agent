@@ -1,0 +1,20 @@
+network group_broadcast
+  group_join
+  internal_link
+end_network
+
+platform_type PT_OBSERVER_UNIT
+  platform observer_platform_basic
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type
+
+platform_type PT_RELAY_UNIT
+  platform relay_platform_basic
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type
+
+platform_type PT_DETECTOR_UNIT
+  platform detector_platform_basic
+  processor report_processor WSF_TRACK_PROCESSOR
+  comm group_network WSF_COMM_TRANSCEIVER
+end_platform_type

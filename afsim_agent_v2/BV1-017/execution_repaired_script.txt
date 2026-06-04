@@ -1,121 +1,49 @@
-script_interface
-   debug
-end_script_interface
+group report_group WSF_GROUP
+end_group
 
-comm BASIC_COMM WSF_COMM_TRANSCEIVER
-end_comm
-
-processor BASIC_TRACK_PROC WSF_TRACK_PROCESSOR
-   report_interval 2 sec
-   circular_report_rejection on
-   update_interval 10 sec
-   on_message
-      type WSF_TRACK_MESSAGE
-      script
-         WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;
-         if(tmsg.Originator() != PLATFORM.Name())
-         {
-            print("T=", TIME_NOW, " P=", PLATFORM.Name(), " received track from ", tmsg.Originator());
-         }
-      end_script
-   end_on_message
-end_processor
-
-group GROUP1 WSF_GROUP end_group
-group GROUP2 WSF_GROUP end_group
-
-platform_type BASIC_STATION WSF_PLATFORM
-   mover WSF_GROUND_MOVER
-      maximum_speed 1 m/sec
-      minimum_speed 0 m/sec
-   end_mover
-
-   comm PLATFORM_COMM WSF_COMM_TRANSCEIVER
-      internal_link TRACK_PROC
-   end_comm
-
-   processor TRACK_PROC WSF_TRACK_PROCESSOR
-      report_interval 2 sec
-      circular_report_rejection on
-      update_interval 10 sec
-      on_message
-         type WSF_TRACK_MESSAGE
-         script
-            WsfTrackMessage tmsg = (WsfTrackMessage)MESSAGE;
-            if(tmsg.Originator() != PLATFORM.Name())
-            {
-               print("T=", TIME_NOW, " P=", PLATFORM.Name(), " received track from ", tmsg.Originator());
-            }
-         end_script
-      end_on_message
-   end_processor
-
-   sensor radar WSF_RADAR_SENSOR
-      frame_time 2 sec
-      reports_location
-      transmitter
-         power 100 kw
-         frequency 1000 mhz
-         antenna_pattern
-            constant_pattern
-               peak_gain 30 db
-               azimuth_beamwidth 10 deg
-               elevation_beamwidth 10 deg
-            end_constant_pattern
-         end_antenna_pattern
-      end_transmitter
-      receiver
-         antenna_pattern
-            constant_pattern
-               peak_gain 30 db
-               azimuth_beamwidth 10 deg
-               elevation_beamwidth 10 deg
-            end_constant_pattern
-         end_antenna_pattern
-      end_receiver
-   end_sensor
+platform_type PT_OBSERVER_UNIT WSF_PLATFORM
+  comm group_network WSF_COMM_TRANSCEIVER
+  end_comm
 end_platform_type
 
-platform detector BASIC_STATION
-   side blue
-   route
-      position 30.67n 104.07e altitude 0 m msl speed 0 m/sec
-   end_route
-   sensor radar
-      on
-   end_sensor
-   group add GROUP1
+platform_type PT_RELAY_UNIT WSF_PLATFORM
+  comm group_network WSF_COMM_TRANSCEIVER
+  end_comm
+end_platform_type
+
+platform_type PT_DETECTOR_UNIT WSF_PLATFORM
+  comm group_network WSF_COMM_TRANSCEIVER
+  end_comm
+  processor report_processor WSF_TRACK_PROCESSOR
+    report_interval 2 sec
+    update_interval 10 sec
+  end_processor
+end_platform_type
+
+platform detector_unit PT_DETECTOR_UNIT
+  side blue
+  position 30.67n 104.07e altitude 0 ft msl
+  group report_group
 end_platform
 
-platform relay BASIC_STATION
-   side blue
-   route
-      position 30.70n 104.10e altitude 0 m msl speed 0 m/sec
-   end_route
-   sensor radar
-      off
-   end_sensor
-   group add GROUP1
-   group add GROUP2
+platform relay_unit PT_RELAY_UNIT
+  side blue
+  position 30.70n 104.10e altitude 0 ft msl
+  group report_group
 end_platform
 
-platform observer BASIC_STATION
-   side blue
-   route
-      position 30.73n 104.13e altitude 0 m msl speed 0 m/sec
-   end_route
-   sensor radar
-      off
-   end_sensor
-   group add GROUP2
+platform observer_unit PT_OBSERVER_UNIT
+  side blue
+  position 30.73n 104.13e altitude 0 ft msl
+  group report_group
 end_platform
 
-event_pipe
-   file output/group_comm_example.aer
+event_pipe group_event_pipe
+  file output/group_comm_example.aer
 end_event_pipe
 
-event_output
-   file output/group_comm_example.evt
+event_output group_output
+  file output/group_comm_example.evt
 end_event_output
 
 end_time 240 sec

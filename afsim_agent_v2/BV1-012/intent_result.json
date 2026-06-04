@@ -4,25 +4,26 @@
   "parser_mode": "llm_schema_retry",
   "supported": true,
   "input": "基于 brawler/brawler_demo_1v1，生成 Brawler 一对一空战近似模型场景。",
-  "few_shot_example_count": 3,
+  "few_shot_example_count": 5,
   "attempt_count": 1,
   "attempts": [
     {
       "attempt": 1,
       "model": "deepseek-v4-pro",
-      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"brawler_demo_1v1\",\n    \"description\": \"Brawler one-on-one air combat approximate model scenario.\",\n    \"duration\": {\n      \"value\": 300,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"blue_spawn\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.67n\",\n        \"lon\": \"104.07e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    },\n    {\n      \"id\": \"red_spawn\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.92n\",\n        \"lon\": \"104.37e\",\n        \"altitude\": {\n          \"value\": 3000,\n          \"unit\": \"m\"\n        }\n      }\n    }\n  ],\n  \"components\": {\n    \"movers\": [\n      {\n        \"id\": \"fighter_mover\",\n        \"role\": \"air_mover\",\n        \"type_hint\": \"air_mover\"\n      }\n    ],\n    \"sensors\": [\n      {\n        \"id\": \"fighter_radar\",\n        \"role\": \"air_intercept_radar\",\n        \"type_hint\": \"radar_sensor\"\n      }",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v2\",\n  \"scenario\": {\n    \"name\": \"brawler_1v1\",\n    \"description\": \"One versus one Brawler air combat engagement with behavior tree decision logic.\",\n    \"duration\": {\n      \"value\": 300,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"air\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    },\n    {\n      \"id\": \"red\",\n      \"display_name\": \"Red\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"blue_spawn\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"0.03s\",\n        \"lon\": \"0.01w\",\n        \"altitude\": {\n          \"value\": 10000,\n          \"unit\": \"ft\"\n        }\n      }\n    },\n    {\n      \"id\": \"red_spawn\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"0.03n\",\n        \"lon\": \"0.01e\",\n        \"altitude\": {\n          \"value\": 10000,\n          \"unit\": \"ft\"\n        }\n      }\n    }\n  ],\n  \"components\": {\n    \"movers\": [\n      {\n        \"id\": \"brawler_mover\",\n        \"role\": \"air_combat_mover\",\n        \"type_hint\": \"brawler_mover\"\n      }\n    ],\n    \"sensors\": [\n      {\n        \"id\": \"brawler_sensor\",\n        \"role\": \"target_acquisiti",
       "validation": {
         "ok": true,
         "error_count": 0,
-        "errors": []
+        "errors": [],
+        "schema_version": "afsim_ir_v2"
       }
     }
   ],
   "ir": {
-    "schema_version": "afsim_ir_v1",
+    "schema_version": "afsim_ir_v2",
     "scenario": {
-      "name": "brawler_demo_1v1",
-      "description": "Brawler one-on-one air combat approximate model scenario.",
+      "name": "brawler_1v1",
+      "description": "One versus one Brawler air combat engagement with behavior tree decision logic.",
       "duration": {
         "value": 300,
         "unit": "sec"
@@ -31,7 +32,8 @@
         "air"
       ],
       "outputs": [
-        "event_pipe"
+        "event_pipe",
+        "event_output"
       ]
     },
     "sides": [
@@ -49,11 +51,11 @@
         "id": "blue_spawn",
         "kind": "point",
         "position": {
-          "lat": "30.67n",
-          "lon": "104.07e",
+          "lat": "0.03s",
+          "lon": "0.01w",
           "altitude": {
-            "value": 3000,
-            "unit": "m"
+            "value": 10000,
+            "unit": "ft"
           }
         }
       },
@@ -61,11 +63,11 @@
         "id": "red_spawn",
         "kind": "point",
         "position": {
-          "lat": "30.92n",
-          "lon": "104.37e",
+          "lat": "0.03n",
+          "lon": "0.01e",
           "altitude": {
-            "value": 3000,
-            "unit": "m"
+            "value": 10000,
+            "unit": "ft"
           }
         }
       }
@@ -73,91 +75,142 @@
     "components": {
       "movers": [
         {
-          "id": "fighter_mover",
-          "role": "air_mover",
-          "type_hint": "air_mover"
+          "id": "brawler_mover",
+          "role": "air_combat_mover",
+          "type_hint": "brawler_mover"
         }
       ],
       "sensors": [
         {
-          "id": "fighter_radar",
-          "role": "air_intercept_radar",
-          "type_hint": "radar_sensor"
+          "id": "brawler_sensor",
+          "role": "target_acquisition",
+          "type_hint": "geometric_sensor"
         }
       ],
       "weapons": [
         {
-          "id": "aam_basic",
+          "id": "short_range_missile",
           "role": "air_to_air_weapon",
           "type_hint": "air_to_air_missile"
+        },
+        {
+          "id": "gun",
+          "role": "gun_weapon",
+          "type_hint": "gun_weapon"
         }
       ],
       "processors": [
         {
-          "id": "brawler_engage",
-          "role": "brawler_engagement",
-          "type_hint": "brawler_processor",
-          "parameters": {}
+          "id": "brawler_thinker",
+          "role": "tactical_decision",
+          "type_hint": "brawler_processor"
+        },
+        {
+          "id": "perception",
+          "role": "threat_perception",
+          "type_hint": "perception_processor"
+        },
+        {
+          "id": "incoming_threats",
+          "role": "threat_assessment",
+          "type_hint": "threat_processor"
+        },
+        {
+          "id": "data_mgr",
+          "role": "track_management",
+          "type_hint": "track_processor"
+        }
+      ],
+      "comms": [
+        {
+          "id": "brawler_datalink",
+          "role": "flight_network",
+          "type_hint": "datalink"
         }
       ]
     },
     "entities": [
       {
-        "id": "blue_fighter",
-        "role": "fighter",
+        "id": "blue_flight_lead",
+        "role": "flight_lead",
         "side": "blue",
         "quantity": 1,
         "domain": "air",
-        "platform_type_hint": "fighter_aircraft",
+        "platform_type_hint": "brawler_flight_lead",
         "component_refs": [
-          "fighter_mover",
-          "fighter_radar",
-          "aam_basic",
-          "brawler_engage"
+          "brawler_thinker",
+          "brawler_datalink"
         ],
         "initial_location_ref": "blue_spawn"
       },
       {
-        "id": "red_fighter",
-        "role": "fighter",
+        "id": "blue_wingman",
+        "role": "wingman",
+        "side": "blue",
+        "quantity": 1,
+        "domain": "air",
+        "platform_type_hint": "brawler_platform",
+        "component_refs": [
+          "brawler_mover",
+          "brawler_sensor",
+          "short_range_missile",
+          "gun",
+          "brawler_thinker",
+          "perception",
+          "incoming_threats",
+          "data_mgr",
+          "brawler_datalink"
+        ],
+        "initial_location_ref": "blue_spawn"
+      },
+      {
+        "id": "red_flight_lead",
+        "role": "flight_lead",
         "side": "red",
         "quantity": 1,
         "domain": "air",
-        "platform_type_hint": "fighter_aircraft",
+        "platform_type_hint": "brawler_flight_lead",
         "component_refs": [
-          "fighter_mover",
-          "fighter_radar",
-          "aam_basic",
-          "brawler_engage"
+          "brawler_thinker",
+          "brawler_datalink"
+        ],
+        "initial_location_ref": "red_spawn"
+      },
+      {
+        "id": "red_wingman",
+        "role": "wingman",
+        "side": "red",
+        "quantity": 1,
+        "domain": "air",
+        "platform_type_hint": "brawler_platform",
+        "component_refs": [
+          "brawler_mover",
+          "brawler_sensor",
+          "short_range_missile",
+          "gun",
+          "brawler_thinker",
+          "perception",
+          "incoming_threats",
+          "data_mgr",
+          "brawler_datalink"
         ],
         "initial_location_ref": "red_spawn"
       }
     ],
     "tasks": [
       {
-        "id": "blue_engage_red",
+        "id": "brawler_engagement",
         "type": "air_engage",
         "assignee_refs": [
-          "blue_fighter"
+          "blue_flight_lead",
+          "blue_wingman"
         ],
         "target_refs": [
-          "red_fighter"
+          "red_wingman",
+          "red_flight_lead"
         ],
         "parameters": {
-          "engagement_style": "intercept"
-        }
-      },
-      {
-        "id": "red_engage_blue",
-        "type": "air_engage",
-        "assignee_refs": [
-          "red_fighter"
-        ],
-        "target_refs": [
-          "blue_fighter"
-        ],
-        "parameters": {
-          "engagement_style": "intercept"
+          "engagement_style": "brawler_tactical"
         }
       }
     ],
@@ -165,21 +218,73 @@
       "unit_system": "afsim_mixed",
       "coordinate_format": "lat_lon_dir",
       "required_fields": [
-        "entities.quantity",
         "entities.side",
-        "tasks"
+        "entities.quantity",
+        "tasks",
+        "components.movers",
+        "components.sensors",
+        "components.weapons",
+        "components.processors"
       ]
     },
     "expected_events": [
       {
-        "id": "brawler_engagement",
+        "id": "brawler_air_engagement",
         "type": "engagement",
         "actor_refs": [
-          "blue_fighter",
-          "red_fighter"
+          "blue_flight_lead",
+          "blue_wingman",
+          "red_flight_lead",
+          "red_wingman"
         ],
-        "success_condition": "Both fighters engage using Brawler approximate model."
+        "success_condition": "Both sides enter a Brawler air-to-air engagement with behavior tree decision logic."
       }
+    ]
+  },
+  "slot_coverage": {
+    "filled_slots": 13,
+    "total_slots": 24,
+    "coverage_ratio": 0.542,
+    "baseline_slots": {
+      "scenario_name": true,
+      "scenario_duration": true,
+      "sides": true,
+      "adversarial_tasks": true,
+      "locations": true,
+      "routes": false,
+      "components_movers": true,
+      "components_sensors": true,
+      "components_weapons": true,
+      "components_processors": true,
+      "components_comms": true,
+      "entities": true,
+      "tasks": true,
+      "expected_events": true,
+      "grounding_hints": false
+    },
+    "new_slots": {
+      "commander_ref": false,
+      "impact_time": false,
+      "activation_delay": false,
+      "multi_phase_tasks": false,
+      "constraints_timing": false,
+      "constraints_triggers": false,
+      "constraints_resource_limits": false,
+      "constraints_roe": false,
+      "constraints_geographic_limits": false
+    },
+    "missing_slots": [
+      "routes",
+      "grounding_hints",
+      "commander_ref",
+      "impact_time",
+      "activation_delay",
+      "multi_phase_tasks",
+      "constraints_timing",
+      "constraints_triggers",
+      "constraints_resource_limits",
+      "constraints_roe",
+      "constraints_geographic_limits"
     ]
   }
 }

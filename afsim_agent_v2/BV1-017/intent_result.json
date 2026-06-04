@@ -4,22 +4,23 @@
   "parser_mode": "llm_schema_retry",
   "supported": true,
   "input": "基于 comm/group_comm_example，生成群组通信示例场景。",
-  "few_shot_example_count": 3,
+  "few_shot_example_count": 5,
   "attempt_count": 1,
   "attempts": [
     {
       "attempt": 1,
       "model": "deepseek-v4-pro",
-      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v1\",\n  \"scenario\": {\n    \"name\": \"group_comm_example\",\n    \"description\": \"Group communication scenario.\",\n    \"duration\": {\n      \"value\": 240,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"surface\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"detector_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.67n\",\n        \"lon\": \"104.07e\"\n      }\n    },\n    {\n      \"id\": \"relay_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.70n\",\n        \"lon\": \"104.10e\"\n      }\n    },\n    {\n      \"id\": \"observer_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.73n\",\n        \"lon\": \"104.13e\"\n      }\n    }\n  ],\n  \"components\": {\n    \"comms\": [\n      {\n        \"id\": \"group_network\",\n        \"role\": \"group_comm\",\n        \"type_hint\": \"comm_system\",\n        \"parameters\": {\n          \"network_mode\": \"group\"\n        }\n      }\n    ],\n    \"processors\": [\n      {\n        \"id\": \"report_processor\",\n        \"role\": \"reporting\",\n        \"type_hint\": \"message_or_report_processor",
+      "raw_content_preview": "{\n  \"schema_version\": \"afsim_ir_v2\",\n  \"scenario\": {\n    \"name\": \"group_comm_example\",\n    \"description\": \"Group communication scenario.\",\n    \"duration\": {\n      \"value\": 240,\n      \"unit\": \"sec\"\n    },\n    \"domains\": [\n      \"surface\"\n    ],\n    \"outputs\": [\n      \"event_pipe\",\n      \"event_output\"\n    ]\n  },\n  \"sides\": [\n    {\n      \"id\": \"blue\",\n      \"display_name\": \"Blue\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"detector_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.67n\",\n        \"lon\": \"104.07e\"\n      }\n    },\n    {\n      \"id\": \"relay_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.70n\",\n        \"lon\": \"104.10e\"\n      }\n    },\n    {\n      \"id\": \"observer_site\",\n      \"kind\": \"point\",\n      \"position\": {\n        \"lat\": \"30.73n\",\n        \"lon\": \"104.13e\"\n      }\n    }\n  ],\n  \"components\": {\n    \"comms\": [\n      {\n        \"id\": \"group_network\",\n        \"role\": \"group_comm\",\n        \"type_hint\": \"comm_system\",\n        \"parameters\": {\n          \"network_mode\": \"group\"\n        }\n      }\n    ],\n    \"processors\": [\n      {\n        \"id\": \"report_processor\",\n        \"role\": \"reporting\",\n        \"type_hint\": \"message_or_report_processor",
       "validation": {
         "ok": true,
         "error_count": 0,
-        "errors": []
+        "errors": [],
+        "schema_version": "afsim_ir_v2"
       }
     }
   ],
   "ir": {
-    "schema_version": "afsim_ir_v1",
+    "schema_version": "afsim_ir_v2",
     "scenario": {
       "name": "group_comm_example",
       "description": "Group communication scenario.",
@@ -159,6 +160,57 @@
         ],
         "success_condition": "Participants exchange reports across the communication group."
       }
+    ]
+  },
+  "slot_coverage": {
+    "filled_slots": 8,
+    "total_slots": 24,
+    "coverage_ratio": 0.333,
+    "baseline_slots": {
+      "scenario_name": true,
+      "scenario_duration": true,
+      "sides": false,
+      "adversarial_tasks": false,
+      "locations": true,
+      "routes": false,
+      "components_movers": false,
+      "components_sensors": false,
+      "components_weapons": false,
+      "components_processors": true,
+      "components_comms": true,
+      "entities": true,
+      "tasks": true,
+      "expected_events": true,
+      "grounding_hints": false
+    },
+    "new_slots": {
+      "commander_ref": false,
+      "impact_time": false,
+      "activation_delay": false,
+      "multi_phase_tasks": false,
+      "constraints_timing": false,
+      "constraints_triggers": false,
+      "constraints_resource_limits": false,
+      "constraints_roe": false,
+      "constraints_geographic_limits": false
+    },
+    "missing_slots": [
+      "sides",
+      "adversarial_tasks",
+      "routes",
+      "components_movers",
+      "components_sensors",
+      "components_weapons",
+      "grounding_hints",
+      "commander_ref",
+      "impact_time",
+      "activation_delay",
+      "multi_phase_tasks",
+      "constraints_timing",
+      "constraints_triggers",
+      "constraints_resource_limits",
+      "constraints_roe",
+      "constraints_geographic_limits"
     ]
   }
 }

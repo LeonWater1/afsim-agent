@@ -1,0 +1,84 @@
+network datalink_network WSF_COMM_NETWORK_AD_HOC
+end_network
+
+platform_type PT_ARTILLERY_LAUNCHER WSF_PLATFORM
+  weapon artillery_155mm WSF_IMPLICIT_WEAPON
+    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
+      maximum_firing_range 30 km
+      minimum_firing_range 3 km
+    end_launch_computer
+    weapon_effects
+      spherical_lethality main_effect WSF_SPHERICAL_LETHALITY
+        lethal_radius 50 m
+      end_spherical_lethality
+    end_weapon_effects
+    quantity 1
+  end_weapon
+
+  processor sub_task_proc WSF_TASK_PROCESSOR
+  end_processor
+
+  comm fires_comm WSF_COMM_TRANSCEIVER
+    network_name datalink_network
+    internal_link no
+  end_comm
+end_platform_type
+
+platform_type PT_MORTAR_LAUNCHER WSF_PLATFORM
+  weapon mortar_120mm WSF_IMPLICIT_WEAPON
+    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
+      maximum_firing_range 8 km
+      minimum_firing_range 1 km
+    end_launch_computer
+    weapon_effects
+      spherical_lethality main_effect WSF_SPHERICAL_LETHALITY
+        lethal_radius 30 m
+      end_spherical_lethality
+    end_weapon_effects
+    quantity 1
+  end_weapon
+
+  processor sub_task_proc WSF_TASK_PROCESSOR
+  end_processor
+
+  comm fires_comm WSF_COMM_TRANSCEIVER
+    network_name datalink_network
+    internal_link no
+  end_comm
+end_platform_type
+
+platform_type PT_ROCKET_LAUNCHER WSF_PLATFORM
+  weapon rocket_122mm WSF_IMPLICIT_WEAPON
+    launch_computer fires_launch_computer WSF_FIRES_LAUNCH_COMPUTER
+      maximum_firing_range 20 km
+      minimum_firing_range 5 km
+    end_launch_computer
+    weapon_effects
+      spherical_lethality main_effect WSF_SPHERICAL_LETHALITY
+        lethal_radius 70 m
+      end_spherical_lethality
+    end_weapon_effects
+    quantity 1
+  end_weapon
+
+  processor sub_task_proc WSF_TASK_PROCESSOR
+  end_processor
+
+  comm fires_comm WSF_COMM_TRANSCEIVER
+    network_name datalink_network
+    internal_link no
+  end_comm
+end_platform_type
+
+platform_type PT_FIRES_COMMANDER WSF_PLATFORM
+  processor commander_task_proc WSF_TASK_PROCESSOR
+  end_processor
+
+  comm fires_comm WSF_COMM_TRANSCEIVER
+    network_name datalink_network
+    internal_link no
+  end_comm
+end_platform_type
+
+platform_type PT_TARGET_UNIT WSF_PLATFORM
+end_platform_type

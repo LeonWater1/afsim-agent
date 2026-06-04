@@ -1,0 +1,479 @@
+{
+  "task": "Task-019",
+  "version": "grounding_library_v2_capability_report",
+  "validation": {
+    "ok": true,
+    "errors": [],
+    "coverage": {
+      "available": true,
+      "platform_hints_total": 18,
+      "task_hints_total": 9,
+      "component_hints_total": 25,
+      "platform_coverage": {
+        "full": [
+          "acoustic_sensor_platform",
+          "acoustic_target",
+          "brawler_flight_lead",
+          "brawler_platform",
+          "chaff_platform",
+          "detector_platform",
+          "fighter_aircraft",
+          "fires_launcher",
+          "iads_command_platform",
+          "intruder_aircraft",
+          "observer_platform",
+          "radar_platform",
+          "relay_platform",
+          "sam_platform",
+          "space_platform",
+          "transport_or_hvaa_aircraft"
+        ],
+        "partial": [
+          "commander_platform",
+          "static_target"
+        ],
+        "unresolved": []
+      },
+      "task_coverage": {
+        "full": [
+          "air_attack",
+          "air_engage",
+          "area_air_defense",
+          "deploy_countermeasure",
+          "detect",
+          "escort",
+          "group_communication",
+          "time_on_target"
+        ],
+        "partial": [
+          "orbital_mission"
+        ],
+        "unresolved": []
+      },
+      "component_coverage": {
+        "sensor": {
+          "full": [
+            "acoustic_sensor",
+            "geometric_sensor",
+            "radar_sensor"
+          ],
+          "partial": [
+            "optical_sensor"
+          ],
+          "unresolved": []
+        },
+        "mover": {
+          "full": [
+            "air_mover",
+            "brawler_mover",
+            "ground_mover",
+            "integrating_space_mover"
+          ],
+          "partial": [],
+          "unresolved": []
+        },
+        "weapon": {
+          "full": [
+            "air_to_air_missile",
+            "chaff_weapon",
+            "fires_implicit_weapon",
+            "sam_weapon"
+          ],
+          "partial": [
+            "gun_weapon"
+          ],
+          "unresolved": []
+        },
+        "processor": {
+          "full": [
+            "battle_manager_processor",
+            "brawler_processor",
+            "escort_processor",
+            "fighter_engagement_processor",
+            "message_or_report_processor",
+            "perception_processor",
+            "sensor_manager_processor",
+            "task_processor",
+            "threat_processor",
+            "track_processor"
+          ],
+          "partial": [],
+          "unresolved": []
+        },
+        "comm": {
+          "full": [
+            "comm_system",
+            "datalink"
+          ],
+          "partial": [],
+          "unresolved": []
+        }
+      },
+      "total_hints": 52,
+      "total_full_match": 47,
+      "coverage_rate": 0.904,
+      "skipped_invalid_lines": []
+    },
+    "unresolved_total": 0,
+    "match_levels_supported": [
+      "full",
+      "partial",
+      "unresolved"
+    ]
+  },
+  "coverage": {
+    "available": true,
+    "platform_hints_total": 18,
+    "task_hints_total": 9,
+    "component_hints_total": 25,
+    "platform_coverage": {
+      "full": [
+        "acoustic_sensor_platform",
+        "acoustic_target",
+        "brawler_flight_lead",
+        "brawler_platform",
+        "chaff_platform",
+        "detector_platform",
+        "fighter_aircraft",
+        "fires_launcher",
+        "iads_command_platform",
+        "intruder_aircraft",
+        "observer_platform",
+        "radar_platform",
+        "relay_platform",
+        "sam_platform",
+        "space_platform",
+        "transport_or_hvaa_aircraft"
+      ],
+      "partial": [
+        "commander_platform",
+        "static_target"
+      ],
+      "unresolved": []
+    },
+    "task_coverage": {
+      "full": [
+        "air_attack",
+        "air_engage",
+        "area_air_defense",
+        "deploy_countermeasure",
+        "detect",
+        "escort",
+        "group_communication",
+        "time_on_target"
+      ],
+      "partial": [
+        "orbital_mission"
+      ],
+      "unresolved": []
+    },
+    "component_coverage": {
+      "sensor": {
+        "full": [
+          "acoustic_sensor",
+          "geometric_sensor",
+          "radar_sensor"
+        ],
+        "partial": [
+          "optical_sensor"
+        ],
+        "unresolved": []
+      },
+      "mover": {
+        "full": [
+          "air_mover",
+          "brawler_mover",
+          "ground_mover",
+          "integrating_space_mover"
+        ],
+        "partial": [],
+        "unresolved": []
+      },
+      "weapon": {
+        "full": [
+          "air_to_air_missile",
+          "chaff_weapon",
+          "fires_implicit_weapon",
+          "sam_weapon"
+        ],
+        "partial": [
+          "gun_weapon"
+        ],
+        "unresolved": []
+      },
+      "processor": {
+        "full": [
+          "battle_manager_processor",
+          "brawler_processor",
+          "escort_processor",
+          "fighter_engagement_processor",
+          "message_or_report_processor",
+          "perception_processor",
+          "sensor_manager_processor",
+          "task_processor",
+          "threat_processor",
+          "track_processor"
+        ],
+        "partial": [],
+        "unresolved": []
+      },
+      "comm": {
+        "full": [
+          "comm_system",
+          "datalink"
+        ],
+        "partial": [],
+        "unresolved": []
+      }
+    },
+    "total_hints": 52,
+    "total_full_match": 47,
+    "coverage_rate": 0.904,
+    "skipped_invalid_lines": []
+  },
+  "probe_results": {
+    "commander_platform": {
+      "matched": true,
+      "match_level": "partial",
+      "mapping_type": "platform",
+      "input": "commander_platform",
+      "canonical_id": "commander_platform_basic",
+      "row": {
+        "canonical_id": "commander_platform_basic",
+        "canonical_role": "commander",
+        "match_labels": [
+          "commander",
+          "command_platform",
+          "c2_node",
+          "指挥平台",
+          "指挥节点"
+        ],
+        "platform_type_hints": [
+          "commander_platform",
+          "c2_node"
+        ],
+        "match_confidence": "partial",
+        "match_confidence_reason": "Generic commander role — specific processor bundle depends on mission type (IADS, fires, air combat, etc.)",
+        "grounding_target": {
+          "target_kind": "platform_template",
+          "target_id": "commander_platform_basic",
+          "wsf_base_type": "WSF_PLATFORM"
+        },
+        "default_component_bundle": [
+          "task_processor_basic",
+          "datalink_basic"
+        ],
+        "implementation_constraints": {
+          "required_components": [
+            "task_processor_basic",
+            "datalink_basic"
+          ]
+        },
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
+        ]
+      },
+      "match_confidence": "partial",
+      "implementation_constraints": {
+        "required_components": [
+          "task_processor_basic",
+          "datalink_basic"
+        ]
+      },
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/fires/time_on_target.txt"
+      ],
+      "grounding_target": {
+        "target_kind": "platform_template",
+        "target_id": "commander_platform_basic",
+        "wsf_base_type": "WSF_PLATFORM"
+      },
+      "match_reason": "Generic commander role — specific processor bundle depends on mission type (IADS, fires, air combat, etc.)"
+    },
+    "gun_weapon": {
+      "matched": true,
+      "match_level": "partial",
+      "mapping_type": "weapon",
+      "input": "gun_weapon",
+      "canonical_id": "gun_weapon_basic",
+      "row": {
+        "canonical_id": "gun_weapon_basic",
+        "match_labels": [
+          "gun",
+          "bullet",
+          "cannon",
+          "机炮",
+          "舰炮"
+        ],
+        "type_hints": [
+          "gun_weapon"
+        ],
+        "match_confidence": "partial",
+        "match_confidence_reason": "Generic gun — caliber, rate-of-fire, and ammunition type unspecified",
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_EXPLICIT_WEAPON"
+        },
+        "host_block": "weapon",
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/brawler/weapons/other/gun.txt"
+        ]
+      },
+      "match_confidence": "partial",
+      "implementation_constraints": {
+        "preferred_declarations": [
+          "weapon <name> WSF_EXPLICIT_WEAPON"
+        ],
+        "wsf_context_rules": [
+          {
+            "wsf_type": "WSF_EXPLICIT_WEAPON",
+            "allowed_block_kinds": [
+              "weapon"
+            ],
+            "preferred_declaration": "weapon <name> WSF_EXPLICIT_WEAPON",
+            "provenance": [
+              "official_doc: wsf_explicit_weapon.html",
+              "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
+              "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt"
+            ]
+          }
+        ]
+      },
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/brawler/weapons/other/gun.txt"
+      ],
+      "grounding_target": {
+        "target_kind": "wsf_type",
+        "target_id": "WSF_EXPLICIT_WEAPON"
+      },
+      "match_reason": "Generic gun — caliber, rate-of-fire, and ammunition type unspecified"
+    },
+    "brawler_mover": {
+      "matched": true,
+      "match_level": "full",
+      "mapping_type": "mover",
+      "input": "brawler_mover",
+      "canonical_id": "brawler_mover_basic",
+      "row": {
+        "canonical_id": "brawler_mover_basic",
+        "match_labels": [
+          "brawler_mover",
+          "brawler机动",
+          "空战机动"
+        ],
+        "type_hints": [
+          "brawler_mover"
+        ],
+        "match_confidence": "full",
+        "grounding_target": {
+          "target_kind": "wsf_type",
+          "target_id": "WSF_BRAWLER_MOVER"
+        },
+        "host_block": "mover",
+        "implementation_constraints": {
+          "required_commands": [
+            "aero_file"
+          ],
+          "companion_wsf_types": [
+            "WSF_BRAWLER_FUEL"
+          ],
+          "companion_optional": true
+        },
+        "external_resources": [
+          "aero_file: platforms/ACFT_BD.FXW"
+        ],
+        "provenance": [
+          "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+        ]
+      },
+      "match_confidence": "full",
+      "implementation_constraints": {
+        "required_commands": [
+          "aero_file"
+        ],
+        "companion_wsf_types": [
+          "WSF_BRAWLER_FUEL"
+        ],
+        "companion_optional": true,
+        "preferred_declarations": [
+          "mover WSF_BRAWLER_MOVER"
+        ],
+        "wsf_context_rules": [
+          {
+            "wsf_type": "WSF_BRAWLER_MOVER",
+            "allowed_block_kinds": [
+              "mover"
+            ],
+            "preferred_declaration": "mover WSF_BRAWLER_MOVER",
+            "provenance": [
+              "official_doc: wsf_brawler_mover.html",
+              "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+            ]
+          }
+        ]
+      },
+      "provenance": [
+        "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+      ],
+      "grounding_target": {
+        "target_kind": "wsf_type",
+        "target_id": "WSF_BRAWLER_MOVER"
+      }
+    },
+    "time_on_target": {
+      "matched": true,
+      "match_level": "full",
+      "mapping_type": "task",
+      "input": "time_on_target",
+      "canonical_id": "time_on_target",
+      "row": {
+        "canonical_id": "time_on_target",
+        "match_labels": [
+          "time_on_target",
+          "tot",
+          "同时弹着",
+          "火力协调"
+        ],
+        "ir_task_types": [
+          "time_on_target",
+          "fires_mission"
+        ],
+        "match_confidence": "full",
+        "grounding_target": {
+          "target_kind": "behavior_bundle",
+          "target_id": "time_on_target_behavior"
+        },
+        "script_realization": [
+          "processor",
+          "weapon",
+          "comm"
+        ],
+        "implementation_constraints": {
+          "requires_comm": true,
+          "requires_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
+          "default_duration_sec": 600,
+          "timing_critical": true
+        }
+      },
+      "match_confidence": "full",
+      "implementation_constraints": {
+        "requires_comm": true,
+        "requires_launch_computer": "WSF_FIRES_LAUNCH_COMPUTER",
+        "default_duration_sec": 600,
+        "timing_critical": true
+      },
+      "provenance": [],
+      "grounding_target": {
+        "target_kind": "behavior_bundle",
+        "target_id": "time_on_target_behavior"
+      }
+    }
+  },
+  "summary": {
+    "ok": true,
+    "coverage_rate": 0.904,
+    "platform_hints_total": 18,
+    "task_hints_total": 9,
+    "component_hints_total": 25
+  }
+}

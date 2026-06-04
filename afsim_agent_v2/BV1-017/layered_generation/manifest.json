@@ -1,0 +1,17 @@
+{
+  "scenario_name": "group_comm_example",
+  "platform_types": {
+    "detector_unit": "PT_DETECTOR_UNIT",
+    "relay_unit": "PT_RELAY_UNIT",
+    "observer_unit": "PT_OBSERVER_UNIT"
+  },
+  "platform_instances": {
+    "detector_unit": "detector_unit",
+    "relay_unit": "relay_unit",
+    "observer_unit": "observer_unit"
+  },
+  "route_ids": [],
+  "task_ids": [
+    "share_group_reports"
+  ]
+}

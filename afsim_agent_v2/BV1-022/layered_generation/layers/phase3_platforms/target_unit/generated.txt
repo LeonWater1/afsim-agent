@@ -1,0 +1,5 @@
+platform target_unit
+  side red
+  platform_type PT_TARGET_UNIT
+  position 51.47n 0.35e
+end_platform

@@ -1,0 +1,36 @@
+// acoustic_simple_demo
+side blue
+side red
+location blue_start position 30.0n 150.0e
+location red_contact position 30.5n 150.5e
+platform_type blue_sensor_type WSF_PLATFORM
+  mover WSF_GROUND_MOVER ground_mover
+    speed 0 m/sec
+  end_mover
+  sensor WSF_ACOUSTIC_SENSOR acoustic_sensor_basic
+  end_sensor
+end_platform_type
+platform_type red_target_type WSF_PLATFORM
+  mover WSF_GROUND_MOVER ground_mover
+    speed 0 m/sec
+  end_mover
+end_platform_type
+platform blue_sensor_unit blue_sensor_type
+  side blue
+  position 30.0n 150.0e
+  altitude 0 m agl
+  sensor acoustic_sensor_basic
+    power_on true
+  end_sensor
+  track_manager WSF_TRACK_MANAGER track_mgr
+  end_track_manager
+end_platform
+platform red_target_unit red_target_type
+  side red
+  position 30.5n 150.5e
+  altitude 0 m agl
+end_platform
+event_pipe
+  file output/acoustic_simple_demo.aer
+end_event_pipe
+end_time 120 sec

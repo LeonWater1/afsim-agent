@@ -16,25 +16,63 @@
   "layers": {
     "scenario_scaffold": {
       "layer_name": "scenario_scaffold",
-      "scenario_name": "brawler_demo_1v1",
-      "description": "Brawler one-on-one air combat approximate model scenario.",
+      "scenario_name": "brawler_1v1",
+      "description": "One versus one Brawler air combat engagement with behavior tree decision logic.",
       "duration": {
         "value": 300,
         "unit": "sec"
       },
+      "schema_version": "afsim_ir_v2",
       "domains": [
         "air"
       ],
       "outputs": [
-        "event_pipe"
+        "event_pipe",
+        "event_output"
       ],
       "side_ids": [
         "blue",
         "red"
       ],
+      "sides": [
+        {
+          "id": "blue",
+          "display_name": "Blue"
+        },
+        {
+          "id": "red",
+          "display_name": "Red"
+        }
+      ],
       "location_ids": [
         "blue_spawn",
         "red_spawn"
+      ],
+      "locations": [
+        {
+          "id": "blue_spawn",
+          "kind": "point",
+          "position": {
+            "lat": "0.03s",
+            "lon": "0.01w",
+            "altitude": {
+              "value": 10000,
+              "unit": "ft"
+            }
+          }
+        },
+        {
+          "id": "red_spawn",
+          "kind": "point",
+          "position": {
+            "lat": "0.03n",
+            "lon": "0.01e",
+            "altitude": {
+              "value": 10000,
+              "unit": "ft"
+            }
+          }
+        }
       ],
       "constraint_keys": [
         "coordinate_format",
@@ -48,13 +86,15 @@
       "layer_name": "platform_layer",
       "entities": [
         {
-          "entity_id": "blue_fighter",
-          "role": "fighter",
+          "entity_id": "blue_flight_lead",
+          "role": "flight_lead",
           "domain": "air",
           "quantity": 1,
           "side": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "side",
+            "input": "blue",
             "canonical_id": "blue",
             "row": {
               "canonical_id": "blue",
@@ -65,80 +105,281 @@
                 "我方",
                 "蓝方",
                 "友方"
-              ]
-            }
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
           },
           "platform_grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "platform",
-            "canonical_id": "fighter_aircraft_basic",
+            "input": "flight_lead",
+            "canonical_id": "brawler_flight_lead_basic",
             "row": {
-              "canonical_id": "fighter_aircraft_basic",
-              "canonical_role": "fighter",
+              "canonical_id": "brawler_flight_lead_basic",
+              "canonical_role": "brawler_commander",
               "match_labels": [
-                "fighter",
-                "fighter_aircraft",
-                "战斗机",
-                "截击机",
-                "歼击机"
+                "brawler_flight_lead",
+                "flight_lead",
+                "brawler_commander",
+                "Brawler长机"
               ],
               "platform_type_hints": [
-                "fighter_aircraft",
-                "escort_fighter",
-                "intruder_aircraft"
+                "brawler_flight_lead",
+                "flight_lead"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
-                "target_id": "fighter_aircraft_basic",
+                "target_id": "brawler_flight_lead_basic",
                 "wsf_base_type": "WSF_PLATFORM"
               },
               "default_component_bundle": [
-                "air_mover_basic",
-                "fighter_radar_basic",
-                "air_to_air_missile_basic",
-                "track_processor_basic"
+                "brawler_processor_basic",
+                "datalink_basic"
               ],
+              "implementation_constraints": {
+                "required_components": [
+                  "brawler_processor_basic",
+                  "datalink_basic"
+                ],
+                "role": "commander_only"
+              },
               "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
-                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_flight_lead.txt",
+                "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "required_components": [
+                "brawler_processor_basic",
+                "datalink_basic"
+              ],
+              "role": "commander_only"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_flight_lead.txt",
+              "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "brawler_flight_lead_basic",
+              "wsf_base_type": "WSF_PLATFORM"
             }
+          },
+          "platform_constraints": {
+            "required_components": [
+              "brawler_processor_basic",
+              "datalink_basic"
+            ],
+            "role": "commander_only"
           },
           "initial_location_ref": "blue_spawn",
           "route_ref": null,
+          "commander_ref": null,
           "component_refs": [
-            "fighter_mover",
-            "fighter_radar",
-            "aam_basic",
-            "brawler_engage"
+            "brawler_thinker",
+            "brawler_datalink"
           ],
           "component_families": {
-            "mover": [
-              "fighter_mover"
-            ],
-            "sensor": [
-              "fighter_radar"
-            ],
-            "weapon": [
-              "aam_basic"
-            ],
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
             "processor": [
-              "brawler_engage"
+              "brawler_thinker"
             ],
-            "comm": []
+            "comm": [
+              "brawler_datalink"
+            ]
           },
           "missing_component_refs": [],
           "ready": true,
           "unresolved_items": []
         },
         {
-          "entity_id": "red_fighter",
-          "role": "fighter",
+          "entity_id": "blue_wingman",
+          "role": "wingman",
           "domain": "air",
           "quantity": 1,
           "side": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "side",
+            "input": "blue",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
+          },
+          "platform_grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "platform",
+            "input": "wingman",
+            "canonical_id": "brawler_platform_basic",
+            "row": {
+              "canonical_id": "brawler_platform_basic",
+              "canonical_role": "brawler_aircraft",
+              "match_labels": [
+                "brawler",
+                "brawler_platform",
+                "brawler_aircraft",
+                "Brawler空战平台"
+              ],
+              "platform_type_hints": [
+                "brawler_platform",
+                "brawler_aircraft"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "brawler_platform_basic",
+                "wsf_base_type": "WSF_BRAWLER_PLATFORM"
+              },
+              "default_component_bundle": [
+                "brawler_mover_basic",
+                "brawler_processor_basic",
+                "perception_processor_basic",
+                "threat_processor_basic",
+                "geometric_sensor_basic",
+                "track_processor_basic",
+                "datalink_basic"
+              ],
+              "implementation_constraints": {
+                "required_components": [
+                  "brawler_mover_basic",
+                  "brawler_processor_basic",
+                  "perception_processor_basic"
+                ],
+                "recommended_components": [
+                  "threat_processor_basic",
+                  "geometric_sensor_basic",
+                  "datalink_basic"
+                ],
+                "forbidden_platform_types": [
+                  "WSF_PLATFORM"
+                ],
+                "required_platform_type": "WSF_BRAWLER_PLATFORM",
+                "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+              },
+              "external_resources": [
+                "platforms/ACFT_BD.FXW"
+              ],
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt",
+                "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "required_components": [
+                "brawler_mover_basic",
+                "brawler_processor_basic",
+                "perception_processor_basic"
+              ],
+              "recommended_components": [
+                "threat_processor_basic",
+                "geometric_sensor_basic",
+                "datalink_basic"
+              ],
+              "forbidden_platform_types": [
+                "WSF_PLATFORM"
+              ],
+              "required_platform_type": "WSF_BRAWLER_PLATFORM",
+              "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt",
+              "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "brawler_platform_basic",
+              "wsf_base_type": "WSF_BRAWLER_PLATFORM"
+            }
+          },
+          "platform_constraints": {
+            "required_components": [
+              "brawler_mover_basic",
+              "brawler_processor_basic",
+              "perception_processor_basic"
+            ],
+            "recommended_components": [
+              "threat_processor_basic",
+              "geometric_sensor_basic",
+              "datalink_basic"
+            ],
+            "forbidden_platform_types": [
+              "WSF_PLATFORM"
+            ],
+            "required_platform_type": "WSF_BRAWLER_PLATFORM",
+            "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+          },
+          "initial_location_ref": "blue_spawn",
+          "route_ref": null,
+          "commander_ref": null,
+          "component_refs": [
+            "brawler_mover",
+            "brawler_sensor",
+            "short_range_missile",
+            "gun",
+            "brawler_thinker",
+            "perception",
+            "incoming_threats",
+            "data_mgr",
+            "brawler_datalink"
+          ],
+          "component_families": {
+            "mover": [
+              "brawler_mover"
+            ],
+            "sensor": [
+              "brawler_sensor"
+            ],
+            "weapon": [
+              "short_range_missile",
+              "gun"
+            ],
+            "processor": [
+              "brawler_thinker",
+              "perception",
+              "incoming_threats",
+              "data_mgr"
+            ],
+            "comm": [
+              "brawler_datalink"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "red_flight_lead",
+          "role": "flight_lead",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "side",
+            "input": "red",
             "canonical_id": "red",
             "row": {
               "canonical_id": "red",
@@ -149,67 +390,266 @@
                 "敌方",
                 "红方",
                 "目标方"
-              ]
-            }
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
           },
           "platform_grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "platform",
-            "canonical_id": "fighter_aircraft_basic",
+            "input": "flight_lead",
+            "canonical_id": "brawler_flight_lead_basic",
             "row": {
-              "canonical_id": "fighter_aircraft_basic",
-              "canonical_role": "fighter",
+              "canonical_id": "brawler_flight_lead_basic",
+              "canonical_role": "brawler_commander",
               "match_labels": [
-                "fighter",
-                "fighter_aircraft",
-                "战斗机",
-                "截击机",
-                "歼击机"
+                "brawler_flight_lead",
+                "flight_lead",
+                "brawler_commander",
+                "Brawler长机"
               ],
               "platform_type_hints": [
-                "fighter_aircraft",
-                "escort_fighter",
-                "intruder_aircraft"
+                "brawler_flight_lead",
+                "flight_lead"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
-                "target_id": "fighter_aircraft_basic",
+                "target_id": "brawler_flight_lead_basic",
                 "wsf_base_type": "WSF_PLATFORM"
               },
               "default_component_bundle": [
-                "air_mover_basic",
-                "fighter_radar_basic",
-                "air_to_air_missile_basic",
-                "track_processor_basic"
+                "brawler_processor_basic",
+                "datalink_basic"
               ],
+              "implementation_constraints": {
+                "required_components": [
+                  "brawler_processor_basic",
+                  "datalink_basic"
+                ],
+                "role": "commander_only"
+              },
               "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/lte_fighter.txt",
-                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_flight_lead.txt",
+                "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "required_components": [
+                "brawler_processor_basic",
+                "datalink_basic"
+              ],
+              "role": "commander_only"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_flight_lead.txt",
+              "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "brawler_flight_lead_basic",
+              "wsf_base_type": "WSF_PLATFORM"
             }
+          },
+          "platform_constraints": {
+            "required_components": [
+              "brawler_processor_basic",
+              "datalink_basic"
+            ],
+            "role": "commander_only"
           },
           "initial_location_ref": "red_spawn",
           "route_ref": null,
+          "commander_ref": null,
           "component_refs": [
-            "fighter_mover",
-            "fighter_radar",
-            "aam_basic",
-            "brawler_engage"
+            "brawler_thinker",
+            "brawler_datalink"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "brawler_thinker"
+            ],
+            "comm": [
+              "brawler_datalink"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "red_wingman",
+          "role": "wingman",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "side",
+            "input": "red",
+            "canonical_id": "red",
+            "row": {
+              "canonical_id": "red",
+              "aliases": [
+                "red",
+                "hostile",
+                "enemy",
+                "敌方",
+                "红方",
+                "目标方"
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
+          },
+          "platform_grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "platform",
+            "input": "wingman",
+            "canonical_id": "brawler_platform_basic",
+            "row": {
+              "canonical_id": "brawler_platform_basic",
+              "canonical_role": "brawler_aircraft",
+              "match_labels": [
+                "brawler",
+                "brawler_platform",
+                "brawler_aircraft",
+                "Brawler空战平台"
+              ],
+              "platform_type_hints": [
+                "brawler_platform",
+                "brawler_aircraft"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "brawler_platform_basic",
+                "wsf_base_type": "WSF_BRAWLER_PLATFORM"
+              },
+              "default_component_bundle": [
+                "brawler_mover_basic",
+                "brawler_processor_basic",
+                "perception_processor_basic",
+                "threat_processor_basic",
+                "geometric_sensor_basic",
+                "track_processor_basic",
+                "datalink_basic"
+              ],
+              "implementation_constraints": {
+                "required_components": [
+                  "brawler_mover_basic",
+                  "brawler_processor_basic",
+                  "perception_processor_basic"
+                ],
+                "recommended_components": [
+                  "threat_processor_basic",
+                  "geometric_sensor_basic",
+                  "datalink_basic"
+                ],
+                "forbidden_platform_types": [
+                  "WSF_PLATFORM"
+                ],
+                "required_platform_type": "WSF_BRAWLER_PLATFORM",
+                "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+              },
+              "external_resources": [
+                "platforms/ACFT_BD.FXW"
+              ],
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt",
+                "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "required_components": [
+                "brawler_mover_basic",
+                "brawler_processor_basic",
+                "perception_processor_basic"
+              ],
+              "recommended_components": [
+                "threat_processor_basic",
+                "geometric_sensor_basic",
+                "datalink_basic"
+              ],
+              "forbidden_platform_types": [
+                "WSF_PLATFORM"
+              ],
+              "required_platform_type": "WSF_BRAWLER_PLATFORM",
+              "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt",
+              "benchmarks/benchmark_v1/demo_sources/brawler/brawler_demo_1v1.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "brawler_platform_basic",
+              "wsf_base_type": "WSF_BRAWLER_PLATFORM"
+            }
+          },
+          "platform_constraints": {
+            "required_components": [
+              "brawler_mover_basic",
+              "brawler_processor_basic",
+              "perception_processor_basic"
+            ],
+            "recommended_components": [
+              "threat_processor_basic",
+              "geometric_sensor_basic",
+              "datalink_basic"
+            ],
+            "forbidden_platform_types": [
+              "WSF_PLATFORM"
+            ],
+            "required_platform_type": "WSF_BRAWLER_PLATFORM",
+            "companion_rules": "Brawler components require WSF_BRAWLER_PLATFORM, not WSF_PLATFORM"
+          },
+          "initial_location_ref": "red_spawn",
+          "route_ref": null,
+          "commander_ref": null,
+          "component_refs": [
+            "brawler_mover",
+            "brawler_sensor",
+            "short_range_missile",
+            "gun",
+            "brawler_thinker",
+            "perception",
+            "incoming_threats",
+            "data_mgr",
+            "brawler_datalink"
           ],
           "component_families": {
             "mover": [
-              "fighter_mover"
+              "brawler_mover"
             ],
             "sensor": [
-              "fighter_radar"
+              "brawler_sensor"
             ],
             "weapon": [
-              "aam_basic"
+              "short_range_missile",
+              "gun"
             ],
             "processor": [
-              "brawler_engage"
+              "brawler_thinker",
+              "perception",
+              "incoming_threats",
+              "data_mgr"
             ],
-            "comm": []
+            "comm": [
+              "brawler_datalink"
+            ]
           },
           "missing_component_refs": [],
           "ready": true,
@@ -223,38 +663,101 @@
       "layer_name": "sensor_layer",
       "components": [
         {
-          "component_id": "fighter_radar",
+          "component_id": "brawler_sensor",
           "family": "sensor",
-          "role": "air_intercept_radar",
-          "type_hint": "radar_sensor",
+          "role": "target_acquisition",
+          "type_hint": "geometric_sensor",
           "parameters": {},
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "sensor",
-            "canonical_id": "radar_sensor_basic",
+            "input": "target_acquisition",
+            "canonical_id": "geometric_sensor_basic",
             "row": {
-              "canonical_id": "radar_sensor_basic",
+              "canonical_id": "geometric_sensor_basic",
               "match_labels": [
-                "radar",
-                "radar_sensor",
-                "aesa_radar",
-                "雷达",
-                "AESA雷达"
+                "geometric_sensor",
+                "几何传感器",
+                "简化探测"
               ],
               "type_hints": [
-                "radar_sensor",
-                "air_intercept_radar",
-                "acquisition_radar",
-                "tracking_radar"
+                "geometric_sensor"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "wsf_type",
-                "target_id": "WSF_RADAR_SENSOR"
+                "target_id": "WSF_GEOMETRIC_SENSOR"
+              },
+              "host_block": "sensor",
+              "implementation_constraints": {
+                "common_commands": [
+                  "azimuth_field_of_view",
+                  "elevation_field_of_view",
+                  "maximum_range",
+                  "frame_time"
+                ]
               },
               "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/air_to_air/sensors/radar/aesa.txt"
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "common_commands": [
+                "azimuth_field_of_view",
+                "elevation_field_of_view",
+                "maximum_range",
+                "frame_time"
+              ],
+              "preferred_declarations": [
+                "sensor <name> WSF_GEOMETRIC_SENSOR"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_GEOMETRIC_SENSOR",
+                  "allowed_block_kinds": [
+                    "sensor"
+                  ],
+                  "preferred_declaration": "sensor <name> WSF_GEOMETRIC_SENSOR",
+                  "provenance": [
+                    "official_doc: wsf_geometric_sensor.html",
+                    "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_GEOMETRIC_SENSOR"
             }
+          },
+          "implementation_constraints": {
+            "common_commands": [
+              "azimuth_field_of_view",
+              "elevation_field_of_view",
+              "maximum_range",
+              "frame_time"
+            ],
+            "preferred_declarations": [
+              "sensor <name> WSF_GEOMETRIC_SENSOR"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_GEOMETRIC_SENSOR",
+                "allowed_block_kinds": [
+                  "sensor"
+                ],
+                "preferred_declaration": "sensor <name> WSF_GEOMETRIC_SENSOR",
+                "provenance": [
+                  "official_doc: wsf_geometric_sensor.html",
+                  "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                ]
+              }
+            ]
           },
           "unresolved_items": []
         }
@@ -266,14 +769,100 @@
       "layer_name": "weapon_layer",
       "components": [
         {
-          "component_id": "aam_basic",
+          "component_id": "gun",
+          "family": "weapon",
+          "role": "gun_weapon",
+          "type_hint": "gun_weapon",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "match_level": "partial",
+            "mapping_type": "weapon",
+            "input": "gun_weapon",
+            "canonical_id": "gun_weapon_basic",
+            "row": {
+              "canonical_id": "gun_weapon_basic",
+              "match_labels": [
+                "gun",
+                "bullet",
+                "cannon",
+                "机炮",
+                "舰炮"
+              ],
+              "type_hints": [
+                "gun_weapon"
+              ],
+              "match_confidence": "partial",
+              "match_confidence_reason": "Generic gun — caliber, rate-of-fire, and ammunition type unspecified",
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_EXPLICIT_WEAPON"
+              },
+              "host_block": "weapon",
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/weapons/other/gun.txt"
+              ]
+            },
+            "match_confidence": "partial",
+            "implementation_constraints": {
+              "preferred_declarations": [
+                "weapon <name> WSF_EXPLICIT_WEAPON"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_EXPLICIT_WEAPON",
+                  "allowed_block_kinds": [
+                    "weapon"
+                  ],
+                  "preferred_declaration": "weapon <name> WSF_EXPLICIT_WEAPON",
+                  "provenance": [
+                    "official_doc: wsf_explicit_weapon.html",
+                    "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
+                    "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/weapons/other/gun.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_EXPLICIT_WEAPON"
+            }
+          },
+          "implementation_constraints": {
+            "preferred_declarations": [
+              "weapon <name> WSF_EXPLICIT_WEAPON"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_EXPLICIT_WEAPON",
+                "allowed_block_kinds": [
+                  "weapon"
+                ],
+                "preferred_declaration": "weapon <name> WSF_EXPLICIT_WEAPON",
+                "provenance": [
+                  "official_doc: wsf_explicit_weapon.html",
+                  "demo: benchmarks/benchmark_v1/demo_sources/fires/types/fires_155mm_artillery_m107_he.txt",
+                  "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/weapons/sam.txt"
+                ]
+              }
+            ]
+          },
+          "unresolved_items": []
+        },
+        {
+          "component_id": "short_range_missile",
           "family": "weapon",
           "role": "air_to_air_weapon",
           "type_hint": "air_to_air_missile",
           "parameters": {},
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "weapon",
+            "input": "air_to_air_weapon",
             "canonical_id": "air_to_air_missile_basic",
             "row": {
               "canonical_id": "air_to_air_missile_basic",
@@ -286,14 +875,42 @@
               "type_hints": [
                 "air_to_air_missile"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "wsf_type",
                 "target_id": "WSF_AIR_TO_AIR_MISSILE"
               },
+              "host_block": "weapon",
+              "implementation_constraints": {
+                "common_commands": [
+                  "quantity",
+                  "salvo_interval"
+                ]
+              },
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/air_to_air/weapons/aam/medium_range_radar_missile.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "common_commands": [
+                "quantity",
+                "salvo_interval"
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/weapons/aam/medium_range_radar_missile.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_AIR_TO_AIR_MISSILE"
             }
+          },
+          "implementation_constraints": {
+            "common_commands": [
+              "quantity",
+              "salvo_interval"
+            ]
           },
           "unresolved_items": []
         }
@@ -305,14 +922,16 @@
       "layer_name": "mission_layer",
       "processors": [
         {
-          "component_id": "brawler_engage",
+          "component_id": "brawler_thinker",
           "family": "processor",
-          "role": "brawler_engagement",
+          "role": "tactical_decision",
           "type_hint": "brawler_processor",
           "parameters": {},
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "processor",
+            "input": "tactical_decision",
             "canonical_id": "brawler_processor_basic",
             "row": {
               "canonical_id": "brawler_processor_basic",
@@ -324,69 +943,400 @@
               "type_hints": [
                 "brawler_processor"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "wsf_type",
                 "target_id": "WSF_BRAWLER_PROCESSOR"
               },
-              "provenance": [
-                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/brawler_test.txt"
-              ]
-            }
-          },
-          "unresolved_items": []
-        }
-      ],
-      "comms": [],
-      "routes": [],
-      "tasks": [
-        {
-          "task_id": "blue_engage_red",
-          "task_type": "air_engage",
-          "grounding": {
-            "matched": true,
-            "mapping_type": "task",
-            "canonical_id": "intercept",
-            "row": {
-              "canonical_id": "intercept",
-              "match_labels": [
-                "intercept",
-                "拦截",
-                "截击"
-              ],
-              "ir_task_types": [
-                "intercept",
-                "air_engage"
-              ],
-              "grounding_target": {
-                "target_kind": "behavior_bundle",
-                "target_id": "intercept_behavior"
+              "host_block": "processor",
+              "implementation_constraints": {
+                "companion_wsf_types": [
+                  "WSF_BRAWLER_MOVER"
+                ],
+                "companion_required": true,
+                "host_block_check": "Must be inside a Brawler-capable platform_type"
               },
-              "script_realization": [
-                "processor",
-                "weapon",
-                "sensor"
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "companion_wsf_types": [
+                "WSF_BRAWLER_MOVER"
+              ],
+              "companion_required": true,
+              "host_block_check": "Must be inside a Brawler-capable platform_type",
+              "preferred_declarations": [
+                "processor <name> WSF_BRAWLER_PROCESSOR"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_BRAWLER_PROCESSOR",
+                  "allowed_block_kinds": [
+                    "processor"
+                  ],
+                  "preferred_declaration": "processor <name> WSF_BRAWLER_PROCESSOR",
+                  "provenance": [
+                    "official_doc: wsf_brawler_processor.html",
+                    "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_BRAWLER_PROCESSOR"
             }
           },
-          "assignee_refs": [
-            "blue_fighter"
-          ],
-          "target_refs": [
-            "red_fighter"
-          ],
-          "location_refs": [],
-          "parameters": {
-            "engagement_style": "intercept"
+          "implementation_constraints": {
+            "companion_wsf_types": [
+              "WSF_BRAWLER_MOVER"
+            ],
+            "companion_required": true,
+            "host_block_check": "Must be inside a Brawler-capable platform_type",
+            "preferred_declarations": [
+              "processor <name> WSF_BRAWLER_PROCESSOR"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_BRAWLER_PROCESSOR",
+                "allowed_block_kinds": [
+                  "processor"
+                ],
+                "preferred_declaration": "processor <name> WSF_BRAWLER_PROCESSOR",
+                "provenance": [
+                  "official_doc: wsf_brawler_processor.html",
+                  "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                ]
+              }
+            ]
           },
-          "ready": true,
           "unresolved_items": []
         },
         {
-          "task_id": "red_engage_blue",
+          "component_id": "perception",
+          "family": "processor",
+          "role": "threat_perception",
+          "type_hint": "perception_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "processor",
+            "input": "threat_perception",
+            "canonical_id": "perception_processor_basic",
+            "row": {
+              "canonical_id": "perception_processor_basic",
+              "match_labels": [
+                "perception_processor",
+                "perception",
+                "威胁感知"
+              ],
+              "type_hints": [
+                "perception_processor"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_PERCEPTION_PROCESSOR"
+              },
+              "host_block": "processor",
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "preferred_declarations": [
+                "processor <name> WSF_PERCEPTION_PROCESSOR"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_PERCEPTION_PROCESSOR",
+                  "allowed_block_kinds": [
+                    "processor"
+                  ],
+                  "preferred_declaration": "processor <name> WSF_PERCEPTION_PROCESSOR",
+                  "provenance": [
+                    "official_doc: wsf_perception_processor.html",
+                    "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_PERCEPTION_PROCESSOR"
+            }
+          },
+          "implementation_constraints": {
+            "preferred_declarations": [
+              "processor <name> WSF_PERCEPTION_PROCESSOR"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_PERCEPTION_PROCESSOR",
+                "allowed_block_kinds": [
+                  "processor"
+                ],
+                "preferred_declaration": "processor <name> WSF_PERCEPTION_PROCESSOR",
+                "provenance": [
+                  "official_doc: wsf_perception_processor.html",
+                  "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                ]
+              }
+            ]
+          },
+          "unresolved_items": []
+        },
+        {
+          "component_id": "incoming_threats",
+          "family": "processor",
+          "role": "threat_assessment",
+          "type_hint": "threat_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "processor",
+            "input": "threat_assessment",
+            "canonical_id": "threat_processor_basic",
+            "row": {
+              "canonical_id": "threat_processor_basic",
+              "match_labels": [
+                "threat_processor",
+                "incoming_threats",
+                "威胁评估"
+              ],
+              "type_hints": [
+                "threat_processor"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_THREAT_PROCESSOR"
+              },
+              "host_block": "processor",
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "preferred_declarations": [
+                "processor <name> WSF_THREAT_PROCESSOR"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_THREAT_PROCESSOR",
+                  "allowed_block_kinds": [
+                    "processor"
+                  ],
+                  "preferred_declaration": "processor <name> WSF_THREAT_PROCESSOR",
+                  "provenance": [
+                    "official_doc: wsf_threat_processor.html",
+                    "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_THREAT_PROCESSOR"
+            }
+          },
+          "implementation_constraints": {
+            "preferred_declarations": [
+              "processor <name> WSF_THREAT_PROCESSOR"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_THREAT_PROCESSOR",
+                "allowed_block_kinds": [
+                  "processor"
+                ],
+                "preferred_declaration": "processor <name> WSF_THREAT_PROCESSOR",
+                "provenance": [
+                  "official_doc: wsf_threat_processor.html",
+                  "demo: benchmarks/benchmark_v1/demo_sources/brawler/platforms/brawler_platform.txt"
+                ]
+              }
+            ]
+          },
+          "unresolved_items": []
+        },
+        {
+          "component_id": "data_mgr",
+          "family": "processor",
+          "role": "track_management",
+          "type_hint": "track_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "processor",
+            "input": "track_management",
+            "canonical_id": "track_processor_basic",
+            "row": {
+              "canonical_id": "track_processor_basic",
+              "match_labels": [
+                "track_processor",
+                "tracking",
+                "数据管理",
+                "跟踪处理"
+              ],
+              "type_hints": [
+                "track_processor",
+                "message_or_report_processor"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_TRACK_PROCESSOR"
+              },
+              "host_block": "processor",
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_TRACK_PROCESSOR"
+            }
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "comms": [
+        {
+          "component_id": "brawler_datalink",
+          "family": "comm",
+          "role": "flight_network",
+          "type_hint": "datalink",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "match_level": "full",
+            "mapping_type": "comm",
+            "input": "flight_network",
+            "canonical_id": "datalink_basic",
+            "row": {
+              "canonical_id": "datalink_basic",
+              "match_labels": [
+                "datalink",
+                "comm_system",
+                "network",
+                "通信链路",
+                "数据链"
+              ],
+              "type_hints": [
+                "datalink",
+                "comm_system"
+              ],
+              "match_confidence": "full",
+              "grounding_target": {
+                "target_kind": "comm_profile",
+                "target_id": "datalink_profile",
+                "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+                "network_pattern": "peer_to_peer_or_hierarchical",
+                "required_directives": [
+                  "network_name"
+                ],
+                "optional_directives": [
+                  "internal_link"
+                ],
+                "message_pattern": "report_to_via_named_comm"
+              },
+              "host_block": "comm",
+              "provenance": [
+                "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+                "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+              ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "preferred_declarations": [
+                "comm <name> WSF_COMM_TRANSCEIVER"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_COMM_TRANSCEIVER",
+                  "allowed_block_kinds": [
+                    "comm"
+                  ],
+                  "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                  "provenance": [
+                    "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
+                    "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt",
+              "benchmarks/benchmark_v1/demo_sources/air_to_air/platforms/escort.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "comm_profile",
+              "target_id": "datalink_profile",
+              "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+              "network_pattern": "peer_to_peer_or_hierarchical",
+              "required_directives": [
+                "network_name"
+              ],
+              "optional_directives": [
+                "internal_link"
+              ],
+              "message_pattern": "report_to_via_named_comm"
+            }
+          },
+          "implementation_constraints": {
+            "preferred_declarations": [
+              "comm <name> WSF_COMM_TRANSCEIVER"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_COMM_TRANSCEIVER",
+                "allowed_block_kinds": [
+                  "comm"
+                ],
+                "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                "provenance": [
+                  "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
+                  "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                ]
+              }
+            ]
+          },
+          "unresolved_items": []
+        }
+      ],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "brawler_engagement",
           "task_type": "air_engage",
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "task",
+            "input": "air_engage",
             "canonical_id": "intercept",
             "row": {
               "canonical_id": "intercept",
@@ -399,6 +1349,7 @@
                 "intercept",
                 "air_engage"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "behavior_bundle",
                 "target_id": "intercept_behavior"
@@ -407,23 +1358,48 @@
                 "processor",
                 "weapon",
                 "sensor"
-              ]
+              ],
+              "implementation_constraints": {
+                "requires_weapon": true,
+                "requires_sensor": true,
+                "default_duration_sec": 300
+              }
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "requires_weapon": true,
+              "requires_sensor": true,
+              "default_duration_sec": 300
+            },
+            "provenance": [],
+            "grounding_target": {
+              "target_kind": "behavior_bundle",
+              "target_id": "intercept_behavior"
             }
           },
+          "implementation_constraints": {
+            "requires_weapon": true,
+            "requires_sensor": true,
+            "default_duration_sec": 300
+          },
           "assignee_refs": [
-            "red_fighter"
+            "blue_flight_lead",
+            "blue_wingman"
           ],
           "target_refs": [
-            "blue_fighter"
+            "red_wingman",
+            "red_flight_lead"
           ],
           "location_refs": [],
           "parameters": {
-            "engagement_style": "intercept"
+            "engagement_style": "brawler_tactical"
           },
+          "phase_ref": "",
           "ready": true,
           "unresolved_items": []
         }
       ],
+      "logic": {},
       "ready": true,
       "unresolved_items": []
     },
@@ -442,7 +1418,22 @@
         "unit": "sec"
       },
       "outputs": [
-        "event_pipe"
+        "event_pipe",
+        "event_output"
+      ],
+      "evaluation": {},
+      "expected_events": [
+        {
+          "id": "brawler_air_engagement",
+          "type": "engagement",
+          "actor_refs": [
+            "blue_flight_lead",
+            "blue_wingman",
+            "red_flight_lead",
+            "red_wingman"
+          ],
+          "success_condition": "Both sides enter a Brawler air-to-air engagement with behavior tree decision logic."
+        }
       ],
       "layer_readiness": {
         "scenario_scaffold": true,

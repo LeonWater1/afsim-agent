@@ -1,0 +1,75 @@
+{
+  "static_pass": false,
+  "findings": [
+    {
+      "error_id": "E002",
+      "line": 11,
+      "message": "end_antenna_pattern closes constant_pattern from line 10"
+    },
+    {
+      "error_id": "E002",
+      "line": 17,
+      "message": "end_comm closes antenna_pattern from line 16"
+    },
+    {
+      "error_id": "E002",
+      "line": 19,
+      "message": "end_platform_type closes processor from line 18"
+    },
+    {
+      "error_id": "E002",
+      "line": 25,
+      "message": "end_comm closes antenna_pattern from line 24"
+    },
+    {
+      "error_id": "E002",
+      "line": 26,
+      "message": "end_platform_type closes comm from line 23"
+    },
+    {
+      "error_id": "E002",
+      "line": 9,
+      "message": "missing end_antenna_pattern"
+    },
+    {
+      "error_id": "E002",
+      "line": 13,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 14,
+      "message": "missing end_mover"
+    },
+    {
+      "error_id": "E002",
+      "line": 15,
+      "message": "missing end_comm"
+    },
+    {
+      "error_id": "E002",
+      "line": 21,
+      "message": "missing end_platform_type"
+    },
+    {
+      "error_id": "E002",
+      "line": 22,
+      "message": "missing end_mover"
+    },
+    {
+      "error_id": "E007",
+      "line": 16,
+      "message": "antenna_pattern missing constant_pattern block"
+    },
+    {
+      "error_id": "E007",
+      "line": 24,
+      "message": "antenna_pattern missing constant_pattern block"
+    }
+  ],
+  "error_ids": [
+    "E002",
+    "E007"
+  ],
+  "primary_error": "E002"
+}

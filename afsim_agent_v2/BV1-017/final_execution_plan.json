@@ -1,0 +1,43 @@
+{
+  "version": "execution_repair_spec_v1",
+  "input": {
+    "script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\execution_repaired_script.txt",
+    "mission_status": "FAIL",
+    "return_code": 1
+  },
+  "static_analysis": {
+    "script": "BV1-017_execution_repair",
+    "syntax_correct": true,
+    "static_pass": true,
+    "primary_error": "",
+    "static_error_ids": [],
+    "findings": []
+  },
+  "execution_analysis": {
+    "mission_pass": false,
+    "primary_error": "E007",
+    "classifier": "input_parse_or_structure_error",
+    "route": "return_to_layer_regeneration",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "regenerate the affected layer or component template",
+    "evidence_lines": [
+      "***** FATAL: Could not process input files.",
+      "***** ERROR: Unknown command: group_event_pipe"
+    ]
+  },
+  "repair_recommendation": {
+    "primary_error": "E007",
+    "route": "return_to_layer_regeneration",
+    "inferred_stage": "static_or_generation",
+    "suggested_action": "regenerate the affected layer or component template"
+  },
+  "rerun_plan": {
+    "preconditions": [
+      "apply the recommended repair at the routed stage",
+      "rerun static_checker_v1 after the repair changes the script text",
+      "rerun mission.exe only after the regenerated script passes static verification"
+    ],
+    "command_hint": "python scripts/run_mission.py -es -fio C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\afsim_agent_v2\\BV1-017\\execution_repaired_script.txt",
+    "success_condition": "mission_status == PASS"
+  }
+}

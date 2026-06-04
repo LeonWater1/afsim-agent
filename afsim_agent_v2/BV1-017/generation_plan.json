@@ -22,6 +22,7 @@
         "value": 240,
         "unit": "sec"
       },
+      "schema_version": "afsim_ir_v2",
       "domains": [
         "surface"
       ],
@@ -32,10 +33,42 @@
       "side_ids": [
         "blue"
       ],
+      "sides": [
+        {
+          "id": "blue",
+          "display_name": "Blue"
+        }
+      ],
       "location_ids": [
         "detector_site",
         "relay_site",
         "observer_site"
+      ],
+      "locations": [
+        {
+          "id": "detector_site",
+          "kind": "point",
+          "position": {
+            "lat": "30.67n",
+            "lon": "104.07e"
+          }
+        },
+        {
+          "id": "relay_site",
+          "kind": "point",
+          "position": {
+            "lat": "30.70n",
+            "lon": "104.10e"
+          }
+        },
+        {
+          "id": "observer_site",
+          "kind": "point",
+          "position": {
+            "lat": "30.73n",
+            "lon": "104.13e"
+          }
+        }
       ],
       "constraint_keys": [
         "coordinate_format",
@@ -55,7 +88,9 @@
           "quantity": 1,
           "side": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "side",
+            "input": "blue",
             "canonical_id": "blue",
             "row": {
               "canonical_id": "blue",
@@ -66,12 +101,18 @@
                 "我方",
                 "蓝方",
                 "友方"
-              ]
-            }
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
           },
           "platform_grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "platform",
+            "input": "detector",
             "canonical_id": "detector_platform_basic",
             "row": {
               "canonical_id": "detector_platform_basic",
@@ -85,6 +126,7 @@
               "platform_type_hints": [
                 "detector_platform"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
                 "target_id": "detector_platform_basic",
@@ -97,10 +139,22 @@
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "detector_platform_basic",
+              "wsf_base_type": "WSF_PLATFORM"
             }
           },
+          "platform_constraints": {},
           "initial_location_ref": "detector_site",
           "route_ref": null,
+          "commander_ref": null,
           "component_refs": [
             "group_network",
             "report_processor"
@@ -127,7 +181,9 @@
           "quantity": 1,
           "side": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "side",
+            "input": "blue",
             "canonical_id": "blue",
             "row": {
               "canonical_id": "blue",
@@ -138,12 +194,18 @@
                 "我方",
                 "蓝方",
                 "友方"
-              ]
-            }
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
           },
           "platform_grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "platform",
+            "input": "relay",
             "canonical_id": "relay_platform_basic",
             "row": {
               "canonical_id": "relay_platform_basic",
@@ -157,6 +219,7 @@
               "platform_type_hints": [
                 "relay_platform"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
                 "target_id": "relay_platform_basic",
@@ -168,10 +231,22 @@
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "relay_platform_basic",
+              "wsf_base_type": "WSF_PLATFORM"
             }
           },
+          "platform_constraints": {},
           "initial_location_ref": "relay_site",
           "route_ref": null,
+          "commander_ref": null,
           "component_refs": [
             "group_network"
           ],
@@ -195,7 +270,9 @@
           "quantity": 1,
           "side": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "side",
+            "input": "blue",
             "canonical_id": "blue",
             "row": {
               "canonical_id": "blue",
@@ -206,12 +283,18 @@
                 "我方",
                 "蓝方",
                 "友方"
-              ]
-            }
+              ],
+              "match_confidence": "full"
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": []
           },
           "platform_grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "platform",
+            "input": "observer",
             "canonical_id": "observer_platform_basic",
             "row": {
               "canonical_id": "observer_platform_basic",
@@ -225,6 +308,7 @@
               "platform_type_hints": [
                 "observer_platform"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "platform_template",
                 "target_id": "observer_platform_basic",
@@ -236,10 +320,22 @@
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "platform_template",
+              "target_id": "observer_platform_basic",
+              "wsf_base_type": "WSF_PLATFORM"
             }
           },
+          "platform_constraints": {},
           "initial_location_ref": "observer_site",
           "route_ref": null,
+          "commander_ref": null,
           "component_refs": [
             "group_network"
           ],
@@ -283,7 +379,9 @@
           "parameters": {},
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "processor",
+            "input": "reporting",
             "canonical_id": "track_processor_basic",
             "row": {
               "canonical_id": "track_processor_basic",
@@ -297,15 +395,27 @@
                 "track_processor",
                 "message_or_report_processor"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "wsf_type",
                 "target_id": "WSF_TRACK_PROCESSOR"
               },
+              "host_block": "processor",
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "wsf_type",
+              "target_id": "WSF_TRACK_PROCESSOR"
             }
           },
+          "implementation_constraints": {},
           "unresolved_items": []
         }
       ],
@@ -320,7 +430,9 @@
           },
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "comm",
+            "input": "group_comm",
             "canonical_id": "group_comm_basic",
             "row": {
               "canonical_id": "group_comm_basic",
@@ -332,6 +444,7 @@
               "type_hints": [
                 "group_comm"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "comm_profile",
                 "target_id": "group_comm_profile",
@@ -345,10 +458,64 @@
                 ],
                 "message_pattern": "report_to_group_via_named_comm"
               },
+              "host_block": "comm",
               "provenance": [
                 "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {
+              "preferred_declarations": [
+                "comm <name> WSF_COMM_TRANSCEIVER"
+              ],
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_COMM_TRANSCEIVER",
+                  "allowed_block_kinds": [
+                    "comm"
+                  ],
+                  "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                  "provenance": [
+                    "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
+                    "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                  ]
+                }
+              ]
+            },
+            "provenance": [
+              "benchmarks/benchmark_v1/demo_sources/comm/group_comm_example.txt"
+            ],
+            "grounding_target": {
+              "target_kind": "comm_profile",
+              "target_id": "group_comm_profile",
+              "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+              "network_pattern": "group_broadcast",
+              "required_directives": [
+                "group_join"
+              ],
+              "optional_directives": [
+                "internal_link"
+              ],
+              "message_pattern": "report_to_group_via_named_comm"
             }
+          },
+          "implementation_constraints": {
+            "preferred_declarations": [
+              "comm <name> WSF_COMM_TRANSCEIVER"
+            ],
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_COMM_TRANSCEIVER",
+                "allowed_block_kinds": [
+                  "comm"
+                ],
+                "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                "provenance": [
+                  "demo: benchmarks/benchmark_v1/demo_sources/comm/platforms/detector.txt",
+                  "demo: benchmarks/benchmark_v1/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                ]
+              }
+            ]
           },
           "unresolved_items": []
         }
@@ -360,7 +527,9 @@
           "task_type": "group_communication",
           "grounding": {
             "matched": true,
+            "match_level": "full",
             "mapping_type": "task",
+            "input": "group_communication",
             "canonical_id": "group_communication",
             "row": {
               "canonical_id": "group_communication",
@@ -373,6 +542,7 @@
               "ir_task_types": [
                 "group_communication"
               ],
+              "match_confidence": "full",
               "grounding_target": {
                 "target_kind": "behavior_bundle",
                 "target_id": "group_communication_behavior"
@@ -381,8 +551,16 @@
                 "comm",
                 "processor"
               ]
+            },
+            "match_confidence": "full",
+            "implementation_constraints": {},
+            "provenance": [],
+            "grounding_target": {
+              "target_kind": "behavior_bundle",
+              "target_id": "group_communication_behavior"
             }
           },
+          "implementation_constraints": {},
           "assignee_refs": [
             "detector_unit",
             "relay_unit",
@@ -393,10 +571,12 @@
           "parameters": {
             "message_flow": "group_broadcast"
           },
+          "phase_ref": "",
           "ready": true,
           "unresolved_items": []
         }
       ],
+      "logic": {},
       "ready": true,
       "unresolved_items": []
     },
@@ -417,6 +597,19 @@
       "outputs": [
         "event_pipe",
         "event_output"
+      ],
+      "evaluation": {},
+      "expected_events": [
+        {
+          "id": "group_message_exchange",
+          "type": "communication",
+          "actor_refs": [
+            "detector_unit",
+            "relay_unit",
+            "observer_unit"
+          ],
+          "success_condition": "Participants exchange reports across the communication group."
+        }
       ],
       "layer_readiness": {
         "scenario_scaffold": true,

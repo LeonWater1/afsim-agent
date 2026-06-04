@@ -1,0 +1,61 @@
+{
+  "version": "hierarchical_generation_executor_v1",
+  "plan_version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "ir_examples_v1",
+    "source_id": "IRX-002",
+    "source_task_id": "BV1-003"
+  },
+  "layers": [
+    {
+      "layer": "phase1_skeleton",
+      "label": "skeleton",
+      "ready_in_plan": true,
+      "static_pass": true,
+      "error_count": 0,
+      "primary_error": "",
+      "repair_attempts": 0
+    },
+    {
+      "layer": "phase2_shared",
+      "label": "shared",
+      "ready_in_plan": true,
+      "static_pass": false,
+      "error_count": 6,
+      "primary_error": "E002",
+      "repair_attempts": 1
+    },
+    {
+      "layer": "phase3_platforms",
+      "label": "platforms",
+      "ready_in_plan": true,
+      "static_pass": false,
+      "error_count": 7,
+      "primary_error": "E002",
+      "repair_attempts": 1
+    },
+    {
+      "layer": "phase4_tasks",
+      "label": "tasks",
+      "ready_in_plan": true,
+      "static_pass": false,
+      "error_count": 10,
+      "primary_error": "E002",
+      "repair_attempts": 1
+    },
+    {
+      "layer": "phase5_assembly",
+      "label": "assembly",
+      "ready_in_plan": true,
+      "static_pass": false,
+      "error_count": 6,
+      "primary_error": "E002",
+      "repair_attempts": 1
+    }
+  ],
+  "total_repairs": 4,
+  "final_static_pass": false,
+  "final_error_count": 6,
+  "final_primary_error": "E002",
+  "final_script_path": "C:\\Users\\28912\\Desktop\\afsim-script-generator-main\\layered_generation_artifacts_v1\\IRX-002\\final_script.txt"
+}

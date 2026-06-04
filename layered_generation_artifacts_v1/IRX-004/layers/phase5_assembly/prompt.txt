@@ -1,0 +1,140 @@
+PHASE 5: Final assembly — add outputs, fix cross-references.
+
+Outputs requested: ['event_pipe', 'event_output']
+
+Steps:
+1. Scan the script for any broken references (platform types used but not declared, components referenced but not defined). Fix them minimally.
+2. Add event_pipe block at top level (before end_time):
+     event_pipe
+       file output/group_comm_example.aer
+     end_event_pipe
+3. If event_output is requested, add it before end_time with appropriate enable directives.
+4. Ensure there is exactly ONE end_time line at the very end of the file. Remove any duplicates.
+5. Verify every open block has a matching close tag.
+
+AFSIM 2.9.0 hard rules:
+- ALL numbers must have units (m/sec, nm, db, kw, hz, deg, sec, min, km, ft, m).
+- Coordinates: position LAT LON  with n/s/e/w suffix.  position 30.67n 104.07e
+- Altitude:  altitude VALUE UNIT REF   altitude 10000 ft msl  or  altitude 500 m agl
+- end_time ALWAYS the last line, top-level, alone.  end_time 120 sec
+- side is a declaration (side blue), NOT a block.  NEVER emit end_side.
+- Blocks close with matching end_*: platform→end_platform, sensor→end_sensor, etc.
+- Return ONLY AFSIM script text. No markdown, no explanation.
+
+FORBIDDEN (hallucinated constructs — NEVER emit):
+  end_side, extend, mission/end_mission, add task, task_type, assign task
+  latitude, longitude (use position instead)
+  cout<<, ternary(?:), fmod(), Vec3.Normalize(), Vec3.Scale(), .LLA()
+  HeadingTo(), SetHeading(), PLATFORM.Offset(), SetAltitude(), SetSpeed()
+  GetPosition(), SetPosition(), GetComponent(), MoveTo(), MoveToward()
+
+Verified WSF types:
+WSF_ACOUSTIC_SENSOR WSF_AERO WSF_AGILITY_EFFECT WSF_AIR_MOVER WSF_AIR_TARGET_FUSE WSF_AIR_TO_AIR_LAUNCH_COMPUTER WSF_AIR_TO_AIR_MISSILE WSF_ALPHA_BETA_FILTER
+WSF_ASSET_MESSAGE WSF_ATA_LAUNCH_COMPUTER WSF_ATG_LAUNCH_COMPUTER WSF_BALLISTIC_MISSILE_LAUNCH_COMPUTER WSF_BRAWLER_FUEL WSF_BRAWLER_MOVER WSF_BRAWLER_PLATFORM WSF_BRAWLER_PROCESSOR
+WSF_CHAFF_PARCEL WSF_CHAFF_WEAPON WSF_COMM_NETWORK_AD_HOC WSF_COMM_RCVR WSF_COMM_ROUTER WSF_COMM_ROUTER_PROTOCOL_AD_HOC WSF_COMM_TRANSCEIVER WSF_COMM_XMTR
+WSF_CONTROL_MESSAGE WSF_COVER_PULSE_EFFECT WSF_CYBER_ATTACK WSF_CYBER_CONSTRAINT WSF_CYBER_DETONATE_EFFECT WSF_CYBER_MAN_IN_THE_MIDDLE_EFFECT WSF_CYBER_PROTECT WSF_CYBER_SCRIPT_EFFECT
+WSF_DIRECTION_FINDER_PROCESSOR WSF_EA_TECHNIQUE WSF_ELECTRONIC_ATTACK WSF_ELECTRONIC_PROTECT WSF_EOIR_SENSOR WSF_EP_TECHNIQUE WSF_ESM_SENSOR WSF_EXPLICIT_WEAPON
+WSF_FALSE_TARGET WSF_FALSE_TARGET_EFFECT WSF_FIRES_LAUNCH_COMPUTER WSF_FIRES_MOVER WSF_FT_SCREENER WSF_FUEL WSF_GEOMETRIC_SENSOR WSF_GRADUATED_LETHALITY
+WSF_GROUND_MOVER WSF_GROUND_TARGET_FUSE WSF_GROUP WSF_GUIDANCE_COMPUTER WSF_GUIDED_MOVER WSF_IMAGE_PROCESSOR WSF_IMPLICIT_WEAPON WSF_INTEGRATING_SPACE_MOVER
+WSF_IRST_SENSOR WSF_JAMMER_POWER_EFFECT WSF_KALMAN_FILTER WSF_KINEMATIC_MOVER WSF_LASER_DESIGNATOR WSF_LASER_TRACKER WSF_LINKED_PROCESSOR WSF_OFFSET_MOVER
+WSF_OLD_GUIDANCE_COMPUTER WSF_OLD_GUIDED_MOVER WSF_PERCEPTION_PROCESSOR WSF_PERFECT_TRACKER WSF_PLATFORM WSF_POINT_MASS_SIX_DOF_MOVER WSF_POL_MOD_EFFECT WSF_POWER_EFFECT
+WSF_PULSE_SUPPRESS_EFFECT WSF_QUANTUM_TASKER_PROCESSOR WSF_RADAR_SENSOR WSF_RADAR_SIGNATURE WSF_RADIO_RCVR WSF_RADIO_TRANSCEIVER WSF_RADIO_XMTR WSF_RF_JAMMER
+WSF_RIPR_PROCESSOR WSF_RPJ_EFFECT WSF_SAR_SENSOR WSF_SA_PROCESSOR WSF_SCRIPT_LAUNCH_COMPUTER WSF_SCRIPT_PROCESSOR WSF_SENSORS_MANAGER_FOV WSF_SIMPLE_FT_EFFECT
+WSF_SIMPLE_SENSORS_MANAGER WSF_SIX_DOF_MOVER WSF_SLB_EFFECT WSF_SLC_EFFECT WSF_SPHERICAL_LETHALITY WSF_STATE_MACHINE WSF_STRAIGHT_LINE_MOVER WSF_TABULAR_RATE_FUEL
+WSF_TASK_PROCESSOR WSF_THREAT_PROCESSOR WSF_TRACK_DROP_MESSAGE WSF_TRACK_EFFECT WSF_TRACK_MANAGER WSF_TRACK_MESSAGE WSF_TRACK_NOTIFY_MESSAGE WSF_TRACK_PROCESSOR
+WSF_UNCLASS_ASSET_MANAGER WSF_UNCLASS_BM WSF_UNCLASS_DISSEMINATE_C WSF_UNGUIDED_MOVER WSF_UPLINK_PROCESSOR WSF_WEAPONS_MANAGER_AI WSF_WEAPONS_MANAGER_SAM WSF_WEAPON_FUSE
+WSF_WEAPON_TRACK_PROCESSOR
+
+Current script:
+```afsim
+side blue
+side red
+end_time 240 sec
+
+antenna_pattern omni_pattern
+  constant_pattern
+    gain 0 db
+  end_constant_pattern
+end_antenna_pattern
+
+platform_type detector_platform WSF_PLATFORM
+  mover WSF_GROUND_MOVER
+  comm WSF_COMM_TRANSCEIVER
+    antenna_pattern omni_pattern
+    end_antenna_pattern
+  end_comm
+  processor WSF_TRACK_PROCESSOR
+  end_processor
+end_platform_type
+
+platform_type comm_node_platform WSF_PLATFORM
+  mover WSF_GROUND_MOVER
+  comm WSF_COMM_ROUTER
+    antenna_pattern omni_pattern
+    end_antenna_pattern
+  end_comm
+end_platform_type
+
+side blue
+platform detector_unit detector_platform
+  position 30.50n 104.00e
+  altitude 0 m agl
+  comm group_network WSF_COMM_TRANSCEIVER
+    antenna_pattern omni_pattern
+    end_antenna_pattern
+  end_comm
+  processor report_processor WSF_SCRIPT_PROCESSOR
+    execute
+      script
+        while true do
+          send_comm_message { to = "group_network", message = "report" }
+          wait 10 sec
+        end_while
+      end_script
+    end_execute
+  end_processor
+end_platform
+
+platform relay_unit comm_node_platform
+  position 30.60n 104.10e
+  altitude 0 m agl
+  comm group_network WSF_COMM_TRANSCEIVER
+    antenna_pattern omni_pattern
+    end_antenna_pattern
+  end_comm
+  processor report_processor WSF_SCRIPT_PROCESSOR
+    execute
+      script
+        while true do
+          send_comm_message { to = "group_network", message = "report" }
+          wait 10 sec
+        end_while
+      end_script
+    end_execute
+  end_processor
+end_platform
+
+platform observer_unit detector_platform
+  position 30.55n 104.15e
+  altitude 0 m agl
+  comm group_network WSF_COMM_TRANSCEIVER
+    antenna_pattern omni_pattern
+    end_antenna_pattern
+  end_comm
+  processor report_processor WSF_SCRIPT_PROCESSOR
+    execute
+      script
+        while true do
+          send_comm_message { to = "group_network", message = "report" }
+          wait 10 sec
+        end_while
+      end_script
+    end_execute
+  end_processor
+end_platform
+
+side red
+location detector_site position 30.50n 104.00e
+location relay_site position 30.60n 104.10e
+location observer_site position 30.55n 104.15e
+```

@@ -1,72 +1,8 @@
 {
   "script": "BV1-017_execution_repair",
-  "syntax_correct": false,
-  "static_pass": false,
-  "primary_error": "E002",
-  "static_error_ids": [
-    "E002",
-    "E007"
-  ],
-  "findings": [
-    {
-      "error_id": "E002",
-      "line": 65,
-      "message": "end_antenna_pattern closes transmitter from line 56"
-    },
-    {
-      "error_id": "E002",
-      "line": 66,
-      "message": "end_transmitter closes sensor from line 53"
-    },
-    {
-      "error_id": "E002",
-      "line": 74,
-      "message": "end_antenna_pattern closes receiver from line 67"
-    },
-    {
-      "error_id": "E002",
-      "line": 75,
-      "message": "end_receiver closes platform_type from line 27"
-    },
-    {
-      "error_id": "E002",
-      "line": 76,
-      "message": "unexpected end_sensor"
-    },
-    {
-      "error_id": "E002",
-      "line": 77,
-      "message": "unexpected end_platform_type"
-    },
-    {
-      "error_id": "E007",
-      "line": 60,
-      "message": "constant_pattern must be nested under antenna_pattern"
-    },
-    {
-      "error_id": "E007",
-      "line": 69,
-      "message": "constant_pattern must be nested under antenna_pattern"
-    },
-    {
-      "error_id": "E007",
-      "line": 12,
-      "message": "unknown command: on_message"
-    },
-    {
-      "error_id": "E007",
-      "line": 21,
-      "message": "unknown command: end_on_message"
-    },
-    {
-      "error_id": "E007",
-      "line": 41,
-      "message": "unknown command: on_message"
-    },
-    {
-      "error_id": "E007",
-      "line": 50,
-      "message": "unknown command: end_on_message"
-    }
-  ]
+  "syntax_correct": true,
+  "static_pass": true,
+  "primary_error": "",
+  "static_error_ids": [],
+  "findings": []
 }

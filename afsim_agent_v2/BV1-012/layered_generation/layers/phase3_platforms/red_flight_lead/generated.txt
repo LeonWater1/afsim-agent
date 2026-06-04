@@ -1,0 +1,5 @@
+platform red_flight_lead of_type PT_RED_FLIGHT_LEAD
+  side red
+  position 0.03n 0.01e
+  altitude 10000 ft msl
+end_platform

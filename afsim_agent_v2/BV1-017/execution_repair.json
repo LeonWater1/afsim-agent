@@ -7,29 +7,73 @@
   },
   "static_analysis": {
     "script": "BV1-017_static_repair",
-    "syntax_correct": true,
-    "static_pass": true,
-    "primary_error": "",
-    "static_error_ids": [],
-    "findings": []
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E002",
+    "static_error_ids": [
+      "E002",
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E002",
+        "line": 31,
+        "message": "end_platform_type closes comm from line 30"
+      },
+      {
+        "error_id": "E002",
+        "line": 35,
+        "message": "end_platform_type closes comm from line 34"
+      },
+      {
+        "error_id": "E002",
+        "line": 40,
+        "message": "end_platform_type closes processor from line 39"
+      },
+      {
+        "error_id": "E002",
+        "line": 29,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 33,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 37,
+        "message": "missing end_platform_type"
+      },
+      {
+        "error_id": "E002",
+        "line": 38,
+        "message": "missing end_comm"
+      },
+      {
+        "error_id": "E007",
+        "line": 68,
+        "message": "end_time must appear at top level, not inside another block"
+      }
+    ]
   },
   "execution_analysis": {
     "mission_pass": false,
-    "primary_error": "E007",
+    "primary_error": "E002",
     "classifier": "input_parse_or_structure_error",
-    "route": "return_to_layer_regeneration",
+    "route": "return_to_self_repair",
     "inferred_stage": "static_or_generation",
-    "suggested_action": "regenerate the affected layer or component template",
+    "suggested_action": "repair block structure and closing tags before mission.exe",
     "evidence_lines": [
       "***** FATAL: Could not process input files.",
-      "***** ERROR: Unknown command: end_platform"
+      "***** ERROR: Unknown command: side"
     ]
   },
   "repair_recommendation": {
-    "primary_error": "E007",
-    "route": "return_to_layer_regeneration",
+    "primary_error": "E002",
+    "route": "return_to_self_repair",
     "inferred_stage": "static_or_generation",
-    "suggested_action": "regenerate the affected layer or component template"
+    "suggested_action": "repair block structure and closing tags before mission.exe"
   },
   "rerun_plan": {
     "preconditions": [

@@ -1,0 +1,92 @@
+network brawler_network WSF_COMM_NETWORK_AD_HOC
+end_network
+
+platform_type PT_BLUE_FLIGHT_LEAD WSF_PLATFORM
+  mover BrawlerMover WSF_BRAWLER_MOVER
+    max_speed 1.2 mach
+    climb_rate 50000 ft/min
+    turn_rate 15 deg/s
+  end_mover
+  processor BrawlerThinker WSF_BRAWLER_PROCESSOR
+  end_processor
+  comm BrawlerDatalink WSF_COMM_TRANSCEIVER
+    network_name brawler_network
+  end_comm
+end_platform_type
+
+platform_type PT_BLUE_WINGMAN WSF_BRAWLER_PLATFORM
+  mover BrawlerMover WSF_BRAWLER_MOVER
+    max_speed 1.2 mach
+    climb_rate 50000 ft/min
+    turn_rate 15 deg/s
+  end_mover
+  sensor BrawlerSensor WSF_GEOMETRIC_SENSOR
+    azimuth_field_of_view 60 deg
+    elevation_field_of_view 30 deg
+    maximum_range 50 nm
+    frame_time 1 sec
+  end_sensor
+  weapon Sidewinder WSF_AIR_TO_AIR_MISSILE
+    quantity 2
+    salvo_interval 0.5 sec
+  end_weapon
+  weapon Gun WSF_EXPLICIT_WEAPON
+    quantity 500
+  end_weapon
+  processor BrawlerThinker WSF_BRAWLER_PROCESSOR
+  end_processor
+  processor Perception WSF_PERCEPTION_PROCESSOR
+  end_processor
+  processor IncomingThreats WSF_THREAT_PROCESSOR
+  end_processor
+  processor DataMgr WSF_TRACK_PROCESSOR
+  end_processor
+  comm BrawlerDatalink WSF_COMM_TRANSCEIVER
+    network_name brawler_network
+  end_comm
+end_platform_type
+
+platform_type PT_RED_FLIGHT_LEAD WSF_PLATFORM
+  mover BrawlerMover WSF_BRAWLER_MOVER
+    max_speed 1.2 mach
+    climb_rate 50000 ft/min
+    turn_rate 15 deg/s
+  end_mover
+  processor BrawlerThinker WSF_BRAWLER_PROCESSOR
+  end_processor
+  comm BrawlerDatalink WSF_COMM_TRANSCEIVER
+    network_name brawler_network
+  end_comm
+end_platform_type
+
+platform_type PT_RED_WINGMAN WSF_BRAWLER_PLATFORM
+  mover BrawlerMover WSF_BRAWLER_MOVER
+    max_speed 1.2 mach
+    climb_rate 50000 ft/min
+    turn_rate 15 deg/s
+  end_mover
+  sensor BrawlerSensor WSF_GEOMETRIC_SENSOR
+    azimuth_field_of_view 60 deg
+    elevation_field_of_view 30 deg
+    maximum_range 50 nm
+    frame_time 1 sec
+  end_sensor
+  weapon Sidewinder WSF_AIR_TO_AIR_MISSILE
+    quantity 2
+    salvo_interval 0.5 sec
+  end_weapon
+  weapon Gun WSF_EXPLICIT_WEAPON
+    quantity 500
+  end_weapon
+  processor BrawlerThinker WSF_BRAWLER_PROCESSOR
+  end_processor
+  processor Perception WSF_PERCEPTION_PROCESSOR
+  end_processor
+  processor IncomingThreats WSF_THREAT_PROCESSOR
+  end_processor
+  processor DataMgr WSF_TRACK_PROCESSOR
+  end_processor
+  comm BrawlerDatalink WSF_COMM_TRANSCEIVER
+    network_name brawler_network
+  end_comm
+end_platform_type

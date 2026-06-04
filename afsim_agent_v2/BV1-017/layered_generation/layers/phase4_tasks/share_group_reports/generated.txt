@@ -1,0 +1,43 @@
+comm_network share_group_net
+  network_type WSF_COMM_NETWORK_AD_HOC
+  link_frequency 3000 MHz
+  bandwidth 1 MHz
+  range 50 km
+end_comm_network
+
+# Inside platform_instance detector_unit
+add transceiver dtx WSF_COMM_TRANSCEIVER
+  network share_group_net
+end_transceiver
+add track_manager dtm WSF_TRACK_MANAGER
+  track_transmitter share_group_net
+  track_receiver share_group_net
+end_track_manager
+
+# Inside platform_instance relay_unit
+add transceiver rtx WSF_COMM_TRANSCEIVER
+  network share_group_net
+end_transceiver
+add track_manager rtm WSF_TRACK_MANAGER
+  track_transmitter share_group_net
+  track_receiver share_group_net
+end_track_manager
+
+# Inside platform_instance observer_unit
+add transceiver otx WSF_COMM_TRANSCEIVER
+  network share_group_net
+end_transceiver
+add track_manager otm WSF_TRACK_MANAGER
+  track_transmitter share_group_net
+  track_receiver share_group_net
+end_track_manager
+
+group report_sharing_group
+  members detector_unit relay_unit observer_unit
+end_group
+
+task share_group_reports
+  task_type group_communication
+  assigned_to report_sharing_group
+  parameter message_flow group_broadcast
+end_task

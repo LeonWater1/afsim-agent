@@ -1,0 +1,6 @@
+// scenario: air_to_air_1v1
+side blue
+side red
+location blue_spawn position 30.00n 130.00e
+location red_spawn position 29.50n 131.20e
+end_time 300 sec

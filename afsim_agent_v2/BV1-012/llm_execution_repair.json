@@ -10,11 +10,34 @@
     },
     "static_analysis": {
       "script": "BV1-012_execution_repair",
-      "syntax_correct": true,
-      "static_pass": true,
-      "primary_error": "",
-      "static_error_ids": [],
-      "findings": []
+      "syntax_correct": false,
+      "static_pass": false,
+      "primary_error": "E007",
+      "static_error_ids": [
+        "E007"
+      ],
+      "findings": [
+        {
+          "error_id": "E007",
+          "line": 19,
+          "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+        },
+        {
+          "error_id": "E007",
+          "line": 32,
+          "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+        },
+        {
+          "error_id": "E007",
+          "line": 63,
+          "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+        },
+        {
+          "error_id": "E007",
+          "line": 76,
+          "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+        }
+      ]
     },
     "execution_analysis": {
       "mission_pass": false,
@@ -25,7 +48,7 @@
       "suggested_action": "regenerate the affected layer or component template",
       "evidence_lines": [
         "***** FATAL: Could not process input files.",
-        "***** ERROR: Unknown command: speed"
+        "***** ERROR: Unknown command: side"
       ]
     },
     "repair_recommendation": {
@@ -44,13 +67,26 @@
       "success_condition": "mission_status == PASS"
     }
   },
-  "repaired_text": "script_interface\n   debug\nend_script_interface\n\nantenna_pattern FIGHTER_RADAR_ANTENNA\n   constant_pattern\n      peak_gain 30 dB\n      azimuth_beamwidth 20 deg\n      elevation_beamwidth 20 deg\n   end_constant_pattern\nend_antenna_pattern\n\nplatform_type BRAWLER_FIGHTER_TYPE WSF_PLATFORM\n   mover WSF_AIR_MOVER\n      maximum_speed 300 m/sec\n      minimum_speed 50 m/sec\n   end_mover\n   sensor radar WSF_RADAR_SENSOR\n      frame_time 2 sec\n      minimum_range 0 nm\n      maximum_range 80 nm\n      reports_location\n      reports_range\n      reports_bearing\n      transmitter\n         antenna_pattern FIGHTER_RADAR_ANTENNA\n         power 150 kw\n         pulse_width 2.0e-6 sec\n         pulse_repetition_frequency 400 hz\n         frequency 1285 mhz\n      end_transmitter\n      receiver\n         antenna_pattern FIGHTER_RADAR_ANTENNA\n         bandwidth 1 mhz\n      end_receiver\n   end_sensor\n   processor task_mgr WSF_BRAWLER_PROCESSOR\n   end_processor\nend_platform_type\n\nplatform blue_fighter BRAWLER_FIGHTER_TYPE\n   indestructible\n   side blue\n   heading 360 deg\n   position 30.67n 104.07e altitude 3000 m msl\nend_platform\n\nplatform red_fighter BRAWLER_FIGHTER_TYPE\n   indestructible\n   side red\n   heading 180 deg\n   position 30.92n 104.37e altitude 3000 m msl\nend_platform\n\nevent_pipe\n   file output/brawler_demo_1v1.aer\nend_event_pipe\n\nend_time 300 sec\n",
+  "repaired_text": "platform_type BrawlerFighter WSF_BRAWLER_PLATFORM\n  mover BrawlerMover WSF_BRAWLER_MOVER\n    max_speed 1.2 mach\n    climb_rate 50000 ft/min\n    turn_rate 15 deg/s\n  end_mover\n  sensor BrawlerSensor WSF_GEOMETRIC_SENSOR\n    azimuth_field_of_view 60 deg\n    elevation_field_of_view 30 deg\n    maximum_range 50 nm\n    frame_time 1 sec\n  end_sensor\n  weapon Sidewinder WSF_AIR_TO_AIR_MISSILE\n    quantity 2\n  end_weapon\n  processor BrawlerThinker WSF_BRAWLER_PROCESSOR\n  end_processor\n  processor Perception WSF_PERCEPTION_PROCESSOR\n  end_processor\n  processor IncomingThreats WSF_THREAT_PROCESSOR\n  end_processor\n  processor DataMgr WSF_TRACK_PROCESSOR\n  end_processor\nend_platform_type\n\nplatform blue_1 BrawlerFighter\n  side blue\n  position 0.03s 0.01w\n  altitude 10000 ft msl\nend_platform\n\nplatform red_1 BrawlerFighter\n  side red\n  position 0.03n 0.01e\n  altitude 10000 ft msl\nend_platform\n\nevent_pipe\n  file output/brawler_1v1.aer\nend_event_pipe\n\nevent_output\n  file output/brawler_1v1.evt\n  disable all\n  enable PLATFORM_ADDED\nend_event_output\n\nend_time 300 sec\n",
   "static_analysis": {
     "script": "BV1-012_execution_repair",
-    "syntax_correct": true,
-    "static_pass": true,
-    "primary_error": "",
-    "static_error_ids": [],
-    "findings": []
+    "syntax_correct": false,
+    "static_pass": false,
+    "primary_error": "E007",
+    "static_error_ids": [
+      "E007"
+    ],
+    "findings": [
+      {
+        "error_id": "E007",
+        "line": 13,
+        "message": "WSF_AIR_TO_AIR_MISSILE cannot be used directly as a standalone weapon block type; use a self-contained explicit weapon profile or omit the weapon block"
+      },
+      {
+        "error_id": "E007",
+        "line": 1,
+        "message": "Brawler-family platform_type requires mover WSF_BRAWLER_MOVER"
+      }
+    ]
   }
 }
