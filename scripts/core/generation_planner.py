@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from grounding_library_v2 import (
+from .grounding import (
     normalize_component_family,
     resolve_component,
     resolve_platform,
@@ -18,7 +18,7 @@ from grounding_library_v2 import (
 )
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 IR_EXAMPLES_V1_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
 IR_EXAMPLES_V2_PATH = ROOT / "docs" / "machine" / "ir_examples_v2.jsonl"
 
@@ -283,6 +283,167 @@ def build_mission_layer(ir: dict, component_index: dict):
     }
 
 
+def build_logic_layer(ir: dict):
+    """Task-018: extract v2 logic fields — behavior_rules, state_machines, engagement, triggers."""
+    logic = ir.get("logic", {})
+    if not isinstance(logic, dict) or not logic:
+        return {
+            "layer_name": "logic_layer",
+            "behavior_rules": [],
+            "state_machines": [],
+            "engagement_logic": {},
+            "trigger_logic": [],
+            "ready": True,
+            "unresolved_items": [],
+        }
+
+    entity_ids = {row["id"] for row in ir.get("entities", [])}
+    task_ids = {row["id"] for row in ir.get("tasks", [])}
+    component_ids = set()
+    for family_items in ir.get("components", {}).values():
+        for item in family_items:
+            component_ids.add(item.get("id", ""))
+
+    unresolved = []
+    behavior_rules = []
+    for rule in logic.get("behavior_rules", []):
+        applies_to = rule.get("applies_to", [])
+        rule_unresolved = [
+            {"kind": "missing_behavior_ref", "rule_id": rule.get("id"), "ref": ref}
+            for ref in applies_to
+            if ref not in entity_ids and ref not in task_ids
+        ]
+        behavior_rules.append({
+            "rule_id": rule.get("id"),
+            "description": rule.get("description", ""),
+            "priority": rule.get("priority", 0),
+            "applies_to": applies_to,
+            "ready": not rule_unresolved,
+            "unresolved_items": rule_unresolved,
+        })
+        unresolved.extend(rule_unresolved)
+
+    state_machines = []
+    for sm in logic.get("state_machines", []):
+        sm_unresolved = []
+        proc_ref = sm.get("processor_ref", "")
+        if proc_ref and proc_ref not in component_ids:
+            sm_unresolved.append({"kind": "missing_processor_ref", "state_machine_id": sm.get("id"), "ref": proc_ref})
+        state_machines.append({
+            "state_machine_id": sm.get("id"),
+            "processor_ref": proc_ref,
+            "initial_state": sm.get("initial_state"),
+            "state_count": len(sm.get("states", [])),
+            "ready": not sm_unresolved,
+            "unresolved_items": sm_unresolved,
+        })
+        unresolved.extend(sm_unresolved)
+
+    engagement = logic.get("engagement_logic", {})
+    engagement_summary = {}
+    if engagement:
+        engagement_summary = {
+            "style": engagement.get("style", ""),
+            "target_prioritization": engagement.get("target_prioritization", []),
+            "rule_count": len(engagement.get("rules", [])),
+        }
+
+    trigger_rules = []
+    for tr in logic.get("trigger_logic", []):
+        tr_unresolved = []
+        for ref in tr.get("source_refs", []):
+            if ref not in entity_ids and ref not in component_ids:
+                tr_unresolved.append({"kind": "missing_trigger_source", "trigger_id": tr.get("id"), "ref": ref})
+        trigger_rules.append({
+            "trigger_id": tr.get("id"),
+            "trigger": tr.get("trigger"),
+            "source_refs": tr.get("source_refs", []),
+            "target_refs": tr.get("target_refs", []),
+            "ready": not tr_unresolved,
+            "unresolved_items": tr_unresolved,
+        })
+        unresolved.extend(tr_unresolved)
+
+    return {
+        "layer_name": "logic_layer",
+        "behavior_rules": behavior_rules,
+        "state_machines": state_machines,
+        "engagement_logic": engagement_summary,
+        "trigger_logic": trigger_rules,
+        "ready": not unresolved,
+        "unresolved_items": unresolved,
+    }
+
+
+def build_evaluation_layer(ir: dict):
+    """Task-018: extract v2 evaluation fields — mission_phases, success_criteria, observation_metrics."""
+    evaluation = ir.get("evaluation", {})
+    if not isinstance(evaluation, dict) or not evaluation:
+        return {
+            "layer_name": "evaluation_layer",
+            "mission_phases": [],
+            "success_criteria": {},
+            "observation_metrics": [],
+            "ready": True,
+            "unresolved_items": [],
+        }
+
+    unresolved = []
+
+    phases = []
+    phase_ids = set()
+    for phase in evaluation.get("mission_phases", []):
+        phase_ids.add(phase.get("id"))
+        objectives = phase.get("objectives", [])
+        phases.append({
+            "phase_id": phase.get("id"),
+            "name": phase.get("name", ""),
+            "order": phase.get("order", 0),
+            "objective_count": len(objectives),
+            "required_objectives": [o["id"] for o in objectives if o.get("required_for_success", True)],
+        })
+
+    success = evaluation.get("success_criteria", {})
+    success_summary = {}
+    if success:
+        required_phases = success.get("minimum_phases_required", [])
+        missing_phases = [p for p in required_phases if p not in phase_ids]
+        unresolved.extend(
+            {"kind": "missing_success_phase_ref", "phase_id": p} for p in missing_phases
+        )
+        success_summary = {
+            "overall_condition": success.get("overall_condition", ""),
+            "minimum_phases_required": required_phases,
+            "score_thresholds": success.get("score_thresholds", {}),
+        }
+
+    metrics = []
+    for metric in evaluation.get("observation_metrics", []):
+        entity_ids = {row["id"] for row in ir.get("entities", [])}
+        metric_unresolved = []
+        for ref in metric.get("target_refs", []):
+            if ref not in entity_ids:
+                metric_unresolved.append({"kind": "missing_metric_target_ref", "metric_id": metric.get("id"), "ref": ref})
+        metrics.append({
+            "metric_id": metric.get("id"),
+            "metric_type": metric.get("metric_type"),
+            "aggregation": metric.get("aggregation"),
+            "threshold": metric.get("threshold"),
+            "ready": not metric_unresolved,
+            "unresolved_items": metric_unresolved,
+        })
+        unresolved.extend(metric_unresolved)
+
+    return {
+        "layer_name": "evaluation_layer",
+        "mission_phases": phases,
+        "success_criteria": success_summary,
+        "observation_metrics": metrics,
+        "ready": not unresolved,
+        "unresolved_items": unresolved,
+    }
+
+
 def build_scenario_assembly(ir: dict, layers: list[dict]):
     unresolved = []
     layer_readiness = {layer["layer_name"]: layer["ready"] for layer in layers}
@@ -324,6 +485,7 @@ def build_generation_plan(ir_source: dict):
         "outputs": ir.get("scenario", {}).get("outputs", []),
         "side_ids": [row.get("id") for row in ir.get("sides", [])],
         "location_ids": [row.get("id") for row in ir.get("locations", [])],
+        "locations": [{"id": row.get("id"), "kind": row.get("kind"), "position": row.get("position")} for row in ir.get("locations", [])],
         "constraint_keys": sorted(ir.get("constraints", {}).keys()),
         "ready": bool(ir.get("scenario", {}).get("name") and ir.get("scenario", {}).get("duration")),
         "unresolved_items": [],
@@ -333,13 +495,15 @@ def build_generation_plan(ir_source: dict):
     sensor_layer = build_component_layer(ir, component_index, "sensor", "sensor_layer")
     weapon_layer = build_component_layer(ir, component_index, "weapon", "weapon_layer")
     mission_layer = build_mission_layer(ir, component_index)
+    logic_layer = build_logic_layer(ir)
+    evaluation_layer = build_evaluation_layer(ir)
     assembly_layer = build_scenario_assembly(
         ir,
-        [scenario_scaffold, platform_layer, sensor_layer, weapon_layer, mission_layer],
+        [scenario_scaffold, platform_layer, sensor_layer, weapon_layer, mission_layer, logic_layer, evaluation_layer],
     )
 
     manual_review_items = []
-    for layer in [platform_layer, sensor_layer, weapon_layer, mission_layer, assembly_layer]:
+    for layer in [platform_layer, sensor_layer, weapon_layer, mission_layer, logic_layer, evaluation_layer, assembly_layer]:
         manual_review_items.extend(layer["unresolved_items"])
 
     ready_for_generation = (
@@ -348,6 +512,8 @@ def build_generation_plan(ir_source: dict):
         and sensor_layer["ready"]
         and weapon_layer["ready"]
         and mission_layer["ready"]
+        and logic_layer["ready"]
+        and evaluation_layer["ready"]
         and assembly_layer["ready"]
     )
 
@@ -364,6 +530,8 @@ def build_generation_plan(ir_source: dict):
             "sensor_layer",
             "weapon_layer",
             "mission_layer",
+            "logic_layer",
+            "evaluation_layer",
             "scenario_assembly",
         ],
         "layers": {
@@ -372,6 +540,8 @@ def build_generation_plan(ir_source: dict):
             "sensor_layer": sensor_layer,
             "weapon_layer": weapon_layer,
             "mission_layer": mission_layer,
+            "logic_layer": logic_layer,
+            "evaluation_layer": evaluation_layer,
             "scenario_assembly": assembly_layer,
         },
         "manual_review_items": manual_review_items,

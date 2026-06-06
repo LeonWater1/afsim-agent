@@ -77,7 +77,7 @@ class LLMClient:
         api_url = os.environ.get("DEEPSEEK_API_URL", "").strip() or DEFAULT_API_URL
         return cls(
             api_key=api_key,
-            model=model or env_model or "deepseek-v4-pro",
+            model=model or env_model or "deepseek-v4-flash",
             api_url=api_url,
             api_timeout=api_timeout,
             max_retries=max_retries,

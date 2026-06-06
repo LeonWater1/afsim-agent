@@ -14,11 +14,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from llm_client_v1 import LLMClient, strip_code_fences
-from static_checker_v1 import VALID_WSFS, analyze_script_text
+from .llm_client import LLMClient, strip_code_fences
+from .reference_rules import build_compact_prompt, postprocess_script
+from .static_checker import VALID_WSFS, analyze_script_text
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 SUPPORTED_OUTPUT_BLOCKS = {"event_pipe", "event_output", "csv_event_output"}
 ABSTRACT_OUTPUT_TOKENS = {"mission_log"}
 
@@ -155,13 +156,17 @@ def load_task_reference_script(task: dict[str, Any]) -> str:
     if not source_hint:
         return ""
 
-    reference_path = ROOT / source_hint
-    if not reference_path.exists():
-        return ""
-
-    text = reference_path.read_text(encoding="utf-8-sig")
-    lines = text.splitlines()
-    return "\n".join(lines[:60]).strip()
+    # Try benchmark_v2 path first, then project root (benchmark_v1 compat)
+    candidates = [
+        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / source_hint,
+    ]
+    for reference_path in candidates:
+        if reference_path.exists():
+            text = reference_path.read_text(encoding="utf-8-sig")
+            lines = text.splitlines()
+            return "\n".join(lines[:120]).strip()
+    return ""
 
 
 def build_script_examples() -> str:
@@ -350,6 +355,7 @@ CRITICAL — NEVER OUTPUT AN EMPTY SCRIPT:
         f"Task ID: {task['id']}\n"
         f"Natural-language request:\n{task['input']}\n\n"
         f"Task metadata:\n{json.dumps(task_meta, ensure_ascii=False, indent=2)}\n\n"
+        f"{build_compact_prompt()}\n\n"
         f"{build_syntax_guardrails()}\n\n"
         f"Compact correct script examples:\n{build_script_examples()}\n\n"
         f"Verified task-family reference script:\n{reference_script or '(none)'}\n\n"
@@ -392,7 +398,7 @@ def generate_script_with_llm(
             temperature=0.0,
             max_tokens=12288,
         )
-        script_text = strip_code_fences(response.content).strip() + "\n"
+        script_text = postprocess_script(strip_code_fences(response.content).strip() + "\n")
         static_analysis = analyze_script_text(script_text, script_label=task["id"])
         attempts.append(
             {

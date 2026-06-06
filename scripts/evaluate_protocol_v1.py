@@ -12,7 +12,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from static_checker_v1 import check_script
+from core.static_checker import check_script
 
 
 ROOT = Path(__file__).resolve().parent.parent

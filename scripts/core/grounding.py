@@ -11,22 +11,23 @@ from __future__ import annotations
 
 import argparse
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from afsim_context_rules_v1 import derive_grounding_constraints
+from .context_rules import derive_grounding_constraints
 
 
-ROOT = Path(__file__).resolve().parent.parent
-MAPPING_V2_PATH = ROOT / "docs" / "machine" / "entity_mapping_v2.json"
-MAPPING_V1_PATH = ROOT / "docs" / "machine" / "entity_mapping_v1.json"
-IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
+ROOT = Path(__file__).resolve().parent.parent.parent
+MAPPING_PATH = ROOT / "docs" / "machine" / "entity_mapping_v2.json"
+_IR_EXAMPLE_PATHS = [
+    ROOT / "docs" / "machine" / "ir_examples_v1.jsonl",
+    ROOT / "docs" / "machine" / "ir_examples_v2.jsonl",
+]
 
 
 def load_mapping() -> dict[str, Any]:
-    if MAPPING_V2_PATH.exists():
-        return json.loads(MAPPING_V2_PATH.read_text(encoding="utf-8-sig"))
-    return json.loads(MAPPING_V1_PATH.read_text(encoding="utf-8-sig"))
+    return json.loads(MAPPING_PATH.read_text(encoding="utf-8-sig"))
 
 
 def normalize_label(text: str) -> str:
@@ -152,38 +153,42 @@ def resolve_component(component_family: str, label: str = "", type_hint: str = "
 
 
 def collect_ir_coverage() -> dict[str, Any]:
-    """Collect coverage stats across IR examples, with match_level breakdown."""
-    if not IR_EXAMPLES_PATH.exists():
-        return {"available": False}
-
+    """Collect coverage stats across all IR example files, with match_level breakdown."""
     platform_hints: set[str] = set()
     task_hints: set[str] = set()
     component_hints: dict[str, set[str]] = {}
     skipped_lines: list[dict[str, Any]] = []
+    sources_scanned = 0
 
-    for line_number, line in enumerate(IR_EXAMPLES_PATH.read_text(encoding="utf-8-sig").splitlines(), 1):
-        if not line.strip():
-            continue
-        try:
-            row = json.loads(line)
-        except json.JSONDecodeError as exc:
-            skipped_lines.append({"line": line_number, "error": f"{exc.msg} at column {exc.colno}"})
-            continue
-        ir = row.get("ir", {})
-        for entity in ir.get("entities", []):
-            hint = entity.get("platform_type_hint") or ""
-            if hint:
-                platform_hints.add(hint)
-        for task in ir.get("tasks", []):
-            hint = task.get("type") or ""
-            if hint:
-                task_hints.add(hint)
-        for family_name, entries in ir.get("components", {}).items():
-            family = normalize_component_family(family_name)
-            for entry in entries:
-                hint = entry.get("type_hint") or ""
+    example_paths = [p for p in _IR_EXAMPLE_PATHS if p.exists()]
+    if not example_paths:
+        return {"available": False}
+
+    for path in example_paths:
+        for line_number, line in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                skipped_lines.append({"source": str(path), "line": line_number, "error": f"{exc.msg} at column {exc.colno}"})
+                continue
+            sources_scanned += 1
+            ir = row.get("ir", {})
+            for entity in ir.get("entities", []):
+                hint = entity.get("platform_type_hint") or ""
                 if hint:
-                    component_hints.setdefault(family, set()).add(hint)
+                    platform_hints.add(hint)
+            for task in ir.get("tasks", []):
+                hint = task.get("type") or ""
+                if hint:
+                    task_hints.add(hint)
+            for family_name, entries in ir.get("components", {}).items():
+                family = normalize_component_family(family_name)
+                for entry in entries:
+                    hint = entry.get("type_hint") or ""
+                    if hint:
+                        component_hints.setdefault(family, set()).add(hint)
 
     # Resolve with match_level breakdown
     def _level_stats(hints, resolver, *args):
@@ -207,6 +212,8 @@ def collect_ir_coverage() -> dict[str, Any]:
 
     return {
         "available": True,
+        "sources_scanned": sources_scanned,
+        "ir_files_checked": [p.name for p in example_paths],
         "platform_hints_total": len(platform_hints),
         "task_hints_total": len(task_hints),
         "component_hints_total": sum(len(h) for h in component_hints.values()),
@@ -226,10 +233,38 @@ def validate_mapping() -> dict[str, Any]:
     if "match_levels" not in mapping:
         errors.append("missing match_levels definition")
 
-    for platform_id, row in mapping["platform_mappings"].items():
+    # Validate platform mappings
+    for platform_id, row in mapping.get("platform_mappings", {}).items():
         conf = row.get("match_confidence", "")
         if conf == "partial" and not row.get("match_confidence_reason"):
             errors.append(f"platform {platform_id} is partial but missing match_confidence_reason")
+        if not row.get("provenance"):
+            errors.append(f"platform {platform_id} missing provenance")
+        if not row.get("grounding_target"):
+            errors.append(f"platform {platform_id} missing grounding_target")
+
+    # Validate task mappings
+    for task_id, row in mapping.get("task_mappings", {}).items():
+        conf = row.get("match_confidence", "")
+        if conf == "partial" and not row.get("match_confidence_reason"):
+            errors.append(f"task {task_id} is partial but missing match_confidence_reason")
+        if not row.get("provenance"):
+            errors.append(f"task {task_id} missing provenance")
+        if not row.get("grounding_target"):
+            errors.append(f"task {task_id} missing grounding_target")
+
+    # Validate component mappings
+    for family, rows in mapping.get("component_mappings", {}).items():
+        for component_id, row in rows.items():
+            conf = row.get("match_confidence", "")
+            if conf == "partial" and not row.get("match_confidence_reason"):
+                errors.append(f"component {family}/{component_id} is partial but missing match_confidence_reason")
+            if not row.get("provenance"):
+                errors.append(f"component {family}/{component_id} missing provenance")
+            if not row.get("host_block"):
+                errors.append(f"component {family}/{component_id} missing host_block")
+            if not row.get("grounding_target"):
+                errors.append(f"component {family}/{component_id} missing grounding_target")
 
     coverage = collect_ir_coverage()
     total_unresolved = 0
@@ -247,6 +282,81 @@ def validate_mapping() -> dict[str, Any]:
         "unresolved_total": total_unresolved,
         "match_levels_supported": list(mapping.get("match_levels", {}).keys()),
     }
+
+
+def build_grounded_ir(ir: dict) -> dict:
+    """Resolve every side/entity/component/task against the v2 mapping."""
+    grounded = {
+        "version": "grounded_ir_v2",
+        "schema_version": ir.get("schema_version"),
+        "scenario": deepcopy(ir.get("scenario", {})),
+        "sides": [],
+        "locations": deepcopy(ir.get("locations", [])),
+        "routes": deepcopy(ir.get("routes", [])),
+        "components": {},
+        "entities": [],
+        "tasks": [],
+        "all_grounded": True,
+        "unresolved_items": [],
+    }
+
+    for side in ir.get("sides", []):
+        side_grounding = resolve_side(side.get("id", ""))
+        row = deepcopy(side)
+        row["grounding"] = side_grounding
+        grounded["sides"].append(row)
+        if not side_grounding["matched"]:
+            grounded["all_grounded"] = False
+            grounded["unresolved_items"].append({"kind": "side", "side_id": side.get("id")})
+
+    for family_name, entries in ir.get("components", {}).items():
+        family = normalize_component_family(family_name)
+        grounded_rows = []
+        for entry in entries:
+            component_grounding = resolve_component(
+                family,
+                label=entry.get("role", ""),
+                type_hint=entry.get("type_hint", ""),
+            )
+            row = deepcopy(entry)
+            row["grounding"] = component_grounding
+            grounded_rows.append(row)
+            if not component_grounding["matched"]:
+                grounded["all_grounded"] = False
+                grounded["unresolved_items"].append(
+                    {"kind": "component", "family": family, "component_id": entry.get("id")}
+                )
+        grounded["components"][family] = grounded_rows
+
+    for entity in ir.get("entities", []):
+        side_grounding = resolve_side(entity.get("side", ""))
+        platform_grounding = resolve_platform(
+            label=entity.get("role", ""),
+            platform_type_hint=entity.get("platform_type_hint", ""),
+        )
+        row = deepcopy(entity)
+        row["side_grounding"] = side_grounding
+        row["grounding"] = platform_grounding
+        grounded["entities"].append(row)
+        if not side_grounding["matched"]:
+            grounded["all_grounded"] = False
+            grounded["unresolved_items"].append(
+                {"kind": "entity_side", "entity_id": entity.get("id"), "side": entity.get("side")}
+            )
+        if not platform_grounding["matched"]:
+            grounded["all_grounded"] = False
+            grounded["unresolved_items"].append({"kind": "entity", "entity_id": entity.get("id")})
+
+    for task in ir.get("tasks", []):
+        task_grounding = resolve_task(task.get("type", ""))
+        row = deepcopy(task)
+        row["grounding"] = task_grounding
+        grounded["tasks"].append(row)
+        if not task_grounding["matched"]:
+            grounded["all_grounded"] = False
+            grounded["unresolved_items"].append({"kind": "task", "task_id": task.get("id")})
+
+    return grounded
 
 
 def main() -> None:

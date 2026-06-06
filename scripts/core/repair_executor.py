@@ -10,14 +10,14 @@ import json
 from pathlib import Path
 from typing import Any
 
-from execution_repair_planner_v1 import build_execution_repair_plan
-from llm_client_v1 import LLMClient, extract_json_object, strip_code_fences
-from llm_script_generator_v1 import build_syntax_guardrails
-from self_repair_planner_v1 import build_repair_plan
-from static_checker_v1 import BLOCK_STARTS, END_TO_START, NESTED_ONLY_KEYWORDS, VALID_WSFS, analyze_script_text, build_block, is_block_start
+from .repair_planner import build_execution_repair_plan
+from .llm_client import LLMClient, extract_json_object, strip_code_fences
+from .script_generator import build_syntax_guardrails
+from .reference_rules import build_compact_prompt, postprocess_script
+from .static_checker import BLOCK_STARTS, END_TO_START, NESTED_ONLY_KEYWORDS, VALID_WSFS, analyze_script_text, build_block, is_block_start
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 BLOCK_LAYER = {
     "script_interface": "scenario_scaffold",
@@ -103,10 +103,18 @@ def _load_task_reference_script(task: dict[str, Any]) -> str:
     if not source_hint:
         return ""
 
-    reference_path = ROOT / source_hint
-    if not reference_path.exists():
-        return ""
-    return "\n".join(reference_path.read_text(encoding="utf-8-sig").splitlines()[:60]).strip()
+    candidates = [
+        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / source_hint,
+    ]
+    for reference_path in candidates:
+        if reference_path.exists():
+            lines = reference_path.read_text(encoding="utf-8-sig").splitlines()
+            # Strip external references — same filter as hierarchical_generation_executor_v1
+            lines = [l for l in lines if not l.strip().startswith(("include_once ", "include_file ", "include "))]
+            lines = [l for l in lines if not l.strip().startswith(("define_path_variable ", "file_path ", "log_file "))]
+            return "\n".join(lines[:120]).strip()
+    return ""
 
 
 def _verified_wsf_lines() -> str:
@@ -459,26 +467,44 @@ def _repair_messages(
     grounded_ir: dict[str, Any],
     generation_plan: dict[str, Any],
     repair_context: dict[str, Any],
+    mission_diagnostics: dict[str, Any] | None = None,
+    target_layers: list[str] | None = None,
 ) -> list[dict[str, str]]:
-    if mode == "static_repair":
-        focus = "Repair the script so it passes the static checker while preserving the intended scenario."
-    else:
-        focus = "Repair the script based on mission execution feedback and preserve the intended scenario."
+    focus = "Repair the script based on mission execution feedback and preserve the intended scenario."
+    if target_layers:
+        focus += " ONLY modify blocks belonging to these layers: " + ", ".join(target_layers) + ". Leave all other blocks exactly as-is."
 
     system_prompt = """You are the repair module of an AFSIM scenario generation agent.
 
 Return exactly one corrected full AFSIM script as plain text.
 
-Rules:
-- No markdown fences and no explanation.
-- Keep end_xxx tags balanced.
-- Preserve all unaffected scenario structure when possible.
-- Prefer local edits that directly address the listed findings.
-- Do not invent unsupported WSF_* identifiers.
-- Do not emit standalone mission_log or output commands.
-- Reuse valid block patterns from the verified task-family reference script when available.
-- Do not emit include_once, file_path, define_path_variable, or external file dependencies.
-- If runtime says `Could not find weapon WSF_*`, replace that direct weapon type usage with a valid self-contained explicit weapon definition or remove the unsupported weapon block in the minimal executable approximation.
+CRITICAL — NEVER introduce these (they cause FATAL parse errors):
+- NEVER use detect_event, on_message, end_on_message, end_state, end_execute, execute, mission_log, message_type
+- NEVER use include_once, include_file, include, file_path, log_file, define_path_variable
+- NEVER place receiver or transmitter at top level — they MUST be inside sensor blocks
+- NEVER place route at top level — route MUST be inside platform blocks
+- NEVER place on_update or on_initialize at global scope — they MUST be inside processor blocks
+- NEVER use C++ syntax: cout, <<, endl, fmod(), ternary (?:), C-style casts — use print() instead
+- NEVER use scan_mode with string values — AFSIM radar sensors don't use scan_mode this way
+- NEVER use navigation/end_navigation inside route — just list position waypoints
+- NEVER invent WSF_ types — only use types from the verified list below
+- NEVER use WSF_WATER_MOVER, WSF_GENERIC_SENSOR, WSF_PROCESSOR, WSF_COMM (without qualifier)
+- NEVER nest script/end_script inside on_initialize/on_update — write code directly
+- NEVER place event_output or event_pipe inside platform or platform_type blocks
+- end_time MUST be the LAST line at top level
+- end_platform_type must close a platform_type block — do NOT emit end_platform_type without matching platform_type
+- ALL numeric parameters REQUIRE units (m/sec, ft, nm, sec, deg, g, kW, MHz)
+- transmitter MUST contain BOTH power X kW AND frequency X MHz
+- minimum_speed must be > 0 — never use minimum_speed 0
+
+Repair rules:
+- Keep end_xxx tags balanced — every open block must have matching close
+- Preserve all unaffected scenario structure when possible
+- Prefer local edits that directly address the listed findings
+- If runtime says 'Could not find weapon/mover/sensor WSF_*', replace with a valid WSF type from the verified list
+- Reuse valid block patterns from the verified task-family reference script when available
+- Do NOT emit standalone mission_log or output commands
+- Do NOT introduce new blocks that don't exist in the original script unless required to fix a specific error
 """
     verified_wsfs = _verified_wsf_lines()
     output_rules = _output_repair_rules(ir)
@@ -489,11 +515,32 @@ Rules:
     runtime_hints = _runtime_repair_hints(
         json.dumps(repair_context, ensure_ascii=False) if isinstance(repair_context, dict) else str(repair_context)
     )
+    diag_block = ""
+    if mission_diagnostics:
+        lines = [
+            "Mission Diagnostics (structured):",
+            "  executable: " + str(mission_diagnostics.get("executable")),
+            "  parser_passed: " + str(mission_diagnostics.get("parser_passed")),
+            "  init_passed: " + str(mission_diagnostics.get("init_passed")),
+            "  phases: " + str(mission_diagnostics.get("phases_reached")),
+            "  error_categories: " + str(mission_diagnostics.get("error_categories")),
+            "  errors:",
+        ]
+        for e in mission_diagnostics.get("errors", []):
+            target = e.get("target", "")
+            line_no = e.get("line", "")
+            raw = e.get("raw", "")[:120]
+            lines.append("    - [" + e.get("category", "") + "] target=" + str(target) + " line=" + str(line_no) + " raw=" + raw)
+        lines.append("  repair_hints:")
+        for h in mission_diagnostics.get("repair_hints", []):
+            lines.append("    - " + h)
+        diag_block = "\n".join(lines)
     user_prompt = (
         f"Mode: {mode}\n"
         f"Task ID: {task['id']}\n"
         f"Natural-language request:\n{task['input']}\n\n"
         f"Task metadata:\n{json.dumps(task_meta, ensure_ascii=False, indent=2)}\n\n"
+        f"{build_compact_prompt()}\n\n"
         f"Common syntax guardrails:\n{build_syntax_guardrails()}\n\n"
         f"Verified task-family reference script:\n{reference_script or '(none)'}\n\n"
         f"IR:\n{json.dumps(ir, ensure_ascii=False, indent=2)}\n\n"
@@ -503,6 +550,7 @@ Rules:
         f"Output Rules:\n{json.dumps(output_rules, ensure_ascii=False, indent=2)}\n\n"
         f"Verified WSF Types:\n{verified_wsfs}\n\n"
         f"Runtime-specific repair hints:\n{json.dumps(runtime_hints, ensure_ascii=False, indent=2)}\n\n"
+        f"{diag_block}\n"
         f"{focus}\n\n"
         f"Current script:\n{script_text}\n"
     )
@@ -587,7 +635,7 @@ def llm_static_repair(
             temperature=0.0,
             max_tokens=12288,
         )
-        repaired_text = strip_code_fences(response.content).strip() + "\n"
+        repaired_text = postprocess_script(strip_code_fences(response.content).strip() + "\n")
         return {
             "version": "llm_repair_executor_v1",
             "mode": "static_repair_full_script",
@@ -622,6 +670,8 @@ def llm_execution_repair(
     return_code: int | None,
     log_text: str,
     client: LLMClient,
+    mission_diagnostics: dict[str, Any] | None = None,
+    target_layers: list[str] | None = None,
 ) -> dict[str, Any]:
     static_analysis = analyze_script_text(script_text, script_label=f"{task['id']}_execution_repair")
     execution_plan = build_execution_repair_plan(
@@ -632,15 +682,19 @@ def llm_execution_repair(
         static_analysis,
     )
     response = client.chat(
-        _repair_messages("execution_repair", task, script_text, ir, grounded_ir, generation_plan, execution_plan),
+        _repair_messages("execution_repair", task, script_text, ir, grounded_ir, generation_plan, execution_plan,
+                         mission_diagnostics=mission_diagnostics,
+                         target_layers=target_layers),
         temperature=0.0,
         max_tokens=12288,
     )
-    repaired_text = strip_code_fences(response.content).strip() + "\n"
+    repaired_text = postprocess_script(strip_code_fences(response.content).strip() + "\n")
     return {
         "version": "llm_repair_executor_v1",
         "mode": "execution_repair",
         "execution_plan": execution_plan,
+        "mission_diagnostics": mission_diagnostics,
+        "target_layers": target_layers,
         "repaired_text": repaired_text,
         "static_analysis": analyze_script_text(repaired_text, script_label=f"{task['id']}_execution_repair"),
     }
@@ -648,7 +702,7 @@ def llm_execution_repair(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run LLM-guided repair on an AFSIM script.")
-    parser.add_argument("--mode", choices=["static_repair", "execution_repair"], required=True)
+    parser.add_argument("--mode", choices=["execution_repair"], required=True)
     parser.add_argument("--task-json", required=True)
     parser.add_argument("--script", required=True)
     parser.add_argument("--ir-json", required=True)
@@ -669,10 +723,7 @@ def main() -> None:
     log_text = Path(args.log_path).read_text(encoding="utf-8-sig") if args.log_path else ""
 
     client = LLMClient.from_env(model=args.model)
-    if args.mode == "static_repair":
-        result = llm_static_repair(task, script_text, ir, grounded_ir, generation_plan, client)
-    else:
-        result = llm_execution_repair(
+    result = llm_execution_repair(
             task,
             script_text,
             ir,

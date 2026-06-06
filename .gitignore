@@ -13,3 +13,19 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Experiment output directories
+afsim_agent_v2/
+afsim_agent_v2_bv1_fair/
+afsim_agent_v2_bv2/
+baseline_direct_bv2/
+baseline_rag_bv2/
+baseline_direct_bv1_fair/
+baseline_rag_bv1_fair/
+
+# Fair evaluation output
+afsim_agent_v2_bv1_fair_20260606/
+
+# Claude
+.claude/
+

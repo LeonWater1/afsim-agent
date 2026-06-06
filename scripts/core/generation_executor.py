@@ -27,50 +27,88 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from hierarchical_generation_planner_v1 import build_generation_plan
-from llm_client_v1 import LLMClient, strip_code_fences
-from static_checker_v1 import VALID_WSFS
+from .reference_rules import build_compact_prompt, build_forbidden_regex, normalise_units, postprocess_script
+from .generation_planner import build_generation_plan
+from .llm_client import LLMClient, strip_code_fences
+from .static_checker import VALID_WSFS
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 SORTED_WSFS = sorted(VALID_WSFS)
 WSF_BLOCK = "\n".join(
     " ".join(SORTED_WSFS[i : i + 8]) for i in range(0, len(SORTED_WSFS), 8)
 )
 
-RULES = f"""AFSIM 2.9.0 hard rules:
-- Return ONLY AFSIM script text. No markdown, no explanation.
-- Use ONLY verified commands and verified WSF types.
-- ALL numbers must include units where AFSIM requires them.
-- Coordinates use n/s/e/w suffix, for example: position 30.67n 104.07e
-- Altitude format: altitude 10000 ft msl  or  altitude 500 m agl
-- side is set inside platform / platform_type context when supported. Never emit top-level side declarations or end_side.
-- Match every block with the correct end_* tag.
-- Do not invent DSL constructs outside the official command set.
+RULES = build_compact_prompt()
 
-Mission-proven forbidden constructs:
-- scenario / end_scenario
-- top-level side declarations
-- network ... end_network
-- comm_network / end_comm_network
-- task_group / end_task_group
-- task_type / assigned_to / parameter message_flow
-- add transceiver / add track_manager
-- group report_sharing_group ... unless the reference script explicitly shows the full valid pattern
-- named event_pipe or named event_output blocks
+# Concrete AFSIM syntax examples — injected into generation prompts to guide LLM.
+# These demonstrate correct AFSIM 2.9.0 syntax for the most common patterns.
+_AFSIM_SYNTAX_EXAMPLES = """
+CONCRETE AFSIM 2.9.0 SYNTAX EXAMPLES (follow these EXACT patterns):
 
-Preferred command shapes:
-- platform_type NAME WSF_PLATFORM
-- platform NAME TYPE
-- comm NAME WSF_COMM_TRANSCEIVER ... end_comm
-- processor NAME TYPE ... end_processor
-- event_pipe ... end_event_pipe
-- event_output ... end_event_output
+Example 1 — platform_type with mover:
+  platform_type PT_FIGHTER WSF_PLATFORM
+     mover WSF_AIR_MOVER
+        maximum_speed 500 m/sec
+        minimum_speed 50 m/sec
+        default_radial_acceleration 5 g
+     end_mover
+  end_platform_type
 
-Verified WSF types:
-{WSF_BLOCK}
+Example 2 — platform_type with sensor (radar):
+  platform_type PT_RADAR WSF_PLATFORM
+     mover WSF_GROUND_MOVER
+        maximum_speed 1 m/sec
+     end_mover
+     sensor radar WSF_RADAR_SENSOR
+        frame_time 1 sec
+        maximum_range 200 nm
+        transmitter
+           power 100 kW
+           frequency 3000 MHz
+        end_transmitter
+        receiver
+           frequency 3000 MHz
+        end_receiver
+     end_sensor
+  end_platform_type
+
+Example 3 — platform instance with route:
+  platform fighter_1 PT_FIGHTER
+     side blue
+     position 30.5n 120.0e altitude 10000 ft msl
+     route
+        position 30.5n 120.0e altitude 10000 ft msl speed 200 m/sec
+        position 31.0n 121.0e altitude 10000 ft msl speed 200 m/sec
+     end_route
+  end_platform
+
+Example 4 — platform instance (static):
+  platform radar_site PT_RADAR
+     side blue
+     position 35.0n 118.0e altitude 0 ft msl
+  end_platform
+
+Example 5 — event output:
+  event_pipe
+     file output/scenario.aer
+  end_event_pipe
+
+CRITICAL SYNTAX RULES:
+- platform_type takes EXACTLY: platform_type <NAME> WSF_PLATFORM (or WSF_BRAWLER_PLATFORM)
+- mover takes EXACTLY: mover <WSF_TYPE>  (ONE argument — the WSF type)
+- sensor/weapon/processor take: <block> <NAME> <WSF_TYPE>
+- platform instance takes: platform <NAME> <TYPE_NAME>
+- route is ONLY inside platform — NEVER at top level
+- receiver/transmitter are ONLY inside sensor
+- end_time is ALWAYS the LAST line at top level
+- ALL numeric values MUST have units
 """
+
+
+def _syntax_examples() -> str:
+    return _AFSIM_SYNTAX_EXAMPLES
 
 
 def _safe_name(text: str, prefix: str) -> str:
@@ -112,11 +150,22 @@ def _load_reference_script(task_context: dict[str, Any] | None) -> str:
     source_hint = task_context.get("source_hint", "")
     if not source_hint:
         return ""
-    reference_path = ROOT / source_hint
-    if not reference_path.exists():
-        return ""
-    lines = reference_path.read_text(encoding="utf-8-sig").splitlines()
-    return "\n".join(lines[:120]).strip()
+    candidates = [
+        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / source_hint,
+    ]
+    for reference_path in candidates:
+        if reference_path.exists():
+            lines = reference_path.read_text(encoding="utf-8-sig").splitlines()
+            # Strip include / include_once / include_file lines — the generated
+            # script must be self-contained; reference includes cause LLM to
+            # hallucinate non-existent include paths.
+            lines = [l for l in lines if not l.strip().startswith(("include_once ", "include_file ", "include "))]
+            # Also strip define_path_variable / file_path / log_file — they
+            # reference external paths that don't exist in the task directory.
+            lines = [l for l in lines if not l.strip().startswith(("define_path_variable ", "file_path ", "log_file "))]
+            return "\n".join(lines[:120]).strip()
+    return ""
 
 
 def _reference_section(task_context: dict[str, Any] | None) -> str:
@@ -155,7 +204,7 @@ Scenario:
 
 Generate ONLY:
 - an optional comment header
-- optional include_once / file_path / log_file setup only if strongly justified by the reference script
+- NEVER include_once, include_file, include, file_path, log_file, or define_path_variable (script must be self-contained)
 - no scenario block
 - no top-level side declarations
 - no location blocks
@@ -220,11 +269,7 @@ Platform type manifest:
 Generate ONLY:
 - platform_type declarations using the EXACT platform_type_name values above
 - inline mover / sensor / weapon / processor / comm declarations inside each platform_type
-- standalone shared blocks when required by constraints:
-  - antenna_pattern
-  - chaff_parcel
-  - top-level comm / processor / group / observer blocks when the reference script proves they are valid
-  - ballistic / shared support blocks
+- standalone shared blocks when required by constraints
 
 Do NOT generate:
 - platform instances
@@ -233,7 +278,7 @@ Do NOT generate:
 - event_pipe / event_output
 - end_time
 
-Use the reference script's valid command shapes instead of inventing new DSL.
+{_syntax_examples()}
 
 {reference}
 {RULES}
@@ -263,13 +308,13 @@ Resolved initial location:
 {json.dumps(location or {}, ensure_ascii=False, indent=2)}
 
 Rules:
-- Emit EXACTLY one platform block for this entity.
-- Use the exact instance and type names above.
+- Emit EXACTLY one platform block for this entity: platform <NAME> <TYPE>
 - Set side and initial position.
-- If route_ref is present ({route_ref or "none"}), you may reference it inside the platform block, but DO NOT define the route block here.
-- Do not put `platform_type` as a command inside a platform block. The syntax is `platform NAME TYPE`.
-- Do not emit any platform_type declaration here.
+- If route_ref is present ({route_ref or "none"}), include a route block INSIDE the platform.
+- Do not put platform_type as a command inside a platform block.
 - Do not emit event_pipe / event_output / end_time.
+
+{_syntax_examples()}
 
 {reference}
 {RULES}
@@ -301,8 +346,8 @@ def p4_task(
         if route_id and route_id in route_index:
             task_routes.append(route_index[route_id])
 
-    logic = plan["layers"]["mission_layer"].get("logic", {})
-    evaluation = plan["layers"]["scenario_assembly"].get("evaluation", {})
+    logic = plan["layers"].get("logic_layer", {})
+    evaluation = plan["layers"].get("evaluation_layer", {})
     reference = _reference_section(task_context)
     return f"""PHASE 4: Generate ONLY task-specific overlays for one task.
 
@@ -356,6 +401,7 @@ def p5_assembly(
 ) -> str:
     scaffold = plan["layers"]["scenario_scaffold"]
     assembly = plan["layers"]["scenario_assembly"]
+    eval_layer = plan["layers"].get("evaluation_layer", {})
     reference = _reference_section(task_context)
     return f"""PHASE 5: Merge all generated chunks into ONE complete AFSIM script.
 
@@ -366,10 +412,10 @@ Requested outputs:
 {json.dumps(assembly.get("outputs", []), ensure_ascii=False)}
 
 Expected events:
-{json.dumps(assembly.get("expected_events", []), ensure_ascii=False, indent=2)}
+{json.dumps(eval_layer.get("expected_events", []), ensure_ascii=False, indent=2)}
 
 Evaluation:
-{json.dumps(assembly.get("evaluation", {}), ensure_ascii=False, indent=2)}
+{json.dumps(eval_layer.get("evaluation", {}), ensure_ascii=False, indent=2)}
 
 Duration / end_time:
 {json.dumps(scaffold.get("duration", {}), ensure_ascii=False)}
@@ -391,17 +437,16 @@ Chunk D - task overlays:
 {json.dumps(task_texts, ensure_ascii=False, indent=2)}
 
 Instructions:
-1. Merge all chunks into one complete script.
+1. Merge all chunks into one complete script. Place platform_type declarations FIRST, then platform instances, then event_pipe/event_output, then end_time.
 2. Preserve the exact platform_type names and platform instance names from the manifest.
-3. Place route blocks and task-specific overlays in the correct final structure.
-4. Do minimal reference repair only:
-   - connect references that are already implied by the manifest
-   - do not invent new platforms, components, or tasks
-5. Add top-level event_pipe / event_output only if requested by outputs.
-6. Emit exactly one end_time line as the LAST line of the script.
-7. Follow the reference script's proven top-level grammar and command shapes.
+3. Each platform instance must have: side, position (with coordinates+units), and optionally a route.
+4. Do NOT invent new platforms, components, or tasks.
+5. The final script MUST NOT contain: mission, task, writeln, extends, sensitivity, scan_mode, engage_iff_permissions, on_message, end_state, shape, or any C++ syntax.
+6. sensor references inside platform use inline form: sensor NAME on end_sensor (ONE line).
+7. Emit exactly one end_time line as the LAST line of the script at top level (depth 0).
+8. CRITICAL: Return a complete AFSIM script. No markdown fences.
 
-Return ONLY the final AFSIM script.
+{_syntax_examples()}
 
 {reference}
 {RULES}
@@ -460,13 +505,97 @@ def _run_parallel_chunks(
         }
 
     results: list[dict[str, Any]] = []
-    max_workers = min(4, len(work_items))
+    max_workers = min(25, len(work_items))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(_worker, item) for item in work_items]
         for future in as_completed(futures):
             results.append(future.result())
     results.sort(key=lambda item: item["item_id"])
     return results
+
+
+def _postprocess_assembly(script_text: str, manifest: dict) -> str:
+    """Deterministic post-processing: dedup merged-chunk declarations.
+
+    Runs AFTER Phase 5 merge, BEFORE static checking.  Does NOT call any LLM —
+    purely rule-based dedup that is cheap and safe to run every time.
+
+    Handles the common E010 pattern where Phase 3 (platform chunks) and
+    Phase 4 (task chunks) both emit the same template declaration during
+    parallel generation, and Phase 5 naively concatenates them.
+
+    Reference repair (E003) is NOT handled here — that requires LLM-level
+    understanding and is left to the repair pipeline.
+    """
+    import re as _re
+
+    lines = script_text.splitlines()
+    seen_declarations: dict[str, int] = {}  # key -> first line index
+    deduped: list[str] = []
+    skip_until_next_block = False
+    skip_depth = 0
+    depth = 0
+
+    # Block-start keywords that declare a named entity (can be duplicated
+    # across chunks during merge).
+    _DECLARE_KEYWORDS = {
+        "platform_type", "mover", "sensor", "weapon", "processor", "comm",
+        "antenna_pattern", "transmitter", "receiver", "platform",
+        "constant_pattern", "event_pipe", "event_output",
+    }
+    _NESTABLE = {"platform", "scenario", "side", "route", "script",
+                 "script_interface", "processor", "behavior_tree",
+                 "advanced_behavior_tree", "advanced_behavior"}
+
+    for line_no, raw in enumerate(lines):
+        line = raw.strip()
+        parts = line.split()
+        head = parts[0] if parts else ""
+
+        if skip_until_next_block:
+            if head in _NESTABLE or head in _DECLARE_KEYWORDS:
+                skip_depth += 1
+            elif head.startswith("end_"):
+                skip_depth -= 1
+                if skip_depth <= 0:
+                    skip_until_next_block = False
+                    skip_depth = 0
+            continue
+
+        # Dedup BEFORE depth tracking — otherwise platform/processor/behavior_tree
+        # (which are in both _DECLARE_KEYWORDS and _NESTABLE) would never be checked
+        # because depth was just incremented.
+        if depth == 0 and head in _DECLARE_KEYWORDS and len(parts) >= 2:
+            name = parts[1]
+            key = f"{head}:{name}"
+            if key in seen_declarations:
+                skip_until_next_block = True
+                skip_depth = 1
+                continue
+            seen_declarations[key] = line_no
+
+        if head in _NESTABLE:
+            depth += 1
+        elif head.startswith("end_"):
+            depth = max(0, depth - 1)
+
+        deduped.append(raw)
+
+    # Relocate misplaced end_time to the last line at depth 0 (fixes E002).
+    end_time_lines = []
+    cleaned = []
+    for raw in deduped:
+        stripped = raw.strip()
+        if stripped.startswith("end_time"):
+            end_time_lines.append(stripped)
+        else:
+            cleaned.append(raw)
+    if end_time_lines:
+        # Keep one end_time with the longest duration (heuristic), drop others
+        best = max(end_time_lines, key=len) if end_time_lines else "end_time 120 sec"
+        cleaned.append(best)
+
+    return "\n".join(cleaned)
 
 
 def execute_layered_generation(
@@ -548,7 +677,8 @@ def execute_layered_generation(
     )
 
     final_path = run_dir / "final_script.txt"
-    _write_text(final_path, phase5["text"])
+    final_text = postprocess_script(phase5["text"])
+    _write_text(final_path, final_text)
 
     result = {
         "version": "hierarchical_generation_executor_v1",
@@ -574,7 +704,7 @@ def execute_layered_generation(
 
 
 def run_on_ir_example(example_id: str, client: LLMClient, output_dir: Path | None = None) -> dict[str, Any]:
-    from hierarchical_generation_planner_v1 import load_ir_from_examples
+    from .generation_planner import load_ir_from_examples
 
     ir_source = load_ir_from_examples(example_id)
     plan = build_generation_plan(ir_source)

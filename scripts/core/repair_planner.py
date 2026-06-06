@@ -12,11 +12,11 @@ import json
 import re
 from pathlib import Path
 
-from run_mission import run_mission
-from static_checker_v1 import analyze_script_text
+from .run_mission import run_mission
+from .static_checker import analyze_script_text
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 VALIDATION_CASES = [
     {
@@ -124,6 +124,147 @@ def classify_from_static(static_analysis: dict) -> dict:
     }
     route, action = routes.get(primary, ("manual_review", "inspect the execution failure manually"))
     return {"primary_error": primary, "route": route, "suggested_action": action}
+
+
+def _scan_block_mismatches(script_text: str) -> list[dict]:
+    """Scan script for structural block problems and return synthetic diagnostics."""
+    from .static_checker import BLOCK_STARTS, END_TO_START
+
+    findings = []
+    stack = []
+    lines = script_text.splitlines()
+
+    for line_no, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        if not line or line.startswith("#") or line.startswith("//"):
+            continue
+        parts = line.split()
+        head = parts[0]
+
+        if head in BLOCK_STARTS:
+            stack.append((head, line_no))
+        elif head in END_TO_START:
+            expected_start = END_TO_START[head]
+            if not stack:
+                findings.append({
+                    "error_id": "E002",
+                    "line": line_no,
+                    "message": f"Unexpected {head} — no matching {expected_start} open; possible missing block start before this line",
+                })
+                continue
+            actual, start_ln = stack.pop()
+            if actual != expected_start:
+                findings.append({
+                    "error_id": "E002",
+                    "line": line_no,
+                    "message": f"{head} closes {actual} (L{start_ln}) but expected {BLOCK_STARTS.get(actual, 'end_' + actual)}; cross-close block mismatch",
+                })
+                # Try to recover: push back expected close context
+                stack.append((expected_start, start_ln))
+
+        # Top-level violations
+        if head == "route" and not stack:
+            findings.append({
+                "error_id": "E007",
+                "line": line_no,
+                "message": "route block at top level — must be nested inside a platform block",
+            })
+        if head == "end_time" and stack:
+            findings.append({
+                "error_id": "E007",
+                "line": line_no,
+                "message": f"end_time inside {stack[-1][0]} block (L{stack[-1][1]}) — must be at top level",
+            })
+
+    # Unclosed blocks
+    for block_kind, start_ln in reversed(stack):
+        end_tag = BLOCK_STARTS.get(block_kind, f"end_{block_kind}")
+        findings.append({
+            "error_id": "E002",
+            "line": start_ln,
+            "message": f"{block_kind} opened at line {start_ln} never closed; missing {end_tag}",
+        })
+
+    return findings
+
+
+def _has_actionable_line(log_text: str) -> bool:
+    """Check whether mission.exe errors include line-number information."""
+    # Patterns that indicate a parsable error with location
+    for pattern in [
+        r"line\s+\d+",            # "line 54"
+        r"near column\s+\d+",     # "near column 18"
+        r"', line \d+",           # "'script.txt', line 54"
+        r"at line \d+",
+    ]:
+        if re.search(pattern, log_text, re.IGNORECASE):
+            return True
+    return False
+
+
+def _has_fatal_without_line(log_text: str) -> bool:
+    """Detect fatal errors that lack actionable line numbers."""
+    has_fatal = bool(re.search(r"FATAL:|fatal exception", log_text, re.IGNORECASE))
+    if not has_fatal:
+        return False
+    return not _has_actionable_line(log_text)
+
+
+def _scan_script_for_fatal_causes(script_text: str) -> list[dict]:
+    """Fallback: scan the script text when mission.exe gave a fatal with no line."""
+    findings = []
+
+    # 1. Block stack scan
+    block_findings = _scan_block_mismatches(script_text)
+    findings.extend(block_findings)
+
+    # 2. Quick structural heuristics
+    text = script_text
+    # Missing end_time entirely
+    if "end_time" not in text:
+        findings.append({
+            "error_id": "E006",
+            "line": len(text.splitlines()),
+            "message": "missing end_time — script has no end_time declaration",
+        })
+    # end_time appearing before the last line
+    lines = text.splitlines()
+    last_non_empty = len([l for l in lines if l.strip()])
+    for i, line in enumerate(lines, start=1):
+        if line.strip().startswith("end_time") and i < last_non_empty - 1:
+            findings.append({
+                "error_id": "E007",
+                "line": i,
+                "message": "end_time is not the last statement — content appears after it",
+            })
+            break
+
+    # Deduplicate
+    seen = set()
+    unique = []
+    for f in findings:
+        key = (f["error_id"], f["line"], f["message"][:80])
+        if key not in seen:
+            seen.add(key)
+            unique.append(f)
+    return unique[:15]
+
+
+def build_synthetic_static_from_fatal(script_text: str, log_text: str) -> dict:
+    """When mission.exe gives a fatal without actionable line info,
+    scan the script directly and produce synthetic E002/E007 diagnostics."""
+    findings = _scan_script_for_fatal_causes(script_text)
+    error_ids = sorted({f["error_id"] for f in findings})
+    primary = error_ids[0] if error_ids else ""
+    return {
+        "synthetic": True,
+        "trigger": "fatal_without_actionable_line",
+        "static_pass": not findings,
+        "primary_error": primary,
+        "static_error_ids": error_ids,
+        "findings": findings,
+        "error_count": len(findings),
+    }
 
 
 def extract_error_lines(log_text: str) -> list[str]:
@@ -291,6 +432,31 @@ def build_execution_repair_plan(
     static_analysis: dict,
 ) -> dict:
     execution_analysis = classify_execution(log_text, static_analysis, return_code)
+
+    # Fallback: when mission.exe gives a fatal with no actionable line info,
+    # scan the script directly for structural block problems.
+    synthetic_static = None
+    fatal_without_line = _has_fatal_without_line(log_text) if log_text else False
+    if fatal_without_line:
+        try:
+            script_text = script_path.read_text(encoding="utf-8-sig")
+        except Exception:
+            script_text = ""
+        if script_text.strip():
+            synthetic_static = build_synthetic_static_from_fatal(script_text, log_text)
+            # If the original static analysis shows pass but our synthetic scan
+            # found structural issues, route to self-repair with E002/E007 hint.
+            if not synthetic_static["static_pass"] and static_analysis.get("static_pass", False):
+                execution_analysis["primary_error"] = synthetic_static["primary_error"]
+                if synthetic_static["primary_error"] in ("E002", "E007"):
+                    execution_analysis["route"] = "return_to_self_repair"
+                    execution_analysis["inferred_stage"] = "static_or_generation"
+                    execution_analysis["suggested_action"] = (
+                        "mission.exe fatal without line number — synthetic scan found "
+                        f"{synthetic_static['error_count']} block-structure issue(s); "
+                        "repair block mismatches and rerun static verification before mission.exe"
+                    )
+
     return {
         "version": "execution_repair_spec_v1",
         "input": {
@@ -299,6 +465,8 @@ def build_execution_repair_plan(
             "return_code": return_code,
         },
         "static_analysis": static_analysis,
+        "synthetic_static_scan": synthetic_static,
+        "fatal_detected_without_line": fatal_without_line,
         "execution_analysis": execution_analysis,
         "repair_recommendation": {
             "primary_error": execution_analysis["primary_error"],

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 RULES_PATH = ROOT / "docs" / "machine" / "afsim_context_rules_v1.json"
 
 

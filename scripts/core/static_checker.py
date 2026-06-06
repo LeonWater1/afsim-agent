@@ -14,10 +14,11 @@ from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 
-from afsim_context_rules_v1 import get_command_context_rule, get_wsf_type_rule
+from .context_rules import get_command_context_rule, get_wsf_type_rule
+from .reference_rules import build_forbidden_regex
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 BLOCK_STARTS = {
@@ -52,6 +53,10 @@ BLOCK_STARTS = {
     "chaff_parcel": "end_chaff_parcel",
     "frequency_maximum_rcs_table": "end_frequency_maximum_rcs_table",
     "ejector": "end_ejector",
+    "electronic_warfare": "end_electronic_warfare",
+    "electronic_attack": "end_electronic_attack",
+    "technique": "end_technique",
+    "effect": "end_effect",
 }
 
 END_TO_START = {value: key for key, value in BLOCK_STARTS.items()}
@@ -88,6 +93,17 @@ NESTED_ONLY_KEYWORDS = {
 UNSUPPORTED_STANDALONE_COMMANDS = {
     "mission_log": "mission_log is not a valid standalone AFSIM command; use supported output blocks such as event_pipe or event_output",
     "output": "output is not a valid standalone AFSIM command in scenario scope",
+    "route": "route is not a valid standalone AFSIM command; use route blocks nested under platform",
+    "empty_mass": "empty_mass is only valid inside integrating_space_mover; not a standalone command",
+}
+# Known LLM-hallucinated command names that have verified correct equivalents.
+# Source: mission.exe diagnostics from BV2-* task logs.
+KNOWN_INVALID_ALIASES = {
+    "max_speed": "use maximum_speed instead of max_speed",
+    "max_alt": "use maximum_altitude instead of max_alt",
+    "min_speed": "use minimum_speed instead of min_speed",
+    "turn_radius": "use turn_rate_limit or route waypoints instead of turn_radius",
+    "engagement_range": "use maximum_range or a proximity_limit instead of engagement_range",
 }
 UNSUPPORTED_DIRECTIVES = {
     "beam_pattern": "beam_pattern is not a validated AFSIM command in this project corpus",
@@ -105,6 +121,8 @@ UNSUPPORTED_DIRECTIVES = {
     "end_constant": "end_constant closes an unsupported constant block",
     "end_explicit_weapon": "end_explicit_weapon closes an unsupported explicit_weapon block; use weapon ... end_weapon",
     "end_process": "end_process closes an unsupported process block; use end_processor",
+    "ea_technique": "ea_technique is not a valid block keyword; use electronic_warfare ... WSF_ELECTRONIC_ATTACK with technique sub-blocks (ref: spot_jamming.txt)",
+    "end_ea_technique": "end_ea_technique closes an unsupported ea_technique block",
     "end_radar_sensor": "end_radar_sensor closes an unsupported radar_sensor block; use sensor ... end_sensor",
     "end_task_processor": "end_task_processor closes an unsupported task_processor block; use processor ... end_processor",
     "end_track_processor": "end_track_processor closes an unsupported track_processor block; use processor ... end_processor",
@@ -115,6 +133,11 @@ UNSUPPORTED_DIRECTIVES = {
     "task_processor": "task_processor is not a valid block keyword; use processor ... WSF_TASK_PROCESSOR",
     "track_processor": "track_processor is not a valid block keyword; use processor ... WSF_TRACK_PROCESSOR",
     "track_output_comm": "track_output_comm is not a validated AFSIM command in this project corpus",
+    # Newly observed LLM hallucinations (mission.exe confirmed, BV1-* task logs)
+    "end_on_message": "end_on_message is not a valid AFSIM end tag; on_message is not an AFSIM block",
+    "end_state": "end_state is not a valid AFSIM end tag; state is not a standalone AFSIM block",
+    "engage_iff_permissions": "engage_iff_permissions is not a valid AFSIM command; use engage block within an appropriate processor",
+    "on_message": "on_message is not a valid AFSIM processor handler; use on_update or create a custom event handler",
 }
 AIR_MOVER_UNSUPPORTED_COMMANDS = {"default_climb_rate", "default_descent_rate"}
 
@@ -323,7 +346,7 @@ KNOWN_AFSIM_TOKENS = (
     }
 )
 
-TAXONOMY_PATH = Path(__file__).resolve().parent.parent / "docs" / "machine" / "error_taxonomy_v1.json"
+TAXONOMY_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "machine" / "error_taxonomy_v1.json"
 
 # Verified WSF_ types extracted from AFSIM 2.9.0 demo scripts that pass mission.exe.
 VALID_WSFS = {
@@ -756,16 +779,26 @@ def check_script_language(lines):
         parts = line.split()
         head = parts[0]
 
+        # "script" / "end_script" are not in BLOCK_STARTS; handle explicitly.
+        if head == "script":
+            stack.append(head)
+            in_script_context = True
+            continue
+        if head == "end_script":
+            if stack and stack[-1] == "script":
+                stack.pop()
+            in_script_context = any(b in _SCRIPT_CONTAINER_BLOCKS or b == "script" for b in stack)
+            continue
+
         if head in BLOCK_STARTS:
             stack.append(head)
             if head in _SCRIPT_CONTAINER_BLOCKS:
                 in_script_context = True
-            # Still allow same-line checks for compact script statements after block starts.
         elif head in END_TO_START:
             if stack:
                 closed = stack.pop()
                 if closed in _SCRIPT_CONTAINER_BLOCKS:
-                    in_script_context = any(block in _SCRIPT_CONTAINER_BLOCKS for block in stack)
+                    in_script_context = any(b in _SCRIPT_CONTAINER_BLOCKS or b == "script" for b in stack)
             continue
 
         if "PLATFORM_NAME" in line:
@@ -810,29 +843,1058 @@ _SCRIPT_CONTAINER_BLOCKS = {
 # that are not in the official command index. Source: benchmark_v1/demo_sources/,
 # references/sensor_types_reference.md, project SKILL.md.
 _DEMO_VERIFIED_COMMANDS = {
-    # Sensor commands (radar, ESM, acoustic)
-    "ignore_same_side", "mode_template", "detection_probability",
-    "reports_range_rate", "reports_elevation", "reports_velocity",
-    "reports_signal_to_noise", "reports_side", "scan_mode", "beamwidth", "antenna_height",
-    "beam_tilt", "frequency_band", "pulse_density", "noise_power",
-    "required_pd", "slew_mode", "azimuth_scan_limits", "elevation_scan_limits",
-    "azimuth_slew_limits", "hits_to_establish_track", "hits_to_maintain_track",
-    "minimum_gain", "pulse_repetition_interval", "probability_of_false_alarm",
-    "swerling_case", "track_quality", "purge_interval", "evaluation_interval",
-    "internal_loss", "mode", "freq", "mach",
-    # Fuse / weapon commands
-    "radius_and_pk",
-    # Platform commands
-    "launched_platform_type", "commander", "icon", "enable",
-    "category", "report_to", "network_name", "technique", "effect",
-    "command_chain", "variable", "values", "precondition",
-    "flight_id", "next_state", "reason",
-    # Brawler commands
-    "salvo_interval",
-    # Other verified commands
-    "script_debug_writes", "on_init",
+    "ACQ_SENSOR_NAME", 
+"ArrayIterator", 
+"COMMANDED_HEIGHT_ABOVE_TERRAIN", 
+"Ellipsoid", 
+"FileIO", 
+"MAX_RANGE",
+
+    "PWCS", 
+"SALVO_SIZE", 
+"SENSOR_NAME", 
+"SENSOR_TRACK_MODE", 
+"TIME_TO_LAUNCH", 
+"TRACK_SENSOR_NAME",
+
+    "WEAPON_NAME", 
+"WsfBrawlerProcessor", 
+"WsfChaffWeapon", 
+"WsfComm", 
+"WsfCommandChain", 
+"WsfCovariance",
+
+    "WsfEM_Interaction", 
+"WsfLaunchComputer", 
+"WsfProcessor", 
+"WsfRoute", 
+"WsfSensorInteraction", 
+"WsfStatusMessage",
+
+    "WsfTadilJ11_1C2", 
+"WsfTadilJ11_1C3", 
+"WsfTadilJ11_1C5", 
+"WsfTadilJ11_1I", 
+"WsfTerrain", 
+"WsfTrackDropMessage",
+
+    "WsfTrackId", 
+"WsfWaypoint", 
+"WsfWeaponTask", 
+"aPressure", 
+"aTemp", 
+"acoustic_signature",
+
+    "acoustic_type", 
+"acquire_deltas", 
+"advanced_behavior", 
+"aero_file", 
+"allow_any_comm", 
+"alpha",
+
+    "altitude_error_to_rate_of_climb_gain", 
+"announce", 
+"antenna_height", 
+"antenna_pattern", 
+"antenna_tilt", 
+"aperture_shape",
+
+    "argument_of_periapsis", 
+"asset_perception", 
+"at_end_of_path", 
+"atmosphere_model", 
+"autostart", 
+"aux_data",
+
+    "azimuth_beamwidth", 
+"azimuth_cue_limits", 
+"azimuth_delta", 
+"azimuth_distribution", 
+"azimuth_error_sigma", 
+"azimuth_exponent",
+
+    "azimuth_field_of_view", 
+"azimuth_scan_limits", 
+"azimuth_slew_limits", 
+"background_noise", 
+"bandwidth", 
+"beam",
+
+    "beam_tilt", 
+"beamwidth", 
+"bearing_measurement_sigma", 
+"behavior", 
+"behavior_node", 
+"behavior_tree",
+
+    "beta", 
+"bloom_diameter", 
+"body_g_limit", 
+"body_rates_gain", 
+"broadcast", 
+"bullet_comp_line",
+
+    "bullet_gen_line", 
+"bullet_line", 
+"category", 
+"chaff_parcel", 
+"check_terrain_masking", 
+"check_transmitter_masking",
+
+    "clientquantity", 
+"close_target_detection", 
+"comm", 
+"command_chain", 
+"commander", 
+"commodity",
+
+    "common", 
+"conditional_section", 
+"conditionals", 
+"constant", 
+"constant_height", 
+"consumption_rate",
+
+    "cont2", 
+"cont3", 
+"cont5", 
+"container_name", 
+"correlation_method", 
+"cross_sectional_area",
+
+    "cue_mode", 
+"currentRouteIndex", 
+"currentTarget", 
+"dDensity", 
+"data_reference_range", 
+"deceleration_rate",
+
+    "default_on", 
+"deferred_connection_time", 
+"define_offset", 
+"define_path_variable", 
+"derivative_gain", 
+"detection_sensitivities",
+
+    "detection_threshold", 
+"dis_exchange", 
+"dis_interface", 
+"disk_tilt_filter_time_constant", 
+"drag_coefficient", 
+"draw_cloud_approximations",
+
+    "dynamics", 
+"eccentricity", 
+"effect", 
+"egm96", 
+"ejection_azimuth", 
+"ejection_elevation",
+
+    "ejection_velocity", 
+"ejector", 
+"electronic_attack", 
+"electronic_warfare", 
+"elevation_beamwidth", 
+"elevation_cue_limits",
+
+    "elevation_delta", 
+"elevation_distribution", 
+"elevation_error_sigma", 
+"elevation_exponent", 
+"elevation_field_of_view", 
+"elevation_measurement_sigma",
+
+    "elevation_scan_limits", 
+"elevation_slew_limits", 
+"enable", 
+"enabled", 
+"entity_orientation_threshold", 
+"entity_position_threshold",
+
+    "epoch_date_time", 
+"error_criterion", 
+"evaluation_interval", 
+"event_output", 
+"event_pipe", 
+"execute",
+
+    "exercise", 
+"expansion_time_constant", 
+"expiration_time", 
+"external_link", 
+"extrapolate", 
+"feature_present",
+
+    "fidelity_range", 
+"file_path", 
+"filter", 
+"fired", 
+"flight_path_analysis", 
+"flight_route",
+
+    "force", 
+"frame_time", 
+"freq", 
+"frequency", 
+"frequency_band", 
+"frequency_maximum_rcs_table",
+
+    "fuel", 
+"fused_track_reporting", 
+"fusion_method", 
+"genap_pattern", 
+"gnuplot_file", 
+"go_to",
+
+    "group_join", 
+"heartbeat_multiplier", 
+"heartbeat_timer", 
+"hits_to_establish_track", 
+"hits_to_maintain_track", 
+"hook_to_fuel",
+
+    "horizontal_map", 
+"icon", 
+"ignore", 
+"ignore_domain", 
+"ignore_pdu_time", 
+"ignore_same_side",
+
+    "inclination", 
+"include_once", 
+"independent_variable", 
+"infrared_signature", 
+"initial_distribution_interval", 
+"initial_flight_path_angle",
+
+    "initial_mass_quantity", 
+"initial_mode", 
+"initial_quantity", 
+"initial_speed", 
+"inline_table", 
+"input_threshold",
+
+    "integral_gain", 
+"integration_gain", 
+"integrator", 
+"internal_link", 
+"internal_loss", 
+"interpolation_interval",
+
+    "intersect_mesh", 
+"isInitialized", 
+"is_receiver", 
+"items", 
+"j11", 
+"lat_lon_format",
+
+    "lateral_acceleration_rate_pid", 
+"lateral_acceleration_value_pid", 
+"latitude", 
+"latitude_range", 
+"latitude_step", 
+"launched_platform_type",
+
+    "link16_interface", 
+"load_atmosphere", 
+"load_sensor", 
+"load_target", 
+"local_link", 
+"location",
+
+    "log", 
+"log_created_entities", 
+"log_file", 
+"longitude", 
+"longitude_range", 
+"longitude_step",
+
+    "mLaunchComputer", 
+"max_threat_load", 
+"maximum_altitude", 
+"maximum_attitude_rate", 
+"maximum_body_roll_rate", 
+"maximum_body_turn_rate",
+
+    "maximum_climb_rate", 
+"maximum_ground_speed", 
+"maximum_linear_acceleration", 
+"maximum_mass_quantity", 
+"maximum_mass_rate", 
+"maximum_quantity",
+
+    "maximum_radial_acceleration", 
+"maximum_range", 
+"maximum_rate_of_climb", 
+"maximum_rate_of_descent", 
+"maximum_request_count", 
+"maximum_speed",
+
+    "maximum_total_acceleration", 
+"message_processor", 
+"mind_file", 
+"minimum_altitude", 
+"minimum_gain", 
+"minimum_range",
+
+    "minimum_speed", 
+"minimum_upward_acceleration", 
+"mitigation_class_name", 
+"mode", 
+"mode_template", 
+"model",
+
+    "modifier_category", 
+"mover", 
+"mover_update_timer", 
+"multicast", 
+"multiresolution_mover", 
+"munition_type",
+
+    "network_name", 
+"next_state", 
+"no_debug", 
+"noise_cloud", 
+"noise_figure", 
+"noise_frequency",
+
+    "noise_octaves", 
+"noise_power", 
+"number_dipoles", 
+"number_of_false_targets", 
+"number_of_pulses_integrated", 
+"observer",
+
+    "off", 
+"offset", 
+"on", 
+"on_entry", 
+"on_initialize", 
+"on_initialize2",
+
+    "on_message", 
+"on_track_drop", 
+"on_update", 
+"one_m2_detect_range", 
+"operating_level", 
+"optical_signature",
+
+    "output", 
+"output_dis", 
+"output_rate", 
+"output_wsf", 
+"parcel_type", 
+"peak_gain",
+
+    "phase", 
+"pitch", 
+"platform", 
+"platform_availability", 
+"platform_type", 
+"port",
+
+    "position", 
+"position_hold_capture_radius", 
+"power", 
+"precise_mode", 
+"precondition", 
+"print_route",
+
+    "print_track_in_message", 
+"priority_selector", 
+"probability_of_false_alarm", 
+"process_noise_sigmas_XYZ", 
+"processor", 
+"proportional_gain",
+
+    "proportional_navigation_gain", 
+"protocol_version", 
+"proximity_limit", 
+"pulse_repetition_frequency", 
+"pulse_repetition_interval", 
+"pulse_width",
+
+    "purge_interval", 
+"quantity", 
+"raan", 
+"radar_signature", 
+"random_seed", 
+"range_delta",
+
+    "range_error_sigma", 
+"range_measurement_sigma", 
+"range_product", 
+"range_rate_error_sigma", 
+"raw_track_reporting", 
+"reacquire_deltas",
+
+    "realtime", 
+"receive_only", 
+"receiver", 
+"rectangular_pattern", 
+"report_interval", 
+"report_to",
+
+    "reporting_self", 
+"reports_bearing", 
+"reports_elevation", 
+"reports_frequency", 
+"reports_iff", 
+"reports_location",
+
+    "reports_range", 
+"reports_range_rate", 
+"reports_self", 
+"reports_side", 
+"reports_signal_to_noise", 
+"reports_type",
+
+    "reports_velocity", 
+"required_pd", 
+"revs_per_day", 
+"route", 
+"routeIndex", 
+"run",
+
+    "sample_interval", 
+"scalar", 
+"scan_mode", 
+"script", 
+"script_debug_writes", 
+"script_interface",
+
+    "script_variables", 
+"selector", 
+"semi_major_axis", 
+"send_interval", 
+"sensor", 
+"sensor_modifier",
+
+    "service", 
+"service_interval", 
+"show_calibration_data", 
+"show_state_transitions", 
+"side", 
+"simple_detonations",
+
+    "simple_kill_range", 
+"sine_pattern", 
+"site", 
+"slew_mode", 
+"slot_group", 
+"slots_per_frame",
+
+    "sosm_interface", 
+"spatial_domain", 
+"spectrum_data", 
+"start_date", 
+"start_mode", 
+"start_time",
+
+    "state", 
+"status", 
+"success", 
+"summary_output", 
+"swerling_case", 
+"target_altitude",
+
+    "target_platform_type", 
+"target_speed", 
+"technique", 
+"term", 
+"terminal_velocity", 
+"terrain",
+
+    "thread_count", 
+"threat_time_to_intercept", 
+"threat_update_interval", 
+"threshold", 
+"tiff_file", 
+"time",
+
+    "time_format", 
+"time_out_clock_interval", 
+"tolerance", 
+"track", 
+"trackIndex", 
+"track_manager",
+
+    "track_quality", 
+"tracking_sigma", 
+"transfer_rate", 
+"transmit_only", 
+"transmitter", 
+"true_anomaly",
+
+    "turn_rate_limit", 
+"turning_sigma", 
+"type", 
+"uncorrelated_track_drops", 
+"uniform_pattern", 
+"update_interval",
+
+    "use_bisector_for_bistatic", 
+"use_preset", 
+"variable", 
+"velocity", 
+"velocity_pursuit_gain", 
+"vertical_acceleration_rate_pid",
+
+    "vertical_acceleration_value_pid", 
+"weapon", 
+"weapon_effects", 
+"weapon_uplink_path", 
+"weathercock_speed", 
+"wsf_weapon_server"
+
 }
 
+# End tags verified in benchmark_v2 demos that supplement BLOCK_STARTS.
+_EXTRA_END_TAGS = {
+    "end_acoustic_signature", 
+"end_acquire_deltas", 
+"end_actuator", 
+"end_advanced_behavior", 
+"end_advanced_behavior_tree", 
+"end_aero",
+
+    "end_aero_component", 
+"end_aero_data", 
+"end_aero_mode", 
+"end_agility_type", 
+"end_air_traffic", 
+"end_airbase",
+
+    "end_aircraft_type", 
+"end_alpha_max_mach_table", 
+"end_alpha_min_mach_table", 
+"end_alpha_stabilizing_frequency_mach_table", 
+"end_alpha_versus_mach_cl_table", 
+"end_alternate_locations",
+
+    "end_altitude", 
+"end_altitude_attributes", 
+"end_altitudes", 
+"end_analysis_map", 
+"end_angle_mapping_table", 
+"end_angle_of_attack_table",
+
+    "end_antenna_pattern", 
+"end_antenna_plot", 
+"end_assets", 
+"end_atmosphere_model", 
+"end_atmosphere_table", 
+"end_atmospheric_coefficients",
+
+    "end_attack_response", 
+"end_attenuation", 
+"end_attitude_controller", 
+"end_autopilot_config", 
+"end_autopilot_support_tables", 
+"end_aux_data",
+
+    "end_ballistic_missile_launch_computer", 
+"end_ballistic_types", 
+"end_beam", 
+"end_behavior", 
+"end_behavior_tree", 
+"end_beta_stabilizing_frequency_mach_table",
+
+    "end_bistatic_signature", 
+"end_cL_alpha_beta_mach_table", 
+"end_cL_alpha_mach_table", 
+"end_cL_alphadot_alpha_mach_table", 
+"end_cL_angle_alpha_mach_table", 
+"end_cLq_alpha_mach_table",
+
+    "end_callback", 
+"end_cancelation_ratios", 
+"end_cancellation_ratios", 
+"end_category", 
+"end_cd_alpha_beta_mach_table", 
+"end_cd_alpha_mach_table",
+
+    "end_cd_angle_mach_table", 
+"end_cd_beta_mach_table", 
+"end_chaff_parcel", 
+"end_circular_pattern", 
+"end_cl_alpha_beta_mach_table", 
+"end_cl_alphadot_mach_table",
+
+    "end_cl_angle_alpha_beta_table", 
+"end_cl_beta_mach_table", 
+"end_cl_betadot_mach_table", 
+"end_cl_max_mach_table", 
+"end_cl_min_mach_table", 
+"end_clamp_gain",
+
+    "end_close_target_detection", 
+"end_clp_angle_mach_table", 
+"end_clp_mach_table", 
+"end_clq_angle_mach_table", 
+"end_clq_mach_table", 
+"end_clr_angle_mach_table",
+
+    "end_clr_mach_table", 
+"end_clutter_model", 
+"end_clutter_table", 
+"end_cm_alpha_beta_mach_table", 
+"end_cm_alpha_mach_table", 
+"end_cm_alphadot_mach_table",
+
+    "end_cm_angle_alpha_mach_table", 
+"end_cmp_mach_table", 
+"end_cmq_angle_mach_table", 
+"end_cmq_mach_table", 
+"end_cn_alpha_beta_mach_table", 
+"end_cn_angle_beta_mach_table",
+
+    "end_cn_beta_mach_table", 
+"end_cn_betadot_mach_table", 
+"end_cnp_mach_table", 
+"end_cnr_angle_mach_table", 
+"end_cnr_mach_table", 
+"end_comm",
+
+    "end_comm_link_list", 
+"end_comm_list", 
+"end_comm_network", 
+"end_commodity", 
+"end_common", 
+"end_condition",
+
+    "end_conditional_section", 
+"end_conditionals", 
+"end_conjunction_setup", 
+"end_connections", 
+"end_constant_pattern", 
+"end_container",
+
+    "end_contour_level", 
+"end_control_boolean", 
+"end_control_input", 
+"end_control_inputs", 
+"end_control_surface", 
+"end_control_value",
+
+    "end_convoy", 
+"end_correlation_method", 
+"end_coverage", 
+"end_csv_event_output", 
+"end_curve", 
+"end_cy_alpha_beta_mach_table",
+
+    "end_cy_angle_beta_mach_table", 
+"end_cy_beta_mach_table", 
+"end_cy_betadot_beta_mach_table", 
+"end_cyber_attack", 
+"end_cyber_constraint", 
+"end_cyber_effect",
+
+    "end_cyber_protect", 
+"end_cyr_beta_mach_table", 
+"end_decorator", 
+"end_default", 
+"end_delays", 
+"end_density_altitude_table",
+
+    "end_departure_traffic", 
+"end_dependent_variable", 
+"end_detection_probability", 
+"end_detection_sensitivities", 
+"end_dis_exchange", 
+"end_dis_interface",
+
+    "end_distribution", 
+"end_distribution_centroid", 
+"end_dynamics", 
+"end_effect", 
+"end_effective_CL_versus_mach_alpha_table", 
+"end_ejectable",
+
+    "end_ejector", 
+"end_electronic_attack", 
+"end_electronic_protect", 
+"end_electronic_warfare", 
+"end_engage_iff_permissions", 
+"end_engagement_settings",
+
+    "end_engine", 
+"end_epoch", 
+"end_error_model", 
+"end_error_model_parameters", 
+"end_event", 
+"end_event_output",
+
+    "end_event_pipe", 
+"end_events", 
+"end_execute", 
+"end_false_target", 
+"end_false_target_movement", 
+"end_false_target_screener",
+
+    "end_field_of_view", 
+"end_filter", 
+"end_fires_elevation_angle_table", 
+"end_fires_table", 
+"end_flaps", 
+"end_flight_controls",
+
+    "end_flight_path", 
+"end_flight_path_analysis", 
+"end_flight_route", 
+"end_fluence_model", 
+"end_force_target_tracks", 
+"end_formation",
+
+    "end_frequency_list", 
+"end_frequency_maximum_rcs_table", 
+"end_fuel", 
+"end_fuel_table", 
+"end_fuel_tank", 
+"end_fuel_transfer",
+
+    "end_fusion_method", 
+"end_gain_table", 
+"end_global_environment", 
+"end_grid", 
+"end_ground_reaction_point", 
+"end_group",
+
+    "end_guidance_autopilot_bank_to_turn", 
+"end_guidance_autopilot_skid_to_turn", 
+"end_guidance_group", 
+"end_hardware_autopilot_bank_to_turn", 
+"end_hardware_autopilot_skid_to_turn", 
+"end_heat_map",
+
+    "end_horizontal_coverage", 
+"end_horizontal_map", 
+"end_independent_variable", 
+"end_independent_variables", 
+"end_infrared_signature", 
+"end_inherent_contrast",
+
+    "end_initial_state", 
+"end_inline_table", 
+"end_inputs", 
+"end_integrator", 
+"end_integrators", 
+"end_intercept_results",
+
+    "end_ionospheric_characteristics", 
+"end_irregular_table", 
+"end_isp_vs_alt", 
+"end_items", 
+"end_j11", 
+"end_jam_strobe_detector",
+
+    "end_jammer_gain_table", 
+"end_jamming_to_signal_gain_table", 
+"end_jet", 
+"end_jet_engine_type", 
+"end_landing_gear", 
+"end_lane",
+
+    "end_lane_route", 
+"end_laser_designations", 
+"end_lateral_acceleration_rate_pid", 
+"end_lateral_acceleration_value_pid", 
+"end_launch_acceptable_region", 
+"end_launch_computer",
+
+    "end_launch_computer_table", 
+"end_limits_and_settings", 
+"end_line_of_sight_manager", 
+"end_link16_interface", 
+"end_liquid_propellant_rocket", 
+"end_liquid_propellant_rocket_type",
+
+    "end_local_pitch_program", 
+"end_local_traffic", 
+"end_location", 
+"end_mach", 
+"end_maneuver", 
+"end_maneuvering",
+
+    "end_manual_pilot_augmented_controls", 
+"end_manual_pilot_augmented_stability", 
+"end_manual_pilot_simple_controls", 
+"end_mapping_table", 
+"end_mass_properties", 
+"end_maximum_pitch_acceleration_mach_table",
+
+    "end_maximum_roll_acceleration_mach_table", 
+"end_maximum_yaw_acceleration_mach_table", 
+"end_message_processor", 
+"end_message_table", 
+"end_mission_sequence", 
+"end_mitigated_technique_classes",
+
+    "end_mitigated_techniques", 
+"end_mode", 
+"end_mode_template", 
+"end_model", 
+"end_moe", 
+"end_mover",
+
+    "end_multiresolution_comm", 
+"end_multiresolution_fuel", 
+"end_multiresolution_mover", 
+"end_multiresolution_optical_signature", 
+"end_multiresolution_processor", 
+"end_multiresolution_radar_signature",
+
+    "end_multiresolution_sensor", 
+"end_navigation", 
+"end_navigation_errors", 
+"end_network", 
+"end_next_state", 
+"end_noise_cloud",
+
+    "end_normalized_thrust_vs_alt", 
+"end_observer", 
+"end_on_bingo", 
+"end_on_empty", 
+"end_on_entry", 
+"end_on_exit",
+
+    "end_on_init", 
+"end_on_initialize", 
+"end_on_initialize2", 
+"end_on_message", 
+"end_on_new_execute", 
+"end_on_new_fail",
+
+    "end_on_track_drop", 
+"end_on_update", 
+"end_optical_signature", 
+"end_orbit", 
+"end_osm_traffic", 
+"end_output",
+
+    "end_output_rate", 
+"end_p6dof_atmosphere", 
+"end_p6dof_integrators", 
+"end_p6dof_object_type", 
+"end_p6dof_object_types", 
+"end_p6dof_terrain",
+
+    "end_parallel", 
+"end_path", 
+"end_phase", 
+"end_pid_alpha", 
+"end_pid_altitude", 
+"end_pid_bank_angle",
+
+    "end_pid_beta", 
+"end_pid_delta_pitch", 
+"end_pid_delta_roll", 
+"end_pid_flightpath_angle", 
+"end_pid_forward_accel", 
+"end_pid_group",
+
+    "end_pid_pitch_angle", 
+"end_pid_pitch_gload", 
+"end_pid_pitch_rate", 
+"end_pid_roll_heading", 
+"end_pid_roll_rate", 
+"end_pid_speed",
+
+    "end_pid_taxi_forward_accel", 
+"end_pid_taxi_heading", 
+"end_pid_taxi_speed", 
+"end_pid_taxi_yaw_rate", 
+"end_pid_vert_speed", 
+"end_pid_yaw_gload",
+
+    "end_pid_yaw_heading", 
+"end_pid_yaw_rate", 
+"end_pilot_manager", 
+"end_pitch_control_mapping_table", 
+"end_platform", 
+"end_platform_availability",
+
+    "end_platform_type", 
+"end_point_mass_engine_type", 
+"end_point_mass_vehicle_type", 
+"end_port", 
+"end_port_route", 
+"end_position",
+
+    "end_precondition", 
+"end_pressure_altitude_table", 
+"end_primary", 
+"end_print_settings", 
+"end_priority_selector", 
+"end_probabilities",
+
+    "end_processor", 
+"end_program", 
+"end_propulsion_data", 
+"end_protocol", 
+"end_pulse_repetition_frequencies", 
+"end_query_bid",
+
+    "end_query_bid_type", 
+"end_radar_signature", 
+"end_rates", 
+"end_reacquire_deltas", 
+"end_receiver", 
+"end_rectangular_pattern",
+
+    "end_reference_centroid", 
+"end_region", 
+"end_regular_table", 
+"end_repeater", 
+"end_reported_emitter_type", 
+"end_reported_target_type",
+
+    "end_response_curve", 
+"end_rigid_body_engine_type", 
+"end_rigid_body_vehicle_type", 
+"end_road_traffic", 
+"end_roll_control_mapping_table", 
+"end_roll_stabilizing_frequency_mach_table",
+
+    "end_route", 
+"end_route_network", 
+"end_router", 
+"end_router_protocol", 
+"end_routing_table", 
+"end_rudder_right",
+
+    "end_run", 
+"end_saturation_effect", 
+"end_scalar_gain", 
+"end_scattering", 
+"end_scheduler", 
+"end_scoring_factors",
+
+    "end_script", 
+"end_script_interface", 
+"end_script_struct", 
+"end_script_variables", 
+"end_sea_traffic", 
+"end_selector",
+
+    "end_selector_with_memory", 
+"end_sensor", 
+"end_sensor_model", 
+"end_sensors", 
+"end_sequence", 
+"end_sequence_with_memory",
+
+    "end_sequencer", 
+"end_service", 
+"end_ship", 
+"end_signal_processor", 
+"end_simple_path", 
+"end_simple_table",
+
+    "end_sine_pattern", 
+"end_six_dof_environment", 
+"end_six_dof_formation", 
+"end_six_dof_object_types", 
+"end_six_dof_unit", 
+"end_slot_group",
+
+    "end_solar_characteristics", 
+"end_solid_propellant_rocket", 
+"end_solid_propellant_rocket_type", 
+"end_sonic_speed_altitude_table", 
+"end_sosm_interface", 
+"end_spectrum_data",
+
+    "end_speed_attributes", 
+"end_speedbrake_dcd_mach_table", 
+"end_speedbrakes", 
+"end_speeds", 
+"end_spherical_map", 
+"end_spin_down_table_ab_per_sec",
+
+    "end_spin_down_table_mil_per_sec", 
+"end_spin_up_table_ab_per_sec", 
+"end_spin_up_table_mil_per_sec", 
+"end_spoilers", 
+"end_stage", 
+"end_state",
+
+    "end_status_settings", 
+"end_stick_back", 
+"end_stick_right", 
+"end_stick_zero_moment_delta_thrust_mach_alpha_table", 
+"end_stick_zero_moment_delta_xcg_mach_alpha_table", 
+"end_stick_zero_moment_delta_zcg_mach_alpha_table",
+
+    "end_stick_zero_moment_mach_alpha_table", 
+"end_subgrid", 
+"end_subobject", 
+"end_surface", 
+"end_synthetic_pilot", 
+"end_system_type_data",
+
+    "end_table", 
+"end_table_data", 
+"end_target", 
+"end_target_blanking_effect", 
+"end_target_data", 
+"end_target_grid",
+
+    "end_target_model", 
+"end_target_region", 
+"end_target_type", 
+"end_technique", 
+"end_temperature_altitude_table", 
+"end_term",
+
+    "end_terrain", 
+"end_test", 
+"end_test_guidance", 
+"end_thrust_ab_alt_mach_table", 
+"end_thrust_idle_alt_mach_table", 
+"end_thrust_mil_alt_mach_table",
+
+    "end_thrust_vs_time_sealevel",
+"end_thrust_vs_time_vacuum",
+"end_time_of_flight_values",
+"end_tool", 
+"end_track",
+
+    "end_track_manager", 
+"end_transactor", 
+"end_transmitter", 
+"end_uniform_pattern", 
+"end_unit", 
+"end_vehicle",
+
+    "end_vertical_acceleration_rate_pid", 
+"end_vertical_acceleration_value_pid", 
+"end_vertical_coverage", 
+"end_vertical_map", 
+"end_visual_part", 
+"end_weapon",
+
+    "end_weapon_effects", 
+"end_weapon_rows", 
+"end_weapon_table", 
+"end_weighted_random", 
+"end_weighted_region", 
+"end_wsf_weapon_server",
+
+    "end_xio_interface", 
+"end_yaw_control_mapping_table", 
+"end_zone", 
+"end_zone_set",
+
+}
+
+
+# Merge demo-verified commands and end tags into the main whitelist.
+KNOWN_AFSIM_TOKENS = KNOWN_AFSIM_TOKENS | _EXTRA_END_TAGS | _DEMO_VERIFIED_COMMANDS
+for tag in _EXTRA_END_TAGS:
+    if tag not in END_TO_START:
+        END_TO_START[tag] = tag
 
 def check_unknown_commands(lines):
     """Flag tokens that look like AFSIM commands but aren't in the known-valid whitelist.
@@ -1025,6 +2087,9 @@ def check_component_syntax(lines):
         if head in UNSUPPORTED_DIRECTIVES:
             findings.append(make_finding("E007", line_no, UNSUPPORTED_DIRECTIVES[head]))
 
+        if head in KNOWN_INVALID_ALIASES:
+            findings.append(make_finding("E007", line_no, KNOWN_INVALID_ALIASES[head]))
+
         expected_parent = NESTED_ONLY_KEYWORDS.get(head)
         if expected_parent and current_kind != expected_parent:
             findings.append(make_finding("E007", line_no, f"{head} must be nested under {expected_parent}"))
@@ -1066,6 +2131,337 @@ def check_component_syntax(lines):
     return findings
 
 
+def check_duplicate_names(lines):
+    """E010: Detect duplicate top-level declarations of the same name.
+
+    Only tracks declarations at depth 0 (outside any block).  References to
+    template names inside platform blocks are valid reuse, not duplicates.
+    The depth check is applied BEFORE the block start pushes depth, so that
+    ``platform_type PT`` at the top level is correctly recorded.
+    """
+    findings = []
+    name_kinds = [
+        ("platform_type", re.compile(r"^\s*platform_type\s+(\S+)")),
+        ("mover",       re.compile(r"^\s*mover\s+(\S+)")),
+        ("sensor",      re.compile(r"^\s*sensor\s+(\S+)")),
+        ("weapon",      re.compile(r"^\s*weapon\s+(\S+)")),
+        ("processor",   re.compile(r"^\s*processor\s+(\S+)")),
+        ("comm",        re.compile(r"^\s*comm\s+(\S+)")),
+        ("platform",    re.compile(r"^\s*platform\s+(\S+)")),
+    ]
+    # Keywords that open a nestable block (push depth).  platform_type and
+    # template-declaration heads are NOT nestable — only platform, scenario,
+    # and a few others actually contain child blocks.
+    _NESTABLE = {"platform", "scenario", "side", "route", "script",
+                 "script_interface", "script_variables", "on_initialize",
+                 "on_update", "on_initialize2", "behavior_tree",
+                 "advanced_behavior_tree", "advanced_behavior",
+                 "orbital_mechanics", "task", "mission",
+                 "if_conditional", "else_conditional"}
+    seen: dict[str, list[tuple[int, str]]] = {}
+    depth = 0
+    for line_no, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        parts = line.split()
+        head = parts[0] if parts else ""
+
+        # Record top-level declarations BEFORE depth changes
+        if depth == 0:
+            for kind, pattern in name_kinds:
+                m = pattern.match(line)
+                if m:
+                    name = m.group(1)
+                    key = f"{kind}:{name}"
+                    seen.setdefault(key, []).append((line_no, kind))
+
+        # Track depth for nestable blocks only
+        if head in _NESTABLE:
+            depth += 1
+        elif head in END_TO_START:
+            depth = max(0, depth - 1)
+
+    for key, occurrences in seen.items():
+        if len(occurrences) > 1:
+            name = key.split(":", 1)[1]
+            kinds = {k for _, k in occurrences}
+            lines_str = ", ".join(str(ln) for ln, _ in occurrences)
+            findings.append((occurrences[0][0],
+                f"duplicate {('/').join(sorted(kinds))} name '{name}' declared at lines {lines_str}"))
+    return findings
+
+
+def check_circular_references(lines):
+    """E011: Detect self-referencing processor / behavior_tree chains.
+
+    Mission-proven: inside ``processor p ... end_processor``, a line like
+    ``behavior_tree p`` or ``processor p`` causes mission.exe to parse-loop.
+    We track enclosing processor blocks, but do not treat platform-level
+    component references as processor block openings.
+    """
+    findings = []
+    proc_header = re.compile(r"^\s*(processor|behavior_tree|advanced_behavior_tree)\s+(\S+)")
+    # Stack of (kind, name) for active processor blocks.
+    proc_stack: list[tuple[str, str, int]] = []  # (kind, name, start_line)
+    block_stack: list[str] = []
+    platform_reference_hosts = {"platform", "platform_type"}
+
+    for line_no, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        if not line:
+            continue
+
+        parts = line.split()
+        head = parts[0]
+
+        if head in END_TO_START:
+            closed_kind = END_TO_START[head]
+            if closed_kind == "processor" and proc_stack:
+                proc_stack.pop()
+            if block_stack:
+                while block_stack:
+                    closed = block_stack.pop()
+                    if closed == closed_kind:
+                        break
+            continue
+
+        m_head = proc_header.match(line)
+
+        if m_head:
+            kind, name = m_head.group(1), m_head.group(2)
+            # Check self-reference: inside an enclosing processor block,
+            # a reference to the SAME name is a self-reference.
+            if proc_stack and kind in ("processor", "behavior_tree"):
+                # Look up the stack for a block of the same name
+                for pk, pn, pl in reversed(proc_stack):
+                    if pn == name:
+                        findings.append((line_no,
+                            f"self-referencing {kind} '{name}' inside {pk} '{pn}'; causes a parse-loop in mission.exe"))
+                        break
+
+            # Platform and platform_type bodies often contain component
+            # references such as "processor ProcA".  Those are not nested
+            # processor block openings and should not poison proc_stack.
+            inside_platform_ref_host = any(b in platform_reference_hosts for b in block_stack)
+            if kind == "processor" and (proc_stack or not inside_platform_ref_host):
+                proc_stack.append((kind, name, line_no))
+                block_stack.append(kind)
+            continue
+
+        if head in BLOCK_STARTS:
+            block_stack.append(head)
+
+    return findings
+
+
+def check_script_api_v2(lines):
+    """E008 expansion: second batch of hallucinated script API patterns.
+
+    Sources: mission.exe compile diagnostics + official wsf_* reference pages.
+    All patterns below are NOT present in any official demo — they are fabrications
+    that only appear in LLM-generated scripts.
+    """
+    findings = []
+    in_script_context = False
+    stack: list[str] = []
+    _SCRIPT_BLOCKS = {"script", "on_initialize", "on_update", "on_initialize2",
+                      "processor", "behavior_tree", "advanced_behavior_tree",
+                      "advanced_behavior", "script_interface"}
+
+    hallucinated = [
+        # Instance-style hallucinated APIs (no official demo uses these)
+        (r"\bHeadingTo\s*\(", "hallucinated script API HeadingTo(); use a verified mover route / waypoint pattern"),
+        (r"\bSetHeading\s*\(", "hallucinated script API SetHeading(); heading is set via mover route waypoints"),
+        (r"\bSetAltitude\s*\(", "hallucinated script API SetAltitude(); altitude is set via route waypoints"),
+        (r"\bSetSpeed\s*\(", "hallucinated script API SetSpeed(); speed is set via route waypoints"),
+        (r"\bGetPosition\s*\(", "hallucinated script API GetPosition(); use PLATFORM.Position() or WsfGeoPoint"),
+        (r"\bSetPosition\s*\(", "hallucinated script API SetPosition(); platforms cannot be teleported in script"),
+        (r"\bGetComponent\s*\(", "hallucinated script API GetComponent(); use PLATFORM.ComponentById() or platform component refs"),
+        # Static-style hallucinated APIs
+        (r"\bPLATFORM\s*\.\s*Offset\s*\(", "hallucinated script API PLATFORM.Offset(); use Vec3 arithmetic on platform position"),
+        (r"\bVec3\s*\.\s*Offset\s*\(", "hallucinated script API Vec3.Offset(); use Vec3 instance-style arithmetic"),
+        (r"\bMoveTo\s*\(", "hallucinated script API MoveTo(); use route waypoints for platform movement"),
+        (r"\bMoveToward\s*\(", "hallucinated script API MoveToward(); use route waypoints for platform movement"),
+    ]
+
+    for line_no, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        if not line:
+            continue
+        parts = line.split()
+        head = parts[0]
+
+        # "script" / "end_script" are not in BLOCK_STARTS but must be
+        # tracked so we know when we're inside a script-code region.
+        if head == "script":
+            stack.append(head)
+            in_script_context = True
+            continue
+        if head == "end_script":
+            if stack and stack[-1] == "script":
+                stack.pop()
+            in_script_context = any(b in _SCRIPT_BLOCKS or b == "script" for b in stack)
+            continue
+
+        if head in BLOCK_STARTS:
+            stack.append(head)
+            if head in _SCRIPT_BLOCKS:
+                in_script_context = True
+        elif head in END_TO_START:
+            if stack and stack.pop() in _SCRIPT_BLOCKS:
+                in_script_context = any(b in _SCRIPT_BLOCKS or b == "script" for b in stack)
+            continue
+        if not in_script_context:
+            continue
+        for pattern, message in hallucinated:
+            if re.search(pattern, line):
+                findings.append((line_no, message))
+                break  # one finding per line
+        # Authoritative API check: any Method(...) not in the legal set
+        method_call = re.findall(r'(?:\.|->)\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(', line)
+        for method in method_call:
+            if method not in _LEGAL_SCRIPT_APIS:
+                findings.append((line_no,
+                    f"unverified script API call .{method}() — not in AFSIM 2.9.0 documented API; verify against script_api_reference or official demos"))
+                break
+    return findings
+
+
+# Authoritative legal script API methods — sourced from AFSIM 2.9.0 script_api_reference.md.
+# Any method call inside a script block that matches the pattern Object.Method(...)
+# but is NOT in this set is a hallucinated API (E008).
+_LEGAL_SCRIPT_APIS: set[str] = {
+    # WsfPlatform
+    "Index", "Name", "CreationTime", "TimeSinceCreation", "Side", "Icon",
+    "Commander", "CommanderName", "Peers", "Subordinates",
+    "Mover", "Fuel", "CommCount", "SensorCount", "WeaponCount", "ProcessorCount",
+    "Length", "Width", "Height", "TotalMass", "EmptyMass", "FuelMass", "PayloadMass",
+    "DeletePlatform", "IsExternallyControlled", "UpdateInterval",
+    # WsfMover
+    "Route", "DefaultRoute", "IsExtrapolating", "TurnOff", "TurnOn",
+    # WsfSensor
+    "ModeCount", "CurrentMode", "SetMode", "IsTurnedOn",
+    # WsfWeapon
+    "Fire", "CeaseFire", "WeaponCount", "SalvoSize",
+    # WsfGeoPoint / WsfLLA
+    "Construct", "Normalize", "Scale", "Dot", "Cross",
+    "DistanceTo", "AzimuthTo", "ElevationTo",
+    # Common script functions
+    "print", "print_debug", "printf", "sqrt", "abs", "sin", "cos", "tan",
+    "asin", "acos", "atan", "atan2", "pow", "exp", "log", "log10",
+    "floor", "ceil", "round", "min", "max", "clamp",
+    # WsfTrack
+    "TrackId", "PlatformId", "Position", "Velocity",
+    # WsfTrackList
+    "Count", "GetTrack",
+    # General
+    "push_back", "size", "clear", "empty", "begin", "end", "find",
+}
+
+
+def check_component_init_constraints(lines):
+    """E007-expanded: component-specific initialization requirements.
+
+    Sources:
+    - AFSIM 2.9.0 mover_reference.md (22+ mover types)
+    - AFSIM 2.9.0 sensor_types_reference.md
+    - mission-proven failure patterns from BV1/2 benchmarks
+    """
+    findings = []
+    in_esm = False
+    in_brawler_mover = False
+    in_space_mover = False
+    in_explicit_weapon = False
+    in_eoir_sensor = False
+    has_frequency_band = False
+    has_aero_file = False
+    has_dynamics = False
+    has_spawned = False
+    has_eoir_resolution = False  # angular_resolution or pixel_count
+    block_stack: list[str] = []
+    block_start_line: dict[str, int] = {}
+
+    for line_no, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        if not line:
+            continue
+        parts = line.split()
+        head = parts[0]
+
+        # Track block enter/exit
+        if head in BLOCK_STARTS:
+            block_stack.append(head)
+            block_start_line[head] = line_no
+            if head == "sensor" and len(parts) > 1 and "esm" in parts[1].lower():
+                in_esm = True
+                has_frequency_band = False
+            elif head == "sensor" and any("eoir" in p.lower() for p in parts[1:3]):
+                in_eoir_sensor = True
+                has_eoir_resolution = False
+            elif head == "mover" and len(parts) > 1 and "brawler" in parts[1].lower():
+                in_brawler_mover = True
+                has_aero_file = False
+            elif head == "mover" and len(parts) > 1 and "integrating_space" in parts[1].lower():
+                in_space_mover = True
+                has_dynamics = False
+            elif head == "weapon" and len(parts) > 1 and "explicit" in parts[1].lower():
+                in_explicit_weapon = True
+                has_spawned = False
+            continue
+
+        if head in END_TO_START:
+            # Check constraints on block exit
+            if in_esm and not has_frequency_band:
+                findings.append(make_finding("E007", block_start_line.get("sensor", line_no),
+                    "ESM sensor missing frequency_band — required by mission.exe for passive detection"))
+            if in_eoir_sensor and not has_eoir_resolution:
+                findings.append(make_finding("E007", block_start_line.get("sensor", line_no),
+                    "EO/IR sensor missing angular_resolution or pixel_count — one is required (ref: sensor_types_reference §3)"))
+            if in_brawler_mover and not has_aero_file:
+                findings.append(make_finding("E007", block_start_line.get("mover", line_no),
+                    "brawler_mover missing aero_file — required for aerodynamic model"))
+            if in_space_mover and not has_dynamics:
+                findings.append(make_finding("E007", block_start_line.get("mover", line_no),
+                    "integrating_space_mover missing dynamics sub-block — required for orbit propagation"))
+            if in_explicit_weapon and not has_spawned:
+                findings.append(make_finding("E007", block_start_line.get("weapon", line_no),
+                    "explicit_weapon missing spawned_platform or launched_platform_type — required for weapon deployment"))
+            if block_stack:
+                closed = block_stack.pop()
+                if closed == "sensor":
+                    in_esm = False
+                    in_eoir_sensor = False
+                elif closed == "mover":
+                    in_brawler_mover = False
+                    in_space_mover = False
+                elif closed == "weapon":
+                    in_explicit_weapon = False
+            continue
+
+        # Track constraints inside active blocks
+        if in_esm and "frequency_band" in line:
+            has_frequency_band = True
+        if in_brawler_mover and "aero_file" in line:
+            has_aero_file = True
+        if in_space_mover and "dynamics" in line:
+            has_dynamics = True
+        if in_explicit_weapon and ("spawned_platform" in line or "launched_platform_type" in line):
+            has_spawned = True
+        if in_eoir_sensor and ("angular_resolution" in line or "pixel_count" in line):
+            has_eoir_resolution = True
+
+    return findings
+
+
+def check_forbidden_patterns(lines):
+    """E007: Flag patterns from common_mistakes.md that mission.exe rejects."""
+    findings = []
+    for line_no, raw in enumerate(lines, start=1):
+        for pattern, message in build_forbidden_regex():
+            if pattern.search(raw):
+                findings.append((line_no, message))
+    return findings
+
+
 def static_analysis(script_text: str, script_label: str = ""):
     lines = script_text.splitlines()
     findings = []
@@ -1078,7 +2474,9 @@ def static_analysis(script_text: str, script_label: str = ""):
         "E005": check_hallucinated_types(lines),
         "E006": check_required_fields(lines),
         "E009": check_external_resources(lines, script_label),
-        "E008": check_script_language(lines),
+        "E008": check_script_language(lines) + check_script_api_v2(lines) + check_forbidden_patterns(lines),
+        "E010": check_duplicate_names(lines),
+        "E011": check_circular_references(lines),
     }
 
     for error_id, items in mapping.items():
@@ -1086,6 +2484,7 @@ def static_analysis(script_text: str, script_label: str = ""):
             findings.append(make_finding(error_id, line_no, message))
 
     findings.extend(check_component_syntax(lines))
+    findings.extend(check_component_init_constraints(lines))
     findings.extend(check_top_level_requirements(lines))
     findings.extend(check_unknown_commands(lines))
     return findings

@@ -25,20 +25,26 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from afsim_agent_v1 import build_grounded_ir
-from execution_repair_planner_v1 import build_execution_repair_plan
-from hierarchical_generation_executor_v1 import execute_layered_generation
-from hierarchical_generation_planner_v1 import build_generation_plan
-from llm_client_v1 import LLMClient
-from llm_intent_parser_v1 import parse_intent_with_llm
-from llm_repair_executor_v1 import llm_execution_repair, llm_static_repair
-from llm_script_generator_v1 import generate_script_with_llm
-from run_direct_baseline import semantic_match
-from run_mission import run_mission
-from static_checker_v1 import analyze_script_text
+from .grounding import build_grounded_ir
+from .repair_planner import build_execution_repair_plan
+from .generation_executor import execute_layered_generation
+from .generation_planner import build_generation_plan
+from .llm_client import LLMClient
+from .intent_parser import parse_intent_with_llm
+from .repair_executor import llm_execution_repair
+from .script_generator import generate_script_with_llm
+from .mission_log_parser import parse as parse_mission_log
+from .reference_rules import postprocess_script
+from .run_mission import run_mission
+from .static_checker import analyze_script_text
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
+
+
+def _finalize_script(text: str) -> str:
+    """Unified pre-write gate: postprocess + static check on every script output."""
+    return postprocess_script(text)
 BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark_v1" / "tasks.jsonl"
 OUTPUT_ROOT = ROOT / "afsim_agent_v2"
 
@@ -94,8 +100,18 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def load_benchmark_index() -> dict[str, dict[str, Any]]:
-    return {row["id"]: row for row in load_jsonl(BENCHMARK_PATH)}
+def normalize_benchmark_task(row: dict[str, Any]) -> dict[str, Any]:
+    """Normalize benchmark v1/v2 rows to the agent's task contract."""
+    task = dict(row)
+    task.setdefault("input", task.get("instruction", ""))
+    task.setdefault("source_hint", task.get("oracle_script", task.get("source_demo", "")))
+    task.setdefault("demo_id", task.get("source_demo", task.get("id", "")))
+    task.setdefault("covered_components", task.get("covered_components", []))
+    return task
+
+
+def load_benchmark_index(path: Path = BENCHMARK_PATH) -> dict[str, dict[str, Any]]:
+    return {row["id"]: normalize_benchmark_task(row) for row in load_jsonl(path)}
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -121,6 +137,86 @@ def mission_status_from_run(return_code: int | None, stdout: str, stderr: str) -
     mission_log_text = "\n".join(part for part in [stdout, stderr] if part)
     mission_status = "PASS" if return_code == 0 and "FATAL:" not in mission_log_text else "FAIL"
     return mission_status, mission_log_text
+
+
+def semantic_match(task: dict, script_text: str, mission_status: str) -> bool:
+    """Check whether the generated script satisfies the task's covered_components."""
+    if mission_status != "PASS":
+        return False
+    component_map = {
+        "Platform": lambda s: "platform " in s.lower() and "platform_type " in s.lower(),
+        "Route": lambda s: "route" in s.lower(),
+        "Mover": lambda s: "mover " in s.lower(),
+        "Sensor": lambda s: "sensor " in s.lower(),
+        "Weapon": lambda s: "weapon " in s.lower(),
+        "Processor": lambda s: "processor " in s.lower(),
+        "Comm": lambda s: "comm " in s.lower(),
+        "Acoustic": lambda s: "ACOUSTIC" in s.upper(),
+        "BehaviorTree": lambda s: "BEHAVIOR_TREE" in s.upper(),
+        "Space": lambda s: "SPACE_MOVER" in s.upper(),
+        "ElectronicWarfare": lambda s: "JAMMER" in s.upper() or "ESM" in s.upper() or "CHAFF" in s.upper(),
+        "IADS": lambda s: "SAM" in s.upper() and "RADAR" in s.upper(),
+        "LaserDesignator": lambda s: "LASER" in s.upper(),
+        "Coverage": lambda s: "HEATMAP" in s.upper(),
+        "Cyber": lambda s: "CYBER" in s.upper(),
+        "Fires": lambda s: "ARTILLERY" in s.upper(),
+    }
+    checks = []
+    for component in task.get("covered_components", []):
+        matcher = component_map.get(component)
+        if matcher:
+            checks.append(matcher(script_text))
+    if not checks:
+        checks.append("route" in script_text.lower())
+    return all(checks)
+
+
+def _classify_exit(return_code: int | None, log_text: str) -> str:
+    """Map mission.exe exit code to failure class."""
+    if return_code == 0:
+        return "ok" if "Simulation complete" in log_text else "parse_or_runtime_ok"
+    if return_code is None:
+        return "timeout_or_hang"
+    if return_code < 0:
+        return "crash"
+    if "FATAL:" in log_text or "Reading of simulation input failed" in log_text:
+        return "parse_error"
+    if "Initialization of simulation failed" in log_text:
+        return "init_error"
+    if "Simulation complete" in log_text:
+        return "ok"
+    return "runtime_error"
+
+
+_ERROR_TO_LAYERS: dict[str, list[str]] = {
+    "missing_platform_type":   ["platform_layer"],
+    "missing_mover":           ["platform_layer"],
+    "missing_companion":       ["platform_layer"],
+    "component_init_failure":  ["platform_layer", "sensor_layer"],
+    "missing_sensor":          ["sensor_layer"],
+    "esm_no_frequency_band":   ["sensor_layer"],
+    "missing_weapon":          ["weapon_layer"],
+    "unknown_command":         ["mission_layer"],
+    "wrong_context_command":   ["mission_layer"],
+    "wrong_block_host":        ["mission_layer"],
+    "hallucinated_api":        ["mission_layer"],
+    "invalid_script_api":      ["mission_layer"],
+    "missing_reference":       ["mission_layer"],
+    "missing_processor":       ["mission_layer"],
+    "missing_entity":          ["scenario_assembly"],
+    "parser_fatal":            ["scenario_assembly"],
+    "unexpected_eof":          ["scenario_assembly"],
+    "init_failed":             ["scenario_assembly"],
+}
+
+
+def _error_to_layers(diagnostics: dict) -> list[str]:
+    """Map error categories to targeted generation layers for repair."""
+    layers: set[str] = set()
+    for cat in diagnostics.get("error_categories", []):
+        for target in _ERROR_TO_LAYERS.get(cat, ["scenario_assembly"]):
+            layers.add(target)
+    return sorted(layers) if layers else ["scenario_assembly"]
 
 
 def assess_script_substance(script_text: str) -> dict[str, Any]:
@@ -206,6 +302,8 @@ def has_reusable_summary(task_id: str) -> bool:
         summary = read_json(summary_path)
     except json.JSONDecodeError:
         return False
+    if summary.get("run_error") or summary.get("generation_mode") == "run_error":
+        return False
     final_script_rel = summary.get("final_script", "")
     if not final_script_rel:
         return False
@@ -238,9 +336,9 @@ def extract_failure_family(static_analysis: dict[str, Any], execution_plan: dict
 
 def compute_primary_root_cause(
     static_before: dict[str, Any],
-    pre_repair_execution_plan: dict[str, Any] | None,
+    execution_plan: dict[str, Any] | None,
 ) -> str:
-    root = extract_failure_family(static_before, pre_repair_execution_plan)
+    root = extract_failure_family(static_before, execution_plan)
     return root or static_before.get("primary_error", "")
 
 
@@ -275,9 +373,6 @@ def run_mission_for_diagnostics(script_path: Path) -> tuple[str, int | None, str
     return_code, stdout, stderr = run_mission(str(script_path), options=["-es", "-fio"])
     mission_status, mission_log_text = mission_status_from_run(return_code, stdout, stderr)
     return mission_status, return_code, mission_log_text
-
-# Backward-compat alias
-run_mission_if_static_pass = run_mission_for_diagnostics
 
 
 def run_task(
@@ -333,54 +428,43 @@ def run_task(
         )
 
     generated_script_path = run_dir / "generated_script.txt"
-    generated_script_path.write_text(script_generation["script_text"], encoding="utf-8")
+    generated_script_path.write_text(_finalize_script(script_generation["script_text"]), encoding="utf-8")
     static_before = analyze_script_text(script_generation["script_text"], script_label=str(generated_script_path))
 
-    current_script_text = script_generation["script_text"]
-    current_script_path = generated_script_path
-    static_after = static_before
-    llm_static_repair_result = None
+    # Phase 1: Deterministic postprocessing only (Self Repair removed)
+    # Postprocess the generated script and proceed directly to mission.exe.
+    # Self-healing is achieved through Static Checker → mission.exe → Execution Repair.
+    current_script_text = _finalize_script(script_generation["script_text"])
+    current_script_path = run_dir / "llm_repaired_script.txt"
+    current_script_path.write_text(current_script_text, encoding="utf-8")
+    static_after = analyze_script_text(current_script_text, script_label=str(current_script_path))
+    llm_static_repair_result = {
+        "version": "postprocess_only",
+        "mode": "deterministic_postprocessing",
+        "repaired_text": current_script_text,
+        "static_analysis": static_after,
+        "note": "Self Repair removed — deterministic postprocessing + Execution Repair for self-healing",
+    }
+    write_json(run_dir / "llm_static_repair.json", llm_static_repair_result)
+    primary_root_cause = ""
 
-    # Run mission.exe BEFORE repair to capture AFSIM parser diagnostics.
-    # Only skip for empty shells — static failures still benefit from mission errors.
-    pre_repair_mission_status, pre_repair_mission_code, pre_repair_mission_log = run_mission_for_diagnostics(current_script_path)
-    (run_dir / "mission.log").write_text(pre_repair_mission_log, encoding="utf-8")
-    pre_repair_execution_plan = build_execution_repair_plan(
-        current_script_path,
-        pre_repair_mission_status,
-        pre_repair_mission_code,
-        pre_repair_mission_log,
-        static_before,
-    )
-    write_json(run_dir / "pre_repair_execution.json", pre_repair_execution_plan)
-
-    if not static_before["static_pass"]:
-        # Pass mission.exe errors to guide the repair with real AFSIM diagnostics
-        llm_static_repair_result = llm_static_repair(
-            task, current_script_text, ir, grounded_ir, generation_plan, client,
-            mission_errors=(pre_repair_mission_log if pre_repair_mission_status == "FAIL" else ""),
-        )
-        write_json(run_dir / "llm_static_repair.json", llm_static_repair_result)
-        current_script_text = llm_static_repair_result["repaired_text"]
-        current_script_path = run_dir / "llm_repaired_script.txt"
-        current_script_path.write_text(current_script_text, encoding="utf-8")
-        static_after = llm_static_repair_result["static_analysis"]
-
-    # Run mission.exe after repair (or on first script if no repair needed).
-    # Always write to mission_final.log so results rows point to the authoritative log.
+    # Phase 2: mission.exe → structured diagnostics
     mission_status, mission_return_code, mission_log_text = run_mission_for_diagnostics(current_script_path)
     (run_dir / "mission_final.log").write_text(mission_log_text, encoding="utf-8")
-
+    mission_diag = parse_mission_log(mission_log_text, mission_return_code, ir=ir, static_analysis=static_after)
+    write_json(run_dir / "mission_diagnostics.json", mission_diag)
+    # Keep legacy plan for backward compat, but mark route from diagnostics
     execution_plan = build_execution_repair_plan(
-        current_script_path,
-        mission_status,
-        mission_return_code,
-        mission_log_text,
-        static_after,
+        current_script_path, mission_status, mission_return_code, mission_log_text, static_after,
     )
+    # Override route with structured diagnostics when legacy plan is vague
+    if execution_plan["repair_recommendation"]["route"] == "manual_review" and mission_diag["repair_hints"]:
+        execution_plan["repair_recommendation"]["route"] = "return_to_layer_regeneration"
+        execution_plan["repair_recommendation"]["suggested_action"] = mission_diag["repair_hints"][0]
     write_json(run_dir / "execution_repair.json", execution_plan)
-    primary_root_cause = compute_primary_root_cause(static_before, pre_repair_execution_plan)
+    primary_root_cause = compute_primary_root_cause(static_before, execution_plan)
 
+    # Phase 3: Execution Repair (mission-driven)
     llm_execution_repair_result = None
     final_script_path = current_script_path
     final_static = static_after
@@ -388,97 +472,63 @@ def run_task(
     final_return_code = mission_return_code
     final_log_text = mission_log_text
     final_execution_plan = execution_plan
-    repair_drift = {
-        "detected": False,
-        "stage": "",
-        "baseline_family": "",
-        "candidate_family": "",
-        "action": "accepted_current_script",
-    }
+    repair_drift: dict[str, Any] = {"detected": False, "stage": "", "baseline_family": "", "candidate_family": "", "action": "accepted_current_script"}
 
-    if (
-        llm_static_repair_result is not None
-        and not static_after["static_pass"]
-        and static_before.get("primary_error")
-        and static_after.get("primary_error")
-        and static_before["primary_error"] != static_after["primary_error"]
-    ):
-        before_count = len(static_before.get("static_error_ids", []))
-        after_count = len(static_after.get("static_error_ids", []))
-        if after_count >= before_count:
-            current_script_text = script_generation["script_text"]
-            current_script_path = generated_script_path
-            static_after = static_before
-            mission_status = pre_repair_mission_status
-            mission_return_code = pre_repair_mission_code
-            mission_log_text = pre_repair_mission_log
-            execution_plan = pre_repair_execution_plan
-            final_script_path = current_script_path
-            final_static = static_after
-            final_mission_status = mission_status
-            final_return_code = mission_return_code
-            final_log_text = mission_log_text
-            final_execution_plan = execution_plan
-            repair_drift = {
-                "detected": True,
-                "stage": "static_repair",
-                "baseline_family": static_before["primary_error"],
-                "candidate_family": llm_static_repair_result["static_analysis"].get("primary_error", ""),
-                "action": "reverted_to_pre_repair_script",
-            }
+    route = execution_plan["repair_recommendation"]["route"]
+    if mission_status == "FAIL" and (route in EXECUTION_REPAIRABLE_ROUTES or mission_diag.get("error_categories")):
+        best_script = current_script_text
+        best_static = static_after
+        best_status = mission_status
+        best_rc = mission_return_code
+        best_log = mission_log_text
+        best_categories = set(mission_diag.get("error_categories", []))
+        best_diag = mission_diag
 
-    if (
-        mission_status == "FAIL"
-        and execution_plan["repair_recommendation"]["route"] in EXECUTION_REPAIRABLE_ROUTES
-    ):
-        llm_execution_repair_result = llm_execution_repair(
-            task,
-            current_script_text,
-            ir,
-            grounded_ir,
-            generation_plan,
-            mission_status,
-            mission_return_code,
-            mission_log_text,
-            client,
+        for attempt in range(1, 3):  # always try 2 repairs
+            target_layers = _error_to_layers(best_diag)
+            llm_execution_repair_result = llm_execution_repair(
+                task, best_script, ir, grounded_ir, generation_plan,
+                best_status, best_rc, best_log, client,
+                mission_diagnostics=best_diag,
+                target_layers=target_layers,
+            )
+            repaired_text = llm_execution_repair_result["repaired_text"]
+            repaired_path = run_dir / f"execution_repaired_{attempt}.txt"
+            repaired_path.write_text(_finalize_script(repaired_text), encoding="utf-8")
+            repaired_static = llm_execution_repair_result["static_analysis"]
+            repaired_status, repaired_rc, repaired_log = run_mission_for_diagnostics(repaired_path)
+            repaired_diag = parse_mission_log(repaired_log, repaired_rc, ir=ir, static_analysis=repaired_static)
+            repaired_categories = set(repaired_diag.get("error_categories", []))
+            write_json(run_dir / f"llm_execution_repair_{attempt}.json", llm_execution_repair_result)
+
+            best_e2 = sum(1 for f in best_static.get("findings", []) if f["error_id"] == "E002")
+            repaired_e2 = sum(1 for f in repaired_static.get("findings", []) if f["error_id"] == "E002")
+            improved = (
+                repaired_status == "PASS"
+                or len(repaired_categories) < len(best_categories)
+                or (len(repaired_categories) == len(best_categories) and repaired_e2 < best_e2)
+            )
+            if improved:
+                best_script = repaired_text
+                best_static = repaired_static
+                best_status = repaired_status
+                best_rc = repaired_rc
+                best_log = repaired_log
+                best_categories = repaired_categories
+                best_diag = repaired_diag
+                if repaired_status == "PASS":
+                    break
+            # If not improved, continue to next attempt with fresh diagnostics guiding repair
+
+        final_script_path = run_dir / "execution_repaired_script.txt"
+        final_script_path.write_text(_finalize_script(best_script), encoding="utf-8")
+        final_static = best_static
+        final_mission_status = best_status
+        final_return_code = best_rc
+        final_log_text = best_log
+        final_execution_plan = build_execution_repair_plan(
+            final_script_path, final_mission_status, final_return_code, final_log_text, final_static,
         )
-        write_json(run_dir / "llm_execution_repair.json", llm_execution_repair_result)
-        candidate_script_path = run_dir / "execution_repaired_script.txt"
-        candidate_script_path.write_text(llm_execution_repair_result["repaired_text"], encoding="utf-8")
-        candidate_static = llm_execution_repair_result["static_analysis"]
-        candidate_mission_status, candidate_return_code, candidate_log_text = run_mission_for_diagnostics(candidate_script_path)
-        candidate_execution_plan = build_execution_repair_plan(
-            candidate_script_path,
-            candidate_mission_status,
-            candidate_return_code,
-            candidate_log_text,
-            candidate_static,
-        )
-        baseline_family = primary_root_cause or extract_failure_family(static_after, execution_plan)
-        candidate_family = extract_failure_family(candidate_static, candidate_execution_plan)
-        if should_reject_repair_as_drift(
-            baseline_family,
-            static_after,
-            mission_status,
-            candidate_family,
-            candidate_static,
-            candidate_mission_status,
-        ):
-            repair_drift = {
-                "detected": True,
-                "stage": "execution_repair",
-                "baseline_family": baseline_family,
-                "candidate_family": candidate_family,
-                "action": "kept_pre_execution_repair_script",
-            }
-        else:
-            final_script_path = candidate_script_path
-            final_static = candidate_static
-            final_mission_status = candidate_mission_status
-            final_return_code = candidate_return_code
-            final_log_text = candidate_log_text
-            final_execution_plan = candidate_execution_plan
-
         (run_dir / "mission_final.log").write_text(final_log_text, encoding="utf-8")
 
     grounding_state = summarize_grounding_state(grounded_ir)
@@ -552,7 +602,73 @@ def run_task(
     return summary
 
 
-def to_results_row(task_summary: dict[str, Any], run_dir: Path) -> dict[str, Any]:
+def write_failed_task_summary(task: dict[str, Any], exc: BaseException) -> dict[str, Any]:
+    run_dir = OUTPUT_ROOT / task["id"]
+    run_dir.mkdir(parents=True, exist_ok=True)
+    error_text = f"{type(exc).__name__}: {exc}"
+    failed_script_path = run_dir / "failed_script.txt"
+    failed_script_path.write_text("", encoding="utf-8")
+    static_after = {
+        "syntax_correct": False,
+        "static_pass": False,
+        "primary_error": "RUN_ERROR",
+        "static_error_ids": ["RUN_ERROR"],
+        "findings": [
+            {
+                "error_id": "RUN_ERROR",
+                "line": 0,
+                "message": error_text,
+            }
+        ],
+    }
+    write_json(run_dir / "static_after.json", static_after)
+    (run_dir / "mission_final.log").write_text(error_text, encoding="utf-8")
+    summary = {
+        "task_id": task["id"],
+        "input": task.get("input", ""),
+        "intent_attempt_count": 0,
+        "ir_valid": False,
+        "grounding_unresolved_count": 0,
+        "generation_mode": "run_error",
+        "initial_static_pass": False,
+        "llm_static_repair_triggered": False,
+        "static_repair_mode": "",
+        "layer_regeneration_triggered": False,
+        "layer_regeneration_static_pass": False,
+        "final_static_pass": False,
+        "mission_status": "FAIL",
+        "primary_root_cause": "RUN_ERROR",
+        "final_blocker": error_text,
+        "repair_drift_detected": False,
+        "repair_drift_stage": "",
+        "repair_drift_action": "",
+        "repair_drift_baseline_family": "",
+        "repair_drift_candidate_family": "",
+        "llm_execution_repair_triggered": False,
+        "execution_route": "run_error",
+        "llm_only_script_selected": False,
+        "llm_only_pass": False,
+        "final_script": str(failed_script_path.relative_to(ROOT)),
+        "final_return_code": None,
+        "effective_line_count": 0,
+        "has_platform_or_type": False,
+        "has_route_or_position": False,
+        "core_block_count": 0,
+        "empty_shell": True,
+        "substantive_pass": False,
+        "reused_existing": False,
+        "run_error": error_text,
+    }
+    write_json(run_dir / "task_summary.json", summary)
+    return summary
+
+
+def to_results_row(
+    task_summary: dict[str, Any],
+    run_dir: Path,
+    benchmark_index: dict[str, dict[str, Any]],
+    output_root: Path = OUTPUT_ROOT,
+) -> dict[str, Any]:
     final_static_path = run_dir / "static_after.json"
     final_static = json.loads(final_static_path.read_text(encoding="utf-8-sig"))
     final_script_path = ROOT / task_summary["final_script"]
@@ -563,10 +679,14 @@ def to_results_row(task_summary: dict[str, Any], run_dir: Path) -> dict[str, Any
     )
     repair_success = task_summary["mission_status"] == "PASS" if repair_attempted else None
     semantic_ok = semantic_match(
-        {"input": task_summary["input"], "covered_components": load_benchmark_index()[task_summary["task_id"]].get("covered_components", [])},
+        {"input": task_summary["input"], "covered_components": benchmark_index[task_summary["task_id"]].get("covered_components", [])},
         final_script_text,
         task_summary["mission_status"],
     )
+    try:
+        mission_log = str((run_dir / "mission_final.log").relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        mission_log = str(run_dir / "mission_final.log")
 
     row = {
         "id": task_summary["task_id"],
@@ -578,7 +698,7 @@ def to_results_row(task_summary: dict[str, Any], run_dir: Path) -> dict[str, Any
         "static_error_ids": final_static["static_error_ids"],
         "mission_status": task_summary["mission_status"],
         "return_code": task_summary["final_return_code"],
-        "mission_log": f"afsim_agent_v2/{task_summary['task_id']}/mission_final.log",
+        "mission_log": mission_log,
         "primary_error": final_static["primary_error"],
         "primary_root_cause": task_summary.get("primary_root_cause", ""),
         "final_blocker": task_summary.get("final_blocker", ""),
@@ -597,7 +717,7 @@ def to_results_row(task_summary: dict[str, Any], run_dir: Path) -> dict[str, Any
     return row
 
 
-def write_readme(task_summaries: list[dict[str, Any]], model: str) -> None:
+def write_readme(task_summaries: list[dict[str, Any]], model: str, output_root: Path = OUTPUT_ROOT) -> None:
     lines = [
         "# AFSIM Agent v2",
         "",
@@ -630,12 +750,16 @@ def write_readme(task_summaries: list[dict[str, Any]], model: str) -> None:
             f"llm_execution_repair={row['llm_execution_repair_triggered']}"
         )
     lines.append("")
-    (OUTPUT_ROOT / "README.md").write_text("\n".join(lines), encoding="utf-8")
+    (output_root / "README.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 def main() -> None:
+    global BENCHMARK_PATH, OUTPUT_ROOT
+
     parser = argparse.ArgumentParser(description="Run LLM-only AFSIM Agent v2 on benchmark tasks.")
-    parser.add_argument("--task-ids", nargs="*", default=DEFAULT_TASK_IDS, help="Benchmark task ids to run.")
+    parser.add_argument("--benchmark-jsonl", default=str(BENCHMARK_PATH.relative_to(ROOT)), help="Benchmark JSONL path to run.")
+    parser.add_argument("--output-root", default=str(OUTPUT_ROOT.relative_to(ROOT)), help="Output directory for run artifacts.")
+    parser.add_argument("--task-ids", nargs="*", default=None, help="Benchmark task ids to run. Defaults to all rows in --benchmark-jsonl.")
     parser.add_argument("--model", default=None, help="Override model name.")
     parser.add_argument("--max-intent-attempts", type=int, default=2)
     parser.add_argument("--max-generation-attempts", type=int, default=1)
@@ -643,35 +767,49 @@ def main() -> None:
     parser.add_argument("--max-workers", type=int, default=4, help="Max parallel workers for task execution.")
     args = parser.parse_args()
 
-    benchmark_index = load_benchmark_index()
+    benchmark_path = Path(args.benchmark_jsonl)
+    if not benchmark_path.is_absolute():
+        benchmark_path = ROOT / benchmark_path
+    output_root = Path(args.output_root)
+    if not output_root.is_absolute():
+        output_root = ROOT / output_root
+    BENCHMARK_PATH = benchmark_path
+    OUTPUT_ROOT = output_root
+
+    benchmark_index = load_benchmark_index(benchmark_path)
+    task_ids = args.task_ids or list(benchmark_index.keys())
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-    for task_id in args.task_ids:
+    for task_id in task_ids:
         if task_id not in benchmark_index:
             raise SystemExit(f"Unknown benchmark task id: {task_id}")
 
     # Only require API key when at least one task needs LLM generation.
     needs_llm = args.rerun_completed or any(
-        not has_reusable_summary(task_id) for task_id in args.task_ids
+        not has_reusable_summary(task_id) for task_id in task_ids
     )
     client = LLMClient.from_env(model=args.model) if needs_llm else None
 
     def _run_one(task_id: str) -> dict[str, Any]:
-        return run_task(
-            benchmark_index[task_id],
-            client,
-            max_intent_attempts=args.max_intent_attempts,
-            max_generation_attempts=args.max_generation_attempts,
-            rerun_completed=args.rerun_completed,
-        )
+        task = benchmark_index[task_id]
+        try:
+            return run_task(
+                task,
+                client,
+                max_intent_attempts=args.max_intent_attempts,
+                max_generation_attempts=args.max_generation_attempts,
+                rerun_completed=args.rerun_completed,
+            )
+        except Exception as exc:
+            return write_failed_task_summary(task, exc)
 
     task_summaries: list[dict[str, Any]] = []
     if args.max_workers <= 1:
-        for task_id in args.task_ids:
+        for task_id in task_ids:
             task_summaries.append(_run_one(task_id))
     else:
         with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-            futures = {executor.submit(_run_one, task_id): task_id for task_id in args.task_ids}
+            futures = {executor.submit(_run_one, task_id): task_id for task_id in task_ids}
             for future in as_completed(futures):
                 task_summaries.append(future.result())
 
@@ -680,9 +818,10 @@ def main() -> None:
         "name": "full_agent_v2",
         "version": "afsim_agent_v2",
         "mode": "llm_only",
-        "benchmark_dir": "benchmarks/benchmark_v1",
+        "benchmark_dir": str(benchmark_path.parent.relative_to(ROOT)).replace("\\", "/"),
+        "benchmark_jsonl": str(benchmark_path.relative_to(ROOT)).replace("\\", "/"),
         "model": model_label,
-        "task_ids": args.task_ids,
+        "task_ids": task_ids,
         "total": len(task_summaries),
         "counts": {
             "total": len(task_summaries),
@@ -701,7 +840,7 @@ def main() -> None:
         },
         "tasks": task_summaries,
     }
-    results_rows = [to_results_row(row, OUTPUT_ROOT / row["task_id"]) for row in task_summaries]
+    results_rows = [to_results_row(row, OUTPUT_ROOT / row["task_id"], benchmark_index, OUTPUT_ROOT) for row in task_summaries]
     semantic_true = sum(1 for row in results_rows if row["semantic_match"])
     substantive_true = sum(1 for row in results_rows if row.get("substantive_pass"))
     repair_values = [row["repair_success"] for row in results_rows if isinstance(row.get("repair_success"), bool)]
@@ -715,7 +854,7 @@ def main() -> None:
     merged_results = merge_results_rows(OUTPUT_ROOT / "results.jsonl", results_rows)
     write_jsonl(OUTPUT_ROOT / "results.jsonl", merged_results)
     write_json(OUTPUT_ROOT / "summary.json", overall)
-    write_readme(task_summaries, model_label)
+    write_readme(task_summaries, model_label, OUTPUT_ROOT)
     print(json.dumps(overall, ensure_ascii=False, indent=2))
 
 

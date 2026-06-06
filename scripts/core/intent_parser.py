@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Task-016: LLM-backed natural-language to AFSIM-IR parser.
+Task-016 / Task-017: LLM-backed natural-language to AFSIM-IR parser.
 """
 
 from __future__ import annotations
@@ -11,12 +11,12 @@ import re
 from pathlib import Path
 from typing import Any
 
-from ir_schema_validator_v1 import validate_ir
-from llm_client_v1 import LLMClient, extract_json_object
+from .ir_validator import validate_ir
+from .llm_client import LLMClient, extract_json_object
 
 
-ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_v1.json"
+ROOT = Path(__file__).resolve().parent.parent.parent
+SCHEMA_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_v2.json"
 IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
 BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark_v1" / "tasks.jsonl"
 
@@ -43,7 +43,7 @@ def tokenize(text: str) -> set[str]:
     return {token for token in ascii_tokens | chinese_tokens if token}
 
 
-def load_few_shot_examples(task_input: str, limit: int = 3) -> list[dict[str, Any]]:
+def load_few_shot_examples(task_input: str, limit: int = 5) -> list[dict[str, Any]]:
     benchmark_inputs = {task_id: row["input"] for task_id, row in load_benchmark_index().items()}
 
     request_tokens = tokenize(task_input)
@@ -71,6 +71,52 @@ def load_few_shot_examples(task_input: str, limit: int = 3) -> list[dict[str, An
     return [item[2] for item in scored_examples[:limit]]
 
 
+def check_slot_coverage(ir: dict[str, Any]) -> dict[str, Any]:
+    """Post-parse slot coverage diagnostics (Task-017)."""
+    # Build entity→side map for cross-side adversarial detection
+    entity_side = {e["id"]: e.get("side", "") for e in ir.get("entities", [])}
+    slots = {
+        "scenario_name": bool(ir.get("scenario", {}).get("name")),
+        "scenario_duration": bool(ir.get("scenario", {}).get("duration")),
+        "sides": len(ir.get("sides", [])) >= 2,
+        "adversarial_tasks": any(
+            t.get("target_refs") and t.get("assignee_refs")
+            and any(
+                entity_side.get(a, "") != entity_side.get(tgt, "")
+                for a in t["assignee_refs"]
+                for tgt in t["target_refs"]
+            )
+            for t in ir.get("tasks", [])
+        ),
+        "locations": len(ir.get("locations", [])) > 0,
+        "routes": len(ir.get("routes", [])) > 0,
+        "components_movers": len(ir.get("components", {}).get("movers", [])) > 0,
+        "components_sensors": len(ir.get("components", {}).get("sensors", [])) > 0,
+        "components_weapons": len(ir.get("components", {}).get("weapons", [])) > 0,
+        "components_processors": len(ir.get("components", {}).get("processors", [])) > 0,
+        "components_comms": len(ir.get("components", {}).get("comms", [])) > 0,
+        "entities": len(ir.get("entities", [])) > 0,
+        "tasks": len(ir.get("tasks", [])) > 0,
+        "expected_events": len(ir.get("expected_events", [])) > 0,
+        "constraints_resource_limits": bool(
+            ir.get("constraints", {}).get("resource_limits")
+        ),
+        "constraints_roe": bool(
+            ir.get("constraints", {}).get("rules_of_engagement")
+        ),
+        "grounding_hints": len(ir.get("grounding_hints", [])) > 0,
+    }
+    filled = sum(1 for v in slots.values() if v)
+    total = len(slots)
+    return {
+        "filled_slots": filled,
+        "total_slots": total,
+        "coverage_ratio": round(filled / total, 3) if total else 0.0,
+        "slots": slots,
+        "missing_slots": [k for k, v in slots.items() if not v],
+    }
+
+
 def build_messages(
     task_id: str,
     user_input: str,
@@ -81,12 +127,12 @@ def build_messages(
 ) -> list[dict[str, str]]:
     system_prompt = """You are the Intent Parsing module of an AFSIM scenario generation agent.
 
-Convert the user's natural-language request into one JSON object that conforms to afsim_ir_schema_v1.
+Convert the user's natural-language request into one JSON object that conforms to afsim_ir_schema_v2.
 
 Rules:
 - Return JSON only. No markdown, no explanation.
 - The top-level object must be the IR object itself.
-- Use schema_version = "afsim_ir_v1".
+- Use schema_version = "afsim_ir_v2".
 - Represent uncertain platform or component types with platform_type_hint or type_hint.
 - Do not invent unsupported WSF_* identifiers.
 - Include scenario, sides, entities, and tasks.
@@ -98,6 +144,13 @@ Rules:
 - Keep Chinese source meaning in scenario.description when helpful.
 - Follow the structure style shown in the few-shot examples when the request resembles them.
 - If benchmark metadata provides a source_hint, stay aligned with that source family and domain rather than over-interpreting one keyword in isolation.
+
+Advanced slot coverage (Task-017 additions):
+- Adversarial relations: If the request describes a conflict (A vs B), create tasks where assignee_refs and target_refs cross sides. For symmetric conflicts, create reciprocal tasks on both sides.
+- Timing / triggers: Extract explicit time values (duration, impact_time, activation_delay). For multi-phase missions, split into multiple tasks with expected_events linking them temporally.
+- Resource constraints: Capture explicit limits (ammo count, speed, altitude, range) into component parameters or constraints.resource_limits. Do not fabricate limits the user did not state.
+- Entity relationships: Commander/subordinate ("A commands B") → use commander_ref. Escort ("A protects B") → use task type=escort. Formation/group → shared comm component with same network_name.
+- Default durations by task type: detect=120s, patrol=600s, air_engage=300s, escort=420s, strike=600s, area_air_defense=480s, communication=240s, time_on_target=600s, orbital_mission=345600s (4 days).
 """
     examples_payload = json.dumps(few_shot_examples, ensure_ascii=False, indent=2)
     benchmark_payload = json.dumps(
@@ -172,6 +225,7 @@ def parse_intent_with_llm(
             attempt_record["validation"] = validation
             attempts.append(attempt_record)
             if validation["ok"]:
+                coverage = check_slot_coverage(ir)
                 return {
                     "version": "llm_intent_parser_v1",
                     "task_id": task_id,
@@ -182,6 +236,7 @@ def parse_intent_with_llm(
                     "attempt_count": attempt_index,
                     "attempts": attempts,
                     "ir": ir,
+                    "slot_coverage": coverage,
                 }
             feedback = [f"{item['path']}: {item['message']}" for item in validation["errors"][:8]]
         except Exception as exc:

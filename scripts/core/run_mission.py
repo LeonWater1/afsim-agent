@@ -28,9 +28,9 @@ def load_config():
             - documentation_dir: Documentation directory path
             - mission_exe: mission.exe path
     """
-    # Get the skill directory (parent of scripts directory)
+    # Get the repo root (parent of parent of core directory)
     script_dir = Path(__file__).parent
-    skill_dir = script_dir.parent
+    skill_dir = script_dir.parent.parent
     config_file = skill_dir / "config.txt"
 
     # Default configuration
