@@ -33,3 +33,4 @@ layered_generation_artifacts/
 # Test/scratch files
 test_*.txt
 mission.log
+assets/
