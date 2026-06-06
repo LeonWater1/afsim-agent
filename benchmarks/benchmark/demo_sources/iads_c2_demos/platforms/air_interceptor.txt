@@ -1,0 +1,72 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once sensors/ttr_radar.txt
+include_once weapons/aa_missile.txt
+
+radar_signature SIG_RADAR_ONE_M_SQUARED
+  constant 1.0 m^2
+end_radar_signature
+
+platform_type AIR_INTERCEPTOR WSF_PLATFORM
+   radar_signature SIG_RADAR_ONE_M_SQUARED
+
+   comm cmdr_net DATALINK
+      network_name <local:slave>
+      internal_link track_manager
+      internal_link dissemination
+   end_comm
+
+   mover WSF_AIR_MOVER
+      roll_rate_limit               1 rad/sec
+      default_linear_acceleration   1.0 g
+      default_radial_acceleration   6.5 g
+      default_climb_rate            400 fps
+      maximum_climb_rate            400 fps
+      maximum_speed                 800.0 knots
+      minimum_speed                 150.0 knots
+      maximum_altitude              50000 ft
+      minimum_altitude              50 ft
+      maximum_linear_acceleration   9 g
+      at_end_of_path                stop
+      turn_rate_limit               4.0 deg/sec
+   end_mover
+
+   processor track_manager WSF_TRACK_MANAGER
+      purge_interval             60 sec
+      report_interval            1 sec
+      fused_track_reporting      off
+      raw_track_reporting        on
+      report_to commander        via   cmdr_net to sub_net
+      circular_report_rejection  true
+   end_processor
+
+   weapon missile AIR_TO_AIR_MISSILE
+      quantity 12
+   end_weapon
+
+   sensor ttr TTR_RADAR
+      off
+      internal_link track_manager
+      ignore_same_side
+   end_sensor
+
+   processor asset_manager WPN_AM
+   end_processor
+
+   processor dissemination DC2
+   end_processor
+
+   processor weapons_manager WM_AI
+   end_processor
+end_platform_type

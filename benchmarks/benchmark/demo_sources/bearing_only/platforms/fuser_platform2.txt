@@ -1,0 +1,68 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+platform_type FUSER_PLATFORM WSF_PLATFORM
+  icon comm_truck_icon
+
+  infrared_signature    VEHICLE_INFRARED_SIGNATURE
+  optical_signature     VEHICLE_OPTICAL_SIGNATURE
+  radar_signature       VEHICLE_RADAR_SIGNATURE
+
+  comm cmdr_net RED_DATALINK
+     network_name <local:slave>
+     #internal_link data_mgr
+     #internal_link task_mgr
+     internal_link fuser
+  end_comm
+
+  comm sub_net RED_DATALINK
+     network_name <local:master>
+     internal_link fuser
+     #internal_link task_mgr
+  end_comm
+
+
+  processor trk_mgr WSF_TRACK_PROCESSOR
+    update_interval 10 sec
+    script bool is_track_reportable(WsfTrack aTrack)
+       //writeln("***** ", aTrack.TrackId(), " ", aTrack.LocationValid());
+       return aTrack.LocationValid();
+    end_script
+    on_update
+        WsfLocalTrackList localtracklist = PLATFORM.MasterTrackList();
+        WsfTrackList        rawtracklist =  PLATFORM.MasterRawTrackList();
+        #foreach (WsfTrack track in rawtracklist)
+        foreach (WsfTrack track in localtracklist)
+        {
+            if (track.IsValid())
+            {
+                WsfDraw aDraw = WsfDraw(); # Make a draw object
+                aDraw.SetColor(1, 0, 0, 1);
+                aDraw.BeginIcons(track.Heading(), "wedge");
+                aDraw.Vertex(track.ReportedLocation());
+                aDraw.End();
+            }
+        }
+    end_on_update
+  end_processor
+
+  processor reporter WSF_LINKED_PROCESSOR
+   report_to commander via cmdr_net to sub_net
+   update_interval  10 sec
+   end_processor
+
+  processor fuser WSF_DIRECTION_FINDER_PROCESSOR
+     processor trk_mgr
+     processor reporter
+     maximum_time_difference 5 sec
+  end_processor
+
+
+end_platform_type

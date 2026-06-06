@@ -1,0 +1,526 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "ir_examples_v1",
+    "source_id": "IRX-004",
+    "source_task_id": "BV1-017"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "group_comm_example",
+      "description": "Group communication scenario.",
+      "duration": {
+        "value": 240,
+        "unit": "sec"
+      },
+      "domains": [
+        "surface"
+      ],
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ],
+      "side_ids": [
+        "blue"
+      ],
+      "location_ids": [
+        "detector_site",
+        "relay_site",
+        "observer_site"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "detector_unit",
+          "role": "detector",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "detector_platform_basic",
+            "row": {
+              "canonical_id": "detector_platform_basic",
+              "canonical_role": "detector",
+              "match_labels": [
+                "detector",
+                "detector_platform",
+                "探测节点",
+                "探测车"
+              ],
+              "platform_type_hints": [
+                "detector_platform"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "detector_platform_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "datalink_basic",
+                "track_processor_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/comm/platforms/detector.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "datalink_basic",
+                "track_processor_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "datalink_basic",
+              "track_processor_basic"
+            ]
+          },
+          "initial_location_ref": "detector_site",
+          "route_ref": null,
+          "component_refs": [
+            "group_network",
+            "report_processor"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [
+              "report_processor"
+            ],
+            "comm": [
+              "group_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "relay_unit",
+          "role": "relay",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "relay_platform_basic",
+            "row": {
+              "canonical_id": "relay_platform_basic",
+              "canonical_role": "relay",
+              "match_labels": [
+                "relay",
+                "relay_platform",
+                "中继节点",
+                "中继平台"
+              ],
+              "platform_type_hints": [
+                "relay_platform"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "relay_platform_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "group_comm_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "group_comm_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "group_comm_basic"
+            ]
+          },
+          "initial_location_ref": "relay_site",
+          "route_ref": null,
+          "component_refs": [
+            "group_network"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [],
+            "comm": [
+              "group_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "observer_unit",
+          "role": "observer",
+          "domain": "ground",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "observer_platform_basic",
+            "row": {
+              "canonical_id": "observer_platform_basic",
+              "canonical_role": "observer",
+              "match_labels": [
+                "observer",
+                "observer_platform",
+                "观察节点",
+                "观察员平台"
+              ],
+              "platform_type_hints": [
+                "observer_platform"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "observer_platform_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "group_comm_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "group_comm_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "group_comm_basic"
+            ]
+          },
+          "initial_location_ref": "observer_site",
+          "route_ref": null,
+          "component_refs": [
+            "group_network"
+          ],
+          "component_families": {
+            "mover": [],
+            "sensor": [],
+            "weapon": [],
+            "processor": [],
+            "comm": [
+              "group_network"
+            ]
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "report_processor",
+          "family": "processor",
+          "role": "reporting",
+          "type_hint": "message_or_report_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "processor",
+            "canonical_id": "track_processor_basic",
+            "row": {
+              "canonical_id": "track_processor_basic",
+              "match_labels": [
+                "track_processor",
+                "tracking",
+                "数据管理",
+                "跟踪处理"
+              ],
+              "type_hints": [
+                "track_processor",
+                "message_or_report_processor"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_TRACK_PROCESSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "comms": [
+        {
+          "component_id": "group_network",
+          "family": "comm",
+          "role": "group_comm",
+          "type_hint": "comm_system",
+          "parameters": {
+            "network_mode": "group"
+          },
+          "grounding": {
+            "matched": true,
+            "mapping_type": "comm",
+            "canonical_id": "group_comm_basic",
+            "row": {
+              "canonical_id": "group_comm_basic",
+              "match_labels": [
+                "group_comm",
+                "group_communication",
+                "群组通信"
+              ],
+              "type_hints": [
+                "group_comm"
+              ],
+              "grounding_target": {
+                "target_kind": "comm_profile",
+                "target_id": "group_comm_profile",
+                "backing_wsf_type": "WSF_COMM_TRANSCEIVER",
+                "network_pattern": "group_broadcast",
+                "required_directives": [
+                  "group_join"
+                ],
+                "optional_directives": [
+                  "internal_link"
+                ],
+                "message_pattern": "report_to_group_via_named_comm"
+              },
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "comm_profile",
+              "wsf_context_rules": [
+                {
+                  "wsf_type": "WSF_COMM_TRANSCEIVER",
+                  "allowed_block_kinds": [
+                    "comm"
+                  ],
+                  "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                  "provenance": [
+                    "demo: benchmarks/benchmark/demo_sources/comm/platforms/detector.txt",
+                    "demo: benchmarks/benchmark/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                  ]
+                }
+              ],
+              "preferred_declarations": [
+                "comm <name> WSF_COMM_TRANSCEIVER"
+              ]
+            }
+          },
+          "implementation_constraints": {
+            "grounding_target_kind": "comm_profile",
+            "wsf_context_rules": [
+              {
+                "wsf_type": "WSF_COMM_TRANSCEIVER",
+                "allowed_block_kinds": [
+                  "comm"
+                ],
+                "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+                "provenance": [
+                  "demo: benchmarks/benchmark/demo_sources/comm/platforms/detector.txt",
+                  "demo: benchmarks/benchmark/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+                ]
+              }
+            ],
+            "preferred_declarations": [
+              "comm <name> WSF_COMM_TRANSCEIVER"
+            ]
+          },
+          "unresolved_items": []
+        }
+      ],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "share_group_reports",
+          "task_type": "group_communication",
+          "grounding": {
+            "matched": true,
+            "mapping_type": "task",
+            "canonical_id": "group_communication",
+            "row": {
+              "canonical_id": "group_communication",
+              "match_labels": [
+                "group_communication",
+                "group_comm",
+                "群组通信",
+                "组网通信"
+              ],
+              "ir_task_types": [
+                "group_communication"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "group_communication_behavior"
+              },
+              "script_realization": [
+                "comm",
+                "processor"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "detector_unit",
+            "relay_unit",
+            "observer_unit"
+          ],
+          "target_refs": [],
+          "location_refs": [],
+          "parameters": {
+            "message_flow": "group_broadcast"
+          },
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 240,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe",
+        "event_output"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": true,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": true
+      },
+      "ready": true,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [],
+  "ready_for_generation": true
+}

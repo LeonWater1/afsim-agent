@@ -1,0 +1,127 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# First define helicopter motion attributes (speeds, rates of climb, etc.) for each motion "mode".
+# This is done in the included file "helo_mover.txt.
+# Recommend that rotorcraft motion modes be named as: HOVER, LOITER, CRUISE, DASH.
+
+mover HELO_MOVER WSF_ROTORCRAFT_MOVER
+
+   mode HOVER
+
+      weathercock_speed               12 kts # Speed above which the aircraft weathercocks to point into the velocity vector.
+
+      maximum_attitude_rate         3.0 rpm # <fabricated>  # Largest angular rate for the body, in any axis.
+      minimum_upward_acceleration   0.1 g  # <fabricated>   # Most-negative permitted value for downward acceleration.
+                                                            # (Generally, rotorcraft CANNOT fly negative G without risk to airframe.)
+
+      body_rates_gain                10 # Rotate heading toward the target at
+                                        # a rate proportional to the error,
+                                        # clamped to maximum_attitude_rate
+
+      maximum_ground_speed          30 kts                  # Self explanatory.  Fastest speed attainable in this mode (HOVER).
+
+      maximum_rate_of_climb       1250 ft/min # <fabricated>
+      maximum_rate_of_descent     1500 ft/min # <fabricated>
+
+      maximum_total_acceleration   2.0 g      # <fabricated>
+
+   end_mode
+
+   mode LOITER
+
+      weathercock_speed              12 kts
+
+      maximum_attitude_rate         3.0 rpm # <fabricated>
+      minimum_upward_acceleration   0.1 g  # <fabricated>
+
+      body_rates_gain                10 # Rotate heading toward the target at
+                                        # a rate proportional to the error,
+                                        # clamped to maximum_attitude_rate
+
+      maximum_ground_speed         135 kts    # Economy Cruise
+      maximum_rate_of_climb       2250 ft/min # Max ROC
+      maximum_rate_of_descent     2550 ft/min # <fabricated>
+      maximum_total_acceleration   3.0 g      # <fabricated>
+
+   end_mode
+
+   mode CRUISE
+
+      weathercock_speed              12 kts
+
+      maximum_attitude_rate         3.0 rpm # <fabricated>
+      minimum_upward_acceleration   0.1 g  # <fabricated>
+
+      body_rates_gain                10 # Rotate heading toward the target at
+                                        # a rate proportional to the error,
+                                        # clamped to maximum_attitude_rate
+
+      maximum_ground_speed         149 kts    # Max Cruise
+      maximum_rate_of_climb       1850 ft/min # <fabricated>
+      maximum_rate_of_descent     2550 ft/min # <fabricated>
+      maximum_total_acceleration   3.5 g      # <fabricated>
+
+   end_mode
+
+   mode DASH
+
+      weathercock_speed               12 kts
+
+      maximum_attitude_rate         3.0 rpm # <fabricated>
+      minimum_upward_acceleration   0.1 g  # <fabricated>
+
+      body_rates_gain                10 # Rotate heading toward the target at
+                                        # a rate proportional to the error,
+                                        # clamped to maximum_attitude_rate
+
+      maximum_ground_speed         180 kts    # (Vne = 195 kts)
+      maximum_rate_of_climb        550 ft/min # <fabricated>
+      maximum_rate_of_descent      850 ft/min # <fabricated>
+      maximum_total_acceleration   3.0 g      # <fabricated>
+
+   end_mode
+
+   start_mode HOVER
+
+   update_interval 0.1 sec
+
+   // Default values for the PIDs are provided in code.
+   lateral_acceleration_rate_pid
+      proportional_gain 2.0
+      integral_gain     0.0
+      derivative_gain   0.5
+      input_threshold   0.0
+   end_lateral_acceleration_rate_pid
+
+   lateral_acceleration_value_pid
+      proportional_gain 0.020
+      integral_gain     0.0
+      derivative_gain   20.0
+      input_threshold   0.0
+   end_lateral_acceleration_value_pid
+
+   vertical_acceleration_rate_pid
+      proportional_gain 0.025
+      integral_gain     0.001
+      derivative_gain   2.00
+      input_threshold   0.0
+   end_vertical_acceleration_rate_pid
+
+   vertical_acceleration_value_pid
+      proportional_gain 0.025
+      integral_gain     0.000
+      derivative_gain   12.00
+      input_threshold   0.0
+   end_vertical_acceleration_value_pid
+
+   disk_tilt_filter_time_constant           3 sec
+   position_hold_capture_radius             100.0 m
+   altitude_error_to_rate_of_climb_gain      2.0
+
+end_mover

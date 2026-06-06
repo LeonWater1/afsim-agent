@@ -1,0 +1,150 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+ 51277 1
+ 1 
+ 1
+ 4 Main
+ 3
+ 50331648
+ 83886082
+ 83886080
+ 770
+ 11
+ 1
+ 6 49 1584 1104
+ Graphics
+1
+3
+38.47588
+-116.6227
+0
+90
+671181.4
+MapOptions
+2
+7
+2
+5
+10 Western US
+0
+1
+0
+0
+0
+0
+0
+1
+0
+EndMapOptions
+ EndGraphics
+ 0
+ 0
+ 1
+ 0
+ 7 EndMain
+ 6 Filter
+entity_options
+3
+.global.
+     DisplayIcon 0 1
+     DisplayName 1 1
+     DisplayWaypts 0 1
+     DisplaySegments 0 1
+     DisplayZones 0 1
+     DisplayAltLocs 0 1
+     DisplayAltLocLines 0 1
+     SymbolSize 2.5 1
+     LineWidth 3 1
+     DisplayUnderground 0 1
+     DisplayAboveground 0 1
+     DisplayCmtBubbles 0 1
+     DisplayCommandChain 0 1
+     InheritAll 0
+     End_EntityOptions
+end_entity_options
+ 11 PostProcess
+postprocess_options
+3
+.global.
+     DisplayIcon 0 1
+     DisplayName 1 1
+     SymbolSize 1.5 1
+     LineWidth 3 1
+     KillRemovalTime 30 1
+     StaleRemovalTime 30 1
+     DeactRemovalTime 30 1
+     EmitFace 0 1
+     EmitEdge 0 1
+     EmitIcon 0 1
+     TraceLines 1 1
+     AltPoles 0 1
+     WingRibbon 0 1
+     CmtBubbles 0 1
+     Length 6000 1
+     AltPoleIncr 20 1
+     InheritEntityAll 0
+     IntrAll 0 0 1
+     XmitDetect 0 0 1
+     XmitTrack 0 0 1
+     XmitJam 0 0 1
+     XmitFire 1 0 1
+     XmitKill 0 0 1
+     RecvDetect 0 0 1
+     RecvTrack 0 0 1
+     RecvJam 0 0 1
+     RecvFire 1 0 1
+     RecvKill 0 0 1
+     XmitComm 0 1
+     RecvComm 0 1
+     CommIntrLife 1 1
+     IntrHistIncr 10 1
+     InheritIntrAll 0
+     End_PostProcessOptions
+.blue.
+     DisplayIcon 0 1
+     DisplayName 1 1
+     SymbolSize 1 0
+     LineWidth 3 1
+     KillRemovalTime 30 1
+     StaleRemovalTime 30 1
+     DeactRemovalTime 30 1
+     EmitFace 0 1
+     EmitEdge 0 1
+     EmitIcon 0 1
+     TraceLines 1 1
+     AltPoles 0 1
+     WingRibbon 0 1
+     CmtBubbles 0 1
+     Length 6000 1
+     AltPoleIncr 20 1
+     InheritEntityAll 0
+     IntrAll 0 0 1
+     XmitDetect 0 0 1
+     XmitTrack 0 0 1
+     XmitJam 0 0 1
+     XmitFire 1 0 1
+     XmitKill 0 0 1
+     RecvDetect 0 0 1
+     RecvTrack 0 0 1
+     RecvJam 0 0 1
+     RecvFire 1 0 1
+     RecvKill 0 0 1
+     XmitComm 0 1
+     RecvComm 0 1
+     CommIntrLife 1 1
+     IntrHistIncr 10 1
+     InheritIntrAll 0
+     End_PostProcessOptions
+end_postprocess_options
+ 6 Common
+0
+0 0 1260 155
+end_common_data
+ 8 EndSedit

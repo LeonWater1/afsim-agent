@@ -1,0 +1,38 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# ==============================================================================
+# common type definitions for sensor_plot map plots.
+# ==============================================================================
+
+sosm_interface
+#  load_atmosphere DEFAULT             from ../../sosm/modtran/us_std_day.txt
+#  load_atmosphere DEFAULT             from ../../sosm/modtran/us_std_night.txt
+   load_atmosphere DEFAULT             from ../../sosm/modtran/mid_lat_summer_day.txt
+#  load_atmosphere DEFAULT             from ../../sosm/modtran/mid_lat_summer_night.txt
+#  load_atmosphere DEFAULT             from ../../sosm/modtran/mid_lat_winter_day.txt
+#  load_atmosphere DEFAULT             from ../../sosm/modtran/mid_lat_winter_night.txt
+
+   load_sensor     IRST                from ../../sosm/sensors/uniform_lwir.txt
+   load_target     TARGET              from ../../sosm/targets/red_multirole_fighter_3/red_multirole_fighter_3.txt
+end_sosm_interface
+
+# ==============================================================================
+
+platform_type TARGET WSF_PLATFORM
+end_platform_type
+
+platform_type TARGET_PLATFORM_TYPE TARGET
+end_platform_type
+
+sensor IRST WSF_SOSM_SENSOR
+   frame_time  1 sec
+   reports_range
+   reports_bearing
+end_sensor
+

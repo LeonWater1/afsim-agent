@@ -1,0 +1,48 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once processors/gun_battery_tactics.txt
+include_once weapons/guns/30mm_bullet.txt
+include_once weapons/guns/30mm_bullet_launch_computer.txt
+include_once sensors/radar/red_ciws_radar_1.txt
+
+platform_type SHIP WSF_PLATFORM
+  icon  ship
+  commander SELF
+  weapon gun 30MM_BULLET
+    location 0 0 -5 m  # 15 feet up off of waterline
+    quantity 101
+  end_weapon
+
+  processor gun_task_processor GUN_BATTERY_TACTICS
+
+    script_variables
+      #TRACK_SENSOR_NAME         = "test_track_sensor";
+      TRACK_SENSOR_NAME         = "red_ciws_radar_1";
+      ACQ_SENSOR_NAME           = "test_acq_sensor";
+      SENSOR_TRACK_MODE         = "default";
+      WEAPON_NAME               = "gun";
+      SALVO_SIZE                = 100;
+      MAX_RANGE                 = 1800; # dont even try to shoot farther
+    end_script_variables
+  end_processor
+
+  processor track_mgr WSF_TRACK_PROCESSOR
+    internal_link gun
+    purge_interval       60 sec
+  end_processor
+
+  sensor red_ciws_radar_1 RED_CIWS_RADAR_1
+     on 
+     ignore_same_side 
+     processor track_mgr     
+     antenna_height                 6.0 m        # about 18 ft above waterline
+  end_sensor
+
+end_platform_type

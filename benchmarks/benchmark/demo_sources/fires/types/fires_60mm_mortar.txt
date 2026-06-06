@@ -1,0 +1,68 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Fires table generated using existing (unclassified, exportable) 60mm mortar model based on the following:
+
+#   http://www.inetres.com/gp/military/infantry/mortar/60mm.html
+#   From above reference, for M720, the following muzzle velocities are available:
+#   From above ref, max range = 3828 yd.
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_60MM_MORTAR_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+   fires_table FIRES_60MM_MORTAR
+      maximum_ordinate_values 2581.65 2581.3 2548.23 2510.96 2468.58 2419.26 2364.94 2300.47 2226.98 2129.38 2038.33 end_maximum_ordinate_values
+      range_values            1596.07 1868.87 2063.09 2272.4 2458.37 2675.11 2850.41 3075.58 3277.17 3359.59 3680.16 end_range_values
+      time_of_flight_values   46.21 46.21 45.56 45.56 44.66 44.66 43.51 43.51 42.76 40.81 40.81 end_time_of_flight_values
+   end_fires_table
+end_launch_computer
+
+weapon_effects FIRES_60MM_MORTAR_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_60MM_MORTAR WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 2.0 seconds
+   launch_computer
+      FIRES_60MM_MORTAR_LAUNCH_COMPUTER
+   end_launch_computer
+   weapon_effects FIRES_60MM_MORTAR_EFFECTS
+   launched_platform_type FIRES_60MM_MORTAR
+end_weapon
+
+platform_type FIRES_60MM_MORTAR WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+   end_mover
+end_platform_type
+
+weapon FIRES_60MM_MORTAR_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   launch_computer
+      FIRES_60MM_MORTAR_LAUNCH_COMPUTER
+   end_launch_computer
+   salvo_interval 5.0 seconds
+   launched_platform_type FIRES_60MM_MORTAR
+  weapon_effects FIRES_60MM_MORTAR_EFFECTS
+end_weapon
+
+platform_type FIRES_60MM_MORTAR_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_60mm_mortar FIRES_60MM_MORTAR_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_60MM_MORTAR_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_60mm_mortar FIRES_60MM_MORTAR
+   end_weapon
+end_platform_type

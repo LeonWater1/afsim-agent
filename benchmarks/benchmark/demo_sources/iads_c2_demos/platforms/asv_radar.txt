@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform_type ASV_RADAR WSF_PLATFORM
+  icon Ground_Radar
+
+  infrared_signature   VEHICLE_INFRARED_SIGNATURE
+  optical_signature    VEHICLE_OPTICAL_SIGNATURE
+  radar_signature      VEHICLE_RADAR_SIGNATURE
+
+  comm sub_net RED_DATALINK
+     network_name <local:slave>
+     internal_link dissemination
+  end_comm
+
+  processor data_mgr WSF_LINKED_PROCESSOR
+     report_to commander via sub_net
+  end_processor
+
+  processor asset_manager ASV_AM
+  end_processor
+
+  processor dissemination DC2
+  end_processor
+end_platform_type

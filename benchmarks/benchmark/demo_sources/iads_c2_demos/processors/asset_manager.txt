@@ -1,0 +1,29 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+processor ASV_AM WSF_UNCLASS_ASSET_MANAGER
+   update_interval 1 sec
+
+   status_settings
+      subord_yellow_timeout  120 secs      # time elapsed before marking asset as yellow if no status
+      subord_red_timeout     180 secs      # time elapsed before marking asset as red if no status
+   end_status_settings
+
+   assignment_delay     0 seconds
+   log_status           off
+   filter_dead_tracks   on
+end_processor
+
+processor WPN_AM ASV_AM
+   max_assignments 10
+end_processor

@@ -19,8 +19,8 @@ from .grounding import (
 
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-IR_EXAMPLES_V1_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
-IR_EXAMPLES_V2_PATH = ROOT / "docs" / "machine" / "ir_examples_v2.jsonl"
+IR_EXAMPLES_V1_PATH = ROOT / "docs" / "machine" / "ir_examples.jsonl"
+IR_EXAMPLES_V2_PATH = ROOT / "docs" / "machine" / "ir_examples_extended.jsonl"
 
 
 def load_ir_from_examples(example_id: str):
@@ -551,7 +551,7 @@ def build_generation_plan(ir_source: dict):
 
 def main():
     parser = argparse.ArgumentParser(description="Build layered generation plan from AFSIM-IR.")
-    parser.add_argument("--example-id", help="IR example id from docs/machine/ir_examples_v1.jsonl")
+    parser.add_argument("--example-id", help="IR example id from docs/machine/ir_examples.jsonl")
     parser.add_argument("--ir-json", help="Path to JSON file containing raw IR or wrapper object with `ir`.")
     parser.add_argument("--output", help="Optional output path for generated plan JSON.")
     args = parser.parse_args()

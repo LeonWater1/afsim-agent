@@ -1,0 +1,14 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# A setup file typically defines the platform types that are used in the scenario
+include_once platforms/bomber.txt
+include_once platforms/target.txt
+include_once platforms/uhf_ew_radar_sensor_platform.txt
+

@@ -1,0 +1,61 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+###############################################################################
+#                          ------ UNCLASSIFIED ------
+#                                 BLUE_ABM_TTR
+###############################################################################
+#
+# Modified from the base_types radar to accomodate track quality
+#
+###############################################################################
+
+
+antenna_pattern BLUE_ABM_TTR_ANTENNA
+   circular_pattern
+      beamwidth                        1.0 deg              # Typical for phased-array tracker
+      peak_gain                        40.0 db              # Typical for phased-array tracker
+end_antenna_pattern
+
+sensor BLUE_ABM_TTR WSF_RADAR_SENSOR
+
+   pitch                               45 deg
+   frame_time                          1 sec
+   # This is just for culling purposes
+   maximum_range                       2500 km              # Increased for this demo
+
+   electronic_beam_steering            azimuth_and_elevation
+   electronic_beam_steering_limit      70 deg               # Typical for phased-array
+   electronic_beam_steering_loss_exponent 1.4               # Typical for phased-array
+
+   scan_mode                           azimuth_and_elevation
+   azimuth_scan_limits                 -70 deg 70 deg       # Same as steering limits
+   elevation_scan_limits               -70 deg 70 deg       # Same as steering limits
+
+   transmitter
+      antenna_pattern                  BLUE_ABM_TTR_ANTENNA
+      frequency                        10 ghz               # Ref 1, 8-12 ghz
+      power                            200 kw
+   end_transmitter
+
+   receiver
+      antenna_pattern                  BLUE_ABM_TTR_ANTENNA
+   end_receiver
+
+   detection_threshold                 12.8 db              # Nominal Swerling case 1, Pd=0.5
+   one_m2_detect_range                 1500 km              # Ref 1
+
+   hits_to_establish_track             2 3
+   hits_to_maintain_track              1 3
+   track_quality                       1 # weapons grade high quality track
+   reports_range
+   reports_bearing
+   reports_elevation
+   reports_velocity
+   reports_iff
+end_sensor

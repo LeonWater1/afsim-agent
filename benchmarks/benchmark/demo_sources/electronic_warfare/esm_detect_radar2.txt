@@ -1,0 +1,316 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Simple ESM detection example.
+#    with scripting logic to maintain frequency for spot jamming of a agile
+#    radar.
+#
+#    EW_RADAR is a mode and frequency agile radar.
+#
+
+define_path_variable CASE esm_detect_radar2
+log_file output/$(CASE).log
+
+# ****************************************************************************
+# Define the system types (movers, sensors, weapons, etc.)
+# ****************************************************************************
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 10 m^2
+end_radar_signature
+
+radar_signature WIDE_BODY_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+# ****************************************************************************
+#                          ESM
+# ****************************************************************************
+
+antenna_pattern ESM_ANTENNA
+/*   uniform_pattern
+      peak_gain           10.0 db
+      minimum_gain        -80 db
+      azimuth_beamwidth   10.0 deg
+      elevation_beamwidth 10.0 deg
+*/
+  esa_pattern
+    minimum_gain                -80.0 db
+    amplitude_quantization_bits   8
+    phase_quantization_bits       8
+    element_spacing_x             0.015 m
+    number_elements_x            10
+    element_spacing_y             0.015 m
+    number_elements_y            10
+
+    distribution_type taylor
+       sidelobe_level_x         25 dB
+       sidelobe_level_y         25 dB
+       n_bar_x                    5
+       n_bar_y                    5
+
+end_antenna_pattern
+
+sensor ESM_SENSOR WSF_ESM_SENSOR
+   frame_time              0.1 sec
+
+   slew_mode               azimuth_and_elevation
+   azimuth_slew_limits     -60 deg 60 deg
+   elevation_slew_limits   -60 deg 60 deg
+
+   maximum_range           200 km
+
+   receiver
+      antenna_pattern      ESM_ANTENNA
+      detection_threshold  5 db
+      noise_power          -180 dbw
+      internal_loss        0 db
+   end_receiver
+
+   frequency_band          0.1 ghz  20 ghz
+
+   #reported_emitter_type
+   #   default_type
+   #      time_to_declare 10 sec
+   #      report_truth
+   #end_reported_emitter_type
+
+   #ranging_time 30 sec
+
+   reports_location
+   reports_frequency
+   reports_type
+end_sensor
+
+
+# ****************************************************************************
+#                     Early Warning Radar
+# ****************************************************************************
+
+antenna_pattern EW_RADAR_ANTENNA
+  rectangular_pattern
+     peak_gain           35 dB
+     minimum_gain       -20 dB
+     azimuth_beamwidth   5 deg
+     elevation_beamwidth 45 deg
+end_antenna_pattern
+
+sensor EW_RADAR WSF_RADAR_SENSOR
+   #show_calibration_data
+
+   frame_time                      10.0 sec
+
+   one_m2_detect_range          100.0 nm
+   maximum_range                120 nm
+
+   antenna_height               6.0 m
+
+   scan_mode                    azimuth
+   azimuth_scan_limits         -180 deg 180 deg
+
+
+   transmitter
+      antenna_pattern            EW_RADAR_ANTENNA
+      beam_tilt                  10.0 deg
+      power                      1000.0 kw
+      frequency                  200 mhz
+      pulse_width                25 usec
+      pulse_repetition_interval  1250 usec
+      internal_loss              2 db
+   end_transmitter
+
+   receiver
+      beam_tilt                  10.0 deg
+      bandwidth                  2.0 mhz
+      noise_power                -160 dBw  # will be calibrated for 1 m^2
+      internal_loss              7 dB
+   end_receiver
+
+   # Swerling detector
+   swerling_case                 1
+   probability_of_false_alarm    1.0e-6
+   number_of_pulses_integrated   32
+
+   required_pd                   0.5
+
+   hits_to_establish_track       3 5   # 3 of last 5 scans to establish track
+   hits_to_maintain_track        1 3   # 1 of last 3 scans to maintain  track
+
+   reports_range
+   reports_bearing
+end_sensor
+
+# ****************************************************************************
+# Define the platform types
+# ****************************************************************************
+
+platform_type ESM_PLATFORM WSF_PLATFORM
+   icon EA-6B
+   mover WSF_AIR_MOVER end_mover
+   radar_signature WIDE_BODY_SIGNATURE
+
+   sensor esm ESM_SENSOR
+      internal_link track_manager
+      ignore_same_side
+   end_sensor
+
+   script_variables
+      double mAzCue = 0.0;
+      double mElCue = 0.0;
+
+      double mDeltaAz = 1;
+      double mDeltaEl = 1;
+   end_script_variables
+
+   on_initialize
+      WsfSensor sensor = PLATFORM.Sensor("esm");
+      mAzCue = sensor.SlewMinimumAzimuth();
+      mElCue = sensor.SlewMinimumElevation();
+   end_on_initialize
+
+   execute at_interval_of 0.2 sec
+      WsfSensor sensor = PLATFORM.Sensor("esm");
+
+      if (mAzCue >= sensor.SlewMaximumAzimuth())
+      {
+         # got to end of azimuth scan
+         #writeln("END_AZ");
+         mAzCue = sensor.SlewMinimumAzimuth();
+         if (mElCue >= sensor.SlewMaximumElevation())
+         {
+            # got to end of elevation scan
+            #writeln(mAzCue, ":", mElCue);
+            #writeln("END EL");
+            mElCue = sensor.SlewMinimumElevation();
+         }
+         else
+         {
+            mElCue = mElCue + mDeltaEl;
+         }
+      }
+      else
+      {
+         mAzCue = mAzCue + mDeltaAz;
+      }
+      #writeln(mAzCue, ":", mElCue);
+      sensor.CueToAzEl(mAzCue, mElCue);
+   end_execute
+
+   processor track_manager WSF_TRACK_PROCESSOR
+     purge_interval   20.0 sec
+   end_processor
+end_platform_type
+
+platform_type EW_RADAR_SITE WSF_PLATFORM
+   icon Ground_Radar
+
+   mover WSF_GROUND_MOVER end_mover
+
+   sensor ew_radar EW_RADAR
+      on
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+
+# ****************************************************************************
+#                        Define the platform instances
+# ****************************************************************************
+
+platform esm_platform ESM_PLATFORM
+   side blue
+
+   route
+      position 37:00:00n 114:30:00w
+      altitude 35000 ft
+      speed      450 kts
+      heading    270 deg
+   end_route
+
+   sensor esm
+      on
+   end_sensor
+end_platform
+
+platform ew-radar-site EW_RADAR_SITE
+   side red
+
+   route
+      position 37:00:00n 116:00:00w
+      altitude 0.0 ft agl
+      heading   90 deg
+    end_route
+
+   sensor ew_radar
+   end_sensor
+end_platform
+
+event_output
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   #enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_UPDATED
+   enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+  file output/$(CASE).evt
+end_event_output
+
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+terrain
+   #load_cme_terrain
+end_terrain
+
+end_time 4800 sec

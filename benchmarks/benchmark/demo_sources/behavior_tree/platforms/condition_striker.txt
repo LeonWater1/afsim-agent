@@ -1,0 +1,64 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once processors/quantum_agents/aiai/condition_checkpoint_1.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_2.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_3.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_4.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_1_reached.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_2_reached.txt
+include_once processors/quantum_agents/aiai/condition_checkpoint_3_reached.txt
+
+platform_type  STRIKER  WSF_PLATFORM
+
+   mover WSF_AIR_MOVER
+      roll_rate_limit               1 rad/sec
+      default_linear_acceleration   1.0 g
+      default_radial_acceleration   6.5 g
+      default_climb_rate            400 fps
+      maximum_climb_rate            400 fps
+      maximum_speed                 600.0 knots
+      minimum_speed                 150.0 knots
+      maximum_altitude              50000 ft
+      minimum_altitude              50 ft
+      maximum_linear_acceleration   9 g
+      at_end_of_path extrapolate
+      turn_rate_limit               4.0 deg/sec
+   end_mover
+
+   fuel WSF_FUEL
+      consumption_rate     7 lb/s
+      initial_quantity 14000 lb     #~33 minutes, at this consumption rate
+      maximum_quantity 14000 lb
+      bingo_quantity    1000 lb
+   end_fuel  
+
+   processor  task_mgr  WSF_QUANTUM_TASKER_PROCESSOR
+      script_debug_writes  off
+      update_interval 5 sec
+      
+      advanced_behavior_tree
+         btt on
+         behavior_node checkpoint_1
+         sequence
+            condition checkpoint_1_reached
+            behavior_node checkpoint_2
+         end_sequence
+         sequence
+            condition checkpoint_2_reached
+            behavior_node checkpoint_3
+         end_sequence
+         sequence
+            condition checkpoint_3_reached
+            behavior_node checkpoint_4
+         end_sequence
+      end_advanced_behavior_tree
+   end_processor
+end_platform_type
+

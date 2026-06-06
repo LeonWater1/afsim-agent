@@ -19,7 +19,7 @@ When you set `AFSIM_INSTALL_DIR`, the following paths are automatically derived:
 
 1. **mission.exe**: `{AFSIM_INSTALL_DIR}/bin/mission.exe`
    - Used to execute AFSIM scripts
-   - Called by `scripts/run_mission.py`
+   - Called by `scripts/core/run_mission.py`
 
 2. **Documentation**: `{AFSIM_INSTALL_DIR}/documentation/html/docs`
    - Contains 1602 official AFSIM HTML documentation files
@@ -54,7 +54,7 @@ That's it! Everything else works automatically.
 To verify your configuration is correct:
 
 ```bash
-python scripts/run_mission.py --help
+python scripts/core/run_mission.py --help
 ```
 
 This will display:

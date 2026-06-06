@@ -1,0 +1,85 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// 227 mm rocket for m26 (MLRS)
+// source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+// Note: The fuse time is given instead of impact time
+// (this is documented to be impact time -3.4 s).
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_227MM_ROCKET_M26_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_227MM_ROCKET_M26
+      12000 9.6  21.68
+      13000 10.2 23.84
+      14000 11.0 26.13
+      15000 11.9 28.56
+      16000 13.0 31.13
+      17000 14.1 33.84
+      18000 15.3 36.7
+      19000 16.6 39.71
+      20000 18.1 42.88
+      21000 19.6 46.19
+      22000 21.2 49.86
+      23000 23.0 53.29
+      24000 24.9 57.08
+      25000 26.9 61.06
+      26000 29.1 65.23
+      27000 31.4 69.65
+      28000 34.0 74.39
+      29000 36.9 79.56
+      30000 40.2 85.57
+      31000 44.8 93.46
+      31500 50.9 103.38
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_227MM_ROCKET_M26_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_227MM_ROCKET_M26 WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 2.0 seconds
+   launch_computer
+      FIRES_227MM_ROCKET_M26_LAUNCH_COMPUTER
+   end_launch_computer
+   weapon_effects FIRES_227MM_ROCKET_M26_EFFECTS
+   launched_platform_type FIRES_227MM_ROCKET_M26
+end_weapon
+
+platform_type FIRES_227MM_ROCKET_M26 WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_227MM_ROCKET_M26_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   launch_computer
+      FIRES_227MM_ROCKET_M26_LAUNCH_COMPUTER
+   end_launch_computer
+   salvo_interval 5.0 seconds
+   launched_platform_type FIRES_227MM_ROCKET_M26
+  weapon_effects FIRES_227MM_ROCKET_M26_EFFECTS
+end_weapon
+
+platform_type FIRES_227MM_ROCKET_M26_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_220MM_ROCKET_9M27F FIRES_227MM_ROCKET_M26_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_227MM_ROCKET_M26_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   weapon fires_220MM_ROCKET_9M27F FIRES_227MM_ROCKET_M26
+   end_weapon
+end_platform_type

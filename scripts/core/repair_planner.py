@@ -476,7 +476,7 @@ def build_execution_repair_plan(
         },
         "rerun_plan": {
             "preconditions": build_rerun_preconditions(execution_analysis),
-            "command_hint": f"python scripts/run_mission.py -es -fio {script_path}",
+            "command_hint": f"python scripts/core/run_mission.py -es -fio {script_path}",
             "success_condition": "mission_status == PASS",
         },
     }

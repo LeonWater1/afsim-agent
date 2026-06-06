@@ -1,0 +1,169 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE assignment_priority
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include setup/setup.txt
+include setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_sam.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/tt_radar.txt
+include_once platforms/sam_battalion.txt
+include_once platforms/sam_launcher.txt
+include_once platforms/ucav.txt
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/single_sam_chain.txt
+include_once scenarios/four_ucavs.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+end_time 30 min
+
+zone weapon_engagement_zone
+   polygonal lat_lon
+      point 39:00:00n 117:00:00w // Top Right
+      point 38:00:00n 117:00:00w // Bottom Right
+      point 38:00:00n 118:00:00w // Bottom Left
+      point 39:00:00n 118:00:00w // Top Left
+end_zone
+
+zone defended_asset_zone
+   polygonal lat_lon
+      point 38:17:07n 117:43:23w // Top Right
+      point 38:15:03n 117:43:23w // Bottom Right
+      point 38:15:03n 117:46:11w // Bottom Left
+      point 38:17:07n 117:46:11w // Top Left
+end_zone
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+end_time 30 min
+
+edit platform 10_iads_cmdr
+   add processor sensors_manager SIMPLE_SM
+   end_processor
+
+   edit processor battle_manager
+      shot_doctrine Shoot-1
+   end_processor
+end_platform
+
+platform 11_acq_radar ACQ_RADAR
+   side red
+
+   commander 10_iads_cmdr
+   position 38:15:06n 117:25:44w altitude 0.0 m agl
+
+   edit sensor acq_radar
+      transmitter
+         frequency  2900.0 mhz
+      end_transmitter
+   end_sensor
+end_platform
+
+platform 12_ttr TTR
+   side red
+
+   commander 10_iads_cmdr
+   position 38:15:36n 117:25:14w altitude 0.0 m agl
+end_platform
+
+platform 13_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 10_iads_cmdr
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+
+   aux_data
+      WsfBMAuxDataZoneAttachment iads_c2_zones
+   end_aux_data
+
+   on_initialize2
+      WsfBMAuxDataZoneAttachment iads_c2_zones = WsfBMAuxDataZoneAttachment();
+      iads_c2_zones.Add("global", 1.0, "defended_asset_zone", "DA");
+      WsfBMUtils.SetZoneAuxData(PLATFORM, "iads_c2_zones", iads_c2_zones);
+   end_on_initialize2
+
+   edit weapon sam
+      quantity 1
+   end_weapon
+end_platform
+
+platform 14_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 10_iads_cmdr
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+
+   edit weapon sam
+      quantity 1
+
+      aux_data
+         WsfBMAuxDataZoneAttachment weapon_zones
+      end_aux_data
+
+      on_initialize2
+         WsfBMAuxDataZoneAttachment weapon_zones = WsfBMAuxDataZoneAttachment();
+         weapon_zones.Add("global", 1.0, "weapon_engagement_zone", "MEZ");
+         WsfBMUtils.SetZoneAuxData(WEAPON, "weapon_zones", weapon_zones);
+      end_on_initialize2
+   end_weapon
+end_platform
+
+platform 15_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 10_iads_cmdr
+   position 38:21:06n 117:28:44w altitude 0.0 m agl
+
+   aux_data
+      WsfBMAuxDataZoneAttachment iads_c2_zones
+   end_aux_data
+
+   on_initialize2
+      WsfBMAuxDataZoneAttachment iads_c2_zones = WsfBMAuxDataZoneAttachment();
+      iads_c2_zones.Add("global", 1.0, "defended_asset_zone", "DA");
+      WsfBMUtils.SetZoneAuxData(PLATFORM, "iads_c2_zones", iads_c2_zones);
+   end_on_initialize2
+
+   edit weapon sam
+      quantity 1
+
+      aux_data
+         WsfBMAuxDataZoneAttachment weapon_zones
+      end_aux_data
+
+      on_initialize2
+         WsfBMAuxDataZoneAttachment weapon_zones = WsfBMAuxDataZoneAttachment();
+         weapon_zones.Add("global", 1.0, "weapon_engagement_zone", "MEZ");
+         WsfBMUtils.SetZoneAuxData(WEAPON, "weapon_zones", weapon_zones);
+      end_on_initialize2
+   end_weapon
+end_platform

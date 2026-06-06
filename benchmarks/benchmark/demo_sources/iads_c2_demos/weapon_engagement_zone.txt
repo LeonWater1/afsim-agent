@@ -1,0 +1,70 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE weapon_engagement_zone
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include setup/setup.txt
+include setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_sam.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/tt_radar.txt
+include_once platforms/sam_battalion.txt
+include_once platforms/sam_launcher.txt
+include_once platforms/ucav.txt
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/single_sam_chain.txt
+include_once scenarios/four_ucavs.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+end_time 30 min
+
+zone weapon_engagement_zone
+   polygonal lat_lon
+      point 38:30:24n 117:20:00w // Top Right
+      point 38:14:10n 117:20:00w // Bottom Right
+      point 38:14:10n 117:37:40w // Bottom Left
+      point 38:30:24n 117:37:40w // Top Left
+end_zone
+
+edit platform 2930_sam_launcher
+   edit weapon sam
+      quantity 12
+
+      aux_data
+         WsfBMAuxDataZoneAttachment weapon_zones
+      end_aux_data
+
+      on_initialize2
+         WsfBMAuxDataZoneAttachment weapon_zones = WsfBMAuxDataZoneAttachment();
+         weapon_zones.Add("global", 1.0, "weapon_engagement_zone", "MEZ");
+         WsfBMUtils.SetZoneAuxData(WEAPON, "weapon_zones", weapon_zones);
+      end_on_initialize2
+   end_weapon
+end_platform

@@ -1,0 +1,158 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+thread_count 5
+
+random_seed 1
+
+frame_time 0.01 sec
+end_time 150 secs
+
+file_path .
+
+include weapons/lrsam.txt
+include launchers/generic_launcher.txt
+include trackers/generic_tracker.txt
+include targets/generic_target.txt
+
+platform_type LAUNCHER_TYPE GENERIC_LAUNCHER
+   weapon lrsam LRSAM
+      quantity 1
+   end_weapon
+end_platform_type
+
+platform_type TRACKER_TYPE GENERIC_TRACKER
+   side red
+   script_variables
+      weapon_name = "lrsam";
+   end_script_variables
+end_platform_type
+
+platform_type TARGET_TYPE GENERIC_TARGET
+   side blue
+   icon F-18E
+   radar_signature FIGHTER_RADAR_SIGNATURE
+   #mover WSF_AIR_MOVER
+   #end_mover
+end_platform_type
+
+
+# Redefine the default output_rate table
+output_rate default
+   time     0.0 secs period  1.0 sec
+   time   500.0 secs period 10.0 sec
+   time   800.0 secs period 50.0 sec
+   time   950.0 secs
+end_output_rate
+
+run
+   #record_file_base_name oo_grid
+   event_output_file_base_name oo_grid
+
+   target_grid
+      down_range  from -100 km to 100 km by 10 km
+      cross_range from -20 km to 20 km by 5 km
+      altitude    from  30 kft to 30 kft by 10 kft
+      speed 262 kts
+
+      #down_range  from 100 km to 100 km by 100 km
+      #cross_range from  20 km to  20 km by 40 km
+   end_target_grid
+
+   output
+      file fort.oog.6
+      phase all
+
+      items
+         variable time format "%.2f"
+         variable target_x units km format " %7.3f"
+         variable target_y units km format " %7.3f"
+         variable target_z units m
+      end_items
+   end_output
+
+   output
+      file fort.oog.7
+      phase flying
+      items
+         variable weapon_flight_time format "%.2f"
+         variable target_x units km format " %7.3f"
+         variable target_y units km format " %7.3f"
+         variable target_z units m format " %7.1f"
+         variable weapon_x units km format " %7.3f"
+         variable weapon_y units km format " %7.3f"
+         variable weapon_z units m format " %7.1f"
+         variable weapon_to_target_range units m format " %7.1f"
+      end_items
+   end_output
+
+   output
+     file fort.oog.8
+     event_output true
+     events
+        enable all
+     end_events
+     summary_output true
+   end_output
+
+end_run
+
+event_output
+   time_format h:m:s.1
+   lat_lon_format d:m:s.2
+   print_track_in_message true
+
+   disable TEAM_NAME_DEFINITION
+
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   #enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   #enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   #enable SENSOR_TRACK_INITIATED
+   #enable SENSOR_TRACK_UPDATED
+   #enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   enable WEAPON_FIRE_ABORTED
+   enable WEAPON_FIRE_REQUESTED
+   enable WEAPON_FIRED
+   enable WEAPON_HIT
+   enable WEAPON_MISSED
+   enable WEAPON_RELOAD_STARTED
+   enable WEAPON_RELOAD_ENDED
+   enable WEAPON_TERMINATED
+   enable WEAPON_TURNED_OFF
+   enable WEAPON_TURNED_ON
+end_event_output

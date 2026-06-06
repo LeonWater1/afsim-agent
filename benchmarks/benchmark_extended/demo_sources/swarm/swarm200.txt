@@ -1,0 +1,32 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+define_path_variable CASE swarm200_demo
+
+file_path .
+#file_path ../base_types
+
+#standard stuff
+include setup.txt
+#include event_pipe.txt
+include event_output.txt
+#include terrain.txt
+
+#overwrite standard stuff with what we want
+log_file output/$(CASE).log
+event_output  file   output/$(CASE).evt end_event_output
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+include scenarios/200_clients.txt # 200 followers
+
+end_time 3 hr
+random_seed 4885945

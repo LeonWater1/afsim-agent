@@ -151,7 +151,7 @@ def _load_reference_script(task_context: dict[str, Any] | None) -> str:
     if not source_hint:
         return ""
     candidates = [
-        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / "benchmarks" / "benchmark_extended" / source_hint,
         ROOT / source_hint,
     ]
     for reference_path in candidates:
@@ -710,7 +710,7 @@ def run_on_ir_example(example_id: str, client: LLMClient, output_dir: Path | Non
     plan = build_generation_plan(ir_source)
     if not plan["ready_for_generation"]:
         raise RuntimeError(f"Plan not ready: {plan.get('manual_review_items', [])}")
-    run_dir = output_dir or (ROOT / "layered_generation_artifacts_v1" / example_id)
+    run_dir = output_dir or (ROOT / "layered_generation_artifacts" / example_id)
     if run_dir.exists():
         shutil.rmtree(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)

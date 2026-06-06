@@ -516,7 +516,7 @@ def postprocess_script(script_text: str, script_dir: str | None = None) -> str:
     script_text = "\n".join(_result)
 
     # ---- Phase 0: Fix known invalid command aliases ----
-    # Source: static_checker_v1.py KNOWN_INVALID_ALIASES + FORBIDDEN_PATTERNS,
+    # Source: core/static_checker.py KNOWN_INVALID_ALIASES + FORBIDDEN_PATTERNS,
     # confirmed by mission.exe diagnostics.
     _COMMAND_FIXES = [
         (r'\bmax_speed\b', 'maximum_speed'),
@@ -660,7 +660,7 @@ def postprocess_script(script_text: str, script_dir: str | None = None) -> str:
     )
 
     # ---- Phase 0.5: Fix known wrong WSF types ----
-    # Source: VALID_WSFS in static_checker_v1.py — official AFSIM 2.9.0 type whitelist.
+    # Source: VALID_WSFS in core/static_checker.py — official AFSIM 2.9.0 type whitelist.
     # ONLY replace types NOT in the whitelist. Keep all whitelisted types.
     from .static_checker import VALID_WSFS as _VALID_WSFS
     _NON_WHITELIST_TYPE_REPLACEMENTS = {
@@ -710,7 +710,7 @@ def postprocess_script(script_text: str, script_dir: str | None = None) -> str:
     # ---- Phase 0.84: Remove empty event_output blocks ----
     # event_output with no content between open and close → remove entirely
     script_text = re.sub(r'^\s*event_output\s*\n\s*end_event_output\s*$', '', script_text, flags=re.MULTILINE)
-    # Source: static_checker_v1.py UNSUPPORTED_DIRECTIVES, confirmed by mission.exe
+    # Source: core/static_checker.py UNSUPPORTED_DIRECTIVES, confirmed by mission.exe
     _HALLUCINATED_DIRECTIVES = {
         "engage_iff_permissions", "end_engage_iff_permissions",
         "conditional_section", "end_conditional_section",

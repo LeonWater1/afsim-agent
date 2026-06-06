@@ -1,0 +1,61 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+include_once processors/ripr_agents/aigci/aigci_processor.txt
+include_once processors/ripr_agents/aigci/behavior_create_clustering_jobs.txt
+include_once processors/ripr_agents/aiai/behavior_debug_job_board.txt
+include_once processors/ripr_agents/aifl/behavior_toggle_windows.txt
+
+
+platform_type RIPR_GCI WSF_PLATFORM
+
+   ### side  blue / red
+
+   comm  cmdr_net  DATALINK
+      network_name tactical_net
+      internal_link track_manager
+   end_comm
+
+   comm  sub_net  DATALINK
+      network_name tactical_net
+      internal_link track_manager
+   end_comm
+
+   processor track_manager WSF_TRACK_PROCESSOR
+      purge_interval             60    seconds
+      report_to commander        via   cmdr_net
+      report_to subordinates     via   sub_net      
+      report_interval            4 sec
+      fused_track_reporting      off
+      raw_track_reporting        on
+      circular_report_rejection  true
+   end_processor
+
+   processor  ripr  AIGCI-thinker
+      update_interval 3.0 sec
+      
+      ### overwrite the gci behavior tree, so it only creates clustering jobs:
+      behavior_tree
+         behavior_node  create_clustering_jobs  
+         behavior_node  toggle_windows          
+        #behavior_node  debug_job_board         
+      ###behavior_node  create_flank_jobs       
+      end_behavior_tree
+      
+      edit behavior create_clustering_jobs
+         script_variables
+            mDrawClusters         = true;
+            mClusterDistanceLimit = 30*1852;    #30 nautical miles
+         end_script_variables
+      end_behavior
+
+   end_processor
+
+end_platform_type

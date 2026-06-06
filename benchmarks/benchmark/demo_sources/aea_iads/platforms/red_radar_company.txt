@@ -1,0 +1,91 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform_type RED_RADAR_COMPANY WSF_PLATFORM
+  icon TWIN_BOX
+
+  infrared_signature    VEHICLE_INFRARED_SIGNATURE
+  optical_signature     VEHICLE_OPTICAL_SIGNATURE
+  radar_signature       VEHICLE_RADAR_SIGNATURE
+
+  comm cmdr_net RED_DATALINK
+     network_name <local:slave>
+     internal_link data_mgr
+     internal_link task_mgr
+  end_comm
+
+  comm sub_net RED_DATALINK
+     network_name <local:master>
+     internal_link data_mgr
+     internal_link task_mgr
+  end_comm
+
+  include processors/commander_track_manager$(TRACKER_TYPE).txt
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+    purge_interval       60 sec
+
+    report_to commander via cmdr_net to sub_net
+
+    report_interval      20 sec
+
+    fused_track_reporting on
+    raw_track_reporting   off
+  end_processor
+
+  processor task_mgr WSF_TASK_PROCESSOR
+  end_processor
+/*
+   # ---------------------------------------------
+   # Draw track to false targets and real targets
+   # ---------------------------------------------
+   script_variables
+      # Create a WsfDraw object.
+      WsfDraw draw = WsfDraw();
+   end_script_variables
+
+   execute at_interval_of 1.0 s
+      foreach (WsfTrack track in MasterTrackList())
+      {
+         if (track.IsValid())
+         {
+            # use the track ID as a unique draw ID
+            # a track icon and a line to the track icon
+            # is drawn at each track update
+            string trackId = track.TrackId().ToString();
+            draw.SetId(trackId);
+            draw.SetDuration(1.0); # this is faster than calling erase every time
+
+            if (track.IsFalseTarget())
+            {
+               draw.SetColor(0,1,0);
+            }
+            else
+            {
+               draw.SetColor(0,0,1);
+            }
+            draw.BeginIcons(track.Heading(), "Wedge");
+            draw.Vertex(track.ReportedLocation());
+            draw.End();
+
+            # Draw a line to the track
+            draw.SetLineStyle("dashed");
+            draw.BeginLines();
+            draw.Vertex(PLATFORM);
+            draw.Vertex(track.ReportedLocation());
+            draw.End();
+         }
+      }
+   end_execute
+*/
+end_platform_type

@@ -1,0 +1,24 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+file_path .
+
+include platforms/alv.txt
+include platforms/awacs.txt
+include platforms/ew_radar_site.txt
+include platforms/fighter_bomber.txt
+include weapons/alv_weapon.txt
+
+event_pipe
+  file output/replay.aer
+end_event_pipe
+
+event_output
+   file output/events.evt
+   enable all
+end_event_output

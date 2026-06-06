@@ -1,0 +1,25 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+define_path_variable CASE 1st_run
+log_file output/$(CASE).log
+
+
+include platforms/tactics_processor1.txt
+
+# setup file includes the platforms
+include setup.txt
+
+# this scenario...
+include scenarios/scenario1.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe file output/$(CASE).aer end_event_pipe
+
+end_time 1200 sec
+

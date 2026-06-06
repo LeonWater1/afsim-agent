@@ -1,0 +1,36 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#Note:
+#Additional processors can be added here to make the kind of linking being used in this
+#scenario set more generic or specific, as needed. The one provided below is just an
+#example for a specific use case.
+
+#Using processor instead of observers. Better debugging and local control of connections.
+#Note that this assumes only a single comm on the platform doing the dynamic connections.
+#Note that this assumes the target comm being linked has the name "iridium_handheld".
+processor DYNAMIC_LINKING_PROC WSF_SCRIPT_PROCESSOR
+   on_message
+      type WSF_TRACK_MESSAGE
+         script
+            WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+            string targetName = trackMsg.Track().Target().Name();
+            WsfComm targetComm = WsfSimulation.FindPlatform(targetName).Comm("iridium_handheld");
+            PLATFORM.CommEntry(0).AddConnection(targetComm.GetAddress());
+            targetComm.AddConnection(PLATFORM.CommEntry(0).GetAddress());
+         end_script
+      type WSF_TRACK_DROP_MESSAGE
+         script
+            WsfTrackDropMessage trackMsg = (WsfTrackDropMessage)MESSAGE;
+            string targetName = WsfSimulation.FindPlatform(trackMsg.TargetIndex()).Name();
+            WsfComm targetComm = WsfSimulation.FindPlatform(targetName).Comm("iridium_handheld");
+            PLATFORM.CommEntry(0).RemoveConnection(targetComm.GetAddress());
+            targetComm.RemoveConnection(PLATFORM.CommEntry(0).GetAddress());
+         end_script
+   end_on_message
+end_processor

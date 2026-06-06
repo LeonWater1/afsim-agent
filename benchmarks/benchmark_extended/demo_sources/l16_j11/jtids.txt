@@ -1,0 +1,109 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# JTIDS Terminal definition
+comm J11_COMM WSF_JTIDS_TERMINAL
+   command_chain NETWORK_ENABLED_WEAPON WEAPON_GRP
+   slot_group WEAPON_GRP
+      slots_per_frame 512
+   end_slot_group
+end_comm
+
+# Alternate radio definition
+#comm J11_COMM WSF_RADIO_TRANSCEIVER
+#   transmitter
+#      power 200 watts
+#      frequency 1087 mhz
+#      bandwidth 237 mhz
+#   end_transmitter
+#end_comm
+
+# Link 16 computer on the weapon
+processor WEAPON_LINK16_COMPUTER WSF_LINK16_COMPUTER
+   output_dis true  // default is false
+   output_wsf false // default is true
+
+   # Using a NETWORK_ENABLED_WEAPON part to automatically send WIFT messages
+   message_processor NetworkEnabledWeapon NETWORK_ENABLED_WEAPON
+      send_interval rrn 9
+      command_chain NETWORK_ENABLED_WEAPON
+   end_message_processor
+end_processor
+
+# Link 16 computer on the weapon fighter
+processor FIGHTER_LINK16_COMPUTER WSF_LINK16_COMPUTER
+   output_dis true  // default is false
+   output_wsf false // default is true
+
+   # Using a SCRIPTED part to manually send IFTU messages
+   message_processor j11 SCRIPTED
+
+      send_interval rrn 9
+      command_chain NETWORK_ENABLED_WEAPON
+
+      # Gets called based on the send_interval
+      script void on_send()
+         # The weapon is launched around 15 sec so start
+         # sending in-flight target update (IFTU) messages at this point
+         if (TIME_NOW > 15)
+         {
+            // J11.1 Initial
+            WsfTadilJ11_1I msg = WsfTadilJ11_1I();
+            msg.TrackNumberAddressee(1);
+            msg.WeaponDirective(12);
+            msg.ResponseRequest(true);
+
+            // J11.1 Continuation Word 2
+            WsfTadilJ11_1C2 cont2 = msg.FindContinuation2();
+            if (!cont2.IsValid())
+            {
+               cont2 = msg.AddContinuation2();
+            }
+            cont2.Latitude(35.6153);
+            cont2.Longitude(-118);
+#            cont2.TargetVelocityDown(0);
+
+            // J11.1 Continuation Word 3
+            WsfTadilJ11_1C3 cont3 = msg.FindContinuation3();
+            if (!cont3.IsValid())
+            {
+               cont3 = msg.AddContinuation3();
+            }
+            cont3.HeightAboveEllipsoid(PLATFORM.Altitude());
+#            cont3.TargetVelocityNorth(0);
+#            cont3.TargetVelocityEast(0);
+
+            // J11.1 Continuation Word 5
+            WsfTadilJ11_1C5 cont5 = msg.FindContinuation5();
+            if (!cont5.IsValid())
+            {
+               cont5 = msg.AddContinuation5();
+            }
+            // This MUST be added or the J11.1 is not considered valid J11.1-5
+            // and will not be sent!!
+            string trackNumberString = "11";
+            cont5.TrackNumber(trackNumberString);
+
+            // Request the SCRIPTED part to send the message
+            // If output_wsf is true, then the part will try to send this message
+            // internally to recipients found on the command chain defined in this processor
+            // If output_dis is true, the message will get sent over DIS as a signal PDU
+#            msg.Print();
+            JPROCESSOR.SendJMessage(msg);
+         }
+      end_script
+
+      # Notification that a WIFT has been received
+      script void on_message_11_0(WsfTadilJ11_0I aMessage)
+         writeln("Received a WIFT (11.0) message");
+      end_script
+
+   end_message_processor
+
+end_processor

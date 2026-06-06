@@ -1,0 +1,33 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+processor WM_SAM WSF_WEAPONS_MANAGER_SAM
+   update_interval 1 sec
+
+   haveco_reporting_strategy on_detonate
+
+   engagement_settings
+      ew_targets                    false
+      tar_targets                   false
+      ttr_targets                   true
+      engage_local_ttr_targets_only true
+   end_engagement_settings
+
+   delays
+      # Note: time_to_launch delay is on the weapon as firing_delay and
+		   # salvo_shot delay is on the weapon as salvo_interval
+      time_between_engagements    0 seconds
+      expected_sensor_acquisition 0 seconds
+   end_delays
+end_processor
+

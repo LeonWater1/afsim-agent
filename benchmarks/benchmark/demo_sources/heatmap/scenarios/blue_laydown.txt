@@ -1,0 +1,111 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+route cap_orbit
+  label start
+     offset  20   0 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  20   5 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  0    5 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+     offset  0    0 km speed 450 kts altitude 35000 ft msl
+        radial_acceleration 2 g
+   goto start
+end_route
+
+# Commander that owns the heat map and uses information from it
+# to generate search jobs
+platform flight_lead FLIGHT_LEAD
+  side blue
+  position 16:18:02.76s 49:40:0.0e
+  commander SELF
+  icon Command_Truck
+  heading 90 deg
+
+## Debug commands that if uncommented will provide additional info
+#  execute at_interval_of 1 sec
+#    WsfLocalTrackList myTracks = PLATFORM.MasterTrackList();
+#    if (myTracks.Count() > 0)
+#    {
+#       WsfGeoPoint myPosition = PLATFORM.Location();
+#       WsfDraw draw = WsfDraw();
+#       draw.SetColor(1,0,1);
+#       draw.SetDuration(1.0);
+#       foreach (WsfLocalTrack track in myTracks)
+#       {
+#          draw.BeginLines();
+#          draw.Vertex(myPosition);
+#          draw.Vertex(track.LocationAtTime(TIME_NOW));
+#          draw.End();
+#       }
+#    }
+#  end_execute
+#  edit processor task_mgr
+#    behavior_tree
+#      behavior_node debug_quantum_tasker
+#    end_behavior_tree
+#  end_processor
+
+end_platform
+
+# Long range radar that provides intial tracks to flight lead
+platform ew_radar EW_RADAR
+   side blue
+   commander flight_lead
+   position 16:18:0.0s 49:43:42.88e altitude 0.00 ft agl
+   heading 90 deg
+end_platform
+
+# SEARCH agent
+platform cap_1 STRIKER
+  side blue
+  icon F-18
+  heading 000 deg
+  commander flight_lead
+  route
+     position 16:27:39.99s 49:33:47.67e altitude 35000.00 ft
+     insert_route cap_orbit reference_heading 180.0 deg
+  end_route
+
+  edit processor task_mgr
+     edit behavior engage_weapon_task_target
+        script_variables
+           DefaultPercentRangeMax = 0.85;
+        end_script_variables
+     end_behavior
+  end_processor
+
+end_platform
+
+platform cap_escort STRIKER
+  side blue
+  icon F-18
+  commander flight_lead
+  route
+     position 16:32:39.05s 49:35:51.80e altitude 35000.00 ft
+     insert_route cap_orbit reference_heading  0.0 deg
+  end_route
+  edit processor task_mgr
+     edit behavior engage_weapon_task_target
+        script_variables
+           DefaultPercentRangeMax = 0.85;
+        end_script_variables
+     end_behavior
+     edit behavior escort
+        script_variables
+           mDrawEscortData = true;
+           mEscortNames.PushBack("cap_1");
+           mEscortProtectDistance = 5.0 * MATH.M_PER_NM();
+           mEscortChaseDistance   = 10.0 * MATH.M_PER_NM();
+        end_script_variables
+     end_behavior
+  end_processor
+end_platform

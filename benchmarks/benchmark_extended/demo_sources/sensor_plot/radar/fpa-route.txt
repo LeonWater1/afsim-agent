@@ -1,0 +1,52 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# -----------------------------------------------------------------------------
+# 'flight_path_analysis' using a sample_interval and platform with a route.
+# (This uses a standard route)
+# -----------------------------------------------------------------------------
+
+include fpa-setup.txt
+
+# -----------------------------------------------------------------------------
+
+platform TARGET TARGET_TYPE
+   add mover WSF_AIR_MOVER
+   end_mover
+
+   start_time 1 sec
+   route
+      position 1.0n 0e altitude 30000 ft speed 500 kts
+      position 1.0s 0e
+   end_route
+end_platform
+
+platform sensor-1 WSF_PLATFORM
+   position 0n 0e heading 90 deg
+   add sensor radar ACQ_RADAR
+   end_sensor
+end_platform
+
+# -----------------------------------------------------------------------------
+
+flight_path_analysis
+   sample_interval 10 sec
+
+   gnuplot_file fpa-route.plt
+   variable time
+   variable target_latitude
+   variable target_longitude
+   variable target_altitude
+   variable target_speed
+   variable slant_range
+   variable pd
+   variable signal_to_noise
+   variable rcs_required
+
+end_flight_path_analysis
+

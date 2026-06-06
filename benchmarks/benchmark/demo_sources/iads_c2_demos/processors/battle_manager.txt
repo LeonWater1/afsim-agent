@@ -1,0 +1,65 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+processor BM WSF_UNCLASS_BM
+      update_interval 1 sec
+
+      commit_authority       true
+      project_tracks_by_delays enable
+
+      stale_asset_time 60 secs
+      shot_doctrine    Shoot-2
+      max_firing_time  360 secs
+
+      print_settings
+         valid_units            on
+         valid_unit_details     on
+         invalid_unit_details   on
+      end_print_settings
+
+      weapon_table
+         speed_attributes
+            attrib slow 0 kts  < 250 kts
+            attrib med  250 kts < 600 kts
+            attrib fast 600 kts < 2000 kts
+         end_speed_attributes
+
+         altitude_attributes
+            attrib low  0 ft     < 1000 ft
+            attrib med  1000 ft  < 30000 ft
+            attrib high 30000 ft < 100000 ft
+         end_altitude_attributes
+
+         # Weapon rows
+         weapon_rows
+            # format is: target_pref priority <int> "<type>" "<subtype>" <speed attrib> <alt attrib> <pk %> <AI priority> <SAM priority> <Other priority>
+            target_pref priority 1 "UCAV" "Any" med high 0.7 1 1 0
+         end_weapon_rows
+      end_weapon_table
+
+      scoring_factors
+         weapon_type      1
+         weapon_subtype   1
+         intercept_range  1
+         intercept_time   1
+         pk               1
+         workload         1
+      end_scoring_factors
+
+      engage_iff_permissions
+         unknowns        false
+         neutrals        false
+         friendlies      false
+         hostiles        true
+      end_engage_iff_permissions
+end_processor

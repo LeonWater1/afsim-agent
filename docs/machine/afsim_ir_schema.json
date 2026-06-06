@@ -1,0 +1,568 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "afsim_ir_schema.json",
+  "title": "AFSIM IR Schema v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "scenario",
+    "sides",
+    "entities",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "afsim_ir_v1"
+    },
+    "scenario": {
+      "$ref": "#/$defs/scenario"
+    },
+    "sides": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/side"
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/location"
+      },
+      "default": []
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/route"
+      },
+      "default": []
+    },
+    "platform_templates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/platform_template"
+      },
+      "default": []
+    },
+    "components": {
+      "$ref": "#/$defs/components"
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "constraints": {
+      "$ref": "#/$defs/constraints"
+    },
+    "expected_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/expected_event"
+      },
+      "default": []
+    },
+    "grounding_hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/grounding_hint"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "id_string": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "domain_name": {
+      "type": "string",
+      "enum": [
+        "air",
+        "ground",
+        "surface",
+        "subsurface",
+        "space",
+        "cyber",
+        "mixed"
+      ]
+    },
+    "output_name": {
+      "type": "string",
+      "enum": [
+        "event_pipe",
+        "event_output",
+        "csv_event_output"
+      ]
+    },
+    "quantity_value": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "value_with_unit": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "position": {
+      "type": "object",
+      "required": [
+        "lat",
+        "lon"
+      ],
+      "properties": {
+        "lat": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lon": {
+          "type": "string",
+          "minLength": 1
+        },
+        "altitude": {
+          "$ref": "#/$defs/value_with_unit"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "required": [
+        "name",
+        "duration"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id_string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "$ref": "#/$defs/value_with_unit"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_name"
+          },
+          "default": []
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/output_name"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "side": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "location": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "point",
+            "area",
+            "orbit_anchor",
+            "named_site"
+          ]
+        },
+        "position": {
+          "$ref": "#/$defs/position"
+        },
+        "radius": {
+          "$ref": "#/$defs/value_with_unit"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "route_waypoint": {
+      "type": "object",
+      "properties": {
+        "location_ref": {
+          "$ref": "#/$defs/id_string"
+        },
+        "position": {
+          "$ref": "#/$defs/position"
+        },
+        "speed": {
+          "$ref": "#/$defs/value_with_unit"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "location_ref"
+          ]
+        },
+        {
+          "required": [
+            "position"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "waypoints"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "transit",
+            "patrol",
+            "orbit",
+            "intercept",
+            "egress"
+          ]
+        },
+        "waypoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/route_waypoint"
+          }
+        },
+        "loop": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "platform_template": {
+      "type": "object",
+      "required": [
+        "id",
+        "domain"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "domain": {
+          "$ref": "#/$defs/domain_name"
+        },
+        "type_hint": {
+          "type": "string"
+        },
+        "component_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id_string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "component_item": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "type_hint": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "movers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_item"
+          },
+          "default": []
+        },
+        "sensors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_item"
+          },
+          "default": []
+        },
+        "weapons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_item"
+          },
+          "default": []
+        },
+        "processors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_item"
+          },
+          "default": []
+        },
+        "comms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_item"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "entity": {
+      "type": "object",
+      "required": [
+        "id",
+        "role",
+        "side",
+        "quantity"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/$defs/id_string"
+        },
+        "quantity": {
+          "$ref": "#/$defs/quantity_value"
+        },
+        "domain": {
+          "$ref": "#/$defs/domain_name"
+        },
+        "template_ref": {
+          "$ref": "#/$defs/id_string"
+        },
+        "platform_type_hint": {
+          "type": "string"
+        },
+        "component_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id_string"
+          },
+          "default": []
+        },
+        "initial_location_ref": {
+          "$ref": "#/$defs/id_string"
+        },
+        "route_ref": {
+          "$ref": "#/$defs/id_string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "assignee_refs"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "assignee_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/id_string"
+          }
+        },
+        "target_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id_string"
+          },
+          "default": []
+        },
+        "location_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id_string"
+          },
+          "default": []
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "unit_system": {
+          "type": "string"
+        },
+        "coordinate_format": {
+          "type": "string"
+        },
+        "required_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected_event": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id_string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "actor_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id_string"
+          },
+          "default": []
+        },
+        "success_condition": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "grounding_hint": {
+      "type": "object",
+      "required": [
+        "label",
+        "target_kind"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "target_kind": {
+          "type": "string",
+          "enum": [
+            "platform",
+            "sensor",
+            "weapon",
+            "mover",
+            "processor",
+            "comm",
+            "task"
+          ]
+        },
+        "candidate_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

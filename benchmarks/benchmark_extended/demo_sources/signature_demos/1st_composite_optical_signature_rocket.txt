@@ -1,0 +1,70 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+###############################################################################
+# 1st_composite_optical_signature_rocket.txt
+# This scenario was primarily made from components in Jeff Johnson's
+# wsf_mil/test_mission/auto_sensor scripts for WSF_COMPOSITE_OPTICAL_SIGNATURE.
+#
+# Mystic tips for analysts using "Sensor Detection Report":
+# 1. Right click an IRST or EOIR sensor -> Select "Sensor Detection Report"
+# 2. Select the target of interest [for this demo it is "launcher_launcher_1"]
+# 3. Right click on the data column header or table in an empty region -> Select "Choose columns"
+# 4. Check the column "opt. sig. (db)" -> click "OK"
+# 5. Right click the column "opt. sig. (db)" -> click "Plot: opt. sig. (db)"
+# 6. Repeat to add additional data to the plot at will, such as "ir sig. (db)"
+# 7. To remove all plot data and reset, simply right click a column to plot by itself
+#
+# Mystic tips for analysts using "Waterfall Plot":
+# 1. Right click an IRST or EOIR sensor -> Select "Waterfall Plot"
+# 2. Select the "Interaction Type" as "Detecting" or "Sensor Tracking"
+# 3. Select the right target(s) using the "Interaction Filter"
+# 4. View the event timeline plot below
+#    - Note: If an event is still in progress when the sim ends, it may not plot correctly.
+#
+# Note 1: Use the new method PLATFORM.ProjectedArea, not PLATFORM.OpticalCrossSection.
+# The new method performs the same function and is preferred.
+# PLATFORM.OpticalCrossSection may be deprecated in some future release.
+#
+# Note 2: Use new method PLATFORM.RadiantIntensity, not PLATFORM.InfraredRadiantIntensity.
+# The new method is preferred because it is more general in that it also handles the visual band
+# (if the optical signature is one that also provides radiant intensity).
+# The method PLATFORM.InfraredRadiantIntensity may be deprecated in some future release.
+###############################################################################
+
+define_path_variable CASE 1st_composite_optical_signature_rocket
+log_file output/$(CASE).log
+file_path .
+
+# how long should the sim run
+end_time 900 sec
+
+# include_once the platform type definitions
+include_once platforms/rocket.txt
+include_once platforms/generic_irst_site.txt
+include_once platforms/generic_eoir_site.txt
+
+#include the scenario(s) we want
+include scenarios/rocket_launch.txt
+include scenarios/sensor_laydown_rocket.txt
+
+# The event and replay file are stated last just in
+# case a previous file setup default files.
+# Enable all events since this is a short and simple scenario.
+event_output
+   file output/$(CASE).evt
+   enable all
+end_event_output
+
+event_pipe
+   file output/$(CASE).aer
+   use_preset full
+   enable DETECTION_ATTEMPT # enable DETECTION_ATTEMPT to have Sensor Detection Report in Mystic (HINT: right-click sensor platform, add columns with optical detection data to plot once open by right-clicking again)
+   #enable DRAW
+end_event_pipe

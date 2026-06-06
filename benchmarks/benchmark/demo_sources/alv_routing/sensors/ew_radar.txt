@@ -1,0 +1,63 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+################################################################################################
+//Ground sensor
+antenna_pattern EARLY_WARNING_RADAR_ANTENNA
+  constant_pattern
+     peak_gain            35 dB
+     azimuth_beamwidth    40 deg
+     elevation_beamwidth  40 deg
+  end_constant_pattern
+end_antenna_pattern
+
+sensor EARLY_WARNING_SENSOR WSF_RADAR_SENSOR
+  frame_time  10 sec
+  location  0.0 0.0 -30 ft
+  scan_mode  azimuth
+  minimum_range    0 nm
+  maximum_range  400 nm
+
+  transmitter
+     antenna_pattern EARLY_WARNING_RADAR_ANTENNA
+     antenna_tilt  5 deg
+     power  800 kw
+     pulse_width                 2.0e-6 sec
+     pulse_repetition_frequency  400 hz
+     frequency  1285 mhz
+  end_transmitter
+
+  receiver
+     antenna_pattern EARLY_WARNING_RADAR_ANTENNA
+     antenna_tilt  5 deg
+     bandwidth  1 mhz
+     internal_loss  19 dB
+  end_receiver
+
+  swerling_case  1
+  number_of_pulses_integrated  44
+  detector_law  square
+  probability_of_false_alarm  1.0e-6
+  azimuth_error_sigma  0.5 deg
+  elevation_error_sigma  0.0 deg
+  range_error_sigma  1.2 nm
+
+  filter WSF_ALPHA_BETA_FILTER
+    alpha  0.6
+    beta   0.2
+  end_filter
+
+  hits_to_establish_track  3 5
+  hits_to_maintain_track  1 3
+
+  reports_location
+  reports_signal_to_noise
+  reports_range
+  reports_bearing
+end_sensor

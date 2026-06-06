@@ -169,7 +169,7 @@ Ask the user about:
 
 ### Step 3: Execute Script
 ```bash
-python scripts/run_mission.py <script_file.txt> [options]
+python scripts/core/run_mission.py <script_file.txt> [options]
 ```
 
 Options:
@@ -631,16 +631,16 @@ All paths are derived from this:
 - **mission.exe**: `{AFSIM_INSTALL_DIR}/bin/mission.exe`
 - **Documentation**: `{AFSIM_INSTALL_DIR}/documentation/html/docs`
 
-### Using run_mission.py
+### Using core/run_mission.py
 ```bash
 # Basic execution
-python scripts/run_mission.py my_script.txt
+python scripts/core/run_mission.py my_script.txt
 
 # With options
-python scripts/run_mission.py my_script.txt -es -fio
+python scripts/core/run_mission.py my_script.txt -es -fio
 
 # Real-time mode
-python scripts/run_mission.py my_script.txt -rt
+python scripts/core/run_mission.py my_script.txt -rt
 ```
 
 The script will:
@@ -795,7 +795,7 @@ All reference files are located in the `references/` directory:
    ↓
 8. Save as .txt file
    ↓
-9. Execute with run_mission.py
+9. Execute with core/run_mission.py
    ↓
 10. Validate output and iterate
 ```

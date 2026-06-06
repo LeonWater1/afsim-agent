@@ -1,0 +1,144 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+## Example scripts to compute available G's for a guided mover
+## Get Temperature at Altitude
+script double Std76AtmosTemp(double aAltitude)
+   double result = 0.0;
+   // This altitude is meters.
+   if ((0 <= aAltitude) && (aAltitude < 11000))
+   {
+      result = 288.15 - 6.5 * aAltitude / 1000;  // Troposphere
+   }
+   else if ((11000 <= aAltitude) && (aAltitude < 20000))
+   {
+      result = 216.65; // Stratosphere A
+   }
+   else if ((20000 <= aAltitude) && (aAltitude < 32000))
+   {
+      result = 216.65 + 1.0 * (aAltitude - 20000) / 1000; // Stratosphere B
+   }
+   else if ((32000 <= aAltitude) && (aAltitude < 47000))
+   {
+      result = 228.65 + 2.8 * (aAltitude - 32000) / 1000; // Stratosphere C
+   }
+   else if ((47000 <= aAltitude) && (aAltitude < 51000))
+   {
+      result = 270.65; // Mesosphere
+   }
+   else if ((51000 <= aAltitude) && (aAltitude < 71000))
+   {
+      result = 270.65 - 2.8 * (aAltitude - 51000) / 1000;
+   }
+   else if ((71000 <= aAltitude) && (aAltitude < 84852))
+   {
+      result = 214.65 - 2.0 * (aAltitude - 71000) / 1000;
+   }
+   else if (84852 <= aAltitude)
+   {
+      result = 186.946;
+   }
+   return result;
+end_script
+
+
+## Get Pressure at an Altitude
+script double Std76AtmosPress(double aAltitude)
+   double dExp = 2.718281828;
+   double result = 101330.0;
+   double cGMR = 34.163195/1000;
+   double aTemp = Std76AtmosTemp(aAltitude);
+   double ratio = 0.0;
+
+   if ((0 <= aAltitude) && (aAltitude < 11000))
+   {
+      ratio = 1.0000000e00 * Math.Pow(288.15 / aTemp, 1000 * cGMR / -6.5);
+   }
+   else if ((11000 <= aAltitude) && (aAltitude < 20000))
+   {
+      ratio = 2.2336110e-1 * Math.Pow(dExp, -cGMR * (aAltitude - 11000) / 216.65);
+   }
+   else if ((20000 <= aAltitude) && (aAltitude < 32000))
+   {
+      ratio = 5.4032950e-2 * Math.Pow(216.65 / aTemp, 1000 * cGMR / 1.0);
+   }
+   else if ((32000 <= aAltitude) && (aAltitude < 47000))
+   {
+      ratio = 8.5666784e-3 * Math.Pow(228.65 / aTemp, 1000 * cGMR / 2.8);
+   }
+   else if ((47000 <= aAltitude) && (aAltitude < 51000))
+   {
+      ratio = 1.0945601e-3 * Math.Pow(dExp, -cGMR * (aAltitude - 47000) / 270.65);
+   }
+   else if ((51000 <= aAltitude) && (aAltitude < 71000))
+   {
+      ratio = 6.6063531e-4 * Math.Pow(270.65 / aTemp, 1000 * cGMR / -2.8);
+   }
+   else if ((71000 <= aAltitude) && (aAltitude < 84852))
+   {
+      ratio = 3.9046830e-5 * Math.Pow(214.65 / aTemp, 1000 * cGMR / -2.0);
+   }
+   else if (84852 <= aAltitude)
+   {
+      ratio = 3.6850100e-6 * Math.Pow(dExp, -cGMR * (aAltitude - 84852) / 186.946);
+   }
+   return result * ratio;
+end_script
+
+## Get Density from temperature and pressure tables from above...
+script double Std76AtmosDens(double aAltitude)
+   double dTempSL = 288.15;     # temp at sea level in K
+   double dPresSL =  101330.0;  #pressure at sea level in Pa (N/m^2)
+   double dDensSL = 1.225;      #density at sea level in kg/m^3
+   double aTemp = dTempSL;
+   double aPressure = dPresSL;
+   double dDensity = 0.0;
+
+   aTemp = Std76AtmosTemp(aAltitude);
+   aPressure = Std76AtmosPress(aAltitude);
+   if (aTemp > 0.0)
+   {
+      dDensity = (aPressure/dPresSL) / (aTemp/dTempSL) * dDensSL;
+   }
+   return dDensity;
+end_script
+
+#####################################
+####THIS GOES ON THE PLATFORM########
+#####################################
+## Compute available G's...
+
+
+/*
+ processor writeoutAvailableGs WSF_SCRIPT_PROCESSOR
+    update_interval 1 sec
+    on_update
+
+    double CLMAX = .5; # SET THIS TO THE CLMAX OF THE PLATFORM
+    double REFAREA = 190 * MATH.M_PER_FT() * MATH.M_PER_FT(); # SET THIS TO THE REF AREA OF THE PLATFORM in meters squared
+
+    extern double Std76AtmosDens(double);
+    double dSpeed = PLATFORM.Speed();
+    double dAltitude = PLATFORM.Altitude();
+    double dMass = PLATFORM.TotalMass();
+
+    if ((! dSpeed == 0)  && (! dAltitude == 0) && (! dMass == 0))
+    {
+        double dAtmosDensity = Std76AtmosDens(dAltitude);
+        double dDynamicPressure = 0.5 * dAtmosDensity * dSpeed * dSpeed;  # (1/2 * ro V^2)
+
+        double MaxLift = CLMAX * dDynamicPressure * REFAREA;
+
+        double MaxAvailableGs = MaxLift / dMass / Earth.ACCEL_OF_GRAVITY();
+
+        writeln(TIME_NOW, " " , PLATFORM.Name(), " Available Gs " ,MaxAvailableGs);
+    }
+   end_on_update
+ end_processor
+ */

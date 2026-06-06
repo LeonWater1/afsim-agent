@@ -1,0 +1,127 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+file_path .
+
+define_path_variable CASE brawler_demo_1v1
+log_file output/$(CASE).log
+
+include_once platforms/brawler_platform.txt
+include_once platforms/brawler_flight_lead.txt
+
+end_time 5 min
+#end_time 2 sec
+
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+event_output
+   file output/$(CASE).evt
+   disable all
+   enable PLATFORM_ADDED
+   enable BTREE_NODE_CHILDREN
+   enable BTREE_NODE_EXEC
+#   enable LOCAL_TRACK_CORRELATION
+#   enable LOCAL_TRACK_DECORRELATION
+#   enable LOCAL_TRACK_DROPPED
+#   enable LOCAL_TRACK_INITIATED
+#   enable LOCAL_TRACK_UPDATED
+#   enable SENSOR_TRACK_INITIATED
+#   enable MESSAGE_TRANSMITTED
+#   enable MESSAGE_RECEIVED
+end_event_output
+
+
+
+
+
+platform blue_cmdr BRAWLER_FLIGHT_LEAD
+   side blue
+   position 00:01:00.00s  00:01:00.00e
+
+#   execute at_time 0.1 sec absolute
+#      double e=3;
+#      writeln("e=",e.ToString());
+#   end_execute
+
+end_platform
+
+
+platform blue_1 BRAWLER_PLATFORM
+   indestructible
+   side blue
+  #draw_nominal_states
+   commander blue_cmdr
+   heading 360 deg
+   position 00:01:50.00s 00:00:25.00w  altitude 10000.00 ft
+
+#   edit processor task_mgr
+#      edit state VAMPIRE
+#         edit behavior HuntPrey
+#            script_variables
+#               OnlyHumans = true;
+#            end_script_variables
+#         end_behavior
+#      end_state
+#   end_processor
+end_platform
+
+
+platform red_cmdr BRAWLER_FLIGHT_LEAD
+   side red
+   position 00:01:00.00s  00:01:00.00e
+end_platform
+
+
+platform red_1 BRAWLER_PLATFORM
+
+   indestructible
+   side red
+   icon SU-27
+   commander red_cmdr
+   edit mover
+     #aero_file platforms/ACFT_BD.FXW     #blue
+     #aero_file platforms/ACFT_RAC1.FXW   #bad red
+      aero_file platforms/ACFT_BAC1.FXW   #good red
+   end_mover
+
+   position 00:01:50.00n 00:00:25.00e altitude 10000.00 ft
+   heading 180 deg
+#   ##for testing route flying:
+#   edit processor task_mgr
+#      behavior_tree  end_behavior_tree   #clear it
+#   end_processor
+#   route
+#      position 00:01:50.00n 00:00:25.00e altitude 10000.00 ft speed 350.0 kts
+#      position 00:00:50.02s 00:00:24.97e altitude 10000.00 ft speed 350.0 kts
+#      position 00:02:31.69s 00:02:28.74e altitude 10000.00 ft
+#      position 00:05:13.85s 00:02:29.85e altitude 10000.00 ft
+#      position 00:06:46.37s 00:00:33.45e altitude 10000.00 ft
+#      position 00:11:03.64s 00:00:35.73e altitude 10000.00 ft
+#   end_route
+end_platform
+
+
+#
+#platform red_2 BRAWLER_PLATFORM
+#
+#   indestructible
+#   side red
+#   icon SU-27
+#   commander red_cmdr
+#   edit mover
+#      aero_file platforms/ACFT_BAC1.FXW   #good red
+#   end_mover
+#
+#   position 00:02:10.00n 00:00:40.00e altitude 10000.00 ft
+#   heading 180 deg
+#
+#end_platform
+
+

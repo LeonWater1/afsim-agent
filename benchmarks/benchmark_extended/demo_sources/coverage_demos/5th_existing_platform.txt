@@ -1,0 +1,31 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#Startup - 5th_existing_platform.txt - Coverage_Demo
+
+define_path_variable CASE 5th_existing_platform
+log_file output/$(CASE).log
+event_pipe file output/$(CASE).aer end_event_pipe
+file_path  .
+
+// Platform definitions
+include_once platforms/groud_station_existing.txt
+include_once platforms/air_target.txt
+
+// Grid and air target laydowns
+include scenarios/ground_station.txt
+include scenarios/air_target_grid.txt
+
+// Coverage and grid definition
+include_once coverage_grids/existing_grid_coverage.txt
+
+// Sim start epoch and end time
+start_date jul 07 2020 
+start_time 00:00:00.00
+
+end_time 6000 seconds

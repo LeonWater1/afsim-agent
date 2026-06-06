@@ -1,0 +1,69 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# On this platform, solar panels are represented as visual parts
+# with visualized separate icons from the standard platform icon set
+platform panelsat-1 WSF_PLATFORM
+   icon cubesat
+   side red
+   add visual_part solar_lf WSF_VISUAL_PART
+      icon unknown
+      location 0 -2 0 m
+      on
+   end_visual_part
+   add visual_part solar_rt WSF_VISUAL_PART
+      icon unknown
+      location 0 2 0 m
+      on
+   end_visual_part
+   
+   add mover WSF_SPACE_MOVER
+      revs_per_day 14.0
+      inclination 100.0 deg
+   end_mover
+   
+   add processor panel_updater WSF_SCRIPT_PROCESSOR
+      update_interval 1 sec
+      on_update
+         Vec3 sunVecECI = Sun.LocationECI(WsfDateTime.CurrentTime());
+         Vec3 sunVecWCS = PLATFORM.ConvertECIToWCS(sunVecECI);
+         Vec3 sunVecECS = PLATFORM.ConvertWCSToECS(sunVecWCS);
+         double ang = Math.ATan2(sunVecECS.Z(), sunVecECS.X());
+         PLATFORM.VisualPart("solar_lf").SetPitch(-ang + 90.0);
+         PLATFORM.VisualPart("solar_rt").SetPitch(-ang + 90.0);
+      end_on_update
+   end_processor
+end_platform
+
+# On this platform, solar panels are represented as visual parts
+# with the visualization coming from nodes on the platforms icon
+platform panelsat-2 WSF_PLATFORM
+   side red
+   icon rosetta_satellite
+   add visual_part panels WSF_VISUAL_PART
+      on
+   end_visual_part
+   
+   add mover WSF_SPACE_MOVER
+      revs_per_day 15.5
+      inclination 120.0 deg
+   end_mover
+   
+   add processor panel_updater WSF_SCRIPT_PROCESSOR
+      update_interval 1 sec
+      on_update
+         Vec3 sunVecECI = Sun.LocationECI(WsfDateTime.CurrentTime());
+         Vec3 sunVecWCS = PLATFORM.ConvertECIToWCS(sunVecECI);
+         Vec3 sunVecECS = PLATFORM.ConvertWCSToECS(sunVecWCS);
+         double ang = Math.ATan2(sunVecECS.Z(), sunVecECS.X());
+         # note the desired 'default' angle is different than in the panelsat-1 example
+         PLATFORM.VisualPart("panels").SetPitch(-ang + 180.0);
+      end_on_update
+   end_processor
+end_platform

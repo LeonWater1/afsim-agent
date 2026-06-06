@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#    ----------------------------------------------------------------
+#                             SOJ Jammers
+#    ----------------------------------------------------------------
+platform 100_soj SOJ
+   side blue
+   commander SELF
+   route
+      position 40:43:48.000n 116:30:48.000w altitude 35000 ft msl
+         speed 450 kts
+      position 39:48:36.000n 117:37:48.000w altitude 35000 ft msl
+      insert_route soj_orbit reference_heading -135.0 deg
+   end_route
+   heading 221.0 deg
+end_platform
+/*
+platform 200_soj SOJ
+   side blue
+   commander SELF
+   route
+      position 39:21:00.000n 113:39:36.000w altitude 35000 ft msl
+         speed 450 kts
+      position 38:09:12.000n 114:54:36.000w altitude 35000 ft msl
+      insert_route soj_orbit reference_heading -135.0 deg
+   end_route
+   heading 222.0 deg
+end_platform
+*/

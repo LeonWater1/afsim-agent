@@ -1,0 +1,219 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once sensors/geosensor/geo_sensor.txt
+include_once sensors/laser/laser_designator-1212.txt
+
+platform_type SOLDIER_JTAC WSF_PLATFORM
+   icon infantry
+   mover WSF_GROUND_MOVER end_mover
+   optical_signature soldier_optical_signature
+   radar_signature   soldier_radar_signature
+   
+   comm  cmd_net WSF_COMM_TRANSCEIVER
+      transfer_rate 100 mbits/sec
+      network_name <local:master>
+      internal_link data_mgr
+      internal_link CMDR_TASK_MGR
+      location 0 0 -4 ft
+   end_comm
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval 20 sec
+   end_processor 
+ 
+#   sensor geo_sensor GEO_SENSOR 
+#      internal_link data_mgr
+#   end_sensor  # represents eyeball
+   
+   sensor laser_designator-1212 LASER_DESIGNATOR-1212 
+      off  # The logic will turn it on
+      location 0 0 -6 ft  # eye level
+   end_sensor
+   
+   processor CMDR_TASK_MGR WSF_TASK_PROCESSOR
+   number_of_servers            5
+   track_update_interval        1.0 sec
+
+   #show_state_transitions
+   #show_task_messages
+   
+   script_variables
+      int MAX_SUBS_PER_TARGET     = 1;
+      int MAX_ASSIGNMENTS_PER_SUB = 1;
+      string WEAPON_NAME          = "hellfire";
+      string AIRCRAFT_TYPE        = "UAV";
+      string DESIGNATOR           = "laser_designator-1212";
+      string TARGET_TYPE          = "APC";
+      string TARGET_NAME          = "";
+      bool   NOW_DESIGNATING      = false;
+      bool   MADE_ASSIGNMENT      = false;
+      bool   DRAW_DESIGNATE_BEAM  = false; # crutch because mystic doesn't show laser beam
+   end_script_variables
+
+   // determine if TRACK is assignable  
+   script bool IsAssignable()
+      if ((! TRACK.IFF_Friend()) && 
+          (TRACK.TimeSinceUpdated() < 5.0) &&
+          (MADE_ASSIGNMENT == false) &&
+          (NOW_DESIGNATING == false))
+      {
+         return true;
+      }
+      return false;
+   end_script 
+           
+   // determine if the subordinate and/or his subordinates have weapons
+   // remaining
+   script bool WeaponsAvailable(WsfPlatform aAssignee)
+      bool weaponsAvailable = false;
+
+      int quantity = 0;
+      WsfWeapon weapon = aAssignee.Weapon(WEAPON_NAME);
+      if (weapon.IsTurnedOn())
+      {
+         quantity = quantity + weapon.QuantityRemaining();
+      }
+      if (quantity > 0)
+      {
+         weaponsAvailable = true;
+      }
+      else
+      {
+         foreach (WsfPlatform sub in aAssignee.Subordinates())
+         {
+            weapon = sub.Weapon(WEAPON_NAME);
+            if (weapon.IsTurnedOn())
+            {
+               quantity = quantity + weapon.QuantityRemaining();
+            }
+         }
+
+         if (quantity > 0) 
+         {
+            weaponsAvailable = true;
+
+         }
+      }
+
+      return weaponsAvailable;
+   end_script
+
+   script void MakeInitialLasingCue()
+      if ((TasksAssignedFor(TRACK.TrackId()) >= 0) &&
+          (NOW_DESIGNATING == 0) && TRACK.TargetType() == TARGET_TYPE)
+      {
+         WsfSensor designator = PLATFORM.Sensor(DESIGNATOR); 
+         designator.TurnOn();
+         designator.CueToPoint(designator.ApparentLocationOf(TRACK.CurrentLocation(), 1.333333));     
+         #designator.CueToTrack(TRACK);
+         TARGET_NAME          = TRACK.TargetName();
+         NOW_DESIGNATING      = true;
+         if(DRAW_DESIGNATE_BEAM == true)
+         {
+            #WsfGeoPoint TargetLLA = TRACK.Location();
+            WsfDraw DesBeam = WsfDraw();
+            DesBeam.SetLineStyle("solid");
+            DesBeam.SetLineSize(5);
+            DesBeam.SetDuration(5.0);
+            DesBeam.BeginLines();
+            DesBeam.Vertex(PLATFORM);
+            DesBeam.Vertex(TRACK.CurrentLocation());
+            DesBeam.End();
+         }
+      }
+   end_script
+
+   script void KeepCueingDesignator()
+      #writeln("Keep Cueing Track name is ", TRACK.TargetType());
+      if ((TRACK.TargetType() == TARGET_TYPE) &&
+          (NOW_DESIGNATING == true) && 
+          (TRACK.TargetName() == TARGET_NAME))
+      {
+         WsfSensor designator = PLATFORM.Sensor(DESIGNATOR);
+         designator.CueToPoint(designator.ApparentLocationOf(TRACK.CurrentLocation(), 1.333333));      
+         if(DRAW_DESIGNATE_BEAM == true)
+         {
+            #WsfGeoPoint TargetLLA = TRACK.Location();
+            WsfDraw DesBeam = WsfDraw();
+            DesBeam.SetLineStyle("solid");
+            DesBeam.SetLineSize(5);
+            DesBeam.SetDuration(5.0);
+            DesBeam.BeginLines();
+            DesBeam.Vertex(PLATFORM);
+            DesBeam.Vertex(TRACK.CurrentLocation());
+            DesBeam.End();
+         }
+         
+      }
+   end_script
+   
+   script bool MakeAssignments()
+      bool MadeAssignment = false;
+      Array<WsfPlatform> filter = Array<WsfPlatform>();
+      foreach (WsfPlatform sub in PLATFORM.Subordinates())
+      {
+         if ((sub.Type() == AIRCRAFT_TYPE) && (TRACK.TargetType() == TARGET_TYPE))
+         {
+            if (WeaponsAvailable(sub) &&
+                (TasksAssignedTo(sub) < MAX_ASSIGNMENTS_PER_SUB) &&
+                (TasksAssignedTo(sub, TRACK.TrackId()) < 1)) 
+            {
+               writeln_d("*** Adding ", sub.Name(), " to filter");
+               filter.PushBack(sub);
+            }
+         }
+      }
+
+      int i;
+      int numAssignments = (int)MATH.Min(filter.Size(), MAX_SUBS_PER_TARGET);
+      for (int i=0; i < numAssignments; i = i + 1)
+      {
+         AssignTask(TRACK, "ENGAGE", filter[i]);
+         MADE_ASSIGNMENT      = true;
+         MadeAssignment = true;
+      }
+      return MadeAssignment;
+   end_script
+
+# -------------------------------------------------------------------------
+
+   evaluation_interval DETECTED 2.0 sec
+   state DETECTED
+      next_state ASSIGNED
+         if (! IsAssignable()) return false;
+         if (!MakeAssignments()) return false;
+         MakeInitialLasingCue();
+         return true;
+      end_next_state
+   end_state
+
+          
+   evaluation_interval ASSIGNED 5.0 sec
+   state ASSIGNED
+      next_state DETECTED
+         if (TRACK.TimeSinceUpdated() >  6.0) # lost sight of target         
+         {
+            CancelTask(TRACK.TrackId());
+            MADE_ASSIGNMENT      = false;
+            TARGET_NAME          = "";
+            NOW_DESIGNATING      = false;
+            WsfSensor designator = PLATFORM.Sensor(DESIGNATOR);
+            designator.TurnOff();
+            return true;
+         }
+         KeepCueingDesignator();         
+         return false;
+      end_next_state
+   end_state
+
+end_processor
+   
+end_platform_type
+
+

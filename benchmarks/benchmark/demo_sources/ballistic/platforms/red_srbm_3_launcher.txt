@@ -1,0 +1,24 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once weapons/ssm/red_srbm_3.txt
+include_once processors/launch_weapon_processor.txt
+
+platform_type RED_SRBM_3_LAUNCHER WSF_PLATFORM
+   icon Scud_Launcher
+   side red
+   mover WSF_GROUND_MOVER end_mover
+   weapon red_srbm_3 RED_SRBM_3
+      quantity 1
+   end_weapon
+   processor launch_weapon_processor LAUNCH_WEAPON_PROCESSOR
+      script_variables
+         WEAPON_NAME = "red_srbm_3";
+      end_script_variables
+   end_processor
+end_platform_type

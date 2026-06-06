@@ -1,0 +1,24 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# The following script is called for SENSOR_TRACK_INITIATED, SENSOR_TRACK_DROPPED.
+script_interface
+# debug
+end_script_interface
+
+script void sensorinfo(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (aTrack.TargetName() == "300_ucav")
+   {
+   writeln(TIME_NOW, ",", aTrack.StartTime(), ",", aTrack.SensorName(), ",", aTrack.TargetName(), ",", aTrack.Range());
+   }
+end_script
+
+observer
+enable SENSOR_TRACK_INITIATED sensorinfo
+enable SENSOR_TRACK_DROPPED sensorinfo
+end_observer

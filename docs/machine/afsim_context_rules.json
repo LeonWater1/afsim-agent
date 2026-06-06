@@ -1,0 +1,141 @@
+{
+  "version": "afsim_context_rules_v1",
+  "description": "Shared AFSIM context legality rules derived from official documentation, benchmark demos, and validated mission.exe failures.",
+  "principles": {
+    "doc_driven": true,
+    "shared_between_grounding_and_checker": true,
+    "purpose": "Catch valid WSF types that are used in the wrong host block or command context."
+  },
+  "wsf_type_host_rules": {
+    "WSF_AIR_TO_AIR_LAUNCH_COMPUTER": {
+      "allowed_block_kinds": ["launch_computer"],
+      "preferred_declaration": "launch_computer <name> WSF_AIR_TO_AIR_LAUNCH_COMPUTER",
+      "notes": [
+        "This is a valid WSF type, but it must be declared as a launch_computer block, not as a processor."
+      ],
+      "provenance": [
+        "official_doc: C:/Program Files/afsim-2.9.0-win64/documentation/html/docs/wsf_air_to_air_launch_computer.html",
+        "demo: benchmarks/benchmark/demo_sources/air_to_air/weapons/aam/mrm_lc.txt"
+      ]
+    },
+    "WSF_ATG_LAUNCH_COMPUTER": {
+      "allowed_block_kinds": ["launch_computer"],
+      "preferred_declaration": "launch_computer <name> WSF_ATG_LAUNCH_COMPUTER",
+      "notes": [
+        "This is a valid air-to-ground launch computer type and should not be emitted as a processor block."
+      ],
+      "provenance": [
+        "official_doc: C:/Program Files/afsim-2.9.0-win64/documentation/html/docs/wsf_atg_launch_computer.html",
+        "demo: benchmarks/benchmark/demo_sources/laser_designator/weapons/agm/hellfire.txt"
+      ]
+    },
+    "WSF_COMM_NETWORK_AD_HOC": {
+      "allowed_block_kinds": ["network"],
+      "preferred_declaration": "network <name> WSF_COMM_NETWORK_AD_HOC",
+      "notes": [
+        "This is a network definition type, not a comm transceiver type."
+      ],
+      "provenance": [
+        "official_doc: C:/Program Files/afsim-2.9.0-win64/documentation/html/docs/wsf_comm_network_ad_hoc.html",
+        "demo: benchmarks/benchmark/demo_sources/comm/comms/network.txt"
+      ]
+    },
+    "WSF_COMM_TRANSCEIVER": {
+      "allowed_block_kinds": ["comm"],
+      "preferred_declaration": "comm <name> WSF_COMM_TRANSCEIVER",
+      "notes": [
+        "This is the comm-hosted transceiver form used by the benchmark communication demos."
+      ],
+      "provenance": [
+        "demo: benchmarks/benchmark/demo_sources/comm/platforms/detector.txt",
+        "demo: benchmarks/benchmark/demo_sources/iads_c2_demos/platforms/acq_radar.txt"
+      ]
+    },
+    "WSF_GUIDANCE_COMPUTER": {
+      "allowed_block_kinds": ["processor"],
+      "preferred_declaration": "processor <name> WSF_GUIDANCE_COMPUTER",
+      "notes": [
+        "Guidance computers appear as processor blocks in the verified AGM and laser-designator demos."
+      ],
+      "provenance": [
+        "official_doc: C:/Program Files/afsim-2.9.0-win64/documentation/html/docs/wsf_guidance_computer.html",
+        "demo: benchmarks/benchmark/demo_sources/laser_designator/weapons/agm/hellfire.txt"
+      ]
+    },
+    "WSF_WEAPON_TRACK_PROCESSOR": {
+      "allowed_block_kinds": ["processor"],
+      "preferred_declaration": "processor <name> WSF_WEAPON_TRACK_PROCESSOR",
+      "notes": [
+        "Weapon track processors are processor-hosted in the verified AGM demos."
+      ],
+      "provenance": [
+        "demo: benchmarks/benchmark/demo_sources/laser_designator/weapons/agm/hellfire.txt"
+      ]
+    },
+    "WSF_GROUND_TARGET_FUSE": {
+      "allowed_block_kinds": ["processor"],
+      "preferred_declaration": "processor <name> WSF_GROUND_TARGET_FUSE",
+      "notes": [
+        "Ground-target fuse behavior is declared via processor blocks in the verified AGM demos."
+      ],
+      "provenance": [
+        "demo: benchmarks/benchmark/demo_sources/laser_designator/weapons/agm/hellfire.txt"
+      ]
+    },
+    "WSF_AIR_TARGET_FUSE": {
+      "allowed_block_kinds": ["processor"],
+      "preferred_declaration": "processor <name> WSF_AIR_TARGET_FUSE",
+      "notes": [
+        "Air-target fuse behavior is declared via processor blocks in verified strike/IADS benchmark scripts."
+      ],
+      "provenance": [
+        "official_doc: C:/Program Files/afsim-2.9.0-win64/documentation/html/docs/wsf_air_target_fuse.html",
+        "demo: benchmarks/benchmark/demo_sources/air_to_air/weapons/aam/short_range_ir_missile.txt",
+        "demo: benchmarks/benchmark/demo_sources/iads_c2_demos/weapons/sam.txt"
+      ]
+    }
+  },
+  "command_context_rules": {
+    "route": {
+      "allowed_parent_blocks": ["platform"],
+      "message": "route must be nested under platform"
+    },
+    "maximum_speed": {
+      "allowed_parent_blocks": ["mover"],
+      "message": "maximum_speed is only valid inside a mover block"
+    },
+    "minimum_speed": {
+      "allowed_parent_blocks": ["mover"],
+      "message": "minimum_speed is only valid inside a mover block"
+    },
+    "task": {
+      "allowed_parent_blocks": ["processor"],
+      "message": "task must be nested under processor"
+    }
+  },
+  "reference_validation_rules": {
+    "comm_named_type_reference": {
+      "description": "A nested comm block that uses a non-WSF type should resolve to a visible comm definition when the script is self-contained.",
+      "verified_by": [
+        "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt",
+        "benchmarks/benchmark/demo_sources/iads_c2_demos/comm/datalinks.txt"
+      ]
+    },
+    "behavior_node_reference": {
+      "description": "behavior_node names in a self-contained script should resolve to advanced_behavior definitions or be provided by includes.",
+      "verified_by": [
+        "benchmarks/benchmark/demo_sources/behavior_tree/run_tree.txt",
+        "benchmarks/benchmark/demo_sources/behavior_tree/processors/quantum_agents/aiai/selector_planned_route.txt"
+      ]
+    }
+  },
+  "external_resource_rules": {
+    "aero_file": {
+      "description": "aero_file should point to a real FXW resource in the local corpus or workspace.",
+      "verified_by": [
+        "benchmarks/benchmark/demo_sources/air_to_air/platforms/lte_fighter.txt",
+        "benchmarks/benchmark/demo_sources/air_to_air/platforms/hvaa.txt"
+      ]
+    }
+  }
+}

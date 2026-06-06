@@ -1,0 +1,92 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#    * * ************************************** * *
+#    *   ****** Demonstration input file ******   *
+#    *   ******      UNCLASSIFIED        ******   *
+#    * * ************************************** * *
+
+
+platform red_1 STRIKER
+   commander SELF
+   side red
+   icon weasel
+   route
+      position 16:14:23.93s 51:24:44.45e altitude 35000.00 ft msl speed 500 kts
+      position 16:14:34.34s 50:34:19.02e altitude 35000.00 ft msl speed 500 kts
+      label loop
+      position 15:47:49.31s 50:34:14.30e altitude 35000.00 ft speed 450 kts
+      position 15:37:43.02s 50:40:26.43e altitude 35000.00 ft
+      goto loop
+   end_route
+   heading 270 deg
+
+   edit processor task_mgr
+      off
+   end_processor
+end_platform
+
+platform red_2 STRIKER
+   side red
+   icon weasel
+   commander SELF
+   route
+      position 16:17:27.01s 51:25:20.82e altitude 35000.00 ft msl speed 400 kts
+      position 16:17:38.18s 50:34:15.39e altitude 35000.00 ft msl speed 400 kts
+      label loop
+      position 16:47:02.31s 50:33:36.41e altitude 35000.00 ft speed 450 kts
+      position 16:58:57.93s 50:41:32.43e altitude 35000.00 ft
+      goto loop
+   end_route
+   heading 270 deg
+
+   edit processor task_mgr
+      off
+   end_processor
+end_platform
+
+platform red_3 STRIKER
+   side red
+   icon weasel
+   commander SELF
+   route
+      position 16:15:47.24s 51:32:47.03e altitude 35000.00 ft msl speed 500 kts
+      position 16:15:54.39s 50:42:08.46e altitude 35000.00 ft msl speed 500 kts
+      label loop
+      position 15:48:51.92s 50:41:50.16e altitude 35000.00 ft speed 450 kts
+      position 15:37:35.62s 50:51:47.59e altitude 35000.00 ft
+      goto loop
+   end_route
+   heading 270 deg
+
+   edit processor task_mgr
+      off
+   end_processor
+end_platform
+
+platform red_4 STRIKER
+   side red
+   icon weasel
+   commander SELF
+   route
+      position 16:19:47.74s 51:32:51.22e altitude 35000.00 ft msl speed 500 kts
+      position 16:20:33.70s 50:42:33.42e altitude 35000.00 ft msl speed 450 kts
+      label loop
+      position 16:46:43.49s 50:45:09.04e altitude 35000.00 ft speed 450 kts
+      position 16:57:51.33s 50:52:12.62e altitude 35000.00 ft
+      goto loop
+   end_route
+   heading 269 deg
+
+   edit processor task_mgr
+      off
+   end_processor
+end_platform
+
+
+

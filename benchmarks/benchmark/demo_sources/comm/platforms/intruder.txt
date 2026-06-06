@@ -1,0 +1,22 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform_type INTRUDER WSF_PLATFORM
+   side red
+   icon mig-25
+   add mover WSF_AIR_MOVER
+      route
+         position 42n 102w altitude 20000 ft speed 3000 km/hr 
+         position 38n 98w altitude 20000 ft speed 3000 km/hr extrapolate
+      end_route
+   end_mover
+end_platform_type
+
+platform intruder INTRUDER
+end_platform

@@ -1,0 +1,98 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once processors/telar_task_mgr.txt
+include_once sensors/radar/sr_sam_acq_radar_sensor.txt
+include_once sensors/radar/sr_sam_ttr_radar_sensor.txt
+include_once processors/red_radar_tactics.txt
+include_once weapons/sam/sr_sam.txt
+
+processor SR_SAM_TELAR_TASK_MGR TELAR_TASK_MGR
+   number_of_servers            4
+
+   #script_debug_writes on
+   #show_state_transitions
+   #show_task_messages
+
+   on_initialize
+      ACQ_SENSOR_NAME         = "sr_sam_acq_radar_sensor";
+      SENSOR_NAME             = "sr_sam_ttr_radar_sensor";
+      REQUIRED_TRACK_QUALITY  = 0.75;
+      SENSOR_ACQUIRE_MODE     = "ACQUIRE";
+      SENSOR_TRACK_MODE       = "TRACK";
+      WEAPON_NAME             = "sam";
+      ENVELOPE                = "full_kinematic";
+      SALVO_SIZE              = 1;
+   end_on_initialize
+end_processor
+# -------------------------------------------------------------------------------
+
+platform_type SR_SAM_TELAR WSF_PLATFORM
+   icon     sr_sam_telar_icon
+   category FIRE_CONTROL
+   category ENGAGEMENT
+   category ACQUISITION
+   category Radar
+
+   infrared_signature    VEHICLE_INFRARED_SIGNATURE
+   optical_signature     VEHICLE_OPTICAL_SIGNATURE
+   radar_signature       VEHICLE_RADAR_SIGNATURE
+
+   track_manager
+      filter FILTER_TACTICS end_filter
+   end_track_manager
+
+   comm cmdr_net RED_DATALINK
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link task_mgr
+   end_comm
+
+   zone full_kinematic
+      circular
+         maximum_altitude 20000 ft
+         maximum_radius   6 nm
+   end_zone
+
+   zone battalion_sector
+      circular
+      maximum_altitude 20000 ft
+      maximum_radius   6 nm
+   end_zone
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval 60 seconds
+   end_processor
+
+   processor task_mgr SR_SAM_TELAR_TASK_MGR
+   end_processor
+
+   sensor sr_sam_acq_radar_sensor SR_SAM_ACQ_RADAR_SENSOR
+      on
+      internal_link data_mgr
+      ignore_same_side
+   end_sensor
+
+   processor acq_radar_mgr RED_RADAR_TACTICS  // Turns on acq radar if given a task
+   end_processor
+
+   sensor sr_sam_ttr_radar_sensor SR_SAM_TTR_RADAR_SENSOR
+      off
+      internal_link data_mgr
+      ignore_same_side
+   end_sensor
+
+   weapon sam SR_SAM
+      quantity 24
+   end_weapon
+end_platform_type

@@ -1,0 +1,136 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+script_variables
+   WsfDraw draw = WsfDraw();
+end_script_variables
+
+script void DrawConnection(WsfAddress aSourceAddress, WsfAddress aDestinationAddress)
+   draw.SetLayer("ad_hoc");
+   WsfPlatform sourcePlat = WsfComm.GetComm(aSourceAddress).Platform();
+   WsfPlatform destinationPlat = WsfComm.GetComm(aDestinationAddress).Platform();
+
+   draw.SetId(aSourceAddress.GetAddress() + aDestinationAddress.GetAddress());
+   draw.SetLineStyle("dotted");
+   draw.BeginLines();
+      draw.SetDuration(Math.DOUBLE_MAX());
+      draw.SetLineSize(2);
+      draw.SetColor(1.0,1.0,1.0);
+      draw.Vertex(sourcePlat);
+      draw.Vertex(destinationPlat);
+   draw.End();
+end_script
+
+script void EraseDrawConnection(WsfAddress aSourceAddress, WsfAddress aDestinationAddress)
+   draw.SetLayer("ad_hoc");
+   draw.Erase(aSourceAddress.GetAddress() + aDestinationAddress.GetAddress());
+end_script
+
+script void DrawRouting(WsfAddress aSourceAddress, WsfAddress aDestinationAddress)
+   draw.SetLayer("ad_hoc");
+   WsfPlatform sourcePlat = WsfComm.GetComm(aSourceAddress).Platform();
+   WsfPlatform destinationPlat = WsfComm.GetComm(aDestinationAddress).Platform();
+   
+   draw.SetLineStyle("solid");
+   draw.BeginLines();
+      draw.SetDuration(2.0);
+      draw.SetLineSize(4.0);
+      draw.SetColor(1.0,0,0.0);
+      draw.Vertex(sourcePlat);
+      draw.Vertex(destinationPlat);
+   draw.End();
+end_script
+
+comm AD_HOC WSF_RADIO_TRANSCEIVER
+   network_name ad_hoc
+   transmitter
+      frequency 100 mhz
+      power 50 mw
+      maximum_range 100 km
+   end_transmitter
+   
+   receiver
+      frequency 100 mhz
+   end_receiver
+end_comm
+
+router_protocol AD_HOC WSF_COMM_ROUTER_PROTOCOL_AD_HOC
+   
+   script bool OnCommAdded(WsfAddress aAddress, WsfCommGraph aGraph, WsfCommRouter aRouter)
+      return true;
+   end_script
+   
+   script bool OnCommRemoved(WsfAddress aAddress, WsfCommGraph aGraph, WsfCommRouter aRouter)
+      return true;
+   end_script
+   
+   script bool OnConnectionAdded(WsfAddress aSourceAddress, WsfAddress aDestinationAddress, WsfCommGraph aGraph, WsfCommRouter aRouter)
+      // Only accept outgoing connections with a local interface
+      Array<WsfAddress> interfaces = aRouter.GetInterfaces();
+      foreach(WsfAddress address in interfaces)
+      {
+         if(address.GetAddress() == aSourceAddress.GetAddress())
+         {
+            DrawConnection(aSourceAddress, aDestinationAddress);
+            return true;
+         }
+      }
+      return false;
+   end_script
+   
+   script bool OnConnectionRemoved(WsfAddress aSourceAddress, WsfAddress aDestinationAddress, WsfCommGraph aGraph, WsfCommRouter aRouter)
+      EraseDrawConnection(aSourceAddress, aDestinationAddress);
+      return true;
+   end_script
+   
+   script WsfAddress OnMessageRouting(WsfCommMessage aMessage, WsfAddress aAddress, WsfCommGraph aGraph, WsfCommRouter aRouter)
+      // Use a greedy algorithm that selects the next hop based on distance from destination.
+      Array<WsfCommGraphEdge> edges = aGraph.GetOutgoingNodeEdges(aAddress);
+      WsfComm destinationComm = WsfComm.GetComm(aMessage.GetSourceMessage().Destination());
+      WsfGeoPoint destLoc = destinationComm.Platform().Location();
+      WsfAddress hop = {};
+      double totalDistance = MATH.DOUBLE_MAX();
+      Array<WsfAddress> traceRoute = aMessage.GetTraceRoute();
+      foreach(WsfCommGraphEdge edge in edges)
+      {
+         if(edge.DestinationAddress().GetAddress() == aAddress.GetAddress())
+         {
+            continue;
+         }
+         
+         foreach(WsfAddress visited in traceRoute)
+         {
+            if(visited.GetAddress() == edge.DestinationAddress().GetAddress())
+            {
+               continue;
+            }
+         }
+         WsfComm potentialComm = WsfComm.GetComm(edge.DestinationAddress());
+         double distance = destLoc.GroundRangeTo(potentialComm.Platform().Location());
+         if(distance < totalDistance)
+         {
+            totalDistance = distance;
+            hop = edge.DestinationAddress();
+         }
+      }
+      
+      if(!hop.IsNull())
+      {
+         DrawRouting(aAddress, hop);
+      }
+      
+      return hop;  
+   end_script
+end_router_protocol
+
+router DEFAULT WSF_COMM_ROUTER
+   add router_protocol ad_hoc AD_HOC end_router_protocol
+   use_default_protocol false
+   hop_limit 10
+end_router

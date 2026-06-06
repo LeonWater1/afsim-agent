@@ -1,0 +1,198 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+acoustic_signature ACOUSTIC_SIGNATURE # MADE UP NUMBERS
+   data_reference_range 10 feet
+   state default
+   spectrum_data
+        freq    31.5 hz   noise_pressure 20.3 dB_20uPa
+        freq    40.0 hz   noise_pressure 20.3 dB_20uPa
+        freq    50.0 hz   noise_pressure 20.3 dB_20uPa
+        freq    63.0 hz   noise_pressure 20.3 dB_20uPa
+        freq    80.0 hz   noise_pressure 20.3 dB_20uPa
+        freq    100.0 hz  noise_pressure 20.3 dB_20uPa
+        freq    200.0 hz  noise_pressure 20.3 dB_20uPa
+        freq    400.0 hz  noise_pressure 20.3 dB_20uPa
+        freq    800.0 hz  noise_pressure 20.3 dB_20uPa
+        freq    900.0 hz  noise_pressure 20.3 dB_20uPa
+        freq   1000.0 hz  noise_pressure 20.3 dB_20uPa
+        freq   2000.0 hz  noise_pressure 78.3 dB_20uPa
+        freq   2500.0 hz  noise_pressure 30.3 dB_20uPa
+        freq   3000.0 hz  noise_pressure 20.3 dB_20uPa
+        freq   4000.0 hz  noise_pressure 20.3 dB_20uPa
+        freq   5000.0 hz  noise_pressure 20.3 dB_20uPa
+        freq   6000.0 hz  noise_pressure 20.3 dB_20uPa
+   end_spectrum_data
+end_acoustic_signature
+
+platform_type    ACOUSTIC_TARGET       WSF_PLATFORM
+  icon c-130
+  mover WSF_AIR_MOVER end_mover
+  acoustic_signature ACOUSTIC_SIGNATURE
+end_platform_type
+
+######################################################
+#antenna_pattern ACOUSTIC_SENSOR_PATTERN
+#   constant 0 db
+#end_antenna_pattern
+
+sensor ACOUSTIC_BASE WSF_ACOUSTIC_SENSOR
+   #debug
+   on
+
+   acoustic_type human
+
+   frame_time 1 sec
+   scan_mode both
+
+   azimuth_scan_limits -180 deg 180 deg
+   elevation_scan_limits 0 deg 90 deg
+
+    detection_threshold 0.0 # do not adjust for human hearing
+
+   hits_to_establish_track 2 3
+   hits_to_maintain_track 1 2
+
+   reports_bearing
+   reports_elevation
+   reports_signal_to_noise
+end_sensor
+####
+
+sensor JUNGLE_DAY_ACOUSTIC_SENSOR ACOUSTIC_BASE
+   background_noise jungle_day
+   on
+end_sensor
+platform_type JUNGLE_DAY_ACOUSTIC_PLATFORM WSF_PLATFORM
+   icon target
+   sensor jungle_day JUNGLE_DAY_ACOUSTIC_SENSOR end_sensor
+end_platform_type
+
+####
+sensor JUNGLE_NIGHT_ACOUSTIC_SENSOR ACOUSTIC_BASE
+   background_noise jungle_night
+   on
+end_sensor
+platform_type JUNGLE_NIGHT_ACOUSTIC_PLATFORM WSF_PLATFORM
+   icon target
+   sensor jungle_night JUNGLE_NIGHT_ACOUSTIC_SENSOR end_sensor
+end_platform_type
+
+####
+sensor INDUSTRIAL_ACOUSTIC_SENSOR ACOUSTIC_BASE
+   background_noise industrial
+   on
+end_sensor
+platform_type INDUSTRIAL_ACOUSTIC_PLATFORM WSF_PLATFORM
+   icon target
+   sensor industrial INDUSTRIAL_ACOUSTIC_SENSOR end_sensor
+end_platform_type
+
+####
+sensor RURAL_ACOUSTIC_SENSOR ACOUSTIC_BASE
+   background_noise rural
+   on
+end_sensor
+platform_type RURAL_ACOUSTIC_PLATFORM WSF_PLATFORM
+   icon target
+   sensor rural RURAL_ACOUSTIC_SENSOR end_sensor
+end_platform_type
+
+####
+sensor RESIDENTIAL_ACOUSTIC_SENSOR ACOUSTIC_BASE
+   background_noise residential
+   on
+end_sensor
+platform_type RESIDENTIAL_ACOUSTIC_PLATFORM WSF_PLATFORM
+   icon target
+   sensor residential RESIDENTIAL_ACOUSTIC_SENSOR end_sensor
+end_platform_type
+
+########################################################################################
+platform jungle_day JUNGLE_DAY_ACOUSTIC_PLATFORM
+  position 30.1n 30e altitude 1 m agl
+  side red
+end_platform
+
+platform jungle_night JUNGLE_NIGHT_ACOUSTIC_PLATFORM
+  position 30.2n 30e altitude 1 m agl
+  side red
+end_platform
+
+
+platform industrial INDUSTRIAL_ACOUSTIC_PLATFORM
+  position 30.3n 30e altitude 1 m agl
+  side red
+end_platform
+
+
+platform rural RURAL_ACOUSTIC_PLATFORM
+  position 30.4n 30e altitude 1 m agl
+  side red
+end_platform
+
+
+platform residential RESIDENTIAL_ACOUSTIC_PLATFORM
+  position 30.5n 30e altitude 1 m agl
+  side red
+end_platform
+
+platform player-1 ACOUSTIC_TARGET
+  position 29:30:57.34n 30e altitude 1500.00 ft
+  side blue
+  route
+    position 29:30:57.34n 30e altitude 1500.00 ft
+    speed 100 kts
+    position 30:40:37.43n 30e altitude 1500.00 ft
+  end_route
+end_platform
+
+platform player-2 ACOUSTIC_TARGET
+  side blue
+  heading 360 deg
+  route
+    position 29:30:56.33n 29:54:21.23e altitude 1500.00 ft
+    speed 100 kts
+    position 30:40:36.42n 29:54:21.23e altitude 1500.00 ft
+  end_route
+end_platform
+
+platform target3 ACOUSTIC_TARGET
+  position 29:30:56.56n 29:48:25.33e altitude 1500.00 ft
+  side blue
+  route
+    position 29:30:56.56n 29:48:25.33e altitude 1500.00 ft speed 100 kts
+    position 30:40:36.65n 29:48:25.33e altitude 1500.00 ft speed 100 kts
+  end_route
+end_platform
+
+platform target4 ACOUSTIC_TARGET
+  position 29:31:00.00n 29:40:00.00e altitude 1500.00 ft
+  side blue
+  route
+    position 29:31n 29:40e altitude 1500.00 ft speed 100 kts
+    position 30:40:19.29n 29:40e altitude 1500.00 ft speed 100 kts
+  end_route
+end_platform
+
+#############################################################
+event_pipe
+   file output/acoustic_demo.aer
+end_event_pipe
+
+event_output
+   file output/acoustic_demo.evt
+   disable all
+   enable SENSOR_DETECTION_ATTEMPT
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_UPDATED
+   enable SENSOR_TRACK_DROPPED
+end_event_output
+
+end_time 70 min

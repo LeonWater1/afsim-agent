@@ -1,0 +1,94 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+processor TERRAIN_FOLLOWING WSF_SCRIPT_PROCESSOR
+   script_variables
+      double COMMANDED_HEIGHT_ABOVE_TERRAIN = 5000; # This is the default - must be changed
+                                                    # by either the platform_type or platform
+      double HEIGHT_TOLERANCE               = 100;   # +/- tolerance for hysteresis
+   end_script_variables
+   update_interval 2.0 sec
+   on_update
+      WsfGeoPoint FutureLocation  = PLATFORM.Location();
+      double CurrentAltAGL  = PLATFORM.HeightAboveTerrain();
+      double CurrentSpeed   = PLATFORM.Speed();
+      double CurrentAltMSL  = PLATFORM.Altitude();
+      double MaxRate        = 100;
+      double Rate           =  50;
+      FutureLocation.Extrapolate(0, CurrentSpeed*2); #heading, speed*script_update_rate
+      double FutureAltAGL = FutureLocation.HeightAboveTerrain();
+      // Valley coming...
+      if (FutureAltAGL > (COMMANDED_HEIGHT_ABOVE_TERRAIN + HEIGHT_TOLERANCE))
+         {
+         #double NewAlt = CurrentAltMSL - COMMANDED_HEIGHT_ABOVE_TERRAIN;
+         double NewAlt = CurrentAltMSL - FutureAltAGL;
+         if (CurrentAltMSL - NewAlt > 100) Rate = MaxRate;
+         PLATFORM.GoToAltitude(NewAlt, Rate, 1); # Alt, Rate, stay on route
+         writeln(TIME_NOW, " Commanding to go down to the new alt of ", NewAlt);
+         }
+      // Hill coming up..
+      if (FutureAltAGL < (COMMANDED_HEIGHT_ABOVE_TERRAIN - HEIGHT_TOLERANCE))
+         {
+         #double NewAlt = CurrentAltMSL + COMMANDED_HEIGHT_ABOVE_TERRAIN;
+         double NewAlt = CurrentAltMSL + FutureAltAGL ;
+         if (NewAlt - CurrentAltMSL > 100) Rate = MaxRate;
+         PLATFORM.GoToAltitude(NewAlt, Rate, 1); # Alt, Rate, stay on route
+         writeln(TIME_NOW, " Commanding to go up to the new alt of ", NewAlt);
+         }
+   end_on_update
+end_processor
+
+platform_type  TEST_AIR_MOVER  WSF_PLATFORM
+   mover WSF_AIR_MOVER
+     body_g_limit 4 g
+     maximum_climb_rate 200 ft/s
+   end_mover
+
+   processor terrain_following TERRAIN_FOLLOWING
+     script_variables
+        COMMANDED_HEIGHT_ABOVE_TERRAIN = 300; # 300 meters
+        #HEIGHT_TOLERANCE = 50;
+     end_script_variables
+   end_processor
+
+end_platform_type
+
+platform test_flyer TEST_AIR_MOVER
+  side blue
+  icon F-15
+  route
+    position 36:08:00.00n 115:10:48.00w altitude 1000.00 ft agl
+      speed 400 kts
+    position 37:18:49.56n 115:10:48.00w altitude 1000.00 ft agl
+      speed 400 kts
+    position 38:29:39.13n 115:10:48.00w altitude 5000.00 ft agl
+      speed 400 kts
+  end_route
+end_platform
+
+event_pipe
+   file terrain_demo.aer
+   use_preset default
+end_event_pipe
+
+terrain
+   ## You must provide terrain data in order for this demo to work
+   ## Here is an example input line
+   #dted 1  c:/AFSIM/dted1/dted128
+end_terrain
+
+on_initialize
+   WsfTerrain terrain = WsfTerrain();
+   if (terrain.TerrainElevApprox(36.0, -115.0) == 0)
+   {
+      writeln("***** WARNING: You must provide your own terrain data in 'terrain_demo.txt', line 71, near column 1");
+   }
+end_on_initialize
+
+end_time 60 min

@@ -1,0 +1,154 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#    * * ************************************** * *
+#    *   ****** Demonstration input file ******   *
+#    *   ******      UNCLASSIFIED        ******   *
+#    * * ************************************** * *
+#    ----------------------------------------------------------------
+#                             Penetrating UCAVs
+#    ----------------------------------------------------------------
+platform ucav_1 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:36n 113:27:36w altitude 35000 ft msl
+   route
+      position 41:42:36n 113:27:36w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:24n 113:27:36w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_2 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:36n 114:27:38w altitude 35000 ft msl
+   route
+      position 41:42:36n 114:27:38w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:24n 114:27:38w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_3 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:36n 115:27:41w altitude 35000 ft msl
+   route
+      position 41:42:36n 115:27:41w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:24n 115:27:41w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_4 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:35n 116:27:43w altitude 35000 ft msl
+   route
+      position 41:42:35n 116:27:43w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:23n 116:27:42w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_5 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:35n 117:27:46w altitude 35000 ft msl
+   route
+      position 41:42:35n 117:27:46w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:23n 117:27:44w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_6 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:36n 118:27:48w altitude 35000 ft msl
+   route
+      position 41:42:36n 118:27:48w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:24n 118:27:47w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_7 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:35n 119:27:50w altitude 35000 ft msl
+   route
+      position 41:42:35n 119:27:50w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:23n 119:27:48w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_8 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:35n 120:27:53w altitude 35000 ft msl
+   route
+      position 41:42:35n 120:27:53w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:23n 120:27:50w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+platform ucav_9 UCAV
+   side blue
+   indestructible
+   commander SELF
+   position 41:42:34n 121:27:56w altitude 35000 ft msl
+   route
+      position 41:42:34n 121:27:56w altitude 35000 ft msl
+         speed 460 kts
+      position 37:17:22n 121:27:53w altitude 35000 ft msl
+         speed 460 kts
+   end_route
+   heading 180 deg
+end_platform
+
+#    ----------------------------------------------------------------
+#                             SOJ Jammers
+#    ----------------------------------------------------------------
+platform soj SOJ
+   side blue
+   commander SELF
+   route
+      position 41:06:26.281n 117:25:38.386w altitude 35000 ft msl
+         speed 0 kts
+     position 40:33:00n 117:25:48w altitude 35000 ft msl
+   end_route
+   heading 180 deg
+end_platform

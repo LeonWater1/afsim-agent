@@ -1,0 +1,95 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+aero HELLFIRE_AERO WSF_AERO
+   cd_zero_subsonic    0.290
+   cd_zero_supersonic  0.835
+   mach_begin_cd_rise  0.500
+   mach_end_cd_rise    1.400
+   mach_max_supersonic 2.000
+   reference_area      0.267 ft2 # 7.0 in body dia
+   cl_max              2.5       # arbitrary, at 12 deg alpha = f(fin defl)
+   aspect_ratio        0.863     # from aero data on hand.
+   oswalds_factor      0.9       # unknown
+   lift_curve_slope   11.9       # CL = 2.5 at 12 deg = 2.5 / (12/57.3) = 11.9 per radian
+end_aero
+
+platform_type HELLFIRE WSF_PLATFORM
+   #icon agm-114_missile_icon  
+   icon missile
+   mover WSF_GUIDED_MOVER      
+      integration_method rk4
+      # data for the agm-114k model
+      total_mass        45.7 kg # 9.00 kg
+      empty_mass        36.7 kg 
+      thrust          1614.0 lbf
+      thrust_duration    3.0 sec      
+      update_interval 0.01 s
+      aero               HELLFIRE_AERO
+   end_mover
+
+   processor hellfire_guidance WSF_GUIDANCE_COMPUTER
+      #debug
+      #show_status
+      guide_to_truth false # Use track location, not truth.
+      update_interval              0.01 s
+      phase LAUNCH         
+         g_bias                       0.0
+         proportional_navigation_gain 0.0
+         velocity_pursuit_gain        0.0
+         next_phase PITCH_UP when flight_time >= 0.15 sec
+      end_phase
+      phase PITCH_UP
+         g_bias                                   2
+         next_phase TERMINAL if target_slant_range < 5000 meter
+      end_phase
+      phase TERMINAL
+         guidance_target truth         
+      end_phase
+   end_processor
+
+   processor track_manager WSF_WEAPON_TRACK_PROCESSOR       
+      #debug
+      turn_on_sensor laser_tracker at_time 0.15 sec after_launch
+   end_processor
+
+   processor hellfire_fuse WSF_GROUND_TARGET_FUSE
+      #debug
+      time_of_flight_to_arm  0.4 sec
+      maximum_time_of_flight 5.0 min
+   end_processor
+
+   sensor laser_tracker WSF_LASER_TRACKER 
+       ignore_same_side           
+       laser_code                    1212
+       off
+       update_interval             0.01 s
+       frame_time                   1 sec  # Time it takes to do a complete box scan.
+       receiver
+          wavelength 1.06E-6 microns
+       end_receiver
+       maximum_range            10 km      
+       azimuth_field_of_view    -15 deg +15 deg
+       elevation_field_of_view   -20 deg  10 deg
+       reports_bearing
+       reports_elevation
+       reports_location
+       track_quality 1.0    # weapons quality
+   end_sensor
+end_platform_type
+
+weapon_effects HELLFIRE_EFFECT WSF_GRADUATED_LETHALITY
+  #debug
+  radius_and_pk 100 m 1.0  # put back at .7 after testing
+  incidental_damage_allowed true
+end_weapon_effects
+ 
+weapon HELLFIRE WSF_EXPLICIT_WEAPON
+   launched_platform_type HELLFIRE
+   weapon_effects   HELLFIRE_EFFECT
+end_weapon   

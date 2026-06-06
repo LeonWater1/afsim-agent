@@ -1,0 +1,49 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+include_once cyber/cyber_attacks/lower_altitude.txt
+
+platform_type CYBER_COMMAND_POST WSF_PLATFORM
+   icon c4i
+   side red
+   
+   comm datalink RED_DATALINK
+     network_name <local:master>
+     internal_link data_mgr
+     internal_link task_mgr
+   end_comm
+   
+   processor data_mgr WSF_TRACK_PROCESSOR
+   end_processor
+   
+   processor task_mgr WSF_TASK_PROCESSOR
+   
+      script void SendCyberAttack()
+         PLATFORM.CyberAttack(TRACK.Target(),"LOWER_ALTITUDE");
+      end_script
+   
+      evaluation_interval DETECTED 1 s
+      state DETECTED      
+         next_state ATTACK
+            return (PLATFORM.SlantRangeTo(TRACK) <= 10*MATH.M_PER_NM() && TRACK.TargetType() == "UAV");
+         end_next_state
+      end_state
+      
+      evaluation_interval ATTACK 1 s
+      state ATTACK
+         on_entry
+            writeln("TIME NOW = ", TIME_NOW, " ",TRACK.TargetName()," WITHIN RANGE OF  ", PLATFORM.Name(),", SENDING CYBER ATTACK");
+            SendCyberAttack();
+         end_on_entry
+      end_state
+   end_processor
+   
+end_platform_type

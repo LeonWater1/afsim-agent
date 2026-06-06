@@ -1,0 +1,413 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+script_variables
+   global double mMoverUpdateInterval = 1.0;
+
+   # list of platforms and systems of interest
+   global Set<string> mPlatformNames  = Set<string>();
+   global Set<string> mES_SystemNames = Set<string>();
+   global Set<string> mEA_SystemNames = Set<string>();
+
+   # File I/O stuff
+   global FileIO mEmitterRptFile  = FileIO();
+   global FileIO mTrackRptFile    = FileIO();
+   global FileIO mDetectRptFile   = FileIO();
+   global FileIO mJamRptFile      = FileIO();
+   global FileIO mAirFrameRptFile = FileIO();
+
+   global string mEmitterRptFilename  = "emitter_reports";
+   global string mTrackRptFileName    = "track_reports";
+   global string mDetectRptFilename   = "detection_reports";
+   global string mJamRptFilename      = "jam_reports";
+   global string mAirFrameRptFilename = "airframe_reports";
+
+   # Storage containers
+   global Map<int, double> mLastAirFrameUpdateMap = Map<int, double>();
+   global Map<string, int> mSystemNameToId = Map<string, int>();
+   global Map<string, int> mTechniqueNameToId = Map<string, int>();
+end_script_variables
+
+on_initialize
+
+   string header;
+   string outstr;
+
+   outstr = write_str("data/", mEmitterRptFilename, ".txt");
+   if (! mEmitterRptFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),Action,SensorName,TargetName,TargetIndex,ReceivedPower(dB),SignalToInterference");
+   mEmitterRptFile.Writeln(header);
+
+   outstr = write_str("data/", mTrackRptFileName, ".txt");
+   if (! mTrackRptFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mTrackRptFile.Writeln(header);
+
+   outstr = write_str("data/", mDetectRptFilename, ".txt");
+   if (! mDetectRptFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mDetectRptFile.Writeln(header);
+
+   outstr = write_str("data/", mJamRptFilename, ".txt");
+   if (! mJamRptFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mJamRptFile.Writeln(header);
+
+   outstr = write_str("data/", mAirFrameRptFilename, ".txt");
+   if (! mAirFrameRptFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mAirFrameRptFile.Writeln(header);
+
+   #Fill in platform names of interest
+   mPlatformNames.Clear();
+   mPlatformNames.Insert("100_soj");
+
+   # Fill in systems of interest
+   mES_SystemNames.Clear();
+   mES_SystemNames.Insert("esm");
+
+   mEA_SystemNames.Clear();
+   mEA_SystemNames.Insert("fwd_vhf_jammer");
+   mEA_SystemNames.Insert("aft_vhf_jammer");
+   mEA_SystemNames.Insert("fwd_sband_jammer");
+   mEA_SystemNames.Insert("aft_sband_jammer");
+   mEA_SystemNames.Insert("fwd_xband_jammer");
+   mEA_SystemNames.Insert("aft_xband_jammer");
+
+   # Name Mappings for systems
+   mSystemNameToId.Clear();
+   mSystemNameToId["fwd_vhf_jammer"]   = 2001;
+   mSystemNameToId["aft_vhf_jammer"]   = 2002;
+   mSystemNameToId["fwd_sband_jammer"] = 2003;
+   mSystemNameToId["aft_sband_jammer"] = 2004;
+   mSystemNameToId["fwd_xband_jammer"] = 2005;
+   mSystemNameToId["aft_xband_jammer"] = 2006;
+
+   mSystemNameToId["esm"] = 3001;
+
+   mTechniqueNameToId["noise_jamming"]        = 100;
+   mTechniqueNameToId["random_pulse_jamming"] = 101;
+   mTechniqueNameToId["false_target_jamming"] = 102;
+end_on_initialize
+
+script bool FindStr(Array<string> aArray, string aKey)
+   foreach (string key in aArray)
+   {
+      if (key == aKey)
+      {
+         return true;
+      }
+   }
+end_script
+
+script int FindNameId(string aName)
+   int id = 0;
+   if (mSystemNameToId.Exists(aName))
+   {
+      id = mSystemNameToId[aName];
+   }
+   return id;
+end_script
+
+script int FindTechniqueId(string aName)
+   int id = 0;
+   if (mTechniqueNameToId.Exists(aName))
+   {
+      id = mTechniqueNameToId[aName];
+   }
+   return id;
+end_script
+
+script void SensorTrackInitiated(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if ((! aTrack.IsStale()) &&
+       mPlatformNames.Exists(aPlatform.Name()) &&
+       mES_SystemNames.Exists(aSensor.Name()))
+   {
+      int trackReportId  = 0;
+
+      if (aTrack.BearingValid() || aTrack.LocationValid())
+      {
+         trackReportId = aTrack.TargetIndex();
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", "new",
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.Latitude(),
+                                     ",", aTrack.Longitude(),
+                                     ",", aTrack.Altitude(),
+                                     ",", aTrack.Bearing(),
+                                     ",", aTrack.Elevation(),
+                                     ",", aTrack.Range());
+         # TODO - emitter reports and id lists
+         mTrackRptFile.Writeln(mystring);
+      }
+
+      if (aTrack.SignalToNoiseValid() || (aTrack.SignalCount() > 0))
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", aTrack.TargetIndex(),
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.TimeSinceUpdated(),
+                                     ",", "new",
+                                     ",", aTrack.TargetIndex(),
+                                     ",", aTrack.SignalCount());
+         # TODO loop over signals to get data
+         mEmitterRptFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void SensorTrackUpdated(WsfPlatform aPlatform,
+                               WsfSensor   aSensor,
+                               WsfTrack    aTrack)
+   if ((! aTrack.IsStale()) &&
+       mPlatformNames.Exists(aPlatform.Name()) &&
+       mES_SystemNames.Exists(aSensor.Name()))
+   {
+      int trackReportId  = 0;
+
+      if (aTrack.BearingValid() || aTrack.LocationValid())
+      {
+         trackReportId = aTrack.TargetIndex();
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", "update",
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.Latitude(),
+                                     ",", aTrack.Longitude(),
+                                     ",", aTrack.Altitude(),
+                                     ",", aTrack.Bearing(),
+                                     ",", aTrack.Elevation(),
+                                     ",", aTrack.Range());
+         # TODO - emitter reports and id lists
+         mTrackRptFile.Writeln(mystring);
+      }
+
+      if (aTrack.SignalToNoiseValid() || (aTrack.SignalCount() > 0))
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", aTrack.TargetIndex(),
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.TimeSinceUpdated(),
+                                     ",", "update",
+                                     ",", aTrack.TargetIndex(),
+                                     ",", aTrack.SignalCount());
+         # TODO loop over signals to get data
+         mEmitterRptFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void SensorTrackDropped(WsfPlatform aPlatform,
+                               WsfSensor   aSensor,
+                               WsfTrack    aTrack)
+   if ((! aTrack.IsStale()) &&
+       mPlatformNames.Exists(aPlatform.Name()) &&
+       mES_SystemNames.Exists(aSensor.Name()))
+   {
+      int trackReportId  = 0;
+
+      if (aTrack.BearingValid() || aTrack.LocationValid())
+      {
+         trackReportId = aTrack.TargetIndex();
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", "drop",
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.Latitude(),
+                                     ",", aTrack.Longitude(),
+                                     ",", aTrack.Altitude(),
+                                     ",", aTrack.Bearing(),
+                                     ",", aTrack.Elevation(),
+                                     ",", aTrack.Range());
+         # TODO - emitter reports and id lists
+         mTrackRptFile.Writeln(mystring);
+      }
+
+      if (aTrack.SignalToNoiseValid() || (aTrack.SignalCount() > 0))
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", trackReportId,
+                                     ",", aTrack.TargetIndex(),
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", aTrack.StartTime(),
+                                     ",", aTrack.UpdateTime(),
+                                     ",", aTrack.TimeSinceUpdated(),
+                                     ",", "drop",
+                                     ",", aTrack.TargetIndex(),
+                                     ",", aTrack.SignalCount());
+         # TODO loop over signals to get data
+         mEmitterRptFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void SensorDetectionAttempt(WsfPlatform          aPlatform,
+                                   WsfSensor            aSensor,
+                                   WsfPlatform          aTarget,
+                                   WsfSensorInteraction aResult)
+   if (mPlatformNames.Exists(aPlatform.Name()) &&
+       mES_SystemNames.Exists(aSensor.Name()))
+   {
+      if (aResult.Succeeded() && aResult.Detected())
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", "detection",
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", aTarget.Index(),
+                                     ",", aResult.RcvdPower(),
+                                     ",", aResult.SignalToInterference());
+         mDetectRptFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void SensorDetectionChanged(WsfPlatform          aPlatform,
+                                   WsfSensor            aSensor,
+                                   int                  aTargetIndex,
+                                   WsfSensorInteraction aResult)
+   if (mPlatformNames.Exists(aPlatform.Name()) &&
+       mES_SystemNames.Exists(aSensor.Name()))
+   {
+      if (aResult.Succeeded() && aResult.Detected())
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", "update",
+                                     ",", FindNameId(aSensor.Name()),
+                                     ",", aTargetIndex,
+                                     ",", aResult.RcvdPower(),
+                                     ",", aResult.SignalToInterference());
+         mDetectRptFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void JammingRequestCanceled(WsfPlatform aPlatform,
+                                   WsfWeapon   aWeapon,
+                                   double      aFreq,
+                                   double      aBW,
+                                   int         aTgtIdx)
+   if (mPlatformNames.Exists(aPlatform.Name()) &&
+       mEA_SystemNames.Exists(aWeapon.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "canceled",
+                                  ",", FindNameId(aWeapon.Name()),
+                                  ",", aFreq,
+                                  ",", aBW,
+                                  ",", aTgtIdx);
+      mJamRptFile.Writeln(mystring);
+   }
+end_script
+
+script void JammingRequestInitiated(WsfPlatform aPlatform,
+                                    WsfWeapon   aWeapon,
+                                    double      aFreq,
+                                    double      aBW,
+                                    string      aTechnique,
+                                    int         aTgtIdx)
+   if (mPlatformNames.Exists(aPlatform.Name()) &&
+       mEA_SystemNames.Exists(aWeapon.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "new",
+                                  ",", FindNameId(aWeapon.Name()),
+                                  ",", aFreq,
+                                  ",", aBW,
+                                  ",", FindTechniqueId(aTechnique),
+                                  ",", aTgtIdx);
+      mJamRptFile.Writeln(mystring);
+   }
+end_script
+
+script void JammingRequestUpdated(WsfPlatform aPlatform,
+                                  WsfWeapon   aWeapon,
+                                  double      aFreq,
+                                  double      aBW,
+                                  string      aTechnique,
+                                  int         aTgtIdx)
+   if (mPlatformNames.Exists(aPlatform.Name()) &&
+       mEA_SystemNames.Exists(aWeapon.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "updated",
+                                  ",", FindNameId(aWeapon.Name()),
+                                  ",", aFreq,
+                                  ",", aBW,
+                                  ",", FindTechniqueId(aTechnique),
+                                  ",", aTgtIdx);
+      mJamRptFile.Writeln(mystring);
+   }
+end_script
+
+script void MoverUpdated(WsfPlatform aPlatform,
+                         WsfMover    aMover)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      if ((! mLastAirFrameUpdateMap.Exists(aPlatform.Index())) ||
+          ((TIME_NOW - mLastAirFrameUpdateMap.Get(aPlatform.Index())) >= mMoverUpdateInterval))
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", aPlatform.Name(),
+                                     ",", aPlatform.Index(),
+                                     ",", aPlatform.Latitude(),
+                                     ",", aPlatform.Longitude(),
+                                     ",", aPlatform.Altitude(),
+                                     ",", aPlatform.VelocityNED().X(),
+                                     ",", aPlatform.VelocityNED().Y(),
+                                     ",", aPlatform.VelocityNED().Z(),
+                                     ",", aPlatform.Roll(),
+                                     ",", aPlatform.Pitch(),
+                                     ",", aPlatform.Heading());
+         mAirFrameRptFile.Writeln(mystring);
+         mLastAirFrameUpdateMap[aPlatform.Index()] = TIME_NOW;
+      }
+   }
+end_script
+
+observer
+   enable SENSOR_TRACK_INITIATED SensorTrackInitiated
+   enable SENSOR_TRACK_UPDATED   SensorTrackUpdated
+   enable SENSOR_TRACK_DROPPED   SensorTrackDropped
+
+   enable SENSOR_DETECTION_ATTEMPT SensorDetectionAttempt # duplicative when used with below
+   enable SENSOR_DETECTION_CHANGED SensorDetectionChanged  # duplicative when used with above
+
+   enable JAMMING_REQUEST_INITIATED JammingRequestInitiated
+   enable JAMMING_REQUEST_UPDATED JammingRequestUpdated
+   enable JAMMING_REQUEST_CANCELED JammingRequestCanceled
+
+   enable MOVER_UPDATED MoverUpdated
+end_observer

@@ -1,0 +1,36 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform_type IADS_CMDR WSF_PLATFORM
+   comm  sub_net  DATALINK
+      network_name <local:master>
+      internal_link track_manager
+      internal_link dissemination
+   end_comm
+
+   processor track_manager WSF_TRACK_PROCESSOR
+      purge_interval             60    seconds
+      circular_report_rejection on
+   end_processor
+
+   processor battle_manager BM
+   end_processor
+
+   processor dissemination DC2
+   end_processor
+
+   processor asset_manager WPN_AM
+   end_processor
+end_platform_type
+
+

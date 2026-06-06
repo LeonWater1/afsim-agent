@@ -19,10 +19,10 @@ from .context_rules import derive_grounding_constraints
 
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-MAPPING_PATH = ROOT / "docs" / "machine" / "entity_mapping_v2.json"
+MAPPING_PATH = ROOT / "docs" / "machine" / "entity_mapping_extended.json"
 _IR_EXAMPLE_PATHS = [
-    ROOT / "docs" / "machine" / "ir_examples_v1.jsonl",
-    ROOT / "docs" / "machine" / "ir_examples_v2.jsonl",
+    ROOT / "docs" / "machine" / "ir_examples.jsonl",
+    ROOT / "docs" / "machine" / "ir_examples_extended.jsonl",
 ]
 
 

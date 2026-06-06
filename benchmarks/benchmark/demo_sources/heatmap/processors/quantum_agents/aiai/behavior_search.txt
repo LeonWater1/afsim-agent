@@ -1,0 +1,103 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# Search behavior that can be driven by locations
+# provided by a heat map
+
+behavior search
+
+   script_debug_writes off
+
+   script_variables
+      WsfQuantumTaskerProcessor processor;
+
+      string mSearchRadarName = "radar";  // replace with sensor name on platform
+
+      bool mDrawSteering = true;
+      WsfDraw mDraw = WsfDraw();
+   end_script_variables
+
+   on_init
+      if (PROCESSOR.IsA_TypeOf("WSF_QUANTUM_TASKER_PROCESSOR"))
+      {
+         processor = (WsfQuantumTaskerProcessor)PROCESSOR;
+      }
+   end_on_init
+
+   precondition
+      writeln_d("T= ",TIME_NOW, " precondition search");
+      if (!PROCESSOR.IsA_TypeOf("WSF_QUANTUM_TASKER_PROCESSOR"))
+      {
+         return Failure("behavior not attached to a quantum tasker processor!");
+      }
+
+      WsfTaskList tasks = processor.TasksReceivedOfType("SEARCH");
+      writeln_d(" Tasks count is ", tasks.Count());
+      if (tasks.Count() <= 0)
+      {
+         return Failure("No search tasks received");
+      }
+      return true;
+   end_precondition
+
+   execute
+      writeln_d(PLATFORM.Name(), " executing search, T=", TIME_NOW);
+
+      WsfGeoPoint targetPoint = WsfGeoPoint();
+      double ownSpeed = PLATFORM.Speed();
+
+      WsfTaskList tasks = processor.TasksReceivedOfType("SEARCH");
+      WsfTask task = tasks.Entry(0);
+
+      if (task.IsValid() && task.AuxDataExists("HeatPoint"))
+      {
+         writeln_d(PLATFORM.Name(), " has HeatPoint aux data, T=", TIME_NOW);
+         targetPoint = (WsfGeoPoint)task.AuxDataObject("HeatPoint");
+      }
+      else
+      {
+         return;
+      }
+
+      //make sure radar is on
+      WsfSensor searchRadar = PLATFORM.Sensor(mSearchRadarName);
+      if (searchRadar.IsValid())
+      {
+         if (!searchRadar.IsTurnedOn())
+         {
+            searchRadar.TurnOn();
+            writeln_d(PLATFORM.Name(), " turned on active radar ", searchRadar);
+         }
+         else
+         {
+            writeln_d("  radar already turned on");
+         }
+      }
+
+
+      if (mDrawSteering == true)
+      {
+         mDraw.SetLayer("behavior_search");
+         mDraw.SetDuration(PROCESSOR.UpdateInterval());
+         mDraw.SetColor(1.0, 0.5, 0.0);
+         mDraw.SetLineSize(1);
+         mDraw.BeginLines();
+            mDraw.Vertex(PLATFORM.Location());
+            mDraw.Vertex(targetPoint);
+         mDraw.End();
+      }
+
+      string msg = write_str("pursue-target: ", targetPoint, " at speed ", (string)ownSpeed);
+      writeln_d("    T=", TIME_NOW, " ", PLATFORM.Name(), " ", msg);
+
+      FlyTarget(PLATFORM, targetPoint, ownSpeed);
+   end_execute
+
+end_behavior
+

@@ -1,0 +1,46 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+include_once sensors/eyeball.txt
+
+platform_type SPOTTER WSF_PLATFORM 
+   side red
+   icon human
+   
+   comm datalink RED_DATALINK
+     network_name <local:slave>
+   end_comm
+   
+   sensor eyeball EYEBALL
+      on
+      internal_link data_mgr
+      internal_link task_mgr
+   end_sensor
+   
+   processor data_mgr WSF_TRACK_PROCESSOR
+   end_processor
+
+   processor task_mgr WSF_TASK_PROCESSOR
+      
+      evaluation_interval REPORT 1 day
+      state REPORT
+         on_entry
+            WsfMessage msg = WsfMessage();
+            if (!TRACK.IFF_Friend() && TRACK.TargetType() == "UAV")
+            {
+              PLATFORM.Comm("datalink").SendMessage(msg, "ground_radar_1", "datalink2");
+            }
+         end_on_entry
+      end_state
+      
+   end_processor
+
+end_platform_type

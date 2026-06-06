@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once scripts/observer_black_van.txt
+
+platform_type BLACK_VAN WSF_PLATFORM
+   side black
+   icon semi
+   category ad_hoc
+   add processor bogey_book WSF_TRACK_PROCESSOR
+      on_message
+         type WSF_TRACK_MESSAGE
+            script
+               writeln(PLATFORM.Name(), " RECEIVES TRACK AT TIME: ", TIME_NOW);
+            end_script
+      end_on_message
+   end_processor
+   
+   add comm van_comm WSF_COMM_TRANSCEIVER
+      network_name van_net
+      internal_link bogey_book
+   end_comm
+end_platform_type
+
+platform black_van BLACK_VAN
+end_platform
+
+execute at_time 0.00001 s absolute
+   WsfPlatform van = WsfSimulation.FindPlatform("black_van");
+   WsfPlatform detect1 = WsfSimulation.FindPlatform("detect1");
+   
+   WsfGeoPoint location = detect1.Location();
+   van.SetLocation(location.Latitude(), location.Longitude(), 0.0);
+   van.SetPitch(0.0);
+   van.SetRoll(0.0);
+   van.SetHeading(220.0);
+end_execute

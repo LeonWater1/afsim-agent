@@ -1,0 +1,159 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This file sets up a scenario to record the number of pixels taken up by
+# a particular aircraft (made up f-4 phantom in this case) based upon its optical
+# signature as it is approached from different directions.
+# Sydney Katz 2017
+
+event_pipe file output_file_demo.aer end_event_pipe
+
+optical_signature F4_OPTICAL_SIG
+   inline_table m^2 9 5
+            -90    -45    0    45    90
+      -180  200    100   10   100   200
+      -135  200     90   50    90   200
+       -90  200     80   90    80   200
+       -45  200     90   50    90   200
+         0  200    100   10   100   200
+        45  200     90   50    90   200
+        90  200     80   90    80   200
+       135  200     90   50    90   200
+       180  200    100   10   100   200
+   end_inline_table
+end_optical_signature
+
+# Set up files for output data at simulation initialization
+on_initialize
+   FileIO gOut = FileIO();
+   gOut.Open("Output_file_Pixel_CountSide.out", "out");
+   gOut.Open("Output_file_Pixel_CountFront.out", "out");
+   gOut.Open("Output_file_Pixel_CountTop.out", "out");
+end_on_initialize
+
+# Platform with an imaging sensor that will approach the aircraft being detected.
+platform_type FIGHTER_SENSOR WSF_PLATFORM
+   mover WSF_AIR_MOVER  end_mover
+   # Can add field of view
+   sensor eoir WSF_EOIR_SENSOR
+      on
+      frame_time 10 sec
+      angular_resolution 0.001 deg
+      reports_location
+      ignore_same_side
+#      slew_mode azimuth_and_elevation
+#      azimuth_field_of_view -60 deg 60 deg
+#      azimuth_slew_limits -6 deg 6 deg
+#      elevation_slew_limits -6 deg 6 deg
+      internal_link image_proc
+   end_sensor
+
+   execute at_time 1 s absolute
+      WsfPlatform platform = WsfSimulation.FindPlatform("f4_phantom");
+      WsfTrack targetTrack = platform.MakeTrack();
+      PLATFORM.Sensor("eoir").CueToTrack(targetTrack);
+   end_execute
+
+   # Processes images to determine number of pixels in each image and then adds the
+   # results to a txt file with the first column as the distance from the target
+   # and the second column as the pixel count. This file can then be used by plotting
+   # software such as excel to analyze the data.
+   processor image_proc WSF_IMAGE_PROCESSOR
+      script_variables
+        FileIO gOut = FileIO();
+      end_script_variables
+
+      on_message
+         script
+            WsfVideoMessage msg = (WsfVideoMessage)MESSAGE;
+#            writeln("Message received. Object Count is ", msg.Image().ObjectCount());
+            for (int i = 0; i < msg.Image().ObjectCount(); i = i + 1)
+            {
+               int pixel_count = msg.Image().PixelCount(i);
+               WsfPlatform f4_phantom = WsfSimulation.FindPlatform("f4_phantom");
+               double range_in_nm = PLATFORM.GroundRangeTo(f4_phantom)*0.000539957;
+#               writeln(PLATFORM.Name(), " detected ", pixel_count, " pixels at a range of ", range_in_nm, " nm");
+               gOut.Open(PLATFORM.AuxDataString("outputFileName"), "append");
+               string pixel_count_string = (string)pixel_count;
+               string range_in_nm_string = (string)range_in_nm;
+               string write = range_in_nm_string + " " + pixel_count_string;
+               gOut.Writeln(write);
+            }
+         end_script
+      end_on_message
+   end_processor
+
+
+end_platform_type
+
+# Set up sensors to approach the target. Angle of approach determined by the route.
+# Sensor coming in from side
+platform fighter_sensor_1 FIGHTER_SENSOR
+   position 30:00:00.00n 55:00:00.00w altitude 20000.00 ft heading 270 deg
+   side red
+   icon fighter
+   aux_data
+      string outputFileName = "PixelCountSide.out"
+   end_aux_data
+   route
+     position 30:00:00.00n 55:00:00.00w altitude 20000.00 ft
+     speed 400 kts
+     position 30:00:00.00n 60:00:00.00w altitude 20000.00 ft
+     speed 400 kts
+   end_route
+end_platform
+
+# Sensor coming in from front
+platform fighter_sensor_2 FIGHTER_SENSOR
+   position 35:00:00.00n 60:00:00.00w altitude 20000.00 ft heading 180 deg
+   side red
+   icon fighter
+   aux_data
+      string outputFileName = "PixelCountFront.out"
+   end_aux_data
+   route
+     position 35:00:00.00n 60:00:00.00w altitude 20000.00 ft
+     speed 400 kts
+     position 30:00:00.00n 60:00:00.00w altitude 20000.00 ft
+     speed 400 kts
+  end_route
+end_platform
+
+# Sensor coming in overhead from front
+platform fighter_sensor_3 FIGHTER_SENSOR
+   position 35:00:00.00n 60:00:00.00w altitude 40000.00 ft heading 180 deg
+   side red
+   icon fighter
+   aux_data
+      string outputFileName = "PixelCountTop.out"
+   end_aux_data
+   route
+    position 35:00:00.00n 60:00:00.00w altitude 40000.00 ft
+    speed 400 kts
+    position 30:00:00.00n 60:00:00.00w altitude 40000.00 ft
+    speed 400 kts
+  end_route
+end_platform
+
+# Platform of aircraft to be detected (f-4 phantom) containing
+# previously defined optical signature
+platform_type     F4_PHANTOM           WSF_PLATFORM
+   optical_signature F4_OPTICAL_SIG
+   mover WSF_AIR_MOVER
+   end_mover
+end_platform_type
+
+platform f4_phantom F4_PHANTOM
+   side blue
+   icon f-4
+   position 30:00:00.00n 60:00:00.00w altitude 20000.00 ft
+end_platform
+
+end_time 3000 sec
+
+

@@ -1,0 +1,57 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# Copyright (C) 2021 Stellar Science; U.S. Government has Unlimited Rights.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+multiresolution_mover MR_MOVER WSF_MULTIRESOLUTION_MOVER
+   model low_fidelity_mover
+      fidelity_range 0.0 0.5
+      mover WSF_SPACE_MOVER
+      end_mover
+   end_model
+      
+   model high_fidelity_mover
+      fidelity_range 0.5 1.0
+      mover WSF_INTEGRATING_SPACE_MOVER
+         integrator prince_dormand_78
+            tolerance 1.0e-11
+            error_criterion L_2
+         end_integrator
+         dynamics
+            term atmospheric_drag
+               cross_sectional_area 1.0 m^2
+               drag_coefficient 1.0e-6
+               atmosphere_model basic
+            end_term
+            term earth_monopole
+               egm96
+            end_term
+            term earth_j2
+               egm96
+            end_term
+            term sun_monopole
+            end_term
+            term moon_monopole
+               interpolation_interval 100.0 s
+            end_term
+            term jupiter_monopole
+            end_term
+         end_dynamics
+      end_mover
+   end_model
+   common
+      update_interval 5 sec
+      eccentricity 1e-3
+      semi_major_axis 6600 km
+      raan 0 deg
+      inclination 0 deg
+      true_anomaly 0 deg
+      argument_of_periapsis 0 deg
+   end_common
+end_multiresolution_mover

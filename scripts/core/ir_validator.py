@@ -17,8 +17,8 @@ from jsonschema import Draft202012Validator
 
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-SCHEMA_V1_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_v1.json"
-SCHEMA_V2_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_v2.json"
+SCHEMA_V1_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema.json"
+SCHEMA_V2_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_extended.json"
 
 _VERSION_MAP: dict[str, Path] = {
     "afsim_ir_v1": SCHEMA_V1_PATH,

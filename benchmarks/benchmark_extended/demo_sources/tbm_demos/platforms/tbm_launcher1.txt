@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+################################################################################
+#                  Define platform type for the TBM launcher
+# This launcher has a built in script to print out trajectory information
+
+
+# Include the weapon file that creates the TBM1 platform type.
+include_once ../weapons/ssm/tbm1.txt
+
+
+platform_type TBM1_LAUNCHER WSF_PLATFORM
+   icon Scud_Launcher
+
+   weapon tbm1-missile WSF_EXPLICIT_WEAPON
+      launched_platform_type TBM1
+      weapon_effects         TBM1_LETHALITY
+
+      script void on_create(WsfPlatform aWeapon, WsfTrack aTrack)
+         double distance = PLATFORM.SlantRangeTo(aTrack);
+         writeln("We are ", distance / MATH.M_PER_NM(), " nautical miles from the target");
+         if (distance < 350.0 * MATH.M_PER_NM())
+         {
+            writeln("Launch depressed");
+            aWeapon.ProcessInput("trajectory_type depressed");
+         }
+         else
+         {
+            writeln("Launch lofted");
+            aWeapon.ProcessInput("trajectory_type lofted");
+         }
+
+     end_script
+   end_weapon
+end_platform_type
+

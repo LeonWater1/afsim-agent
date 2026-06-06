@@ -1,0 +1,567 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Simple ESM detection example.
+#    with scripting logic to maintain frequency for spot jamming of a agile
+#    radar.
+#
+#    EW_RADAR is a mode and frequency agile radar.
+#
+
+define_path_variable CASE esm_detect_multi_sensor_radar
+log_file output/$(CASE).log
+
+# ****************************************************************************
+# Define the system types (movers, sensors, weapons, etc.)
+# ****************************************************************************
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 10 m^2
+end_radar_signature
+
+radar_signature WIDE_BODY_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+# ****************************************************************************
+#                          ESM
+# ****************************************************************************
+
+antenna_pattern ESM_ANTENNA
+   uniform_pattern
+      peak_gain 0.0 db
+      azimuth_beamwidth 90 deg
+      elevation_beamwidth 90 deg
+end_antenna_pattern
+
+sensor ESM_SENSOR WSF_ESM_SENSOR
+   frame_time              1 sec
+
+   slew_mode               fixed
+
+   maximum_range           200 km
+
+   antenna_tilt         -45 deg
+
+   receiver
+      antenna_pattern      ESM_ANTENNA
+      detection_threshold  5 db
+      noise_power          -120 dbw
+      internal_loss        0 db
+   end_receiver
+
+   frequency_band          0.1 ghz  20 ghz
+
+   reported_target_type
+      type EW_RADAR_SITE
+         #time_to_declare 20 sec
+         #time_to_reevaluate 20 sec
+         report_type EW_ACQ_SITE
+            emitter EW_RADAR
+            emitter ACQ_RADAR
+         report_type ACQ_SITE
+            emitter ACQ_RADAR
+         report_type EW_SITE
+            emitter EW_RADAR
+      type ACQ_RADAR_SITE
+         #time_to_declare 10 sec
+         #time_to_reevaluate 10 sec
+         report_type ACQ_RDR_SITE 0.75
+         report_type ACQ_SITE 0.25
+      default_type
+         #time_to_declare 1 sec
+         report_truth
+   end_reported_target_type
+
+   reported_emitter_type
+      type EW_RADAR
+         time_to_declare 10 sec
+         time_to_reevaluate 20 sec
+         #report_type EW_RDR 0.5
+         #report_type EW_UNK 0.5
+         report_truth
+      type ACQ_RADAR
+         time_to_declare 5 sec
+         time_to_reevaluate 5 sec
+         #report_type ACQ_RDR 0.75
+         #report_type ACQ_UNK 0.25
+         report_truth
+      default_type
+         time_to_declare 1 sec
+         report_truth
+   end_reported_emitter_type
+
+   #ranging_time 30 sec
+
+   reports_location
+   reports_frequency
+   reports_type
+end_sensor
+
+
+# ****************************************************************************
+#                     Early Warning Radar
+# ****************************************************************************
+
+antenna_pattern EW_RADAR_ANTENNA
+  rectangular_pattern
+     peak_gain           35 dB
+     minimum_gain       -20 dB
+     azimuth_beamwidth   5 deg
+     elevation_beamwidth 5 deg
+end_antenna_pattern
+
+sensor EW_RADAR WSF_RADAR_SENSOR
+   #show_calibration_data
+
+   frame_time                   10.0 sec
+
+   beam 1
+      one_m2_detect_range          100.0 nm
+      maximum_range                120 nm
+
+      antenna_height               6.0 m
+
+      scan_mode                    azimuth_and_elevation
+      azimuth_scan_limits          -180 deg 180 deg
+      elevation_scan_limits        -6 deg 2.5 deg
+
+      transmitter
+         antenna_pattern            EW_RADAR_ANTENNA
+         power                      20.0 kw
+         frequency                  200 mhz
+         pulse_width                25 usec
+         pulse_repetition_interval  1250 usec
+         internal_loss              2 db
+      end_transmitter
+
+      receiver
+         beam_tilt                  10.0 deg
+         bandwidth                  2.0 mhz
+         noise_power                -160 dBw  # will be calibrated for 1 m^2
+         internal_loss              7 dB
+      end_receiver
+
+      # Swerling detector
+      swerling_case                 1
+      probability_of_false_alarm    1.0e-6
+      number_of_pulses_integrated   32
+   end_beam
+
+   beam 2
+         elevation_scan_limits         5 deg 7.5 deg
+         transmitter
+            frequency 205 mhz
+         end_transmitter
+   end_beam
+
+   beam 3
+         elevation_scan_limits         10 deg 27.5 deg
+
+         transmitter
+            power 0.01 w
+            frequency 210 mhz
+         end_transmitter
+   end_beam
+
+   required_pd                   0.5
+
+   hits_to_establish_track       3 5   # 3 of last 5 scans to establish track
+   hits_to_maintain_track        1 3   # 1 of last 3 scans to maintain  track
+
+   reports_range
+   reports_bearing
+end_sensor
+
+sensor ACQ_RADAR WSF_RADAR_SENSOR
+   #show_calibration_data
+
+   frame_time                   1.0 sec
+
+   beam 1
+      one_m2_detect_range          100.0 nm
+      maximum_range                120 nm
+
+      antenna_height               6.0 m
+
+      scan_mode                    azimuth_and_elevation
+      azimuth_scan_limits          -180 deg 180 deg
+      elevation_scan_limits        -6 deg 2.5 deg
+
+      transmitter
+         antenna_pattern            EW_RADAR_ANTENNA
+         power                      20.0 kw
+         frequency                  5000 mhz
+         pulse_width                25 usec
+         pulse_repetition_interval  1250 usec
+         internal_loss              2 db
+      end_transmitter
+
+      receiver
+         beam_tilt                  10.0 deg
+         bandwidth                  2.0 mhz
+         noise_power                -160 dBw  # will be calibrated for 1 m^2
+         internal_loss              7 dB
+      end_receiver
+
+      # Swerling detector
+      swerling_case                 1
+      probability_of_false_alarm    1.0e-6
+      number_of_pulses_integrated   32
+   end_beam
+
+   beam 2
+         elevation_scan_limits         5 deg 7.5 deg
+         transmitter
+            frequency 5100 mhz
+         end_transmitter
+   end_beam
+
+   beam 3
+         elevation_scan_limits         10 deg 27.5 deg
+
+         transmitter
+            power 0.01 w
+            frequency 5200 mhz
+         end_transmitter
+   end_beam
+
+   required_pd                   0.5
+
+   hits_to_establish_track       3 5   # 3 of last 5 scans to establish track
+   hits_to_maintain_track        1 3   # 1 of last 3 scans to maintain  track
+
+   reports_range
+   reports_bearing
+end_sensor
+
+# ****************************************************************************
+# Define the platform types
+# ****************************************************************************
+
+platform_type ESM_PLATFORM WSF_PLATFORM
+   icon EA-6B
+
+   mover WSF_AIR_MOVER end_mover
+   radar_signature WIDE_BODY_SIGNATURE
+
+   sensor esm ESM_SENSOR
+      internal_link track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+     purge_interval   20.0 sec
+   end_processor
+end_platform_type
+
+platform_type EW_RADAR_SITE WSF_PLATFORM
+   icon Ground_Radar
+
+   mover WSF_GROUND_MOVER end_mover
+
+      sensor acq_radar ACQ_RADAR
+      on
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   sensor ew_radar EW_RADAR
+      on
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+
+# ****************************************************************************
+#                        Define the platform instances
+# ****************************************************************************
+
+platform esm_platform ESM_PLATFORM
+   side blue
+
+   route
+      position 37:00:00n 114:30:00w
+      altitude 35000 ft
+      speed      450 kts
+      heading    270 deg
+   end_route
+
+   sensor esm
+      on
+   end_sensor
+end_platform
+
+platform ew-radar-site EW_RADAR_SITE
+   side red
+
+   route
+      position 37:00:00n 116:00:00w
+      altitude 0.0 ft agl
+      heading   90 deg
+    end_route
+
+   sensor ew_radar
+   end_sensor
+end_platform
+
+event_output
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   #enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   #enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_UPDATED
+   enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+  file output/$(CASE).evt
+end_event_output
+
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+terrain
+   #load_cme_terrain
+end_terrain
+
+end_time 720 sec
+
+script_variables
+   global Set< string > mPlatformNames = Set< string >();
+   global FileIO mTrackFile = FileIO();
+   global string mTrackFileName = "msr_esm_track_data";
+end_script_variables
+
+
+on_initialize
+   string header;
+   string outstr;
+
+   outstr = write_str(mTrackFileName, "_", WsfSimulation.RunNumber(), ".dat");
+   if (! mTrackFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName,TargetType");
+   mTrackFile.Writeln(header);
+
+   #Fill in platform names of interest
+   mPlatformNames.Clear();
+   mPlatformNames.Insert("esm_platform");
+end_on_initialize
+
+script bool FindStr(Array< string > aArray, string aKey)
+   foreach (string key in aArray)
+   {
+      if (key == aKey)
+      {
+         return true;
+      }
+   }
+   return false;
+end_script
+
+script void SensorTrackInitiated(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackInitiated",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName(),
+                                  ",", aTrack.Type());
+      int count = aTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aTrack.EmitterType(i));
+            int signalCount = aTrack.EmitterSignalIndexCount(i);
+            if (signalCount > 0)
+            {
+               for (int j = 0; j < signalCount; j = j + 1)
+               {
+                  mystring = write_str(mystring, ",", aTrack.EmitterSignalIndexEntry(i,j));
+               }
+            }
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void SensorTrackUpdated(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackUpdated",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName(),
+                                  ",", aTrack.Type());
+      int count = aTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aTrack.EmitterType(i));
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void SensorTrackDropped(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackDropped",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName(),
+                                  ",", aTrack.Type());
+      int count = aTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aTrack.EmitterType(i));
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void LocalTrackInitiated(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackInitiated",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aLocalTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName(),
+                                  ",", aLocalTrack.Type());
+      int count = aLocalTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aLocalTrack.EmitterType(i));
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void LocalTrackUpdated(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackUpdated",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aLocalTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName(),
+                                  ",", aLocalTrack.Type());
+      int count = aLocalTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aLocalTrack.EmitterType(i));
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void LocalTrackDropped(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackDropped",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aLocalTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName(),
+                                  ",", aLocalTrack.Type());
+      int count = aLocalTrack.EmitterCount();
+      if (count > 0)
+      {
+         mystring = write_str(mystring, ",", count);
+         for (int i = 0; i < count; i = i + 1)
+         {
+            mystring = write_str(mystring, ",", aLocalTrack.EmitterType(i));
+         }
+      }
+      mTrackFile.Writeln(mystring);
+   }
+end_script
+
+observer
+   enable SENSOR_TRACK_INITIATED SensorTrackInitiated
+   enable SENSOR_TRACK_UPDATED   SensorTrackUpdated
+   enable SENSOR_TRACK_DROPPED   SensorTrackDropped
+
+   enable LOCAL_TRACK_INITIATED LocalTrackInitiated
+   enable LOCAL_TRACK_UPDATED   LocalTrackUpdated
+   enable LOCAL_TRACK_DROPPED   LocalTrackDropped
+end_observer

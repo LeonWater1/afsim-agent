@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This file was generated with HELCAT v2.0
+
+processor HEL-Target_isect_proc WSF_INTERSECT_PROCESSOR
+   define_offset CANOPY
+      3.461642 m
+      -0.000184 m
+      -0.943480 m
+   define_offset IRST
+      5.138014 m
+      0.000004 m
+      -0.621585 m
+   intersect_mesh mesh/red_adv_fighter_2.imesh
+end_processor

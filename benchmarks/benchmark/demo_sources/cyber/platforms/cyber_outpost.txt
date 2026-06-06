@@ -1,0 +1,76 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+include_once cyber/cyber_attacks/crash.txt
+
+platform_type CYBER_OUTPOST WSF_PLATFORM
+   icon c4i
+   side red
+   
+   comm datalink RED_DATALINK
+     network_name <local:master>
+     internal_link data_mgr
+     internal_link task_mgr
+   end_comm
+   
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval 60 s
+   end_processor
+   
+   processor task_mgr WSF_TASK_PROCESSOR
+   number_of_servers 100
+   
+   script void SendCyberAttack()
+      if (!TRACK.Target().IsNull())
+      {
+         PLATFORM.CyberAttack(TRACK.Target(),"CRASH");
+      }
+   end_script
+   
+   evaluation_interval DETECTED 1 s
+   state DETECTED
+      next_state END_STATE
+         return(TRACK.TimeSinceUpdated()>30);
+      end_next_state
+      
+      next_state ATTACK
+         return (PLATFORM.SlantRangeTo(TRACK) <= 40*MATH.M_PER_NM() && !TRACK.Target().IsNull() && TRACK.Target().Processor("guidance").IsTurnedOn() && TRACK.Target().Altitude()>15000*MATH.M_PER_FT());
+      end_next_state
+   end_state
+   
+   evaluation_interval ATTACK 61 s
+   time_to_evaluate ATTACK 60 s
+   state ATTACK
+      on_entry
+         writeln("TIME NOW = ", TIME_NOW, " WITHIN RANGE, SENDING CYBER ATTACK FOR ", TRACK.Target());
+         SendCyberAttack();
+      end_on_entry
+      
+      next_state END_STATE
+         return(TRACK.TimeSinceUpdated()>30);
+      end_next_state
+      
+      next_state DETECTED
+         if (!TRACK.Target().IsNull()) 
+         {
+            return (PLATFORM.CyberAttackStatus(TRACK.Target(), "CRASH") == 0);
+         }
+         return false;
+      end_next_state
+   end_state
+   
+   evaluation_interval END_STATE 1 day
+   state END_STATE
+   end_state
+   
+   end_processor
+   
+end_platform_type

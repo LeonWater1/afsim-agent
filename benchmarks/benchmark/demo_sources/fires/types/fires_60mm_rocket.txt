@@ -1,0 +1,74 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This is the 60 mm Qassam fin-stabilized rocket
+# source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.98
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_60MM_ROCKET_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_60MM_ROCKET
+     1000 8.5 5.4
+     1500 12.6 8.4
+     2000 17.6 11.8
+     2500 23.6 15.8
+     3000 34.3 22.2
+     3100 44.8 28.2
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_60MM_ROCKET_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_60MM_ROCKET WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_60MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_60MM_ROCKET
+   weapon_effects FIRES_60MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_60MM_ROCKET WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_60MM_ROCKET_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_60MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_60MM_ROCKET
+   weapon_effects FIRES_60MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_60MM_ROCKET_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_60mm_rocket FIRES_60MM_ROCKET_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_60MM_ROCKET_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_60mm_rocket FIRES_60MM_ROCKET
+   end_weapon
+end_platform_type
+

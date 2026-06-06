@@ -16,9 +16,9 @@ from .llm_client import LLMClient, extract_json_object
 
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-SCHEMA_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_v2.json"
-IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples_v1.jsonl"
-BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark_v1" / "tasks.jsonl"
+SCHEMA_PATH = ROOT / "docs" / "machine" / "afsim_ir_schema_extended.json"
+IR_EXAMPLES_PATH = ROOT / "docs" / "machine" / "ir_examples.jsonl"
+BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark" / "tasks.jsonl"
 
 
 def load_schema_text() -> str:

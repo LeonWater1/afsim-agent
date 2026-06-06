@@ -1,0 +1,42 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once fires_60mm_mortar.txt
+include_once fires_60mm_mortar_m720_he.txt
+include_once fires_60mm_rocket.txt
+include_once fires_120mm_mortar_m934_he.txt
+include_once fires_81mm_mortar_m821_he.txt
+include_once fires_107mm_rocket.txt
+include_once fires_120mm_artillery.txt
+include_once fires_120mm_mortar.txt
+include_once fires_122mm_rocket.txt
+include_once fires_122mm_rocket_short.txt
+include_once fires_152mm_artillery.txt
+include_once fires_155mm_artillery_m107_he.txt
+include_once fires_155mm_artillery_m107_he_lofted.txt
+include_once fires_160mm_rocket.txt
+include_once fires_220mm_rocket_9m27f.txt
+include_once fires_227mm_rocket_m26.txt
+include_once fires_240mm_rocket.txt
+include_once fires_300mm_rocket_9m55k.txt
+
+// register these as external ballisitc types
+ballistic_types
+   FIRES_60MM_MORTAR
+   FIRES_107MM_ROCKET
+   FIRES_120MM_ARTILLERY
+   FIRES_120MM_MORTAR
+   FIRES_122MM_ROCKET
+   FIRES_152MM_ARTILLERY
+   FIRES_155MM_ARTILLERY_M107_HE
+   FIRES_155MM_ARTILLERY_M107_HE_LOFTED
+   FIRES_81MM_MORTAR_M821_HE
+   FIRES_60MM_MORATAR_M720_HE
+   FIRES_220MM_ROCKET_9M27F
+end_ballistic_types
+

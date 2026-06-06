@@ -1,0 +1,40 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+ script void CyberAttackInitiated(WsfCyberEngagement aEngagement) 
+    writeln("TIME NOW = ",TIME_NOW, " ",aEngagement.Attacker()," trying to ",aEngagement.AttackType() ," against ",aEngagement.Victim());
+ end_script
+ 
+ script void CyberAttackSucceeded(WsfCyberEngagement aEngagement) 
+    writeln("TIME NOW = ",TIME_NOW, " ", aEngagement.Attacker(), "'s CYBER ATTACK against ",aEngagement.Victim()," SUCCEEDED");
+ end_script
+ 
+ script void CyberAttackFailed(WsfCyberEngagement aEngagement) 
+    writeln("TIME NOW = ",TIME_NOW, " CYBER ATTACK FAILED");
+ end_script
+
+ script void MessageTransmitted(WsfComm aComm, WsfMessage aMsg) 
+ end_script
+
+ script void MessageReceived(WsfComm aXmtr, WsfComm aRcvr, WsfMessage aMsg, WsfCommInteraction aResult) 
+    if (aRcvr.Platform().Type() == "GROUND_RADAR")
+    {
+       writeln("TIME NOW = ",TIME_NOW, " ",aRcvr.Platform().Name(), " receives message from ",aRcvr.Platform().Name());
+       aRcvr.Platform().Sensor("ground_radar").TurnOn();
+    }
+ end_script
+
+observer 
+   enable CYBER_ATTACK_INITIATED
+   enable CYBER_ATTACK_SUCCEEDED
+   enable CYBER_ATTACK_FAILED
+   enable MESSAGE_TRANSMITTED
+   enable MESSAGE_RECEIVED
+end_observer

@@ -1,0 +1,42 @@
+{
+  "report": "benchmark_extended_validation",
+  "overall_status": "PASS",
+  "results": [
+    {
+      "file": "type_a_instruction_to_script.jsonl",
+      "exists": true,
+      "records": 50,
+      "errors": []
+    },
+    {
+      "file": "type_b_script_to_instruction.jsonl",
+      "exists": true,
+      "records": 50,
+      "errors": []
+    },
+    {
+      "file": "type_c_instruction_to_ir.jsonl",
+      "exists": true,
+      "records": 50,
+      "errors": []
+    },
+    {
+      "file": "type_d_ir_to_script.jsonl",
+      "exists": true,
+      "records": 50,
+      "errors": []
+    },
+    {
+      "file": "type_e_error_to_repair.jsonl",
+      "exists": true,
+      "records": 50,
+      "errors": []
+    }
+  ],
+  "oracle_files": {
+    "found": 50,
+    "missing": 0
+  },
+  "total_unique_ids": 250,
+  "total_errors": 0
+}

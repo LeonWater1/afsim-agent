@@ -1,0 +1,150 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+platform_type FUSER_PLATFORM WSF_PLATFORM
+  icon comm_truck_icon
+
+  infrared_signature    VEHICLE_INFRARED_SIGNATURE
+  optical_signature     VEHICLE_OPTICAL_SIGNATURE
+  radar_signature       VEHICLE_RADAR_SIGNATURE
+
+  comm cmdr_net RED_DATALINK
+     network_name <local:slave>
+     #internal_link data_mgr
+     internal_link task_mgr
+     internal_link fuser
+  end_comm
+
+  comm sub_net RED_DATALINK
+     network_name <local:master>
+     internal_link fuser
+     internal_link task_mgr
+  end_comm
+
+
+  processor task_mgr WSF_TASK_PROCESSOR
+  end_processor
+
+  # The following fuser processor uses simple trig to compute range and altitude from bearing only sensors
+  # It is not meant to be a total solution but serve as an example only.
+  processor fuser WSF_TRACK_PROCESSOR
+    purge_interval       60 sec
+    report_to commander via cmdr_net
+    report_interval      10 sec
+    fused_track_reporting off
+    raw_track_reporting   on
+    update_interval 10 sec
+    script_variables
+       string sensor1name = "bearing_sensor_01";
+       string sensor2name = "bearing_sensor_02";
+       string TargetName;
+    end_script_variables
+
+    script bool is_track_reportable(WsfTrack aTrack)
+       //writeln("***** ", aTrack.TrackId(), " ", aTrack.LocationValid());
+       return aTrack.LocationValid();
+    end_script
+
+    on_update
+        WsfLocalTrackList localtracklist = PLATFORM.MasterTrackList();
+        WsfTrackList        rawtracklist =  PLATFORM.MasterRawTrackList();
+        WsfTrack            FusedTrack;
+        double              sensor1bearing;
+        double              sensor2bearing;
+        double              normal1bearing;
+        double              normal2bearing;
+        double              sensor1elevation;
+        double              sensor2elevation;
+        WsfPlatform sensor1 = WsfSimulation.FindPlatform(sensor1name);
+        WsfPlatform sensor2 = WsfSimulation.FindPlatform(sensor2name);
+        double separation = sensor1.GroundRangeTo(sensor2);
+
+       if (localtracklist.Count() > 0)
+       {
+          foreach (WsfTrack rawtrack in rawtracklist)
+          {
+            if (rawtrack.IsValid())
+            {
+
+               TargetName = rawtrack.TargetName();
+               #writeln(TIME_NOW, "  RTrack platform name is ", rawtrack.TargetName());
+               #Now set the two bearing sensors bearing reports
+               if((rawtrack.OriginatorName() == sensor1name) )
+               {
+                  FusedTrack = WsfTrack(rawtrack); # we are going to copy this and update the location
+                  sensor1bearing = rawtrack.Bearing(); # -180 to 180
+                  normal1bearing = Math.NormalizeAngle0_360(sensor1bearing); # gives 0 to 360 angle
+                  if(normal1bearing <= 90)
+                  {
+                     normal1bearing = 90 - normal1bearing;
+                  }
+                  if(normal1bearing >= 90)
+                  {
+                     normal1bearing = 180 - normal1bearing;
+                  }
+                  sensor1elevation = rawtrack.Elevation();
+               }
+               if((rawtrack.OriginatorName() == sensor2name) )
+               {
+                  sensor2bearing = rawtrack.Bearing();
+                  normal2bearing = Math.NormalizeAngle0_360(sensor2bearing);
+                  if(normal2bearing >= 270)
+                  {
+                     normal2bearing = 90 - (360 - normal2bearing);
+                  }
+               }
+            }
+
+             # This determines the range from a line between the two sensors perpendicular to the target
+             double targetRangeP = separation * (MATH.Sin(normal1bearing) * MATH.Sin(normal2bearing)) / Math.Sin(normal1bearing + normal2bearing) * 0.985;
+             # Now compute the range from sensor1
+             double targetRange = targetRangeP / MATH.Sin(normal1bearing);
+             WsfGeoPoint ComputedTrackLocation = PLATFORM.Location();
+             ComputedTrackLocation.Extrapolate(sensor1bearing, targetRange);
+             double ComputedTrackAltitude = targetRange / Math.Tan(90 - sensor1elevation) * 1.2; #1.22 is visual line of site curvature
+             ComputedTrackLocation.SetAltitudeAGL(ComputedTrackAltitude);
+             # Get rid of edge cases along 0 and 90 degrees
+             if((targetRange > 20) && (ComputedTrackAltitude > 20)
+                                  && (normal1bearing != 0)
+                                  && (normal2bearing != 0)
+                                  && (normal1bearing >= 2)
+                                  && (normal2bearing <= 88))
+             {
+                #writeln(TIME_NOW, " Target Range is ", targetRange);
+                WsfPlatform TargetPlatform =  WsfSimulation.FindPlatform("target1");
+                double ErrorFromTargetTruth = TargetPlatform.SlantRangeTo(ComputedTrackLocation);
+                string writeline = write_str(" Target Range is ", targetRange, " Target Alt is ", ComputedTrackAltitude, " TrackError is ", ErrorFromTargetTruth);
+                PLATFORM.Comment(writeline);
+                #writeln("Altitude of target is ", ComputedTrackAltitude);
+                WsfDraw aDraw = WsfDraw(); # Make a draw object
+                aDraw.SetColor(1, 0, 0, 1);
+                aDraw.BeginIcons(rawtrack.Heading(), "wedge");
+                aDraw.Vertex(rawtrack.ReportedLocation());
+                aDraw.End();
+                #Now make the updated FusedTrack
+                FusedTrack.SetOriginator(PROCESSOR);
+                FusedTrack.SetCurrentLocation(ComputedTrackLocation); # Now a 3d track
+                #writeln("#### ",TIME_NOW, " Target Speed ", FusedTrack.Speed());
+                Vec3 WCSvelocity = FusedTrack.Target().VelocityWCS();
+                FusedTrack.SetVelocityWCS(WCSvelocity.X(), WCSvelocity.Y(), WCSvelocity.Z());
+                #writeln("##### ",TIME_NOW, " Target Speed ", FusedTrack.Speed());
+                #writeln(TIME_NOW, " Track Range is ", PLATFORM.DownRangeTo(FusedTrack));
+                #writeln(TIME_NOW, "  FTrack Range is ", FusedTrack.Range());
+                FusedTrack.SetRange(PLATFORM.DownRangeTo(FusedTrack));
+                #writeln(TIME_NOW, "  FTrack Velocityvalidity is ", FusedTrack.VelocityValid());
+             }
+          }
+          if(FusedTrack.IsValid())
+          PLATFORM.TrackManager().AddTrackReport(FusedTrack);
+       }
+    end_on_update
+  end_processor
+
+end_platform_type

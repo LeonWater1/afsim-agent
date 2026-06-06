@@ -1,0 +1,120 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+antenna_pattern EW_RADAR_ANTENNA
+  genap_pattern
+    peak_gain              20 dB
+    minimum_gain           -10.0 db
+    aperture_shape         elliptical
+    azimuth_distribution   cosine
+    azimuth_beamwidth      10 deg
+    azimuth_exponent       1.0
+    elevation_distribution cosine
+    elevation_beamwidth    20 deg
+    elevation_exponent     1.0
+end_antenna_pattern
+
+antenna_pattern AUX_ANTENNA
+  uniform_pattern
+     peak_gain  -5 dB
+     beamwidth 360 deg
+  end_uniform_pattern
+end_antenna_pattern
+
+sensor EW_RADAR WSF_RADAR_SENSOR
+
+   one_m2_detect_range            100.0 nm
+
+   antenna_height                 6.0 m
+
+   frame_time                     20.0 sec
+
+   scan_mode                      azimuth
+   azimuth_scan_limits            -180 deg 180 deg
+
+   false_target_screener SCREENER WSF_FT_SCREENER
+      #debug
+      track_capacity     1000
+      plot_capacity      1000
+      transfer_capacity  1000
+   end_false_target_screener
+
+   transmitter
+      antenna_pattern             EW_RADAR_ANTENNA
+      beam_tilt                   10.0 deg
+      power                       1000.0 kw
+      frequency                   200 mhz
+      pulse_width                 700 usec
+      pulse_repetition_interval    70 usec
+      internal_loss               2 db
+   end_transmitter
+
+   receiver
+      antenna_pattern             EW_RADAR_ANTENNA
+      beam_tilt                   10.0 deg
+      bandwidth                   2.0 mhz
+      noise_power                 -160 dBw  # will be calibrated for 1 m^2
+      internal_loss               7 dB
+
+      electronic_protect
+         technique sensor_sidelobe_canceler
+            mitigated_techniques
+               noise_jamming
+            end_mitigated_techniques
+            effect slc_effect WSF_SLC_EFFECT
+               number_canceller_channels  2
+               cancellation_lock_ratio    2 dB
+               antenna_pattern            AUX_ANTENNA
+               cancellation_ratios
+                  jammer_to_noise 0.0 db   0.0 db
+                  jammer_to_noise 15.0 db 10.0 db
+                  jammer_to_noise 30.0 db 20.0 db
+                  saturation_ratio 10.0 dB
+               end_cancellation_ratios
+            end_effect
+         end_technique
+         technique sensor_sidelobe_blanker
+            mitigated_techniques
+               random_pulse_jamming
+              # false_targets
+            end_mitigated_techniques
+            effect slb_effect WSF_SLB_EFFECT
+               antenna_pattern      AUX_ANTENNA
+               blanking_threshold 2 dB
+               saturation_effect
+                 duty_cycle_limit_effect
+                 duty_cycle_limit 0.50
+              end_saturation_effect
+              target_blanking_effect
+                 duty_cycle_probability_effect
+              end_target_blanking_effect
+            end_effect
+         end_technique
+      end_electronic_protect
+
+   end_receiver
+
+   probability_of_false_alarm     1.0e-6
+   required_pd                    0.5
+   swerling_case                  1
+
+   hits_to_establish_track        3 5
+   hits_to_maintain_track         1 3
+
+   track_quality 0.5         # This sensor produces a relatively low fidelity track.
+
+   reports_range
+   reports_bearing
+   reports_iff
+end_sensor

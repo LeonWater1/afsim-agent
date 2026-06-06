@@ -1,0 +1,41 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+define_path_variable CASE laser_designator
+file_path .
+log_file output/$(CASE).log
+event_output  
+   file   output/$(CASE).evt 
+   #enable SENSOR_DETECTION_ATTEMPT 
+   enable TASK_ASSIGNED
+end_event_output
+
+#dis_interface  # making a higher definition replay file (higher update rate)
+#   record output/$(CASE).rep
+#   entity_orientation_threshold .1 deg # 3 deg default
+#   entity_position_threshold 0.1 meters # 1 meter default
+#   heartbeat_timer 1 sec # 5 sec default
+#end_dis_interface
+
+event_pipe
+  file output/$(CASE).aer
+  use_preset full
+end_event_pipe
+
+include terrain.txt
+
+include_once setup.txt  # reads in platform definitions
+
+// Read in scenario files
+include scenarios/light_attack_initial.txt
+include scenarios/red_apc.txt
+include scenarios/blue_uav.txt
+#include test.txt
+end_time 10 min
+start_time 18:00:00 

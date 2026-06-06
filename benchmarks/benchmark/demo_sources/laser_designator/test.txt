@@ -1,0 +1,49 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Simple example script to change current target
+
+platform_type TARGET WSF_PLATFORM end_platform_type
+
+platform primary_target   TARGET end_platform
+platform secondary_target TARGET end_platform
+
+platform_type TEST WSF_PLATFORM    
+   
+   processor change_target_to_secondary WSF_SCRIPT_PROCESSOR
+      update_interval 15 sec
+      on_update
+         WsfTrack CurrentTarget = PLATFORM.CurrentTargetTrack();
+         if (! CurrentTarget.IsValid())  # if not valid, the current target is dead
+         {
+            PLATFORM.ClearCurrentTarget(); 
+            WsfLocalTrackList MasterList = PLATFORM.MasterTrackList();
+            foreach (WsfTrack track in MasterList)
+            {
+               if (track.TargetName() == "secondary_target")
+        
+              {
+                  PLATFORM.SetCurrentTarget(track);
+                  PROCESSOR.TurnOff();
+              }               
+            }   
+         }  
+      end_on_update
+   end_processor
+   
+end_platform_type
+
+
+platform test TEST
+   track 
+      platform primary_target  
+   end_track
+   track 
+      platform secondary_target  
+   end_track
+end_platform

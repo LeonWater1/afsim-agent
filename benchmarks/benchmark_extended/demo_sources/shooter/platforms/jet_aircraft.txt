@@ -1,0 +1,81 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# jet airplane that carries the aa_mrm missile
+
+include_once weapons/aam/aa_mrm.txt
+include_once platforms/aa_tactics.txt
+include_once sensors/radar/generic_file_control_radar.txt
+
+processor AA_DATA_MGR WSF_TRACK_PROCESSOR
+   purge_interval         60 sec
+end_processor
+
+processor AA_TASK_MGR AA_TACTICS
+  on_initialize
+    SENSOR_NAME = "radar";
+    SENSOR_TRACK_MODE = "default";
+    WEAPON_NAME = "aa_mrm";
+  end_on_initialize
+end_processor
+
+platform_type JET_AIRCRAFT WSF_PLATFORM
+   icon F-18
+   mover WSF_AIR_MOVER
+   end_mover
+
+   weapon aa_mrm AA_MRM
+     quantity 8
+     internal_link task_mgr
+     internal_link data_mgr
+   end_weapon
+
+   comm cmd_net WSF_COMM_TRANSCEIVER
+      network_name <local:slave>  # it is not the commander of the network
+      internal_link data_mgr
+      internal_link task_mgr
+   end_comm
+
+   comm datalink WSF_COMM_TRANSCEIVER
+      network_name <local:master>
+      internal_link data_mgr
+   end_comm
+
+   processor data_mgr AA_DATA_MGR
+   end_processor
+
+
+   processor task_mgr AA_TASK_MGR
+      operating_level ENGAGE 1
+      weapon_uplink_path radar datalink
+      update_interval 1 secs
+      # check to see if I am commanded and turn on my radar
+      on_update
+            writeln_d(PLATFORM.CommanderName());
+            WsfSensor sensor = PLATFORM.Sensor("radar");
+            if ( ! sensor.IsTurnedOn())
+            {
+              if ((TasksReceived() > 0) ||
+                   (PLATFORM == PLATFORM.Commander()))
+                {
+                sensor.TurnOn();
+                }
+            }
+      end_on_update
+   end_processor
+
+    sensor radar GENERIC_FIRE_CONTROL_RADAR
+#      on   # testing only - the task processor will turn on radar
+      off
+      internal_link data_mgr
+      internal_link task_mgr
+      ignore_same_side
+    end_sensor
+
+end_platform_type
+

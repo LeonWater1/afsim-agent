@@ -1,0 +1,79 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+platform target01 TARGET
+  side red
+  position 40n 88w
+end_platform
+
+
+platform bomber BOMBER
+   side blue
+   position 39:31:42.00n 91:38:35.00w
+   altitude 30000.00 ft
+   heading 90 deg
+   route
+      position 39:31:42n 91:38:35w altitude 30000 ft speed 300 kts
+      position 39:31:40n 91:30:00w altitude 30000 ft speed 300 kts
+   end_route
+   track platform target01 end_track
+   edit weapon client_agm
+      quantity 200
+   end_weapon
+
+
+   add processor launch_leader_agm WSF_SCRIPT_PROCESSOR
+      update_interval 1.0 sec
+      on_update
+         if (TIME_NOW > 1.0)
+         {
+            int trackIndex = 0;
+            WsfWeapon weapon = PLATFORM.Weapon("leader_agm");
+            WsfLocalTrackList trackList = PLATFORM.MasterTrackList();
+            double clientquantity = weapon.QuantityRemaining();
+            while (clientquantity > 0)
+            {
+              weapon.Fire(trackList.TrackEntry(trackIndex));
+              clientquantity = weapon.QuantityRemaining();
+            }
+          }
+          if (TIME_NOW > 10)
+          {
+             PLATFORM.TurnToRelativeHeading(179, 9.9);
+             PROCESSOR.TurnOff();
+          }
+      end_on_update
+    end_processor
+    add processor launch_client_agm WSF_SCRIPT_PROCESSOR
+      update_interval 1.0 sec
+      on_update
+         if (TIME_NOW > 3.0)
+         {
+            int trackIndex = 0;
+            double LastFired = 0;
+            double Interval  = 1;
+            WsfWeapon weapon = PLATFORM.Weapon("client_agm");
+            WsfLocalTrackList trackList = PLATFORM.MasterTrackList();
+            double clientquantity = weapon.QuantityRemaining();
+            while (clientquantity > 0)
+            {
+              weapon.Fire(trackList.TrackEntry(trackIndex));
+              clientquantity = weapon.QuantityRemaining();
+
+            }
+          }
+          if (TIME_NOW > 10)
+          {
+             #PLATFORM.TurnToHeading(270);
+             PROCESSOR.TurnOff();
+          }
+
+
+      end_on_update
+    end_processor
+end_platform

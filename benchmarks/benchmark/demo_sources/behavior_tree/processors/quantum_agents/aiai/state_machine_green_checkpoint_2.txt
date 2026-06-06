@@ -1,0 +1,41 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+advanced_behavior green_checkpoint_2
+   
+   script_variables
+      bool reachedCheckpoint = false;
+      bool commandIssued = false;
+   end_script_variables
+
+   precondition
+      return Success();
+   end_precondition
+   
+   execute
+      if (reachedCheckpoint)
+      {
+         return Success("Checkpoint 2 reached!");
+      }
+      
+      if (PLATFORM.GroundRangeTo(WsfSimulation.FindPlatform("Green_checkpoint_2")) < 10000)
+      {
+         reachedCheckpoint = true;
+         return Success("Checkpoint 2 reached!");
+      }
+      
+      if (!commandIssued)
+      {
+         commandIssued = true;
+         FlyTarget(PLATFORM, WsfSimulation.FindPlatform("Green_checkpoint_2").Location(), 450);
+      }
+      return Running("Flying to Checkpoint 2");
+   end_execute
+   
+end_advanced_behavior

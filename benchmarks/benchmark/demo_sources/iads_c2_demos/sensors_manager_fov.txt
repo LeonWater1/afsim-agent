@@ -1,0 +1,86 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE sensors_manager_fov
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include_once setup/setup.txt
+include_once setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_sam.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/tt_radar.txt
+include_once platforms/sam_battalion.txt
+include_once platforms/sam_launcher.txt
+include_once platforms/ucav.txt
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/single_sam_chain.txt
+include_once scenarios/four_ucavs.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+# Remove simple sensors manager from sam battalion and replace it with FOV sensors manager
+edit platform 2900_sam_battalion
+   delete processor sensors_manager
+
+   add processor fov_sensors_manager WSF_SENSORS_MANAGER_FOV
+      turn_off_tar_if_no_tracks true
+   end_processor
+end_platform
+
+# Add the necessary aux data to the TTR
+edit platform 2920_ttr
+   aux_data
+      unitary RESTING_AZIMUTH = 0.0 deg
+      unitary COARSE_SLEW_RATE_AZIMUTH = 10.0 deg/sec
+      unitary FINE_SLEW_RATE_AZIMUTH = 1.0 deg/sec
+   end_aux_data
+end_platform
+
+# Add three duplicate sam launchers for more clear FOV sensors manager demonstration
+platform 2940_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 2900_sam_battalion
+   position 38:22:06n  117:29:44w  altitude 0.0 m agl
+end_platform
+
+platform 2950_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 2900_sam_battalion
+   position 38:22:06n  117:28:44w  altitude 0.0 m agl
+end_platform
+
+platform 2960_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 2900_sam_battalion
+   position 38:21:06n  117:29:44w  altitude 0.0 m agl
+end_platform
+
+end_time 30 min

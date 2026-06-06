@@ -1,0 +1,83 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_107MM_ROCKET_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_107MM_ROCKET
+    2000 8.0 6.6
+    2500 9.3 8.2
+    3000 10.7 9.9
+    3500 12.2 11.7
+    4000 13.7 13.6
+    4500 15.4 15.6
+    5000 17.3 17.8
+    5500 19.3 20.0
+    6000 21.6 22.6
+    6500 24.1 25.3
+    7000 27.0 28.3
+    7500 30.5 31.8
+    8000 35.0 36.2
+    8500 46.0 45.9
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_107MM_ROCKET_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_107MM_ROCKET WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_107MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_107MM_ROCKET
+   weapon_effects FIRES_107MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_107MM_ROCKET WSF_PLATFORM
+   icon SA-10_Missile
+   side red
+   category RAM
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_107MM_ROCKET_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_107MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_107MM_ROCKET
+   weapon_effects FIRES_107MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_107MM_ROCKET_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   side red
+   weapon fires_107mm_rocket FIRES_107MM_ROCKET_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_107MM_ROCKET_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   side red
+   weapon fires_107mm_rocket FIRES_107MM_ROCKET
+   end_weapon
+end_platform_type
+

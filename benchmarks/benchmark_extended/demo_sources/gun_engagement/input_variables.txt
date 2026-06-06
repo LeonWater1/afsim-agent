@@ -1,0 +1,58 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# User required input parameters
+# USER SET BULLET NAME HERE
+$define BULLET_NAME BULLET
+
+script_variables
+  string LAUNCHER_SYSTEM_NAME = "GOAL_KEEPER";
+  #string LAUNCHER_PLATFORM_FILENAME ="goal_keeper.txt";
+  string BULLET_NAME = "$<BULLET_NAME:BULLET>$"; # EXPLOSIVE ROUND
+  double MUZZLE_VELOCITY_MS = 1021.0;
+  double BULLET_DIAMETER_MM = 30.0;
+  double BULLET_MASS_KG     = 0.6710;
+  double BULLET_MAX_CL      = 0.001;  # VERY LITTLE LIFT
+  double MAGAZINE_CAPACITY  = 1200;
+  double RATE_OF_FIRE_PER_SEC  = 70;
+  double BURST_SIZE          = 200; #gives a total of 6 bursts
+  double MIN_ELEVATION_ANGLE = -10;
+  double MAX_ELEVATION_ANGLE = 85;
+  double MAX_EL_RATE_PER_SEC = 85;
+  double MIN_AZIMUTH_ANGLE   = -180;
+  double MAX_AZIMUTH_ANGLE   = 180;
+  double MAX_AZ_RATE_PER_SEC = 100;
+  double FIRING_DELAY        = 0;
+  double FIRING_INTERVAL     = 10;  # give some time to cool off the gun...
+  #double ELEVATION_ANGLE_INCREMENT = 0.1;
+  double BULLET_MAX_RANGE_LCG  = 2000;  # Used by the launch computer - max effective range
+
+  # The following mach vs cd table is from the US ARMY RESEARCH report on the GAU-8 round
+  # Dont modify the next variable...it sets up the Map - enter in increasing mach values
+  Map<double, double> MACH_VS_CD = Map<double, double>();
+  MACH_VS_CD[0.2] = 0.1;
+  MACH_VS_CD[0.8] = 0.25;
+  MACH_VS_CD[0.95] = 0.3;
+  MACH_VS_CD[1.0] = 0.35;
+  MACH_VS_CD[1.2] = 0.42;
+  MACH_VS_CD[1.7] = 0.38;
+  MACH_VS_CD[2.0] = 0.18;
+  MACH_VS_CD[3.5] = 0.12;
+  bool   USE_DEFAULT_AERO   = false;  #todo
+end_script_variables
+
+#aero DEFAULT_BULLET_AERO  WSF_AERO  # EXAMPLE
+#   reference_area      7.0 cm2
+#   cl_max              0.001
+#   mach_and_cd         0.2      .2
+#   mach_and_cd         0.8      .21
+#   mach_and_cd         0.95     .29
+#   mach_and_cd         1.1      .45
+#   mach_and_cd         1.5      .3
+#   mach_and_cd         4.2      .23
+#end_aero

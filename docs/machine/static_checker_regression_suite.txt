@@ -1,0 +1,190 @@
+# static_checker_regression_suite_v2 — Task-021
+#
+# Format: one test per line with expected result
+#   EXPECT:E008  =  should trigger E008 finding
+#   EXPECT:PASS  =  no findings from new checks
+#
+# Run: python scripts/core/static_checker.py <this_file>
+
+# --- E008 Script API v2 (hallucinated APIs) ---
+
+EXPECT:E008
+script
+  platform.PlatformHeadingTo(90)
+end_script
+
+EXPECT:E008
+script
+  SetHeading(target, 270)
+end_script
+
+EXPECT:E008
+script
+  platform.SetAltitude(5000)
+end_script
+
+EXPECT:E008
+script
+  platform.SetSpeed(250)
+end_script
+
+EXPECT:E008
+script
+  pos = platform.GetPosition()
+end_script
+
+EXPECT:E008
+script
+  PLATFORM.Offset(10, 20, 0)
+end_script
+
+EXPECT:E008
+script
+  Vec3.Offset(delta, 100)
+end_script
+
+EXPECT:E008
+script
+  platform.MoveTo(waypoint)
+end_script
+
+EXPECT:E008
+script
+  platform.MoveToward(target)
+end_script
+
+EXPECT:E008
+script
+  comp = platform.GetComponent("radar")
+end_script
+
+EXPECT:E008
+script
+  platform.SetPosition(0, 0, 0)
+end_script
+
+# --- E008 negative: legitimate APIs should NOT trigger ---
+
+EXPECT:PASS
+script
+  direction.Normalize()
+  direction.Scale(myDist)
+  WsfGeoPoint.Construct(lat, lon, alt)
+end_script
+
+# --- E010 Duplicate names ---
+
+EXPECT:E010
+platform_type PT
+platform_type PT
+
+EXPECT:E010
+mover air_basic
+  maximum_speed 300 m/sec
+end_mover
+mover air_basic
+  maximum_speed 250 m/sec
+end_mover
+
+EXPECT:E010
+sensor radar_basic
+  frequency 10 GHz
+end_sensor
+sensor radar_basic
+  frequency 12 GHz
+end_sensor
+
+# --- E010 negative: references inside platform are valid reuse ---
+
+EXPECT:PASS
+mover air_mover
+  maximum_speed 300 m/sec
+end_mover
+platform P1
+  mover air_mover
+end_platform
+platform P2
+  mover air_mover
+end_platform
+
+EXPECT:PASS
+platform_type FIGHTER
+  mover fighter_mover
+end_platform_type
+platform F1 FIGHTER
+  route patrol_route
+end_platform
+platform F2 FIGHTER
+  route intercept_route
+end_platform
+
+# --- E011 Self-referencing processor ---
+
+EXPECT:E011
+processor p
+  behavior_tree p
+end_processor
+
+EXPECT:E011
+processor self_loop
+  processor self_loop
+end_processor
+
+# --- E011 negative: valid nested references ---
+
+EXPECT:PASS
+processor outer
+  behavior_tree inner
+end_processor
+processor inner
+  script
+  end_script
+end_processor
+
+# --- E011 negative: platform-level processor references ---
+
+EXPECT:PASS
+platform P WSF_PLATFORM
+  processor ProcA
+end_platform
+
+EXPECT:PASS
+platform P1 WSF_PLATFORM
+  processor ProcA
+end_platform
+platform P2 WSF_PLATFORM
+  processor ProcA
+end_platform
+
+# --- E007 Component init constraints ---
+
+EXPECT:E007
+sensor WSF_ESM_SENSOR passive_esm
+  reports_range_rate true
+end_sensor
+
+EXPECT:E007
+mover WSF_BRAWLER_MOVER brawler
+  maximum_speed 400 m/sec
+end_mover
+
+# --- E007 negative ---
+
+EXPECT:PASS
+sensor WSF_ESM_SENSOR passive_esm
+  frequency_band 2 4 GHz
+  reports_range_rate true
+end_sensor
+
+EXPECT:PASS
+mover WSF_BRAWLER_MOVER brawler
+  aero_file platforms/ACFT_BD.FXW
+  maximum_speed 400 m/sec
+end_mover
+
+# == End of regression suite ==
+# Source: mission-proven failure patterns from BV1-* task logs
+# Coverage: E007 (component init), E008 (hallucinated API v2), E010 (duplicate names), E011 (self-reference)
+# False-positive risk: LOW — all patterns are verified absent from official demos
+# Unseen-data generalisation: patterns are pattern-based, not task-specific; expected to catch
+# similar LLM fabrications regardless of scenario domain

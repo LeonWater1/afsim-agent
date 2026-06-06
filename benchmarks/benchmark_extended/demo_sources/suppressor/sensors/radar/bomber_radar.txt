@@ -1,0 +1,69 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+##############################################################################
+#                      Bomber sensor subsystem definition
+##############################################################################
+
+antenna_pattern BOMBER_RDR_RX_ANTENNA
+  uniform_pattern
+    peak_gain                20 db
+    azimuth_beamwidth       360 degrees
+    elevation_beamwidth     180 degrees
+  end_uniform_pattern
+end_antenna_pattern
+
+antenna_pattern BOMBER_RDR_TX_ANTENNA
+  uniform_pattern
+    peak_gain                30 db
+    azimuth_beamwidth       360 degrees
+    elevation_beamwidth     180 degrees
+  end_uniform_pattern
+end_antenna_pattern
+
+sensor BOMBER_RADAR WSF_RADAR_SENSOR
+  one_m2_detect_range          40 km
+
+  hits_to_establish_track      4 4
+
+  frame_time                   6 sec
+
+  scan_mode                    azimuth_and_elevation
+
+  maximum_range                40 km
+
+  transmitter
+    antenna_pattern            BOMBER_RDR_TX_ANTENNA
+    power                      5 mw
+    frequency                  3 ghz
+    pulse_repetition_frequency 250 hz
+    internal_loss              10 db
+  end_transmitter
+
+  receiver
+    antenna_pattern            BOMBER_RDR_RX_ANTENNA
+    bandwidth                  1.6 mhz
+    detection_threshold        13 db
+    noise_power                -150 dbw
+    internal_loss              10 db
+  end_receiver
+
+  # For now the filter is required if we're to report velocity
+  filter WSF_ALPHA_BETA_FILTER
+    alpha 0.6
+    beta  0.2
+  end_filter
+
+  reports_location
+  reports_velocity
+  reports_bearing
+  reports_iff
+  reports_type
+
+  processor sensor_processor
+end_sensor

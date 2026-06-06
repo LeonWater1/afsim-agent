@@ -1,0 +1,114 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# Search behavior that can be driven by locations
+# provided by a heat map. This behavior is stand alone and
+# does not rely on tasks being assigned by a commander.
+
+behavior search_pursuit
+
+   script_debug_writes off
+
+   script_variables
+      WsfQuantumTaskerProcessor processor;
+
+      string mSearchRadarName = "radar";  // replace with sensor name on platform
+
+      // For guiding search via heat map
+      // Level of heat to check for nearest, higer vales more likely
+      // to guide to target
+      double mHeatLevel = 0.3;
+      // Nearest track or Closest heat location that is mHeatLevel or higer
+      WsfGeoPoint mPursuitLocation = WsfGeoPoint();
+
+      bool mDrawSteering = true;
+      WsfDraw mDraw = WsfDraw();
+   end_script_variables
+
+   on_init
+      if (PROCESSOR.IsA_TypeOf("WSF_QUANTUM_TASKER_PROCESSOR"))
+      {
+         processor = (WsfQuantumTaskerProcessor)PROCESSOR;
+      }
+   end_on_init
+
+   precondition
+      writeln_d("T= ",TIME_NOW, " precondition search_pursuit");
+      if (!PROCESSOR.IsA_TypeOf("WSF_QUANTUM_TASKER_PROCESSOR"))
+      {
+         return Failure("behavior not attached to a quantum tasker processor!");
+      }
+
+      WsfPerceptionProcessor perception = (WsfPerceptionProcessor)PLATFORM.Processor("perception");
+
+      // Check if we have a threat track
+#      WsfTrack nearestThreat = perception.NearestThreat();
+#      if (nearestThreat.IsValid() && nearestThreat.LocationValid())
+#      {
+#         mPursuitLocation = nearestThreat.CurrentLocation();
+#         return true;
+#      }
+      // Check for closest heat square with (heatValue >= mHeatLevel) and get the location
+      if (perception.GetNearestHeat(PLATFORM.Location(), mPursuitLocation, mHeatLevel))
+      {
+         return true;
+      }
+      else
+      {
+         return Failure("No heat locations to pursue");
+      }
+
+   end_precondition
+
+   execute
+      writeln_d(PLATFORM.Name(), " executing search_pursuit, T=", TIME_NOW);
+
+      if (!mPursuitLocation.IsValid())
+      {
+         writeln_d(PLATFORM.Name(), " has invalid HeatPoint, T=", TIME_NOW);
+         return;
+      }
+
+      //make sure radar is on
+      WsfSensor searchRadar = PLATFORM.Sensor(mSearchRadarName);
+      if (searchRadar.IsValid())
+      {
+         if (!searchRadar.IsTurnedOn())
+         {
+            searchRadar.TurnOn();
+            writeln_d(PLATFORM.Name(), " turned on active radar ", searchRadar);
+         }
+         else
+         {
+            writeln_d("  radar already turned on");
+         }
+      }
+
+
+      if (mDrawSteering == true)
+      {
+         mDraw.SetLayer("behavior_search_pursuit");
+         mDraw.SetDuration(PROCESSOR.UpdateInterval());
+         mDraw.SetColor(1.0, 0.5, 0.0);
+         mDraw.SetLineSize(1);
+         mDraw.BeginLines();
+            mDraw.Vertex(PLATFORM.Location());
+            mDraw.Vertex(mPursuitLocation);
+         mDraw.End();
+      }
+
+      double ownSpeed = PLATFORM.Speed();
+      string msg = write_str("pursuing target: ", mPursuitLocation, " at speed ", (string)ownSpeed);
+      writeln_d("    T=", TIME_NOW, " ", PLATFORM.Name(), " ", msg);
+
+      FlyTarget(PLATFORM, mPursuitLocation, ownSpeed);
+   end_execute
+
+end_behavior
+

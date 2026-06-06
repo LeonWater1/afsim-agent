@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Generic 1 m^2 target
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 1.0 m^2
+end_radar_signature
+
+platform_type GENERIC_TARGET WSF_PLATFORM
+   side blue
+   icon F-18E
+   radar_signature FIGHTER_RADAR_SIGNATURE
+   mover WSF_AIR_MOVER
+   end_mover
+end_platform_type

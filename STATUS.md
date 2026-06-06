@@ -10,7 +10,7 @@
 → mission.exe → Execution Repair → Executable Scenario
 ```
 
-## benchmark_v1 三方法公平对比
+## benchmark 三方法公平对比
 
 **模型**: deepseek-v4-flash | **temperature**: 0.0 | **日期**: 2026-06-06
 
@@ -33,7 +33,7 @@
 
 ### RAG 标注
 
-RAG 语料 = references/ + benchmark_v1/v2 demo_sources（排除 exact oracle + same top-level demo tree）。标注为 **demo-augmented RAG**。
+RAG 语料 = references/ + benchmark/v2 demo_sources（排除 exact oracle + same top-level demo tree）。标注为 **demo-augmented RAG**。
 
 ### Phase 6 分析
 
@@ -49,6 +49,6 @@ RAG 语料 = references/ + benchmark_v1/v2 demo_sources（排除 exact oracle + 
 
 ### 输出目录
 
-- `afsim_agent_v2_bv1_fair/` — Agent v2
-- `baseline_direct_bv1_fair/` — Direct
-- `baseline_rag_bv1_fair/` — RAG
+- `afsim_agent_v2_benchmark_fair/` — Agent v2
+- `baseline_direct_benchmark_fair/` — Direct
+- `baseline_rag_benchmark_fair/` — RAG

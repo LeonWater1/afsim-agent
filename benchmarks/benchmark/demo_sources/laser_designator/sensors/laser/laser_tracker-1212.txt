@@ -1,0 +1,30 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+sensor LASER_TRACKER-1212 WSF_LASER_TRACKER
+
+   #debug
+   #private_debug
+   laser_code                    1212
+   off
+   update_interval             0.01 s
+   azimuth_field_of_view    -15 deg +15 deg
+   elevation_field_of_view   -65 deg  -5 deg
+
+   maximum_range            10 km
+   frame_time                   4 sec  # Time it takes to do a complete box scan.
+   receiver
+      wavelength 1.06E-6 microns
+   end_receiver
+
+   reports_bearing
+   reports_elevation
+   reports_location
+   track_quality 1.0    # weapons quality
+end_sensor

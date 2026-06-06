@@ -1,0 +1,173 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+include_once sensors/radar/uhf_ew_radar_sensor.txt
+
+filter FILTER_TACTICS WSF_KALMAN_FILTER
+   range_measurement_sigma       100. m
+   bearing_measurement_sigma     5 deg
+   elevation_measurement_sigma   5 deg
+   # values for maneuvering targets (per Erik)
+   process_noise_sigmas_XYZ  25 25 30
+end_filter
+
+platform_type UHF_EW_RADAR_PLATFORM WSF_PLATFORM
+   icon ew_radar_icon
+   category 3D_RADAR
+   #infrared_signature   VEHICLE_INFRARED_SIGNATURE
+   #optical_signature    VEHICLE_OPTICAL_SIGNATURE
+   #radar_signature      VEHICLE_RADAR_SIGNATURE
+
+   track_manager
+      #filter FILTER_TACTICS end_filter
+      correlation_method nearest_neighbor
+         precise_mode true  #NOT DOCUMENTED - EVENTUALLY WILL BE DEFAULT
+         tracking_sigma 1   # multiplier applied to sensor sigma
+                            #( 5 gives 99.99% correlation if ellipsoid boundaries intersected
+                            #( 3 gives 99.73% correlation if ellipsoid boundaries intersected
+                            #( 1 gives 68.27% correlation if ellipsoid boundaries intersected
+                             #(.5 gives 38.29% correlation if ellipsoid boundaries intersected
+         turning_sigma  1   # KEEP THE SAME AS tracking_sigma!!!
+      end_correlation_method
+      fusion_method replacement end_fusion_method
+      #fusion_method weighted_average end_fusion_method
+   end_track_manager
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+   end_processor
+
+   sensor uhf_ew_radar_sensor UHF_EW_RADAR_SENSOR
+      on
+      internal_link data_mgr
+      ignore_same_side
+   end_sensor
+
+   processor printout WSF_SCRIPT_PROCESSOR
+      internal_link data_mgr
+      update_interval 1 sec
+
+      script_variables
+         WsfDraw mDraw  =  WsfDraw(); # Will provide the track line
+         WsfDraw ConDraw = WsfDraw(); # Gives the contributor line
+         WsfDraw Con2Draw = WsfDraw(); # Gives the contributor line
+         WsfDraw Con3Draw = WsfDraw(); # Gives the contributor line
+      end_script_variables
+
+      on_initialize
+         # Red Line for Track to sensor
+         mDraw.SetLineStyle("solid");
+         mDraw.SetLineSize(3);
+         mDraw.SetColor(1.0, 0.0, 0.0, 0.5);
+         mDraw.SetDuration(1.0); # MATCH UPDATE INTERVAL!
+         # Green line from platform shows where the sensor is reporting the target
+         ConDraw.SetLineStyle("solid");
+         ConDraw.SetLineSize(3);
+         ConDraw.SetColor(0.0, 1.0, 0.0, 0.5);
+         ConDraw.SetDuration(1.0); # MATCH UPDATE INTERVAL!
+         # Blue line for platform to track location (who's contributing to the track)
+         Con2Draw.SetLineStyle("solid");
+         Con2Draw.SetLineSize(3);
+         Con2Draw.SetColor(0.0, 0.0, 1.0, 0.5);
+         Con2Draw.SetDuration(1.0); # MATCH UPDATE INTERVAL!
+         # Gray for statecovariance ellipsoid
+         Con3Draw.SetLineStyle("solid");
+         Con3Draw.SetLineSize(3);
+         Con3Draw.SetColor(0.5, 0.5, 0.5, 0.3); # Gray
+         Con3Draw.SetDuration(1.0); # MATCH UPDATE INTERVAL!
+         #int ConDrawNumber = 0;
+      end_on_initialize
+
+      on_update
+      WsfLocalTrackList tracklist = PLATFORM.MasterTrackList();
+
+      if (PLATFORM.MasterRawTrackList().Count() > 0)
+      {
+         writeln(TIME_NOW, " Number of Local Tracks is ", tracklist.Count(), " out of a total raw track count of ", PLATFORM.MasterRawTrackList().Count());
+         string writeline = write_str("Total tracks reported by the platform track manager is ",
+                                      tracklist.Count(), " out of a total raw track count of ",
+                                      PLATFORM.MasterRawTrackList().Count());
+         PLATFORM.Comment(writeline);
+      }
+
+      if (tracklist.Count() > 0)
+      {
+         foreach (WsfLocalTrack track in tracklist)
+         {
+            if (track.IsValid())
+            {
+               writeln(TIME_NOW, "  Track platform name is ", track.TargetName());
+               writeln(TIME_NOW, "  Number of Contributors are ", track.RawTrackCount());
+
+               WsfGeoPoint trackLocation = track.CurrentLocation();
+               mDraw.BeginLines();
+               mDraw.Vertex(PLATFORM);
+               mDraw.Vertex(trackLocation);
+               mDraw.End();
+               for (int i=0; i < track.RawTrackCount(); i = i + 1)
+               {
+                  WsfTrack ContributorTrack = track.RawTrack(i);
+                  WsfGeoPoint ContributorTrackLocation = ContributorTrack.CurrentLocation();
+                  WsfPlatform ContributorTrackPlatform = ContributorTrack.Target();
+                  if (ContributorTrackPlatform.IsValid())
+                  {
+                     double ContributorSlantrangeToTrack = ContributorTrackPlatform.SlantRangeTo(ContributorTrackLocation);
+                     writeln(TIME_NOW, "   Contributor ", ContributorTrackPlatform.Name(), " is ", ContributorSlantrangeToTrack, " meters from reported track. Reported track is ",
+                             PLATFORM.SlantRangeTo(trackLocation), " from sensor, contributor platorm is " , PLATFORM.SlantRangeTo(ContributorTrackPlatform), " meters from sensor");
+                     #Draw a line to the platforms to the reported track location
+                     #The reported track location will be a green ball.
+                     ConDraw.BeginLines();
+                     ConDraw.Vertex(ContributorTrackPlatform.Location());
+                     ConDraw.Vertex(ContributorTrackLocation); #
+                     ConDraw.End();
+                     ConDraw.BeginEllipsoid(0, 50, 50, 50, 50, 50);
+                     ConDraw.Vertex(ContributorTrackLocation);
+                     ConDraw.End();
+                     #Draw a line to where we THINK the contributors are...
+                     Con2Draw.BeginLines();
+                     Con2Draw.Vertex(ContributorTrackPlatform.Location());
+                     Con2Draw.Vertex(trackLocation);
+                     #Con2Draw.Vertex(ContributorTrackLocation);
+                     Con2Draw.End();
+                  }
+               }
+
+               WsfCovariance PWCS = track.StateCovariance();
+               if(! PWCS.IsValid())
+               PWCS = track.MeasurementCovariance();
+               // Used to give the cov access to the track location, needed
+               // for conversion to NED. ...Actually, this is not scriptable. The
+               // call to track.StateCovariance() calls copy.
+               ////PWCS.CopyTrackData(track);
+                  if (PWCS.IsValid() && track.LocationValid())
+                  {
+                     // We can amplify the size to make it more findable
+                     // in Mystic
+                     double S = 1.0;
+                     //WsfGeoPoint originatorLocation = track.OriginatorLocation();
+                     Ellipsoid e2 = PWCS.EllipsoidNED();
+                     Con3Draw.BeginEllipsoid(
+                              e2.OrientationHeadingDeg(),
+                              e2.OrientationPitchDeg(),
+                              e2.OrientationRollDeg(),
+                              e2.SemiAxisForward()*S,
+                              e2.SemiAxisSide()*S,
+                              e2.SemiAxisUp()*S
+                     );
+                     Con3Draw.Vertex(trackLocation);
+                     Con3Draw.End();
+                  }
+               }
+            }
+         }
+      end_on_update
+   end_processor
+
+   aux_data
+      double max_range = 370400 # meters = 200 nm
+   end_aux_data
+end_platform_type

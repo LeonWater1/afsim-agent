@@ -1,0 +1,177 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# New file created by Wizard
+
+processor BLUE_MULTIROLE_FIGHTER_2_TASK_PROCESSOR WSF_TASK_PROCESSOR
+
+   script_variables
+      string aam          = "blue_lr_a2a_rf_missile";
+      double flyout       = 60.0;
+
+      string activeTarget = "Active target";     # used in aux data command
+      string evalTime     = "Evaluation time";   # used in aux data command
+      int currentRouteIndex = -1;
+      Map<string, bool> deassigned = Map<string, bool>();
+      string currentTarget;
+   end_script_variables
+
+#   show_task_messages
+
+   on_message
+      type WSF_STATUS_MESSAGE
+         script
+         end_script
+      type WSF_TRACK_MESSAGE
+         script
+         end_script
+      type WSF_TASK_ASSIGN_MESSAGE
+         script
+#            writeln("");
+#            writeln(PLATFORM.Name(), " received a task assign message at time ", TIME_NOW);
+#            WsfTaskAssignMessage TAmsg = (WsfTaskAssignMessage)MESSAGE;
+#
+#            writeln(" the assigner is      ", TAmsg.AssignerName());
+#            writeln(" the task type is     ", TAmsg.TaskType());
+#            writeln(" the resource name is ", TAmsg.ResourceName());
+#
+#            WsfTrack tempTrack = TAmsg.Track();
+#            writeln(" the target is        ", tempTrack.TargetName());
+#            writeln(" the track ID is      ", tempTrack.TrackId().ToString());
+
+         end_script
+      type WSF_TASK_CANCEL_MESSAGE
+         script
+            # Note: the track ID is from the commander, so I can't use it to find the track!
+            # to add insult to injury, the task is now cancelled, so I don't have any received tasks!
+            # my approach is to use a map to record what is deassigned, and to look for
+            # that value in the state machine.
+            # this assumes that I only have one current target at a time.
+            deassigned[currentTarget] = true;
+            currentTarget = "";
+         end_script
+      default
+         script
+#            writeln(PLATFORM.Name(), " received a ", MESSAGE.Type(), " from ", MESSAGE.Originator());
+#            writeln("");
+         end_script
+   end_on_message
+
+   script void announce(string sState)
+#      writeln("");
+      writeln(PLATFORM.Name(), " has entered state ", sState, " for "
+            , TRACK.TargetName(), " at time ", TIME_NOW);
+#      writeln(" the track ID is      ", TRACK.TrackId().ToString());
+#      writeln(" the number of assigned tasks is ", TasksAssignedFor(TRACK.TrackId(), "ENGAGE"));
+#      writeln(" the number of received tasks is ", TasksReceivedFor(TRACK.TrackId(), "ENGAGE"));
+   end_script
+
+   # this script needs to tell the commander that the task is finished.
+   script void returnToRoute()
+      TaskComplete(TRACK.TrackId(), "ENGAGE");
+      string routeName = PLATFORM.AuxDataString("route");
+      writeln(" ***** ", PLATFORM.Name(), " is resuming route ", routeName, " at point ", currentRouteIndex);
+      PLATFORM.FollowRoute(routeName, currentRouteIndex);
+      currentRouteIndex = -1;
+      TRACK.SetAuxData(activeTarget, false);
+   end_script
+
+   on_track_drop
+      writeln("");
+      writeln("**************************");
+      writeln(PLATFORM.Name(), " has dropped track on ", TRACK.TargetName());
+      if ( TRACK.AuxDataBool(activeTarget) && !deassigned[TRACK.TargetName()])
+      {
+         writeln("This was the active target!");
+         returnToRoute();
+      }
+      writeln("");
+   end_on_track_drop
+
+   evaluation_interval DETECTED 10 sec
+   state DETECTED
+      on_entry
+#         announce("DETECTED");
+         TRACK.SetAuxData(activeTarget, false);
+      end_on_entry
+
+
+      next_state INTERCEPT
+#         writeln(PLATFORM.Name(), " has received ", TasksReceivedFor(TRACK.TrackId(), "ENGAGE"), " tasks for ", TRACK.TargetName());
+         return (TasksReceivedFor(TRACK.TrackId(), "ENGAGE") > 0);
+      end_next_state
+   end_state
+
+   evaluation_interval INTERCEPT 10 sec
+   state INTERCEPT
+      on_entry
+         announce("INTERCEPT");
+         TRACK.SetAuxData(activeTarget, true);
+         currentTarget = TRACK.TargetName();
+         if (currentRouteIndex < 0) currentRouteIndex = PLATFORM.RoutePointIndex();
+         deassigned[TRACK.TargetName()] = false;
+      end_on_entry
+
+      next_state ENGAGE
+         WsfWaypoint intercept = WsfWaypoint();
+         double interceptTime = PLATFORM.InterceptLocation3D(TRACK, intercept);
+         if (interceptTime > 0.0)
+         {
+#            writeln(PLATFORM.Name(), " is headed to ", intercept.Location().ToString());
+            PLATFORM.GoToSpeed(540.0*MATH.MPS_PER_NMPH());
+            PLATFORM.GoToPoint(intercept.Location());
+         }
+         return (PLATFORM.SlantRangeTo(TRACK) < 50.0 * MATH.M_PER_NM());
+      end_next_state
+
+      next_state RETURN_TO_ROUTE
+         WsfPlatform target = TRACK.Target();
+         if (target.IsValid()) return false;
+         if (deassigned[target.Name()]) return true;
+         return true;
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGE 10 sec
+   state ENGAGE
+      on_entry announce("ENGAGE"); end_on_entry
+      next_state WAIT
+         bool fired = false;
+         WsfWeapon aim120 = PLATFORM.Weapon(aam);
+         if (aim120.IsValid())
+         {
+            fired = Fire(TRACK, "ENGAGE", aim120, 2);
+         }
+         return fired;
+      end_next_state
+   end_state
+
+   evaluation_interval WAIT 1.0 sec
+   state WAIT
+      on_entry
+         announce("WAIT");
+         TRACK.SetAuxData(evalTime, TIME_NOW+flyout);
+      end_on_entry
+
+      next_state RETURN_TO_ROUTE
+         WsfPlatform target = TRACK.Target();
+         if (target.IsValid()) return false;
+         return true;
+      end_next_state
+   end_state
+
+   evaluation_interval RETURN_TO_ROUTE 24 hours
+   state RETURN_TO_ROUTE
+      on_entry
+         announce ("RETURN_TO_ROUTE");
+         if (currentTarget != "") deassigned[currentTarget] = true;
+         returnToRoute();
+      end_on_entry
+   end_state
+
+end_processor

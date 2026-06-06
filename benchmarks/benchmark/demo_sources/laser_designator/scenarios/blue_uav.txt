@@ -1,0 +1,22 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform uav UAV
+  side blue
+  commander blue_ground_troop-JTAC
+  position 45:02:19.22n 121:38:40.13w altitude 5000 ft agl
+  route
+     label Loiter_Cap
+        position 45:02:19.22n 121:38:40.13w altitude 5000 ft agl speed 150 knots
+        position 45:03:19.22n 121:38:40.13w altitude 5000 ft agl speed 150 knots
+     goto Loiter_Cap
+  end_route
+  
+end_platform
+

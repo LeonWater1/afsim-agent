@@ -1,0 +1,80 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# USED THE GUN DEMO SCRIPT TO CREATE THE BULLET
+
+aero 30MM_BULLET_AERO  WSF_AERO
+   reference_area   7.06858 cm2
+   cl_max           0.001
+   mach_and_cd       0.2    0.1
+   mach_and_cd       0.8    0.25
+   mach_and_cd       0.95    0.3
+   mach_and_cd       1    0.35
+   mach_and_cd       1.2    0.42
+   mach_and_cd       1.7    0.38
+   mach_and_cd       2    0.18
+   mach_and_cd       3.5    0.12
+end_aero
+
+platform_type  30MM_BULLET WSF_PLATFORM
+   icon x_marker
+   
+   mover WSF_UNGUIDED_MOVER
+      #show status
+      update_interval   0.001 sec
+      total_mass        0.671 kg
+      aero              30MM_BULLET_AERO
+   end_mover
+
+
+// writes out the muzzle velocity
+#   execute at_time 0.001 sec relative
+#       writeln("******* ",TIME_NOW, " " , PLATFORM.Name(), " ",  PLATFORM.TimeSinceCreation(), " Speed ", PLATFORM.Speed() );   
+#   end_execute
+
+
+   processor fuse WSF_AIR_TARGET_FUSE
+      gross_update_interval 0.01 sec
+      fine_update_interval 0.001 sec
+      gross_proximity_range  3 m
+      hit_proximity_range 2 m
+   end_processor
+end_platform_type
+
+
+weapon_effects 30MM_BULLET_LETHALITY  WSF_GRADUATED_LETHALITY
+   radius_and_pk      2.0 m   1.0
+end_weapon_effects
+
+weapon 30MM_BULLET WSF_EXPLICIT_WEAPON
+    script_variables
+        double AVG_VEL = 1021 ;  # muzzle velocity
+        double VARIANCE = 3.0;   # Unknown muzzle velocity +/- variance
+    end_script_variables
+    launch_computer           30MM_BULLET_LAUNCH_COMPUTER   end_launch_computer
+    launched_platform_type    30MM_BULLET
+    weapon_effects            30MM_BULLET_LETHALITY
+    slew_mode                 azimuth_and_elevation
+       azimuth_slew_limits       -180 deg 180 deg
+       elevation_slew_limits      -10 deg  85 deg
+    quantity                  1200
+    firing_delay              0 secs
+    firing_interval           0.0142857 sec # 70 rnds per sec
+    salvo_interval            0.0142857 sec  # 70 rnds per sec   
+    #launch_delta_v            1021  0 0 m/s   # This is set in the on_create script
+
+    automatic_target_cueing    true
+    cue_to_predicted_intercept  true
+
+    script void on_create(WsfPlatform aWeapon, WsfTrack aTarget)
+       double LAUNCH_VEL = MATH.RandomUniform(AVG_VEL-VARIANCE, AVG_VEL+VARIANCE);
+       aWeapon.SetVelocityECS(LAUNCH_VEL, 0, 0);  # Just like launch_delta_v...
+    end_script
+end_weapon
+
+

@@ -1,0 +1,46 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+dis_interface
+
+   autostart
+
+   # Specifies the DIS Protocol Version, range 0-6.
+   protocol_version 5
+
+   force blue   1
+   force red    2
+   force green  3
+
+   site         1
+   application  1
+   exercise     1
+
+   # If a large quantity of entities are present at the start of the simulation, the
+   # entities will be intially created over this distribution time in order to not
+   # overload the network upon start up.
+
+   initial_distribution_interval 5.0 sec
+
+#  keyword            PLATFORM_TYPE       kind:domain:country:cat:scat:specific:extra
+   entity_type        TANKER              1:1:222:28:2:0:0    # NOT DIS COMPLIANT
+   entity_type        RECEIVER            1:1:222:28:3:0:0    # NOT DIS COMPLIANT
+   entity_type        JP8_FUEL            1:1:222:28:4:0:0    # NOT DIS COMPLIANT
+
+   entity_type        ENGINE_REPAIR       1:1:222:29:9:9:9    # NOT DIS COMPLIANT
+
+   multicast 227.1.1.1 10. port 3031
+
+   dis_exchange
+      debug
+   end_dis_exchange
+
+end_dis_interface
+

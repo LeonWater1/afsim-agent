@@ -45,7 +45,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 def _finalize_script(text: str) -> str:
     """Unified pre-write gate: postprocess + static check on every script output."""
     return postprocess_script(text)
-BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark_v1" / "tasks.jsonl"
+BENCHMARK_PATH = ROOT / "benchmarks" / "benchmark" / "tasks.jsonl"
 OUTPUT_ROOT = ROOT / "afsim_agent_v2"
 
 DEFAULT_TASK_IDS = ["BV1-001", "BV1-003", "BV1-017"]

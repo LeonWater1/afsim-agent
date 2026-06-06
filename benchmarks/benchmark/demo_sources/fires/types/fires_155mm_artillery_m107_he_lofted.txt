@@ -1,0 +1,74 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// source: http://www.globalsecurity.org/military/library/report/call/call_98-13_caschap3.htm
+// (trajectory table; lofted trajectories)
+// Note that max. ord values are valid and can be used instead of elevation angle values
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_155MM_ARTILLERY_M107_HE_LOFTED_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_table FIRES_155MM_ARTILLERY_M107_HE_LOFTED
+      range_values                  5300  7250  8650  9550  10150  end_range_values
+//      maximum_ordinate_values       5350  4900  4500  4000  3500   end_maximum_ordinate_values
+      elevation_angle_values        1300  1200  1100  1000    900  end_elevation_angle_values
+      time_of_flight_values          66.3   63.4   60.8    57.2    53.5 end_time_of_flight_values
+   end_fires_table
+end_launch_computer
+
+weapon_effects FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.00
+  radius_and_pk  249.9 m 1.0
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_155MM_ARTILLERY_M107_HE_LOFTED WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 1.0 seconds
+   launch_computer
+      FIRES_155MM_ARTILLERY_M107_HE_LOFTED_LAUNCH_COMPUTER
+   end_launch_computer
+  weapon_effects FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EFFECTS
+   launched_platform_type FIRES_155MM_ARTILLERY_M107_HE_LOFTED
+end_weapon
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE_LOFTED WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   maximum_request_count 10
+   salvo_interval 10.0 seconds
+   launch_computer
+      FIRES_155MM_ARTILLERY_M107_HE_LOFTED_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_155MM_ARTILLERY_M107_HE_LOFTED
+  weapon_effects FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EFFECTS
+end_weapon
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon FIRES_155MM_ARTILLERY_M107_HE_LOFTED FIRES_155MM_ARTILLERY_M107_HE_LOFTED_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE_LOFTED_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon FIRES_155MM_ARTILLERY_M107_HE_LOFTED FIRES_155MM_ARTILLERY_M107_HE_LOFTED
+   end_weapon
+end_platform_type
+

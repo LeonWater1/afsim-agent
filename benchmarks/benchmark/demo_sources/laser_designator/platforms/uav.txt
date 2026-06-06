@@ -1,0 +1,202 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once sensors/laser/laser_tracker-1212.txt
+include_once weapons/agm/hellfire.txt
+
+platform_type UAV WSF_PLATFORM
+   icon predator
+   mover WSF_AIR_MOVER 
+      maximum_radial_acceleration 1.5 g
+   end_mover
+   comm  cmd_net WSF_COMM_TRANSCEIVER
+      transfer_rate 100 mbits/sec
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link task_mgr
+   end_comm   
+   sensor laser_tracker-1212 LASER_TRACKER-1212 
+      internal_link data_mgr
+      ignore_same_side 
+   end_sensor
+   weapon hellfire HELLFIRE 
+      quantity 4      
+   end_weapon
+   processor data_mgr WSF_TRACK_PROCESSOR end_processor
+   processor task_mgr WSF_TASK_PROCESSOR 
+      #show_state_transitions
+      #show_task_messages
+      track_update_interval 1.0 sec
+      
+      script_variables
+         string SENSOR_NAME = "laser_tracker-1212";
+         string WEAPON_NAME = "hellfire";
+         double WEAPON_MAX_RNG = 7500;
+         double WEAPON_MIN_RNG = 1500;
+         double REQUIRED_TRACK_QUALITY    = 1.0; #whatever is feeding us the track it has to be good
+         int SALVO_SIZE                   = 1;
+         # the following are used internally and should not be modified by the user
+         #string mTrackTaskStr     = "Track";
+         string mShootTaskStr     = "Shoot";
+      end_script_variables
+      
+      script bool InInterceptEnvelopeOf(WsfWeapon aWeapon)
+         bool canIntercept = false;
+         WsfTrackId id = TRACK.TrackId();       
+         double targetrange = PLATFORM.GroundRangeTo(TRACK);
+         if ((targetrange > WEAPON_MIN_RNG) && 
+             (targetrange < WEAPON_MAX_RNG)  &&
+             (Math.Fabs(PLATFORM.RelativeBearingTo(TRACK)) <= 5))
+         {
+            canIntercept = true;
+            writeln_d("Target is in range to intercept");
+         }
+         return canIntercept;
+      end_script
+
+      script bool IsAssignable()  
+         bool IsAssignable;    
+          if((PLATFORM == PLATFORM.Commander()) || 
+             (TRACK.TargetType() == "APC" ) && (TRACK.BelievedAlive()) &&             
+             (TasksReceivedFor(TRACK.TrackId()) > 0))              
+          {
+             IsAssignable = true;
+             PLATFORM.Sensor(SENSOR_NAME).TurnOn();
+          }       
+         return IsAssignable;       
+      end_script
+
+      script bool FiringNow()
+         return (WeaponsActiveFor(TRACK.TrackId()) > 0);
+      end_script 
+
+      script void CancelTheTask()
+         CancelTask(TRACK.TrackId());
+      end_script 
+          
+      script bool HaveWeapons()
+         WsfWeapon weapon = PLATFORM.Weapon(WEAPON_NAME);
+         bool haveWeapons = false;
+         if (weapon.QuantityRemaining() >= SALVO_SIZE)
+         {
+             haveWeapons = true;
+         }
+         return haveWeapons;
+      end_script
+
+      script bool LaunchWeapon()
+         WsfWeapon   weapon;
+         weapon = PLATFORM.Weapon(WEAPON_NAME);
+         bool canInterceptNow = false;
+         if (HaveWeapons())
+         {
+            canInterceptNow = ((InInterceptEnvelopeOf(weapon)) && (!FiringNow()));
+         }
+         bool launched = false;
+         
+         if (canInterceptNow)  
+         {
+            launched = Fire(TRACK, mShootTaskStr, weapon, SALVO_SIZE);
+            
+            if (launched)
+            {
+               writeln("*** T=", TIME_NOW, " ", PLATFORM.Name(), " ",
+                      TRACK.TargetName(), " R=", PLATFORM.SlantRangeTo(TRACK),
+                      " FIRE!!!!");
+            }
+         }
+         return launched;
+      end_script
+
+
+# State Machine
+
+  evaluation_interval IS_ASSIGNABLE 2.0 sec
+  state IS_ASSIGNABLE
+     next_state GOHOME
+       
+       bool weaponnotavail = false;
+       if (! HaveWeapons())
+         {
+             #writeln("dont have weapons - duh");
+             weaponnotavail = true;
+         }
+         return weaponnotavail;    
+     end_next_state
+  
+     next_state ENGAGING
+         bool Assignable = false;
+         
+         if ((IsAssignable()) && 
+             
+             ((PROCESSOR.CountInState("ENGAGING") < 1 ) || (PROCESSOR.CountInState("FIRED") < 1 )))
+         {
+            Assignable = true;
+         } 
+         #writeln("Got to here and Assignable = ", Assignable);
+         return Assignable;        
+     end_next_state
+  end_state
+
+  evaluation_interval GOHOME 2.0 sec
+  state GOHOME  # Goes back to Loiter if out of weapons
+      next_state GOHOME
+         bool weaponavail = true; 
+         if (! HaveWeapons())
+         {
+             weaponavail = false;
+             PLATFORM.ReturnToRoute();
+             writeln("Turning off launch computer");
+             PROCESSOR.TurnOff();
+         }
+         return weaponavail;
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGING 2.0 sec
+   state ENGAGING  # Engages and fires the weapon if it can 
+      next_state FIRED
+         bool launched = false;
+         PLATFORM.GoToLocation(TRACK.Latitude(), TRACK.Longitude());
+         if (InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)))
+         {
+             #writeln_d("Trying to launch weapon " );
+             launched = LaunchWeapon();
+         }
+         return launched;
+      end_next_state
+   end_state
+   
+   evaluation_interval FIRED 4 seconds
+   state FIRED   
+      next_state  FIRED
+         bool busy = false;
+         if(TRACK.TrackQuality() > 0.95 && FiringNow())
+         {
+            busy = true;
+         }
+         return busy; 
+      end_next_state 
+      next_state IS_ASSIGNABLE
+         bool done = false;
+         if ((TimeSinceWeaponLastTerminatedFor(TRACK.TrackId()) > 0.0) && (TRACK.BelievedDead()))
+ 
+         {
+            TaskComplete(TRACK.TrackId(), "ENGAGE");
+            CancelTheTask();
+            PLATFORM.ReturnToRoute();
+            done = true;
+         }
+         return done;
+      end_next_state
+   end_state     
+
+
+   end_processor
+end_platform_type

@@ -1,0 +1,46 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE basic_iads
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include_once setup/setup.txt
+include_once setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_sam.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/tt_radar.txt
+include_once platforms/sam_battalion.txt
+include_once platforms/sam_launcher.txt
+include_once platforms/ucav.txt
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/single_sam_chain.txt
+include_once scenarios/single_ucav.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+end_time 30 min

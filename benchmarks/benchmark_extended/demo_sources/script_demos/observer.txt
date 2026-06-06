@@ -1,0 +1,84 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+#### Example Observer to play sounds when certain events occur
+#### Jan 2015
+#### CHANGE THE PATH TO WHERE THE SOUND FILES ARE. WMPLAYER doesn't use relative pathing...
+
+script void PlaySoundBoom()
+   ### The following is for Out of the Box Windows 7...
+   ### Windows XP used "sndrec32.exe /embedding /play /close <file_name>" and played in the background without a gui...
+   //string str = write_str("wmplayer ..\\script_demos\\explosion.wav");
+   //writeln(str);  # just to show what we are doing to make the sound
+   ### Windows Media Player is NOT my first choice to play audio files...
+   System.Command("start wmplayer ..\\script_demos\\explosion.wav");
+end_script
+
+script void PlaySoundBombDrop()
+   ### The following is for Out of the Box Windows 7...
+   //string str = write_str("wmplayer ..\\script_demos\\dropbomb.wav");
+   //writeln(str);  # just to show what we are doing to make the sound
+   System.Command("start wmplayer ..\\script_demos\\dropbomb.wav");
+end_script
+
+
+script void WeaponTerminated(WsfWeaponEngagement aWeaponEngagement)
+   PlaySoundBoom();
+end_script
+
+script void PlatformKilled(WsfPlatform aPlatform)
+   PlaySoundBoom();
+end_script
+
+script void WeaponHit(WsfWeaponEngagement aWeaponEngagement, WsfPlatform aTargetPlatform)
+   PlaySoundBoom();
+end_script
+
+script void WeaponFired(WsfWeaponEngagement aWeaponEngagement, WsfTrack aTargetTrack)
+   PlaySoundBombDrop();
+end_script
+
+observer
+   enable WEAPON_TERMINATED
+   enable PLATFORM_BROKEN
+   enable WEAPON_HIT
+   enable WEAPON_FIRED
+end_observer
+########################################################################################################################
+### Make the sim run realtime and start it 970 seconds into the sim so we aren't bored...
+### In order to see the sim while it is running, connect to multicast 235.7.11.13 port 3225
+### in Warlock or with your favorite DIS snooper
+realtime
+dis_interface
+   #log_created_entities
+   exercise    1
+   site        25
+   application 1
+   multicast   235.7.11.13 130.38
+   #broadcast 10.
+   port        3225
+
+   autostart
+   ignore_pdu_time
+   deferred_connection_time  970 secs
+   simple_detonations on
+   simple_kill_range  100 m
+
+   heartbeat_timer             5.0 sec
+   heartbeat_multiplier        2.4
+   mover_update_timer          5.0 sec
+   entity_position_threshold   5.0 meters
+
+   #suppress_comm_data          true
+
+   initial_distribution_interval 1 sec
+
+   #debug_emission_pdu 2
+
+end_dis_interface

@@ -1,0 +1,178 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+define_path_variable CASE delegate_battle_manager
+log_file output/$(CASE).log
+
+include_once utils/BM_Utilities.txt
+include setup/setup.txt
+include setup/terrain.txt
+
+include_once processors/asset_manager.txt
+include_once processors/disseminate_c2.txt
+include_once processors/battle_manager.txt
+include_once processors/simple_sensors_manager.txt
+include_once processors/weapons_manager_sam.txt
+
+include_once comm/datalinks.txt
+include_once platforms/common.txt
+include_once platforms/target.txt
+include_once platforms/iads_cmdr.txt
+include_once platforms/radar_company.txt
+include_once platforms/ew_radar.txt
+include_once platforms/acq_radar.txt
+include_once platforms/tt_radar.txt
+include_once platforms/sam_battalion.txt
+include_once platforms/ucav.txt
+
+include_once weapons/sam.txt
+
+script WsfBMInterceptCalcResult SAM_LaunchComputer(WsfTrack aTrack,
+                                                   WsfPlatform aLauncher,
+                                                   string aEnvelopeName,
+                                                   double aLaunchDelay,
+                                                   double aPK)
+   WsfBMInterceptCalcResult result = WsfBMInterceptCalcResult();
+   result.SetCantIntercept();
+
+   double tgtAlt = aLauncher.RelativeAltitudeOf(aTrack);
+
+   double maxRng = 25.0 * 1852.0; # 25 nautical miles
+   double maxTOF = 27.0;
+   double avgSpd = 2643.0 * 1852.0 / 3600.0; # kts -> m/sec
+
+   WsfWaypoint intercept = WsfWaypoint();
+   double tti = WsfBMUtils.InterceptLocation2DNoProject(aTrack, aLauncher, intercept, avgSpd);
+
+   if ((tti > 0.0) && (tti < maxTOF))
+   {
+      result.SetCanIntercept(true);
+      result.SetTTI(tti);
+
+      double lat = intercept.Latitude();
+      double lon = intercept.Longitude();
+      WsfGeoPoint point;
+      point = point.Construct(lat, lon, tgtAlt);
+      result.SetPredPoint(point);
+
+      result.SetWeaponMaxRange(maxRng);
+      result.SetEstimatedPK(aPK);
+   }
+
+   return result;
+end_script
+
+platform_type SAM_LAUNCHER WSF_PLATFORM
+   icon SA-10_Launcher
+
+   comm cmdr_net RED_DATALINK
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link dissemination
+   end_comm
+
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval              60 sec
+      unchanged_track_reporting   disable
+      circular_report_rejection   on
+   end_processor
+
+   processor dissemination DC2
+   end_processor
+
+   processor asset_manager WPN_AM
+   end_processor
+
+   processor weapons_manager WM_SAM
+   end_processor
+end_platform_type
+
+include_once scenarios/iads_laydown_asv_full_bm.txt
+include_once scenarios/single_sam_chain.txt
+include_once scenarios/four_ucavs.txt
+
+event_output file output/$(CASE).evt end_event_output
+event_pipe   file output/$(CASE).aer end_event_pipe
+
+end_time 30 min
+
+edit platform 10_iads_cmdr
+   edit processor battle_manager
+      scoring_factors
+         pk 0
+      end_scoring_factors
+   end_processor
+end_platform
+
+edit platform 2900_sam_battalion
+   commander 10_iads_cmdr
+
+   add processor battle_manager BM
+      commit_authority   false
+      shot_doctrine      Shoot-1
+   end_processor
+end_platform
+
+weapon_effects SLIGHTLY_BETTER_SAM_EFFECT WSF_GRADUATED_LETHALITY
+   radius_and_pk 100.0 m 0.71
+end_weapon_effects
+
+edit platform 2930_sam_launcher
+   add weapon sam_one SAM
+      quantity 2
+      weapon_effects SLIGHTLY_BETTER_SAM_EFFECT
+      aux_data
+         double pK = 0.7
+      end_aux_data
+   end_weapon
+
+   add weapon sam_two SAM
+      quantity 1
+      aux_data
+         double pK = 0.71
+      end_aux_data
+   end_weapon
+
+   # Intercept calculator
+   script WsfBMInterceptCalcResult can_intercept(WsfWeapon weapon, WsfTrack track)
+      WsfBMInterceptCalcResult result = SAM_LaunchComputer(track, weapon.Platform(), "no-zone", 0, weapon.AuxDataDouble("pK"));
+
+      return result;
+   end_script
+end_platform
+
+weapon_effects HIGH_PK_SAM_EFFECT WSF_GRADUATED_LETHALITY
+   radius_and_pk  100.0 m  0.9
+end_weapon_effects
+
+platform 2940_sam_launcher SAM_LAUNCHER
+   side red
+
+   commander 2900_sam_battalion
+   position 38:21:26n 117:28:44w altitude 0.0 m agl
+
+   add weapon sam_three SAM
+      quantity 2
+      weapon_effects HIGH_PK_SAM_EFFECT
+      aux_data
+         double pK = 0.9
+     end_aux_data
+   end_weapon
+
+   # Intercept calculator
+   script WsfBMInterceptCalcResult can_intercept(WsfWeapon weapon, WsfTrack track)
+      WsfBMInterceptCalcResult result = SAM_LaunchComputer(track, weapon.Platform(), "no-zone", 0, weapon.AuxDataDouble("pK"));
+
+      return result;
+   end_script
+end_platform

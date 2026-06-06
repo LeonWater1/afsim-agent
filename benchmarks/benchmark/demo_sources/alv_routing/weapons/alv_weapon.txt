@@ -1,0 +1,127 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# -------------------------
+weapon_effects ALV_EFFECTS WSF_SPHERICAL_LETHALITY
+  # Note:  Does not consider the hardness of any target.  All are treated the same.
+  minimum_radius    1.0 ft # largest blast radius at which damage inflicted is maximum.
+  maximum_damage    1.0    # maximum damage level achievable upon the target.
+  maximum_radius  100.0 ft # blast radius beyond which the damage inflicted is Zero.
+  minimum_damage    0.05   # damage level achieved at the maximum radius.
+  threshold_damage  0.20   # initial damage level which must be achieved
+                           # before effects begin to accumulate upon the target
+  exponent          1.00   # exponent of proportionality of damage with radius.
+                           # ( e = 1.0 ==> linear damage within blast region,
+                           #   e > 1.0 ==> more damaging within the blast region,
+                           #   0.0 < e < 1.0 ==> less damaging within blast region. )
+end_weapon_effects
+
+# -------------------------
+weapon ALV_WEAPON WSF_EXPLICIT_WEAPON
+   launched_platform_type ALV
+   weapon_effects         ALV_EFFECTS
+end_weapon
+
+# -------------------------
+weapon ALV_JAMMER_WEAPON WSF_EXPLICIT_WEAPON
+   launched_platform_type ALV_JAMMER
+   weapon_effects         ALV_EFFECTS
+end_weapon
+
+################################################################################################
+// Script to fire the ALV
+processor ALV_LAUNCH_COMPUTER WSF_TASK_PROCESSOR
+#   script_debug_writes on
+#   show_state_transitions
+#   show_task_messages
+
+   script_variables
+      string WEAPON_NAME        = "alv";
+      int SALVO_SIZE            = 1;
+      # the following variable is used internally and should not be modified by the user
+      string mShootTaskStr      = "Shoot";
+   end_script_variables
+
+    script bool InInterceptEnvelopeOf(WsfWeapon aWeapon)
+       bool canIntercept = false;
+       double maxRng = 555600; # 300 nm
+       double minRng = 300;
+       WsfTrackId id = TRACK.TrackId();
+       double targetrange = PLATFORM.GroundRangeTo(TRACK);
+       if ((targetrange > minRng) && (targetrange < maxRng))
+       {
+         canIntercept = true;
+         writeln_d("Target is in range to intercept");
+       }
+       return canIntercept;
+   end_script
+
+   script bool HaveWeapons()
+      WsfWeapon weapon = PLATFORM.Weapon(WEAPON_NAME);
+      bool haveWeapons = false;
+      if (weapon.QuantityRemaining() >= SALVO_SIZE)
+      {
+          haveWeapons = true;
+      }
+      return haveWeapons;
+   end_script
+
+   script bool LaunchWeapon()
+      WsfWeapon   weapon;
+      weapon = PLATFORM.Weapon(WEAPON_NAME);
+      bool canInterceptNow = false;
+      if (HaveWeapons())
+      {
+         canInterceptNow = InInterceptEnvelopeOf(weapon);
+      }
+      bool launched = false;
+      if (canInterceptNow)
+      {
+         launched = FireAt(TRACK, mShootTaskStr, weapon, SALVO_SIZE);
+         if (launched)
+         {
+            writeln("*** T=", TIME_NOW, " ", PLATFORM.Name(), " ",
+                    TRACK.TargetName(), " R=", PLATFORM.SlantRangeTo(TRACK),
+                    " FIRE!!!!");
+         }
+      }
+      return launched;
+   end_script
+
+
+  # State Machine
+  # Very simple state machine
+  evaluation_interval GOHOME 2.0 sec
+  state GOHOME  # Goes back to Loiter if out of weapons
+      next_state ENGAGE
+         bool weaponavail = true;
+         if (! HaveWeapons())
+         {
+             weaponavail = false;
+             PLATFORM.ReturnToRoute();
+             writeln_d("Turning off launch computer");
+             PROCESSOR.TurnOff();
+         }
+         return weaponavail;
+      end_next_state
+   end_state
+
+   evaluation_interval ENGAGE 2.0 sec
+   state ENGAGE  # Engages and fires the weapon if it can
+      next_state GOHOME
+         bool launched = false;
+         if (InInterceptEnvelopeOf(PLATFORM.Weapon(WEAPON_NAME)))
+         {
+             writeln_d("Trying to launch weapon " );
+             launched = LaunchWeapon();
+         }
+         return launched;
+      end_next_state
+   end_state
+end_processor

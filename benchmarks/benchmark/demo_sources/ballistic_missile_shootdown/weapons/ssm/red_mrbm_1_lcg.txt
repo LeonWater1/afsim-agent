@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+###############################################################################
+# Launch computer generator for RED_MRBM_1.
+###############################################################################
+
+include red_mrbm_1.txt
+
+platform_type LAUNCH_PLATFORM_TYPE WSF_PLATFORM
+   side red
+   weapon red_mrbm_1 RED_MRBM_1
+   end_weapon
+end_platform_type
+
+tool BALLISTIC_MISSILE_LAUNCH_COMPUTER_GENERATOR
+   tool_debug
+
+   # altitude 1 m choosen to correspond with typical scenario altitudes
+   position 0n 0e altitude 1 m
+
+   surface_target_file red_mrbm_1_launch_data.txt
+
+   # Best loft angle will automatically be determined
+   burn_times from 91 sec to 126 sec by 0.02 sec
+end_tool
+
+#event_pipe
+#   file replay.aer
+#end_event_pipe

@@ -1,0 +1,74 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+// source: http://www.globalsecurity.org/military/library/report/call/call_98-13_caschap3.htm
+// (trajectory table; depressed trajectories)
+// Note that max. ord values are valid and can be used instead of elevation angle values
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_155MM_ARTILLERY_M107_HE_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_table FIRES_155MM_ARTILLERY_M107_HE
+      range_values                2500 4550 6300  7750  8900 9700   10200 10400 end_range_values
+  //    maximum_ordinate_values      100  250  550  850 1350 1800  2400  2950 end_maximum_ordinate_values
+      elevation_angle_values      100 200  300   400   500   600   700   800   end_elevation_angle_values
+      time_of_flight_values         7  14    21   26.5   33   38.5   44.3   49.2    end_time_of_flight_values
+   end_fires_table
+end_launch_computer
+
+weapon_effects FIRES_155MM_ARTILLERY_M107_HE_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.00
+  radius_and_pk  249.9 m 1.0
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_155MM_ARTILLERY_M107_HE WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 1.0 seconds
+   launch_computer
+      FIRES_155MM_ARTILLERY_M107_HE_LAUNCH_COMPUTER
+   end_launch_computer
+  weapon_effects FIRES_155MM_ARTILLERY_M107_HE_EFFECTS
+   launched_platform_type FIRES_155MM_ARTILLERY_M107_HE
+end_weapon
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_155MM_ARTILLERY_M107_HE_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   maximum_request_count 10
+   salvo_interval 10.0 seconds
+   launch_computer
+      FIRES_155MM_ARTILLERY_M107_HE_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_155MM_ARTILLERY_M107_HE
+  weapon_effects FIRES_155MM_ARTILLERY_M107_HE_EFFECTS
+end_weapon
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_155MM_ARTILLERY_M107_HE FIRES_155MM_ARTILLERY_M107_HE_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_155MM_ARTILLERY_M107_HE_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   category HEL_IGNORE
+   icon mil_SS-Launcher-LR
+   weapon fires_155MM_ARTILLERY_M107_HE FIRES_155MM_ARTILLERY_M107_HE
+   end_weapon
+end_platform_type
+

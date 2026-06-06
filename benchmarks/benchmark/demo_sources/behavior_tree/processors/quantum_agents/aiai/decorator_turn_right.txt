@@ -1,0 +1,20 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+advanced_behavior turn_right
+   precondition
+      return Success();
+   end_precondition
+   
+   execute
+      PLATFORM.TurnToRelativeHeading(18);
+      return Success("turn_right maneuver complete!");
+   end_execute
+   
+end_advanced_behavior

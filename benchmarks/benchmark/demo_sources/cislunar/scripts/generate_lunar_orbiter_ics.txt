@@ -1,0 +1,79 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# The script in this file is responsible for writing the
+# ECI position and velocity for the orbiter platform to
+# file. This script should be run any time the simulation
+# epoch is modified.
+#
+# To run this script, just include this file from the
+# startup file (../lunar_orbiter.txt). When included, the
+# simulation will have no platforms, and will instead
+# write the details of the orbiter platform's initial
+# conditions to file, which may then be used in subsequent
+# runs.
+
+script_variables
+   // User selectable parameters;
+   double gOrbitAlt_km   = 120.0;
+   double gOrbitIncl_deg = 85.0;
+   
+   // Constants
+   double gMoonMu   = 4.9028E+12;     // [m^3/s^2]
+   double gMoonRad  = 1.7371E+6;      // [m]
+   string gFileName = "./elements/orbiter.txt";
+end_script_variables
+
+# This script computes the initial conditions for a lunar
+# orbit, and then saves the initial conditions to file for
+# use by the platform.
+script void ComputeLunarOrbitICs()
+   // Retrieve the Moon's kinematics.
+   Calendar epoch = WsfDateTime.StartTime();
+   Vec3 moonPos = Moon.LocationECI(epoch);
+   Vec3 moonVel = Moon.VelocityECI(epoch);
+   
+   // Compute the kinematics of the orbiter relative to the Moon.
+   double orbitSMA = gMoonRad + gOrbitAlt_km * 1000.0;
+   double orbitPeriod = Math.TWO_PI() * Math.Sqrt(orbitSMA * orbitSMA * orbitSMA / gMoonMu);
+   double orbitSpeed = Math.TWO_PI() * orbitSMA / orbitPeriod;
+   Vec3 posLunar = Vec3.Construct(orbitSMA, 0.0, 0.0);
+   Vec3 velLunar = Vec3.Construct(0.0,
+                                  Math.Cos(gOrbitIncl_deg) * orbitSpeed,
+                                  Math.Sin(gOrbitIncl_deg) * orbitSpeed);
+   
+   // Compute the kinematics of the orbiter relative to the Earth.
+   Vec3 posECI = Vec3.Add(posLunar, moonPos);
+   Vec3 velECI = Vec3.Add(velLunar, moonVel);
+   
+   // Write the kinematics to file.
+   FileIO file = FileIO();
+   file.Open(gFileName, "out");
+   file.Writeln("position "
+                + Format.Scientific(posECI.X(), 12) + " m "
+                + Format.Scientific(posECI.Y(), 12) + " m "
+                + Format.Scientific(posECI.Z(), 12) + " m");
+   file.Writeln("velocity "
+                + Format.Scientific(velECI.X(), 12) + " m/s "
+                + Format.Scientific(velECI.Y(), 12) + " m/s "
+                + Format.Scientific(velECI.Z(), 12) + " m/s");
+   file.Writeln("epoch_date_time " + epoch.ToStringDate() + " " + epoch.ToStringTime()); 
+   file.Close();             
+end_script
+
+# Call the ComputeLunarOrbitICs when the simulation begins.
+observer
+   enable SIMULATION_STARTING ComputeLunarOrbitICs
+end_observer
+
+# This will remove the orbiter platform from the simulation when
+# this file is included.
+platform_availability
+   name orbiter availability 0.0
+end_platform_availability

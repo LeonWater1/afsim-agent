@@ -1,0 +1,302 @@
+// ****************************************************************************
+// CUI
+//
+// The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+//
+// Copyright 2021 Radiance Technologies. All rights reserved.
+//
+// The use, dissemination or disclosure of data in this file is subject to
+// limitation or restriction. See accompanying README and LICENSE for details.
+// ****************************************************************************
+
+aero WEAPON_AERO WSF_AERO
+  # Note:  Values for Mk-82-like slick bomb.
+  cd_zero_subsonic    0.100
+  cd_zero_supersonic  0.40
+  mach_begin_cd_rise  0.800
+  mach_end_cd_rise    1.200
+  mach_max_supersonic 2.000
+  reference_area      0.059 m2 # 273mm body dia
+  cl_max             10.400    # unknown
+  aspect_ratio        4.000    # unknown
+end_aero
+
+weapon_effects WEAPON_EFFECT WSF_SPHERICAL_LETHALITY
+  minimum_radius   25.0 m
+  maximum_radius   25.0 km
+  maximum_damage   1.0
+  minimum_damage   0.99
+end_weapon_effects
+
+weapon WEAPON WSF_EXPLICIT_WEAPON 
+   launched_platform_type WEAPON_PT
+end_weapon
+
+platform_type WEAPON_PT WSF_PLATFORM
+  icon missile
+
+  mover WSF_GUIDED_MOVER 
+     aero WEAPON_AERO
+     total_mass 500.0 lbm
+     update_interval 0.5 s
+  end_mover
+
+  processor guidance_computer WSF_GUIDANCE_COMPUTER
+      proportional_navigation_gain  10.0
+      velocity_pursuit_gain         10.0
+      g_bias                         1.0
+      maximum_commanded_g           25.0 g
+      guidance_delay                0.0 sec
+  end_processor
+
+  processor fuse  WSF_AIR_TARGET_FUSE   
+      hit_proximity_range 2500 m
+      debug
+  end_processor
+end_platform_type
+
+platform_type FISH WSF_PLATFORM   
+   icon drone
+   side red
+
+   weapon bomb WEAPON
+      quantity 1
+      weapon_effects WEAPON_EFFECT
+   end_weapon
+
+   processor fuse WSF_SCRIPT_PROCESSOR
+      update_interval 10.0 sec
+      on_update
+         
+         if (PLATFORM.SlantRangeTo(32, -87, 0) < 7500)
+         {   
+            WsfPlatform ally = WsfSimulation.FindPlatform("ALLY_AIRPORT");
+            if (ally != null)
+            {
+               WsfTrack track = ally.MakeTrack();
+               PLATFORM.Weapon("bomb").Fire(track);
+
+            }
+            
+         }
+      end_on_update
+   end_processor
+   
+   
+   execute at_time 0.1 sec absolute
+      PLATFORM.GoToLocation(32, -87);    #Attack Allied Airport
+   end_execute
+   
+   execute at_time 4 hr absolute
+      PLATFORM.Weapon("bomb").Fire(PLATFORM.MakeTrack());
+   end_execute
+   
+   execute at_time 4.01 hr absolute
+      PLATFORM.DeletePlatform();
+   end_execute
+
+   mover WSF_AIR_MOVER  
+      maximum_speed 50 m/s
+      minimum_speed 25 m/s
+        
+   end_mover
+   
+   processor CAUGHT_FISH WSF_SCRIPT_PROCESSOR
+      # This Cyber Attack scambles the location of the target and replaces it
+      # with a location close enough to the attacking platform to collect intell.
+      update_interval 10.0 sec
+      on_update
+         WsfPlatform hemFish = WsfSimulation.FindPlatform("HEMINGWAY");
+         if (hemFish.CyberAttackStatus(PLATFORM, "SMALL_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(25, -84, 0);      # New Dumby Location 1 of Target
+         }
+         else if (hemFish.CyberAttackStatus(PLATFORM, "BIG_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(25, -84, 0);      # New Dumby Location 1 of Target
+         }
+         
+         WsfPlatform oldFish = WsfSimulation.FindPlatform("OLD_MAN");
+         if (oldFish.CyberAttackStatus(PLATFORM, "SMALL_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(26, -88, 0);         # New Dumby Location 2 of Target
+         }
+         else if (oldFish.CyberAttackStatus(PLATFORM, "BIG_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(26, -88, 0);         # New Dumby Location 2 of Target
+         }
+         
+         WsfPlatform yngFish = WsfSimulation.FindPlatform("YOUNG_MAN");
+         if (yngFish.CyberAttackStatus(PLATFORM, "SMALL_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(27, -88.5, 0);      # New Dumby Location 3 of Target
+         }
+         else if (yngFish.CyberAttackStatus(PLATFORM, "BIG_CATCH") == 1)
+         {
+            PLATFORM.GoToLocation(27, -88.5, 0);      # New Dumby Location 3 of Target
+         }
+      end_on_update
+   end_processor
+
+end_platform_type
+
+cyber_attack SMALL_CATCH WSF_CYBER_ATTACK
+   probability_of_attack_success 1.0
+   resources_required 1.0
+end_cyber_attack
+
+cyber_attack BIG_CATCH WSF_CYBER_ATTACK
+   probability_of_attack_success 1.0
+   resources_required 5.0
+end_cyber_attack
+
+platform_type AIRPORT WSF_PLATFORM
+   side green
+   icon lha
+   position 32n 87w
+end_platform_type
+
+platform ALLY_AIRPORT AIRPORT
+end_platform
+
+platform_type FISHERMAN WSF_PLATFORM
+   cyber_constraint WSF_CYBER_CONSTRAINT 
+      resources 5.0
+   end_cyber_constraint
+end_platform_type
+
+platform HEMINGWAY FISHERMAN
+   side blue
+   icon ship
+   position 27.53n 83.01w
+   execute at_time 1.0 hour absolute
+      WsfPlatform fish0 = WsfSimulation.FindPlatform("SMALL_FISH_0");
+      WsfPlatform fish1 = WsfSimulation.FindPlatform("SMALL_FISH_1");
+      WsfPlatform fish2 = WsfSimulation.FindPlatform("SMALL_FISH_2");
+      WsfPlatform fish3 = WsfSimulation.FindPlatform("SMALL_FISH_3");
+      
+      WsfPlatform bigfish = WsfSimulation.FindPlatform("BIG_FISH");
+            
+      PLATFORM.CyberAttack(fish0, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish0.Name(),  "  ",   PLATFORM.CyberAttackStatus(fish0, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish1, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish1.Name(),  "  ",   PLATFORM.CyberAttackStatus(fish1, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish2, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish2.Name(),  "  ",   PLATFORM.CyberAttackStatus(fish2, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish3, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish3.Name(),  "  ",   PLATFORM.CyberAttackStatus(fish3, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(bigfish, "BIG_CATCH"); writeln(PLATFORM.Name(), " caught ", bigfish.Name(),"     ", PLATFORM.CyberAttackStatus(bigfish, "BIG_CATCH"));
+   end_execute
+end_platform
+
+platform YOUNG_MAN FISHERMAN
+   side blue
+   icon ship
+   position 29.08n 89.97w
+   execute at_time 1.5 hour absolute
+      WsfPlatform fish4 = WsfSimulation.FindPlatform("SMALL_FISH_4");
+      WsfPlatform fish5 = WsfSimulation.FindPlatform("SMALL_FISH_5");
+      WsfPlatform fish6 = WsfSimulation.FindPlatform("SMALL_FISH_6");
+      WsfPlatform fish7 = WsfSimulation.FindPlatform("SMALL_FISH_7");
+      WsfPlatform fish8 = WsfSimulation.FindPlatform("SMALL_FISH_8");
+      WsfPlatform fish9 = WsfSimulation.FindPlatform("SMALL_FISH_9");
+      
+      PLATFORM.CyberAttack(fish4, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish4.Name(), "   ", PLATFORM.CyberAttackStatus(fish4, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish5, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish5.Name(), "   ", PLATFORM.CyberAttackStatus(fish5, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish6, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish6.Name(), "   ", PLATFORM.CyberAttackStatus(fish6, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish7, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish7.Name(), "   ", PLATFORM.CyberAttackStatus(fish7, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish8, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish8.Name(), "   ", PLATFORM.CyberAttackStatus(fish8, "SMALL_CATCH"));
+      PLATFORM.CyberAttack(fish9, "SMALL_CATCH"); writeln(PLATFORM.Name(), " caught ", fish9.Name(), "  ", PLATFORM.CyberAttackStatus(fish9, "SMALL_CATCH"));
+   end_execute
+end_platform
+
+platform OLD_MAN FISHERMAN
+   side blue
+   icon ship
+   position 26.00n 90.00w
+   execute at_time 2.0 hour absolute
+      WsfPlatform bigfish = WsfSimulation.FindPlatform("BIG_FISH");
+
+      PLATFORM.CyberAttack(bigfish, "BIG_CATCH");  writeln(PLATFORM.Name(), " caught ", bigfish.Name(), "         ", PLATFORM.CyberAttackStatus(bigfish, "BIG_CATCH"));
+   end_execute
+end_platform
+
+platform SMALL_FISH_0 FISH 
+   route
+      position 28.25n 86.10w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_1 FISH 
+   route
+      position 28.20n 86.10w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_2 FISH 
+   route
+      position 28.20n 86.00w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_3 FISH 
+   route
+      position 28.20n 85.90w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_4 FISH 
+   route
+      position 28.10n 86.10w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_5 FISH 
+   route
+      position 28.10n 86.00w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_6 FISH 
+   route
+      position 28.10n 85.90w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_7 FISH 
+   route
+      position 28.00n 86.10w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_8 FISH
+   route
+      position 28.00n 86.00w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform SMALL_FISH_9 FISH 
+   route
+      position 28.00n 85.90w altitude 5000.0 m 
+      speed 35 m/s
+   end_route
+end_platform
+
+platform BIG_FISH FISH
+   icon bomber
+   route
+      position 27.95n 86.00w altitude 5000.0 m 
+      speed 25 m/s
+   end_route
+end_platform
+
+event_pipe
+    file output/fishCaught.aer
+end_event_pipe
+
+end_time 5.5 hour

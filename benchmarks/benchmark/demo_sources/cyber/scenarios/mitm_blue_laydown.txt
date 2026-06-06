@@ -1,0 +1,37 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+include_once cyber/cyber_attacks/delay_comms.txt
+
+platform uav_1 UAV
+
+   track platform target_1 end_track
+   
+   mover
+      route
+         navigation
+            position 38:47:48.237n 87:53:26.794w
+               altitude 2500 feet
+               speed 600 mi/h
+            position 38:50:06.35n 91:40:52.01w
+         end_navigation
+      end_route
+   end_mover
+   
+   on_update 
+      WsfPlatform spotter = WsfSimulation.FindPlatform("spotter_1");
+      if ((PLATFORM.GroundRangeTo(spotter) < 15*MATH.M_PER_MI()) && PLATFORM.CyberAttackStatus(spotter,"DELAY_COMMS") <= 0)
+      {
+         PLATFORM.CyberAttack(spotter,"DELAY_COMMS");
+      }
+   end_on_update
+   
+end_platform

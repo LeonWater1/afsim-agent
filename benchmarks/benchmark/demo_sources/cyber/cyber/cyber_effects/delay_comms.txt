@@ -1,0 +1,27 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+
+cyber_effect DELAY_COMMS_EFFECT WSF_CYBER_MAN_IN_THE_MIDDLE_EFFECT
+   
+   platform_type SPOTTER
+      all
+            
+      script   WsfCyberMitmMessage OnSend(WsfMessage aMessage)
+         writeln("TIME NOW = ",TIME_NOW, " ",aMessage.Originator(), " TRYING TO SEND A MESSAGE");
+         return WsfCyberMitmMessage.Construct(aMessage, 20, false);
+      end_script
+      
+      script   WsfCyberMitmMessage OnReceive(WsfMessage aMessage)
+         return WsfCyberMitmMessage.Construct(aMessage, 20, false);
+      end_script
+   end_platform_type
+
+end_cyber_effect

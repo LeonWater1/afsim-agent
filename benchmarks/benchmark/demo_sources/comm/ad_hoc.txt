@@ -1,0 +1,47 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#
+# This demo highlights some of the ad-hoc capabilities available in AFSIM.
+#
+# A group of 'detectors' are randomly placed in a geographical area
+# and will automatically form their network. As time progresses,
+# connections are added and removed based on the constraints of
+# the comm model being used (radio-based). Connections are visualized
+# using WsfDraw.
+#
+# A single opposing side aircraft passes through, and the resulting
+# routing decisions made by individual platforms are shown as a message
+# propagates through the network.
+#
+# A single platform passes directly through this region at high
+# velocity, and provides a more dramatic view of it
+# adding and removing connections as it passes through the area.
+# With the current seed, this platform is also used to help relay
+# messages.
+
+file_path .
+start_date aug 29 2019
+
+random_seed 1 # also try random_seed 18
+end_time 15 min
+
+include_once comms/network.txt
+include_once comms/ad_hoc_comm.txt
+include_once platforms/detector.txt
+include_once platforms/intruder.txt
+include_once platforms/black_van.txt
+
+event_pipe
+   file output/ad_hoc.aer
+end_event_pipe
+
+event_output
+   enable all
+   file output/ad_hoc.evt
+end_event_output

@@ -66,13 +66,13 @@ python -m scripts.core.grounding --validate
 python -m scripts.core.repair_planner --validate
 
 # 评测协议 — 生成统一评分表
-python scripts/evaluate_protocol_v1.py
+python scripts/evaluate_protocol.py
 
 # 分层生成规划器（用 IR 示例测试）
 python -m scripts.core.generation_planner --example-id IRX-001
 
 # Benchmark v2 验证
-python benchmarks/benchmark_v2/validate_benchmark.py
+python benchmarks/benchmark_extended/validate_benchmark.py
 ```
 
 ## 架构：核心流水线模块
@@ -87,7 +87,7 @@ python benchmarks/benchmark_v2/validate_benchmark.py
 版本感知的校验器，同时支持 v1 和 v2 schema。从 IR JSON 自动检测 schema 版本。
 
 ### 4. Grounding（`scripts/core/grounding.py`）
-`build_grounded_ir(ir)` — 将用户实体映射到 AFSIM 标准类型，包含匹配置信度（full/partial/unresolved）、实现约束、伴随规则和外部资源依赖。映射数据位于 `docs/machine/entity_mapping_v2.json`。
+`build_grounded_ir(ir)` — 将用户实体映射到 AFSIM 标准类型，包含匹配置信度（full/partial/unresolved）、实现约束、伴随规则和外部资源依赖。映射数据位于 `docs/machine/entity_mapping_extended.json`。
 
 ### 5. 分层生成
 - **规划器**（`scripts/core/generation_planner.py`）：`build_generation_plan(grounded_ir)` → 分层生成计划（scenario_scaffold → platform → sensor → weapon → mission → assembly）
@@ -97,7 +97,7 @@ python benchmarks/benchmark_v2/validate_benchmark.py
 `generate_script_with_llm(ir, grounded_ir, generation_plan, client)` — 纯 LLM 生成；无确定性脚手架回退。
 
 ### 7. 静态检查器（`scripts/core/static_checker.py`）
-`analyze_script_text(text, script_label)` → 输出 findings JSON。检查内容：单位、end_xxx 块闭合、坐标格式、引用完整性、必填字段、非法组件类型、幻觉对象、脚本结构一致性。由 `docs/machine/error_taxonomy_v1.json` 中的错误分类体系驱动。同时使用：
+`analyze_script_text(text, script_label)` → 输出 findings JSON。检查内容：单位、end_xxx 块闭合、坐标格式、引用完整性、必填字段、非法组件类型、幻觉对象、脚本结构一致性。由 `docs/machine/error_taxonomy.json` 中的错误分类体系驱动。同时使用：
 - `scripts/core/context_rules.py` — WSF 类型和命令上下文规则
 - `scripts/core/reference_rules.py` — 禁止正则模式、后处理规则
 
@@ -110,19 +110,19 @@ python benchmarks/benchmark_v2/validate_benchmark.py
 ### 10. LLM 修复执行器（`scripts/core/repair_executor.py`）
 `llm_execution_repair()` — LLM 引导的修复，限定到特定层（基于 mission.exe 诊断）。重试循环：最多 2 次尝试，error family 未改善时回退。
 
-### 11. Mission 日志解析器（`scripts/core/mission_log_parser.py`）
+### 11. Mission 日志解析器（`scripts/core/core/mission_log_parser.py`）
 `parse(mission_log_text)` — 从 mission.exe 输出中提取结构化诊断（退出码、错误类别、缺失事件、实体状态）。
 
 ## IR Schema 版本
 
-- **v1**：`docs/machine/afsim_ir_schema_v1.json` — Scenario、Side、Platform、Mission、Components、Constraints
-- **v2**：`docs/machine/afsim_ir_schema_v2.json` — 新增 Logic 层（behavior_rules、state_machines、engagement/trigger logic）和 Evaluation 层（mission_phases、success_criteria、observation_metrics）
+- **v1**：`docs/machine/afsim_ir_schema.json` — Scenario、Side、Platform、Mission、Components、Constraints
+- **v2**：`docs/machine/afsim_ir_schema_extended.json` — 新增 Logic 层（behavior_rules、state_machines、engagement/trigger logic）和 Evaluation 层（mission_phases、success_criteria、observation_metrics）
 - v1 → v2 向后兼容（仅需升级 `schema_version`）
 
 ## Benchmark 数据
 
-- **benchmark_v1**：`benchmarks/benchmark_v1/tasks.jsonl` — 27 个任务，oracle 脚本已通过 `mission.exe` 验证（27 PASS）
-- **benchmark_v2**：`benchmarks/benchmark_v2/` — 5 种类型（A：指令→脚本、B：脚本→指令、C：指令→IR、D：IR→脚本、E：错误→修复），共 38 条样本
+- **benchmark**：`benchmarks/benchmark/tasks.jsonl` — 27 个任务，oracle 脚本已通过 `mission.exe` 验证（27 PASS）
+- **benchmark_extended**：`benchmarks/benchmark_extended/` — 5 种类型（A：指令→脚本、B：脚本→指令、C：指令→IR、D：IR→脚本、E：错误→修复），共 38 条样本
 
 ## 修复原则（来自 AGENTS.md）
 

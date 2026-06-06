@@ -1,0 +1,250 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+script_variables
+   global Set< string > mPlatformNames = Set< string >();
+
+   global FileIO mSensorTrackFile = FileIO();
+   global FileIO mLocalTrackFile = FileIO();
+   global FileIO mTrackMessageFile = FileIO();
+
+   global string mSensorFilename       = "sensor_track_data";
+   global string mLocalTrackFilename   = "local_track_data";
+   global string mTrackMessageFilename = "message_data";
+
+   global string mStartDateTime = "out";
+end_script_variables
+
+script void SetDateAndTimeString()
+   #System.Command("date +%Y%m%d_%H%M%S > "date_time.txt");
+   #FileIO dateTimeFile = FileIO();
+   #dateTimeFile.Open("date_time.txt", "in");
+   #mStartDateTime = dateTimeFile.ReadToken();
+   #dateTimeFile.Close();
+   #System.Command("rm -f date_time.txt");
+
+   #System.Command("date /T > date_time.txt");
+   #System.Command("time /T >> date_time.txt");
+   #FileIO dateTimeFile = FileIO();
+   #dateTimeFile.Open("date.txt");
+   #mStartDateTime = write_str(dateTimeFile.Readln(), "_", dateTimeFile.Readln());
+   #dateTimeFile.Close();
+   #System.Command("del /F date_time.txt");
+end_script
+
+on_initialize
+   SetDateAndTimeString();
+
+   string header;
+   string outstr;
+
+   outstr = write_str("output/", mStartDateTime, "_", mSensorFilename, "_", WsfSimulation.RunNumber(), ".txt");
+   if (! mSensorTrackFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mSensorTrackFile.Writeln(header);
+
+   outstr = write_str("output/", mStartDateTime, "_", mLocalTrackFilename, "_", WsfSimulation.RunNumber(), ".txt");
+   if (! mLocalTrackFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mLocalTrackFile.Writeln(header);
+
+   outstr = write_str("output/", mStartDateTime, "_", mTrackMessageFilename, "_", WsfSimulation.RunNumber(), ".txt");
+   if (! mTrackMessageFile.Open(outstr, "out"))
+   {
+      writeln("Could not open file: ", outstr);
+   }
+   header = write_str("Time(sec),ObserverCallbackType,PlatformName,TrackStartTime(sec),SensorName,TargetName");
+   mTrackMessageFile.Writeln(header);
+
+   #Fill in platform names of interest
+   mPlatformNames.Clear();
+   mPlatformNames.Insert("10_iads_cmdr");
+   mPlatformNames.Insert("100_radar_company");
+   mPlatformNames.Insert("600_ew_radar");
+   mPlatformNames.Insert("acq_radar");
+   mPlatformNames.Insert("ttr_radar");
+end_on_initialize
+
+script bool FindStr(Array<string> aArray, string aKey)
+   foreach (string key in aArray)
+   {
+      if (key == aKey)
+      {
+         return true;
+      }
+   }
+end_script
+
+script void SensorTrackInitiated(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackInitiated",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName());
+      mSensorTrackFile.Writeln(mystring);
+   }
+end_script
+
+script void SensorTrackUpdated(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackUpdated",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName());
+      mSensorTrackFile.Writeln(mystring);
+
+   }
+end_script
+
+script void SensorTrackDropped(WsfPlatform aPlatform, WsfSensor aSensor, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "SensorTrackDropped",
+                                  ",", aPlatform.Name(),
+                                  ",", aTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aTrack.TargetName());
+      mSensorTrackFile.Writeln(mystring);
+
+   }
+end_script
+
+script void LocalTrackInitiated(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackInitiated",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName());
+      mLocalTrackFile.Writeln(mystring);
+
+   }
+end_script
+
+script void LocalTrackUpdated(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack, WsfTrack aTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackupdated",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName());
+      mLocalTrackFile.Writeln(mystring);
+
+   }
+end_script
+
+script void LocalTrackDropped(WsfPlatform aPlatform, WsfLocalTrack aLocalTrack)
+   if (mPlatformNames.Exists(aPlatform.Name()))
+   {
+      string mystring = write_str(TIME_NOW,
+                                  ",", "LocalTrackInitiated",
+                                  ",", aPlatform.Name(),
+                                  ",", aLocalTrack.StartTime(),
+                                  ",", aLocalTrack.SensorName(),
+                                  ",", aLocalTrack.TargetName());
+      mLocalTrackFile.Writeln(mystring);
+
+   }
+end_script
+
+script void MessageReceived(WsfPlatform aPlatformXmtr,
+                            WsfComm     aXmtr,
+                            WsfPlatform aPlatformRcvr,
+                            WsfComm     aRcvr,
+                            WsfMessage  aMsg,
+                            WsfCommInteraction aResult)
+   if ((aMsg.Type() == "WSF_TRACK_MESSAGE") &&
+       mPlatformNames.Exists(aPlatformRcvr.Name()))
+   {
+      WsfTrack track = ((WsfTrackMessage)aMsg).Track();
+      if (track.IsValid())
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", "TrackMessageReceived",
+                                     ",", aPlatformRcvr.Name(),
+                                     ",", track.UpdateTime(),
+                                     ",",
+                                     ",", track.TargetName());
+         mTrackMessageFile.Writeln(mystring);
+      }
+      else if ((aMsg.Type() == "WSF_TRACK_DROP_MESSAGE") &&
+               mPlatformNames.Exists(aPlatformRcvr.Name()))
+      {
+         WsfTrackDropMessage msg = (WsfTrackDropMessage)aMsg;
+         string mystring = write_str(TIME_NOW,
+                                     ",", "TrackDropMessageReceived",
+                                     ",", aPlatformRcvr.Name(),
+                                     ",", msg.Time(),
+                                     ",",
+                                     ",", WsfSimulation.PlatformName(msg.TargetIndex()));
+         mTrackMessageFile.Writeln(mystring);
+      }
+   }
+end_script
+
+script void MessageTransmitted(WsfPlatform aPlatform,
+                               WsfComm     aComm,
+                               WsfMessage  aMsg)
+   if ((aMsg.Type() == "WSF_TRACK_MESSAGE") &&
+        mPlatformNames.Exists(aPlatform.Name()))
+   {
+      WsfTrack track = ((WsfTrackMessage)aMsg).Track();
+      if (track.IsValid())
+      {
+         string mystring = write_str(TIME_NOW,
+                                     ",", "TrackMessageTransmitted",
+                                     ",", aPlatform.Name(),
+                                     ",", track.UpdateTime(),
+                                     ",",
+                                     ",", track.TargetName());
+         mTrackMessageFile.Writeln(mystring);
+      }
+      else if ((aMsg.Type() == "WSF_TRACK_DROP_MESSAGE") &&
+               mPlatformNames.Exists(aPlatform.Name()))
+      {
+         WsfTrackDropMessage msg = (WsfTrackDropMessage)aMsg;
+         string mystring = write_str(TIME_NOW,
+                                     ",", "TrackDropMessageTransmitted",
+                                     ",", aPlatform.Name(),
+                                     ",", msg.Time(),
+                                     ",",
+                                     ",", WsfSimulation.PlatformName(msg.TargetIndex()));
+         mTrackMessageFile.Writeln(mystring);
+      }
+   }
+end_script
+
+observer
+   enable SENSOR_TRACK_INITIATED SensorTrackInitiated
+   enable SENSOR_TRACK_UPDATED   SensorTrackUpdated
+   enable SENSOR_TRACK_DROPPED   SensorTrackDropped
+
+   enable LOCAL_TRACK_INITIATED LocalTrackInitiated
+   enable LOCAL_TRACK_UPDATED   LocalTrackUpdated
+   enable LOCAL_TRACK_DROPPED   LocalTrackDropped
+
+   enable MESSAGE_RECEIVED   MessageReceived
+   enable MESSAGE_TRANSMITTED MessageTransmitted
+end_observer

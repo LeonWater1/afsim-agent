@@ -1,0 +1,27 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+script_variables 
+   int blackVanMsgs = 0;
+end_script_variables
+
+script void MessageReceived(WsfComm aXmtr, WsfComm aRcvr, WsfMessage aMsg, WsfCommInteraction aResult)
+   WsfPlatform rcvPlat = aRcvr.Platform();
+   string rcvPlatName = rcvPlat.Name();
+   
+   if(rcvPlatName == "black_van")
+   {
+      blackVanMsgs = blackVanMsgs + 1;
+      #writeln(TIME_NOW," : black received a message");
+      WsfEventPipe.Record(rcvPlat,"Received Messages = ",blackVanMsgs);
+   }
+end_script
+
+observer 
+   enable MESSAGE_RECEIVED 
+end_observer

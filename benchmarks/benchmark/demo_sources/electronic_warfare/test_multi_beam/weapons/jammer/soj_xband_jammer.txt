@@ -1,0 +1,52 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+antenna_pattern SOJ_XBAND_ANTENNA
+   sine_pattern
+      peak_gain             20.0 db
+      minimum_gain          -20.0 db
+      azimuth_beamwidth     5.0 deg
+      elevation_beamwidth   5.0 deg
+   end_sine_pattern
+end_antenna_pattern
+
+weapon SOJ_XBAND_JAMMER WSF_RF_JAMMER
+
+  maximum_number_of_beams      2
+  beam_power_distribution      average
+
+  maximum_spots_per_beam       2
+  spot_power_distribution      average
+
+  maximum_range                200 km
+
+  slew_mode                    azimuth_and_elevation
+  azimuth_slew_limits          -60.0 deg 60.0 deg
+  elevation_slew_limits        -60.0 deg 60.0 deg
+
+
+  transmitter
+    antenna_pattern            SOJ_XBAND_ANTENNA
+    frequency_band             8 ghz 12 ghz
+    power                      1.5 kw
+    internal_loss              0.0 db
+    electronic_attack
+       technique noise_jamming
+          effect noise_effect WSF_JAMMER_POWER_EFFECT
+             jamming_delta_gain 0 dB
+          end_effect
+        end_technique
+     end_electronic_attack
+  end_transmitter
+end_weapon

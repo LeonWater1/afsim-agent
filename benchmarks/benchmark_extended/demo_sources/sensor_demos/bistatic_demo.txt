@@ -1,0 +1,196 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+// Bistatic demo that puts the jet in a single location to verify
+// signal parameters and calculations
+
+define_path_variable CASE bistatic_demo
+log_file output/$(CASE).log
+
+radar_signature RADAR_SIGNATURE
+  use_bisector_for_bistatic true
+  constant 5 m^2
+end_radar_signature
+
+platform_type JET WSF_PLATFORM
+   radar_signature RADAR_SIGNATURE
+   mover WSF_AIR_MOVER
+   end_mover
+end_platform_type
+
+antenna_pattern BISTATIC_TX_ANTENNA
+  constant 0 db
+end_antenna_pattern
+
+antenna_pattern BISTATIC_RX_ANTENNA
+  constant 12 dB
+end_antenna_pattern
+
+sensor BISTATIC_SENSOR_RCVR WSF_RADAR_SENSOR
+   #debug
+
+   receive_only
+
+   frame_time            1.0 sec
+
+   receiver
+      antenna_pattern    BISTATIC_RX_ANTENNA
+      antenna_height     9 m
+      frequency          100 mhz
+      bandwidth          200 khz
+      noise_figure         7 db
+
+      check_transmitter_masking false
+   end_receiver
+
+   detection_threshold    15 db
+   integration_gain 1e5 absolute // Signal Processing Gain, Gsp = Tsp * Br = 0.5 sec * 200e3 1/sec
+   #probability_of_false_alarm  1.0e-6
+   #required_pd                    0.9
+   #swerling_case                  1
+
+   reports_range
+   reports_bearing
+end_sensor
+
+sensor BISTATIC_SENSOR_XMTR WSF_RADAR_SENSOR
+
+   transmit_only
+
+   frame_time                10.0 sec
+
+   transmitter
+      antenna_pattern       BISTATIC_TX_ANTENNA
+      antenna_height        90 m
+      power                    50 kw
+      frequency               100 mhz
+      bandwidth               200 khz
+      #pulse_compression_ratio 1e5 absolute // Signal Processing Gain, Gsp = Tsp * Br = 0.5 sec * 200e3 1/sec
+      internal_loss        8 db
+   end_transmitter
+end_sensor
+
+platform rcvr_pltfrm WSF_PLATFORM
+   icon C4I
+   side red
+
+   position 01:07:48.1n 00:00:0.0w altitude 0 m agl
+   add sensor sns_rcvr BISTATIC_SENSOR_RCVR
+      on
+      debug
+      internal_link data_mgr
+      ignore_same_side
+   end_sensor
+
+   add processor data_mgr WSF_TRACK_PROCESSOR
+   end_processor
+end_platform
+
+platform xmtr_pltfrm WSF_PLATFORM
+   icon C4I
+   side red
+
+   position 02:02:3.83s 00:00:0.0w altitude 0 m agl
+   add sensor snsr_xmtr BISTATIC_SENSOR_XMTR
+      on
+   end_sensor
+end_platform
+
+platform jet JET
+   side blue
+   icon b-747
+
+   position 00:00:0.0n 00:00:0.0w altitude 2500 m agl
+end_platform
+
+event_output
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   #enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_FREQUENCY_CHANGED
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   #enable SENSOR_TRACK_INITIATED
+   #enable SENSOR_TRACK_UPDATED
+   #enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+  file output/$(CASE).evt
+end_event_output
+
+script void SensorDetectionAttempt(WsfPlatform          aPlatform,
+                                   WsfSensor            aSensor,
+                                   WsfPlatform          aTarget,
+                                   WsfSensorInteraction aResult)
+   if (aResult.IsValid() && aResult.Detected())
+   {
+      writeln("");
+      writeln("-----------------------------------------------");
+      writeln("* RcvrToTgtRange  = ", aResult.RcvrToTargetRange()/1000., "\tkm\t*");
+      writeln("* XmtrToTgtRange  = ", aResult.XmtrToTargetRange()/1000., "\tkm\t*");
+      writeln("* RcvdPower       = ", aResult.RcvdPower(), "\tdBW\t*");
+      writeln("* NoisePower      = ", aResult.RcvrNoise(), "\tdBw\t*");
+      writeln("* SNR             = ", aResult.SignalToInterference(), "\tdB\t*");
+      writeln("* BoltzmannConst  = ", MATH.BOLTZMANN_CONSTANT(), "\tJ/K\t*");
+      writeln("* C(SpeedOfLight) = ", MATH.LIGHT_SPEED(), "\tm/s\t*");
+      writeln("-----------------------------------------------");
+      writeln("");
+   }
+end_script
+
+observer
+   enable SENSOR_DETECTION_ATTEMPT
+end_observer
+
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+terrain
+   #load_cme_terrain
+end_terrain
+
+end_time .9 sec

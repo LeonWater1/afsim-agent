@@ -1,0 +1,774 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+platform 10_iads_cmdr IADS_CMDR
+  side red
+
+  commander SELF
+  position 36:42:24n 114:33:00w  altitude 0.0 m agl
+end_platform
+
+platform 100_radar_company RADAR_COMPANY
+  side red
+
+  commander 10_iads_cmdr
+  position 37:19:53n 114:25:06w  altitude 0.0 m agl
+end_platform
+
+platform 200_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 100_radar_company
+  position 38:00:54n 114:52:03w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  150.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 300_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 100_radar_company
+  position 38:00:52n 114:51:48w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  155.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 400_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 100_radar_company
+  position 37:42:27n 113:52:39w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  160.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 500_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 100_radar_company
+  position 37:41:57n 113:53:19w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  165.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 600_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 100_radar_company
+  position 37:19:53n 114:25:06w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  170.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 700_radar_company RADAR_COMPANY
+  side red
+
+  commander 10_iads_cmdr
+  position 36:54:14n 115:03:03w  altitude 0.0 m agl
+end_platform
+
+platform 800_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 36:54:14n 115:03:03w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  175.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 900_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 36:54:14n 115:03:03w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  180.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1000_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 37:05:42n 114:51:20w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  185.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1100_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 37:04:27n 115:36:48w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  190.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1200_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 37:04:46n 115:36:20w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  200.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1300_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 37:04:38n 115:35:57w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  205.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1400_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 700_radar_company
+  position 36:39:17n 115:32:52w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  210.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1500_radar_company RADAR_COMPANY
+  side red
+
+  commander 10_iads_cmdr
+  position 36:39:27n 114:44:54w  altitude 0.0 m agl
+end_platform
+
+platform 1600_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:39:27n 114:44:54w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  220.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1700_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:30:20n 114:47:59w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  225.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1800_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:31:27n 114:46:32w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  230.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 1900_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:31:28n 114:46:11w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  235.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2000_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:27:40n 114:33:49w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  240.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2100_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 1500_radar_company
+  position 36:27:35n 114:34:15w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  245.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2200_radar_company RADAR_COMPANY
+  side red
+
+  commander 10_iads_cmdr
+  position 36:45:11n 114:12:21w  altitude 0.0 m agl
+end_platform
+
+platform 2300_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 2200_radar_company
+  position 36:45:11n 114:12:21w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  250.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2400_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 2200_radar_company
+  position 36:45:10n 114:12:21w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  150.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2500_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 2200_radar_company
+  position 36:33:13n 113:29:07w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  155.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2600_ew_radar EW_RADAR
+  side red
+  icon Ground_Radar
+  commander 2200_radar_company
+  position 36:45:33n 114:11:43w  altitude 0.0 m agl
+
+  edit sensor ew_radar
+     transmitter
+        frequency  160.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2900_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 2910_acq_radar ACQ_RADAR
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  2800.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 2920_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 2930_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 2940_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 2950_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 2960_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 2970_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 2900_large_sam_battalion
+  position 36:59:24n 114:47:28w  altitude 0.0 m agl
+end_platform
+
+platform 3000_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3010_acq_radar ACQ_RADAR
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  2900.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3020_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3030_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3040_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3050_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3060_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3070_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3000_large_sam_battalion
+  position 36:42:12n 114:45:27w  altitude 0.0 m agl
+end_platform
+
+platform 3100_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3110_acq_radar ACQ_RADAR
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  3000.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3120_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3130_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3140_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3150_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3160_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3170_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3100_large_sam_battalion
+  position 36:54:02n 114:59:58w  altitude 0.0 m agl
+end_platform
+
+platform 3200_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3210_acq_radar ACQ_RADAR
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  3100.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3220_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3230_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3240_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3250_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3260_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3270_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3200_large_sam_battalion
+  position 36:55:57n 114:16:55w  altitude 0.0 m agl
+end_platform
+
+platform 3300_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3310_acq_radar ACQ_RADAR
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  3200.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3320_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3330_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3340_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3350_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3360_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3370_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3300_large_sam_battalion
+  position 37:06:53n 114:55:19w  altitude 0.0 m agl
+end_platform
+
+platform 3400_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3410_acq_radar ACQ_RADAR
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  3300.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3420_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3430_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3440_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3450_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3460_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3470_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3400_large_sam_battalion
+  position 36:55:19n 115:06:40w  altitude 0.0 m agl
+end_platform
+
+platform 3500_large_sam_battalion LARGE_SAM_BATTALION
+  side red
+
+  commander 10_iads_cmdr
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+  use_zone 100_battalion_sector as battalion_sector
+end_platform
+
+platform 3510_acq_radar ACQ_RADAR
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+
+  edit sensor acq_radar
+     transmitter
+        frequency  3400.0 mhz
+     end_transmitter
+  end_sensor
+end_platform
+
+platform 3520_large_sam_ttr LARGE_SAM_TTR
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform
+
+platform 3530_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform
+
+platform 3540_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform
+
+platform 3550_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform
+
+platform 3560_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform
+
+platform 3570_large_sam_launcher LARGE_SAM_LAUNCHER
+  side red
+
+  commander 3500_large_sam_battalion
+  position 36:30:20n 114:47:27w  altitude 0.0 m agl
+end_platform

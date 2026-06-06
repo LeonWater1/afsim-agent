@@ -1,0 +1,77 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+define_path_variable CASE state_machine
+
+file_path .
+file_path ../..
+include_once platforms/common.txt
+include_once platforms/state_machine_striker.txt
+
+event_pipe
+enable BEHAVIOR_TOOL
+file output/$(CASE).aer
+end_event_pipe
+
+random_seed 731165679
+
+end_time  60.0 min
+
+
+platform Blue_checkpoint_1 WSF_PLATFORM
+   side blue
+   position 01:00:00.00n 03:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Blue_checkpoint_2 WSF_PLATFORM
+   side blue
+   position 01:00:00.00n 01:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Green_checkpoint_3 WSF_PLATFORM
+   side green
+   position 00:00:00.00n 03:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Green_checkpoint_2 WSF_PLATFORM
+   side green
+   position 00:30:00.00n 02:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Green_checkpoint_1 WSF_PLATFORM
+   side green
+   position 00:00:00.00n 01:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Red_checkpoint_1 WSF_PLATFORM
+   side red
+   position 01:00:00.00s 03:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform Red_checkpoint_2 WSF_PLATFORM
+   side red
+   position 01:20:00.00s 02:20:00.00e altitude 30000 ft agl
+end_platform
+
+platform Red_checkpoint_3 WSF_PLATFORM
+   side red
+   position 00:40:00.00s 01:40:00.00e altitude 30000 ft agl
+end_platform
+
+platform Red_checkpoint_4 WSF_PLATFORM
+   side red
+   position 01:00:00.00s 01:00:00.00e altitude 30000 ft agl
+end_platform
+
+platform  Blue_1  STRIKER
+   icon        F-22
+   side        blue
+   position 00:30:00.00n 03:00:00.00e altitude 30000 ft agl
+   heading 0 deg
+end_platform

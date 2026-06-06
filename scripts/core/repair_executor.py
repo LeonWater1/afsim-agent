@@ -104,7 +104,7 @@ def _load_task_reference_script(task: dict[str, Any]) -> str:
         return ""
 
     candidates = [
-        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / "benchmarks" / "benchmark_extended" / source_hint,
         ROOT / source_hint,
     ]
     for reference_path in candidates:

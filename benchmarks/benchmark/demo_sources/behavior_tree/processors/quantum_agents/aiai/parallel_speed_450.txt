@@ -1,0 +1,40 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+advanced_behavior speed_450
+   script_variables
+      bool commandIssued = false;
+      bool reachedSpeed = false;
+   end_script_variables
+
+   precondition
+      return Success();
+   end_precondition
+   
+   execute
+      if (reachedSpeed)
+      {
+         return Success("450 m/s reached!");
+      }
+
+      if (PLATFORM.Speed() >= 449.8 && PLATFORM.Speed() <= 450.2)
+      {
+         reachedSpeed = true;
+      }
+      
+      if (!commandIssued)
+      {
+         PLATFORM.GoToSpeed(450);
+         commandIssued = true;
+      }
+      
+      return Running("Going to 450 m/s");
+   end_execute
+   
+end_advanced_behavior

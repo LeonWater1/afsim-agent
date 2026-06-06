@@ -1,0 +1,26 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once asv_radar.txt
+include_once sensors/ew_radar.txt
+
+platform_type EW_RADAR ASV_RADAR
+  icon Ground_Radar
+  category 2D_RADAR
+
+  sensor ew_radar EW_RADAR
+     on
+     internal_link data_mgr
+     ignore_same_side
+  end_sensor
+end_platform_type

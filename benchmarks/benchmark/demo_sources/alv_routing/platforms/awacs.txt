@@ -1,0 +1,44 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+radar_signature AWACS_RADAR_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+platform_type AWACS WSF_PLATFORM
+   icon abn_cmdr
+   radar_signature AWACS_RADAR_SIGNATURE
+
+   mover WSF_AIR_MOVER
+     maximum_radial_acceleration .5 g
+     maximum_linear_acceleration .5 g
+   end_mover
+
+   comm rcvr-1 WSF_RADIO_RCVR
+      frequency 1200 mhz
+   end_comm
+
+   comm xmtr-1 WSF_RADIO_XMTR
+      frequency 1200 mhz
+   end_comm
+
+   // The 'perfect' ESM device.  It can perfectly locate any transmitter in L-band
+   sensor esm-1 WSF_ESM_SENSOR
+      on
+      frame_time 5 sec
+      frequency_band 1000 mhz 2000 mhz    // L-band
+      reports_location
+      reports_frequency
+      processor track-proc
+      ignore no_awacs_esm
+   end_sensor
+
+   processor track-proc WSF_TRACK_PROCESSOR
+      update_interval 2 sec
+   end_processor
+end_platform_type

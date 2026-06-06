@@ -1,0 +1,34 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#----------------------------------------------------------------------
+# This file should be included first in each of the main input files.
+# It includes all of the 'type' definitions as well as the core zone
+# definitions
+#----------------------------------------------------------------------
+
+file_path .
+file_path ../../iads
+
+include event_pipe.txt
+include event_output.txt
+include terrain.txt
+
+# include common type definitions
+
+include_once platforms/common.txt
+include_once platforms/cmdr_players.txt
+include_once platforms/radar_players.txt
+include_once platforms/sam_players.txt
+include_once platforms/blue_players.txt
+
+# include common scenario files
+
+include_once scenarios/nets_zones.txt
+
+end_time 1 hrs

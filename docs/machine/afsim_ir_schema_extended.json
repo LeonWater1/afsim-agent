@@ -1,0 +1,654 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "afsim_ir_schema_extended.json",
+  "title": "AFSIM IR Schema v2",
+  "description": "Extends v1 with Logic (behavior rules, state machines, engagement/trigger logic) and Evaluation (mission phases, success criteria, observation metrics) layers. Backwards compatible: all v1 fields remain valid.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "scenario",
+    "sides",
+    "entities",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "afsim_ir_v2"
+    },
+    "scenario": {
+      "$ref": "#/$defs/scenario"
+    },
+    "sides": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/side"
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/location"
+      },
+      "default": []
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/route"
+      },
+      "default": []
+    },
+    "platform_templates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/platform_template"
+      },
+      "default": []
+    },
+    "components": {
+      "$ref": "#/$defs/components"
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "constraints": {
+      "$ref": "#/$defs/constraints"
+    },
+    "expected_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/expected_event"
+      },
+      "default": []
+    },
+    "grounding_hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/grounding_hint"
+      },
+      "default": []
+    },
+    "logic": {
+      "$ref": "#/$defs/logic",
+      "description": "Task-018: behavior rules, state machines, engagement logic, trigger/event logic"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluation",
+      "description": "Task-018: mission phases, success criteria, observation metrics"
+    }
+  },
+  "$defs": {
+    "id_string": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "domain_name": {
+      "type": "string",
+      "enum": ["air", "ground", "surface", "subsurface", "space", "cyber", "mixed"]
+    },
+    "output_name": {
+      "type": "string",
+      "enum": ["event_pipe", "event_output", "csv_event_output"]
+    },
+    "quantity_value": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "value_with_unit": {
+      "type": "object",
+      "required": ["value", "unit"],
+      "properties": {
+        "value": {"type": "number"},
+        "unit": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "position": {
+      "type": "object",
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": {"type": "string", "minLength": 1},
+        "lon": {"type": "string", "minLength": 1},
+        "altitude": {"$ref": "#/$defs/value_with_unit"}
+      },
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["name", "duration"],
+      "properties": {
+        "name": {"$ref": "#/$defs/id_string"},
+        "description": {"type": "string"},
+        "duration": {"$ref": "#/$defs/value_with_unit"},
+        "domains": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/domain_name"},
+          "default": []
+        },
+        "outputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/output_name"},
+          "default": []
+        },
+        "start_time": {
+          "$ref": "#/$defs/value_with_unit",
+          "description": "Task-018: scenario epoch / start offset"
+        }
+      },
+      "additionalProperties": false
+    },
+    "side": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "display_name": {"type": "string"},
+        "aliases": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": []
+        },
+        "doctrine": {
+          "type": "string",
+          "description": "Task-018: side-level ROE / tactical doctrine label"
+        }
+      },
+      "additionalProperties": false
+    },
+    "location": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "kind": {
+          "type": "string",
+          "enum": ["point", "area", "orbit_anchor", "named_site"]
+        },
+        "position": {"$ref": "#/$defs/position"},
+        "radius": {"$ref": "#/$defs/value_with_unit"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "route_waypoint": {
+      "type": "object",
+      "properties": {
+        "location_ref": {"$ref": "#/$defs/id_string"},
+        "position": {"$ref": "#/$defs/position"},
+        "speed": {"$ref": "#/$defs/value_with_unit"},
+        "phase": {
+          "type": "string",
+          "description": "Task-018: mission phase this waypoint belongs to"
+        }
+      },
+      "anyOf": [{"required": ["location_ref"]}, {"required": ["position"]}],
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": ["id", "kind", "waypoints"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "kind": {
+          "type": "string",
+          "enum": ["transit", "patrol", "orbit", "intercept", "egress"]
+        },
+        "waypoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/route_waypoint"}
+        },
+        "loop": {"type": "boolean", "default": false},
+        "phase_ref": {
+          "$ref": "#/$defs/id_string",
+          "description": "Task-018: mission phase this route belongs to"
+        }
+      },
+      "additionalProperties": false
+    },
+    "platform_template": {
+      "type": "object",
+      "required": ["id", "domain"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "domain": {"$ref": "#/$defs/domain_name"},
+        "type_hint": {"type": "string"},
+        "component_refs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/id_string"},
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "component_item": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "type_hint": {"type": "string"},
+        "role": {"type": "string"},
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "movers": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component_item"},
+          "default": []
+        },
+        "sensors": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component_item"},
+          "default": []
+        },
+        "weapons": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component_item"},
+          "default": []
+        },
+        "processors": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component_item"},
+          "default": []
+        },
+        "comms": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component_item"},
+          "default": []
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "entity": {
+      "type": "object",
+      "required": ["id", "role", "side", "quantity"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "role": {"type": "string"},
+        "side": {"$ref": "#/$defs/id_string"},
+        "quantity": {"$ref": "#/$defs/quantity_value"},
+        "domain": {"$ref": "#/$defs/domain_name"},
+        "template_ref": {"$ref": "#/$defs/id_string"},
+        "platform_type_hint": {"type": "string"},
+        "component_refs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/id_string"},
+          "default": []
+        },
+        "initial_location_ref": {"$ref": "#/$defs/id_string"},
+        "route_ref": {"$ref": "#/$defs/id_string"},
+        "commander_ref": {
+          "$ref": "#/$defs/id_string",
+          "description": "Task-017: entity that commands this entity"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": ["id", "type", "assignee_refs"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "type": {"type": "string"},
+        "assignee_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/id_string"}
+        },
+        "target_refs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/id_string"},
+          "default": []
+        },
+        "location_refs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/id_string"},
+          "default": []
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        },
+        "phase_ref": {
+          "$ref": "#/$defs/id_string",
+          "description": "Task-018: mission phase this task belongs to"
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "unit_system": {"type": "string"},
+        "coordinate_format": {"type": "string"},
+        "required_fields": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": []
+        },
+        "resource_limits": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        },
+        "rules_of_engagement": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {"type": "string"},
+              "action": {"type": "string"},
+              "timing": {"$ref": "#/$defs/value_with_unit"}
+            },
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "geographic_limits": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {}
+        }
+      },
+      "additionalProperties": true
+    },
+    "expected_event": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id_string"},
+        "type": {"type": "string"},
+        "actor_refs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/id_string"},
+          "default": []
+        },
+        "success_condition": {"type": "string"},
+        "phase_ref": {
+          "$ref": "#/$defs/id_string",
+          "description": "Task-018: mission phase this event belongs to"
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "earliest": {"$ref": "#/$defs/value_with_unit"},
+            "latest": {"$ref": "#/$defs/value_with_unit"}
+          },
+          "additionalProperties": true,
+          "description": "Task-018: time window for event occurrence"
+        }
+      },
+      "additionalProperties": false
+    },
+    "grounding_hint": {
+      "type": "object",
+      "required": ["label", "target_kind"],
+      "properties": {
+        "label": {"type": "string"},
+        "target_kind": {
+          "type": "string",
+          "enum": ["platform", "sensor", "weapon", "mover", "processor", "comm", "task"]
+        },
+        "candidate_types": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": []
+        },
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "logic": {
+      "type": "object",
+      "description": "Task-018: scenario-level behavioral logic and decision rules",
+      "properties": {
+        "behavior_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"$ref": "#/$defs/id_string"},
+              "description": {"type": "string"},
+              "condition": {"type": "string"},
+              "action": {"type": "string"},
+              "priority": {"type": "integer", "default": 0},
+              "applies_to": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/id_string"},
+                "description": "entity / task refs this rule applies to"
+              }
+            },
+            "required": ["id", "condition", "action"],
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "state_machines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"$ref": "#/$defs/id_string"},
+              "description": {"type": "string"},
+              "processor_ref": {"$ref": "#/$defs/id_string"},
+              "initial_state": {"type": "string"},
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string"},
+                    "on_entry": {"type": "string"},
+                    "transitions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "to": {"type": "string"},
+                          "guard": {"type": "string"}
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            },
+            "required": ["id", "initial_state"],
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "engagement_logic": {
+          "type": "object",
+          "properties": {
+            "style": {
+              "type": "string",
+              "enum": ["brawler", "scripted", "quantum_agent", "custom"],
+              "description": "Engagement decision engine type"
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "condition": {"type": "string"},
+                  "target_selection": {"type": "string"},
+                  "weapon_selection": {"type": "string"}
+                },
+                "additionalProperties": true
+              }
+            },
+            "target_prioritization": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Ordered priority list: e.g. [closest_threat, highest_value, weakest_defense]"
+            }
+          },
+          "additionalProperties": true,
+          "default": {}
+        },
+        "trigger_logic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"$ref": "#/$defs/id_string"},
+              "trigger": {
+                "type": "string",
+                "enum": ["on_detect", "on_track_loss", "on_weapon_launch", "on_platform_destroyed", "on_time", "on_message", "on_enter_area", "on_exit_area", "custom"]
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/id_string"},
+                "description": "entities / sensors whose state triggers this"
+              },
+              "action": {"type": "string"},
+              "target_refs": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/id_string"},
+                "description": "entities / tasks affected by the action"
+              }
+            },
+            "required": ["id", "trigger", "action"],
+            "additionalProperties": true
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": true,
+      "default": {}
+    },
+    "evaluation": {
+      "type": "object",
+      "description": "Task-018: mission evaluation and success measurement",
+      "properties": {
+        "mission_phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"$ref": "#/$defs/id_string"},
+              "name": {"type": "string"},
+              "order": {"type": "integer"},
+              "description": {"type": "string"},
+              "duration": {"$ref": "#/$defs/value_with_unit"},
+              "objectives": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {"$ref": "#/$defs/id_string"},
+                    "description": {"type": "string"},
+                    "task_refs": {
+                      "type": "array",
+                      "items": {"$ref": "#/$defs/id_string"}
+                    },
+                    "required_for_success": {"type": "boolean", "default": true}
+                  },
+                  "required": ["id", "description"],
+                  "additionalProperties": true
+                }
+              },
+              "entry_condition": {"type": "string"},
+              "exit_condition": {"type": "string"}
+            },
+            "required": ["id", "order"],
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "success_criteria": {
+          "type": "object",
+          "properties": {
+            "overall_condition": {"type": "string"},
+            "minimum_phases_required": {
+              "type": "array",
+              "items": {"$ref": "#/$defs/id_string"},
+              "description": "phase ids that must succeed"
+            },
+            "score_thresholds": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "number"},
+                "partial": {"type": "number"},
+                "failure": {"type": "number"}
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true,
+          "default": {}
+        },
+        "observation_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"$ref": "#/$defs/id_string"},
+              "metric_type": {
+                "type": "string",
+                "enum": ["detection_count", "kill_count", "survival_count", "time_to_complete", "distance_traveled", "message_count", "coverage_percent", "custom"]
+              },
+              "target_refs": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/id_string"}
+              },
+              "aggregation": {
+                "type": "string",
+                "enum": ["sum", "max", "min", "average", "at_end", "boolean"]
+              },
+              "unit": {"type": "string"},
+              "threshold": {"type": "number", "description": "Value that indicates success"}
+            },
+            "required": ["id", "metric_type"],
+            "additionalProperties": true
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "additionalProperties": false
+}

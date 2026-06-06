@@ -346,7 +346,7 @@ KNOWN_AFSIM_TOKENS = (
     }
 )
 
-TAXONOMY_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "machine" / "error_taxonomy_v1.json"
+TAXONOMY_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "machine" / "error_taxonomy.json"
 
 # Verified WSF_ types extracted from AFSIM 2.9.0 demo scripts that pass mission.exe.
 VALID_WSFS = {
@@ -572,7 +572,7 @@ def script_has_external_includes(lines):
 @lru_cache(maxsize=1)
 def _repo_file_name_index():
     roots = [
-        ROOT / "benchmarks" / "benchmark_v1" / "demo_sources",
+        ROOT / "benchmarks" / "benchmark" / "demo_sources",
         ROOT / "references",
         ROOT / "docs",
     ]
@@ -754,8 +754,8 @@ def check_script_language(lines):
 
     # Mission-verified API shape guards for script-processor code.
     # Sources:
-    # - benchmark_v1/demo_sources/example_scripts/proc_mover_demo.txt
-    # - benchmark_v1/demo_sources/*/brawler_script_util*.txt
+    # - benchmark/demo_sources/example_scripts/proc_mover_demo.txt
+    # - benchmark/demo_sources/*/brawler_script_util*.txt
     # - mission.exe compile diagnostics from BV1-021
     #
     # Verified good forms in the corpus are instance-style:
@@ -840,7 +840,7 @@ _SCRIPT_CONTAINER_BLOCKS = {
 }
 
 # Supplementary AFSIM commands verified in project demo sources and documentation
-# that are not in the official command index. Source: benchmark_v1/demo_sources/,
+# that are not in the official command index. Source: benchmark/demo_sources/,
 # references/sensor_types_reference.md, project SKILL.md.
 _DEMO_VERIFIED_COMMANDS = {
     "ACQ_SENSOR_NAME", 
@@ -1349,7 +1349,7 @@ _DEMO_VERIFIED_COMMANDS = {
 
 }
 
-# End tags verified in benchmark_v2 demos that supplement BLOCK_STARTS.
+# End tags verified in benchmark_extended demos that supplement BLOCK_STARTS.
 _EXTRA_END_TAGS = {
     "end_acoustic_signature", 
 "end_acquire_deltas", 

@@ -1,0 +1,526 @@
+{
+  "version": "hierarchical_generation_plan_v1",
+  "source": {
+    "source_type": "ir_examples_v1",
+    "source_id": "IRX-002",
+    "source_task_id": "BV1-003"
+  },
+  "generation_order": [
+    "scenario_scaffold",
+    "platform_layer",
+    "sensor_layer",
+    "weapon_layer",
+    "mission_layer",
+    "scenario_assembly"
+  ],
+  "layers": {
+    "scenario_scaffold": {
+      "layer_name": "scenario_scaffold",
+      "scenario_name": "air_to_air_1v1",
+      "description": "One versus one air combat scenario.",
+      "duration": {
+        "value": 300,
+        "unit": "sec"
+      },
+      "domains": [
+        "air"
+      ],
+      "outputs": [
+        "event_pipe"
+      ],
+      "side_ids": [
+        "blue",
+        "red"
+      ],
+      "location_ids": [
+        "blue_spawn",
+        "red_spawn"
+      ],
+      "constraint_keys": [
+        "coordinate_format",
+        "required_fields",
+        "unit_system"
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "platform_layer": {
+      "layer_name": "platform_layer",
+      "entities": [
+        {
+          "entity_id": "blue_fighter",
+          "role": "fighter",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "blue",
+            "row": {
+              "canonical_id": "blue",
+              "aliases": [
+                "blue",
+                "friendly",
+                "allied",
+                "我方",
+                "蓝方",
+                "友方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "fighter_aircraft_basic",
+            "row": {
+              "canonical_id": "fighter_aircraft_basic",
+              "canonical_role": "fighter",
+              "match_labels": [
+                "fighter",
+                "fighter_aircraft",
+                "战斗机",
+                "截击机",
+                "歼击机"
+              ],
+              "platform_type_hints": [
+                "fighter_aircraft",
+                "escort_fighter",
+                "intruder_aircraft"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "fighter_aircraft_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "air_mover_basic",
+                "fighter_radar_basic",
+                "air_to_air_missile_basic",
+                "track_processor_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/air_to_air/platforms/lte_fighter.txt",
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "air_mover_basic",
+                "fighter_radar_basic",
+                "air_to_air_missile_basic",
+                "track_processor_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "air_mover_basic",
+              "fighter_radar_basic",
+              "air_to_air_missile_basic",
+              "track_processor_basic"
+            ]
+          },
+          "initial_location_ref": "blue_spawn",
+          "route_ref": null,
+          "component_refs": [
+            "fighter_mover",
+            "fighter_radar",
+            "aam_basic",
+            "engage_processor"
+          ],
+          "component_families": {
+            "mover": [
+              "fighter_mover"
+            ],
+            "sensor": [
+              "fighter_radar"
+            ],
+            "weapon": [
+              "aam_basic"
+            ],
+            "processor": [
+              "engage_processor"
+            ],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "entity_id": "red_fighter",
+          "role": "fighter",
+          "domain": "air",
+          "quantity": 1,
+          "side": {
+            "matched": true,
+            "mapping_type": "side",
+            "canonical_id": "red",
+            "row": {
+              "canonical_id": "red",
+              "aliases": [
+                "red",
+                "hostile",
+                "enemy",
+                "敌方",
+                "红方",
+                "目标方"
+              ]
+            }
+          },
+          "platform_grounding": {
+            "matched": true,
+            "mapping_type": "platform",
+            "canonical_id": "fighter_aircraft_basic",
+            "row": {
+              "canonical_id": "fighter_aircraft_basic",
+              "canonical_role": "fighter",
+              "match_labels": [
+                "fighter",
+                "fighter_aircraft",
+                "战斗机",
+                "截击机",
+                "歼击机"
+              ],
+              "platform_type_hints": [
+                "fighter_aircraft",
+                "escort_fighter",
+                "intruder_aircraft"
+              ],
+              "grounding_target": {
+                "target_kind": "platform_template",
+                "target_id": "fighter_aircraft_basic",
+                "wsf_base_type": "WSF_PLATFORM"
+              },
+              "default_component_bundle": [
+                "air_mover_basic",
+                "fighter_radar_basic",
+                "air_to_air_missile_basic",
+                "track_processor_basic"
+              ],
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/air_to_air/platforms/lte_fighter.txt",
+                "benchmarks/benchmark/demo_sources/comm/group_comm_example.txt"
+              ]
+            },
+            "implementation_constraints": {
+              "grounding_target_kind": "platform_template",
+              "wsf_context_rules": [],
+              "preferred_declarations": [],
+              "default_component_bundle": [
+                "air_mover_basic",
+                "fighter_radar_basic",
+                "air_to_air_missile_basic",
+                "track_processor_basic"
+              ]
+            }
+          },
+          "platform_constraints": {
+            "grounding_target_kind": "platform_template",
+            "wsf_context_rules": [],
+            "preferred_declarations": [],
+            "default_component_bundle": [
+              "air_mover_basic",
+              "fighter_radar_basic",
+              "air_to_air_missile_basic",
+              "track_processor_basic"
+            ]
+          },
+          "initial_location_ref": "red_spawn",
+          "route_ref": null,
+          "component_refs": [
+            "fighter_mover",
+            "fighter_radar",
+            "aam_basic",
+            "engage_processor"
+          ],
+          "component_families": {
+            "mover": [
+              "fighter_mover"
+            ],
+            "sensor": [
+              "fighter_radar"
+            ],
+            "weapon": [
+              "aam_basic"
+            ],
+            "processor": [
+              "engage_processor"
+            ],
+            "comm": []
+          },
+          "missing_component_refs": [],
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "sensor_layer": {
+      "layer_name": "sensor_layer",
+      "components": [
+        {
+          "component_id": "fighter_radar",
+          "family": "sensor",
+          "role": "air_intercept_radar",
+          "type_hint": "radar_sensor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "sensor",
+            "canonical_id": "radar_sensor_basic",
+            "row": {
+              "canonical_id": "radar_sensor_basic",
+              "match_labels": [
+                "radar",
+                "radar_sensor",
+                "aesa_radar",
+                "雷达",
+                "AESA雷达"
+              ],
+              "type_hints": [
+                "radar_sensor",
+                "air_intercept_radar",
+                "acquisition_radar",
+                "tracking_radar"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_RADAR_SENSOR"
+              },
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/air_to_air/sensors/radar/aesa.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "weapon_layer": {
+      "layer_name": "weapon_layer",
+      "components": [
+        {
+          "component_id": "aam_basic",
+          "family": "weapon",
+          "role": "air_to_air_weapon",
+          "type_hint": "air_to_air_missile",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "weapon",
+            "canonical_id": "air_to_air_missile_basic",
+            "row": {
+              "canonical_id": "air_to_air_missile_basic",
+              "match_labels": [
+                "missile",
+                "aam",
+                "air_to_air_missile",
+                "空空导弹"
+              ],
+              "type_hints": [
+                "air_to_air_missile"
+              ],
+              "grounding_target": {
+                "target_kind": "wsf_type",
+                "target_id": "WSF_AIR_TO_AIR_MISSILE"
+              },
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/air_to_air/weapons/aam/medium_range_radar_missile.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "mission_layer": {
+      "layer_name": "mission_layer",
+      "processors": [
+        {
+          "component_id": "engage_processor",
+          "family": "processor",
+          "role": "air_engagement",
+          "type_hint": "fighter_engagement_processor",
+          "parameters": {},
+          "grounding": {
+            "matched": true,
+            "mapping_type": "processor",
+            "canonical_id": "fighter_engagement_basic",
+            "row": {
+              "canonical_id": "fighter_engagement_basic",
+              "match_labels": [
+                "fighter_engagement",
+                "air_engagement",
+                "空战交战",
+                "战斗机交战"
+              ],
+              "type_hints": [
+                "fighter_engagement_processor"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "fighter_engagement_behavior",
+                "script_pattern": "air_to_air_engagement_bundle",
+                "preferred_platform_template": "fighter_aircraft_basic",
+                "required_support_components": [
+                  "radar_sensor_basic",
+                  "air_to_air_missile_basic"
+                ],
+                "optional_support_components": [
+                  "datalink_basic",
+                  "track_processor_basic"
+                ]
+              },
+              "provenance": [
+                "benchmarks/benchmark/demo_sources/air_to_air/platforms/lte_fighter.txt",
+                "benchmarks/benchmark/demo_sources/air_to_air/platforms/escort.txt"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "unresolved_items": []
+        }
+      ],
+      "comms": [],
+      "routes": [],
+      "tasks": [
+        {
+          "task_id": "blue_engage_red",
+          "task_type": "air_engage",
+          "grounding": {
+            "matched": true,
+            "mapping_type": "task",
+            "canonical_id": "intercept",
+            "row": {
+              "canonical_id": "intercept",
+              "match_labels": [
+                "intercept",
+                "拦截",
+                "截击"
+              ],
+              "ir_task_types": [
+                "intercept",
+                "air_engage"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "intercept_behavior"
+              },
+              "script_realization": [
+                "processor",
+                "weapon",
+                "sensor"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "blue_fighter"
+          ],
+          "target_refs": [
+            "red_fighter"
+          ],
+          "location_refs": [],
+          "parameters": {
+            "engagement_style": "intercept"
+          },
+          "ready": true,
+          "unresolved_items": []
+        },
+        {
+          "task_id": "red_engage_blue",
+          "task_type": "air_engage",
+          "grounding": {
+            "matched": true,
+            "mapping_type": "task",
+            "canonical_id": "intercept",
+            "row": {
+              "canonical_id": "intercept",
+              "match_labels": [
+                "intercept",
+                "拦截",
+                "截击"
+              ],
+              "ir_task_types": [
+                "intercept",
+                "air_engage"
+              ],
+              "grounding_target": {
+                "target_kind": "behavior_bundle",
+                "target_id": "intercept_behavior"
+              },
+              "script_realization": [
+                "processor",
+                "weapon",
+                "sensor"
+              ]
+            },
+            "implementation_constraints": {}
+          },
+          "implementation_constraints": {},
+          "assignee_refs": [
+            "red_fighter"
+          ],
+          "target_refs": [
+            "blue_fighter"
+          ],
+          "location_refs": [],
+          "parameters": {
+            "engagement_style": "intercept"
+          },
+          "ready": true,
+          "unresolved_items": []
+        }
+      ],
+      "ready": true,
+      "unresolved_items": []
+    },
+    "scenario_assembly": {
+      "layer_name": "scenario_assembly",
+      "required_order": [
+        "scenario_scaffold",
+        "platform_layer",
+        "sensor_layer",
+        "weapon_layer",
+        "mission_layer",
+        "scenario_assembly"
+      ],
+      "end_time": {
+        "value": 300,
+        "unit": "sec"
+      },
+      "outputs": [
+        "event_pipe"
+      ],
+      "layer_readiness": {
+        "scenario_scaffold": true,
+        "platform_layer": true,
+        "sensor_layer": true,
+        "weapon_layer": true,
+        "mission_layer": true
+      },
+      "ready": true,
+      "unresolved_items": []
+    }
+  },
+  "manual_review_items": [],
+  "ready_for_generation": true
+}

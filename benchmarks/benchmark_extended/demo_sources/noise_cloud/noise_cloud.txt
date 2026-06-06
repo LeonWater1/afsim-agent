@@ -1,0 +1,54 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+platform_type target_type WSF_PLATFORM
+end_platform_type
+
+platform radar_platform WSF_PLATFORM
+   side red
+   add sensor radar WSF_RADAR_SENSOR
+      on
+      frame_time 5.0 sec
+
+      beam 1
+         transmitter
+            frequency 0.5 ghz
+            power 60 dbw
+         end_transmitter
+         receiver
+            noise_power -140 dbw
+         end_receiver
+         swerling_case 1
+      end_beam
+
+      modifier_category cloud_mod
+      reports_range
+   end_sensor
+   position 30n 90w
+end_platform
+
+noise_cloud cloud_layer WSF_NOISE_CLOUD
+   noise_frequency 3
+   noise_octaves 3
+   sensor_modifier cloud_mod 0.001
+   constant_height 3300 ft
+   scalar 5 km
+   threshold 0.6
+end_noise_cloud
+
+horizontal_map
+   target_platform_type target_type
+   target_altitude 30000 ft
+   variable pd
+   longitude_range 90.6w 89.4w
+   latitude_range 29.4n 30.6n
+   longitude_step 0.002
+   latitude_step 0.002
+   tiff_file output\noise_cloud.tiff
+end_horizontal_map

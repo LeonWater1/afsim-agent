@@ -1,0 +1,470 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include_once signatures/fighter_sigs.txt
+include_once sensors/esm_rwr/ucav_esm.txt
+include_once weapons/jammer/soj_vhf_jammer.txt
+include_once weapons/jammer/soj_sband_jammer.txt
+include_once weapons/jammer/soj_xband_jammer.txt
+
+# -------------------------------------------------------------------------
+
+# script to make jamming assignemnts based on
+# frequency band and FOV of the jamming weapons system.
+
+processor SOJ_TASK_MGR WSF_TASK_PROCESSOR
+
+   #script_debug_writes on
+   #show_state_transitions
+   #show_task_messages
+
+   script_variables
+      # Track time since updated to consider track stale
+      double mTrackUpdateStaleTime = 10.0;   # seconds
+
+      # MUST BE DIFFERENT FOR EACH JAMMER TASK MANAGER CONTROLLING DIFFERENT SYSTEMS
+      string mJamTaskStr = "SOJ_JAM";   # Reset to all caps in the on_initialize script below.
+
+      # Map of the previous signal count for the given track Id
+      Map<WsfTrackId, int> mSignalCountMap = Map<WsfTrackId, int>();
+
+
+      # Default technique to assign for threats not defined in mThreatTechniqueMap below
+      string mDefaultTechnique = "noise_jamming";
+
+      # Available types: noise_jamming, random_pulse_jamming, false_target_jamming,
+      #                  simple_false_target_jamming, track_error, jtos_gain_jamming
+      Map<string, struct> mThreatData = Map<string, struct>();
+
+      // EW Radar
+      struct ew_data = struct();
+      ew_data->mAssign = true;
+      ew_data->mTechnique = "noise_jamming";
+      #ew_data->mTechnique = "false_target_jamming";
+
+      //ACQ Radar
+      struct acq_data = struct();
+      acq_data->mAssign = true;
+      acq_data->mTechnique = "random_pulse_jamming";
+
+      //TTR Radar
+      struct ttr_data = struct();
+      ttr_data->mAssign = true;
+      ttr_data->mTechnique = "jtos_gain_jamming";
+
+      // Create data map for use by scripts
+      # Must be top level names or types, does not drill into sub-types
+      mThreatData["EW_RADAR"] = ew_data;
+      mThreatData["ACQ_RADAR"] = acq_data;
+      mThreatData["TTR_RADAR"] = ttr_data;
+
+      # Must be top level names or types, does not drill into sub-types
+      Map<string, bool> mWeaponAssignMap = Map<string, bool>();
+      mWeaponAssignMap["SOJ_VHF_JAMMER"]   = true;
+      mWeaponAssignMap["SOJ_SBAND_JAMMER"] = true;
+      mWeaponAssignMap["SOJ_XBAND_JAMMER"] = true;
+   end_script_variables
+
+   on_initialize
+      mJamTaskStr = Name().Upper();
+   end_on_initialize
+
+   # Script to determine if the given threat is in the list
+   # and its status for assignments
+   script bool AllowTrack()
+      bool allowAssign = false;
+      int emitterCount = TRACK.EmitterCount();
+      for (int i = 0; i < emitterCount; i = i + 1)
+      {
+         string emitterType = TRACK.EmitterType(i);
+         if (emitterType == "")
+         {
+            emitterType = TRACK.TargetType();
+         }
+
+         if (mThreatData.Exists(TRACK.TargetName()) &&
+             mThreatData.Get(TRACK.TargetName())->mAssign)
+         {
+            return true;
+         }
+         else if (mThreatData.Exists(emitterType) &&
+                  mThreatData.Get(emitterType)->mAssign)
+         {
+            return true;
+         }
+      }
+      return allowAssign;
+   end_script
+
+   # Script to determine if the given jammer is in the list
+   # and its status for assignments
+   # must be top level names or types, does not drill into sub-types
+   script bool AllowWeaponTasking(WsfWeapon aWeapon)
+      bool allowAssign = false;
+      if (aWeapon.IsValid() &&
+          aWeapon.IsA_TypeOf("WSF_RF_JAMMER"))
+      {
+         if (mWeaponAssignMap.Exists(aWeapon.Name()))
+         {
+            allowAssign = mWeaponAssignMap.Get(aWeapon.Name());
+         }
+         else if (mWeaponAssignMap.Exists(aWeapon.Type()))
+         {
+            allowAssign = mWeaponAssignMap.Get(aWeapon.Type());
+         }
+      }
+      return allowAssign;
+   end_script
+
+   # Script to determine the appropriate jammer types based on frequency
+   # must be top level names or types, does not drill into sub-types
+   script Map<string, bool> JammerTypes(double aFrequency)
+      Map<string, bool> jammerTypes = Map<string, bool>();
+      if (TRACK.FrequencyValid())
+      {
+         for (int i = 0; i < PLATFORM.WeaponCount(); i = i + 1)
+         {
+            WsfWeapon weapon = PLATFORM.WeaponEntry(i);
+            if (AllowWeaponTasking(weapon))
+            {
+               double minFreq = weapon.MinimumFrequency();
+               double maxFreq = weapon.MaximumFrequency();
+               if ((aFrequency >= minFreq) && (aFrequency <= maxFreq))
+                {
+                   jammerTypes[weapon.Type()] = true;
+                }
+             }
+          }
+      }
+      return jammerTypes;
+   end_script
+
+   # Script to determine the appropriate technique to use based on target type
+   script string TechniqueType(int aSignalIndex)
+      string techniqueType = mDefaultTechnique;  // default technique
+      string emitterType = TRACK.SignalEmitterType(aSignalIndex);
+      if (emitterType == "")
+      {
+         emitterType = TRACK.TargetType();
+      }
+
+      if (TRACK.IsValid())
+      {
+         if (mThreatData.Exists(TRACK.TargetName()))
+         {
+            techniqueType = mThreatData.Get(TRACK.TargetName())->mTechnique;
+         }
+         else if (mThreatData.Exists(TRACK.TargetType()))
+         {
+            techniqueType = mThreatData.Get(emitterType)->mTechnique;
+         }
+      }
+      return techniqueType ;
+   end_script
+
+   # Script to determine the appropriate bandwidth to use based on technique
+   # Note: Could also add in the target type if required
+   script double Bandwidth(int aSignalIndex, double aPulsewidth)
+      double bandwidth = 1.e6;  // default bandwidth
+      if (TechniqueType(aSignalIndex) == "false_target_jamming")
+      {
+         bandwidth = 1.0e6;
+         if (aPulsewidth > 0.0)
+         {
+            bandwidth = 1 / aPulsewidth;
+         }
+      }
+      else if (TechniqueType(aSignalIndex) == "random_pulse_jamming")
+      {
+         bandwidth = 1.5e6;
+      }
+      return bandwidth;
+   end_script
+
+   // Add spot for the current signal index in the track
+   script bool AddSpot(int aSignalIndex)
+      bool addedSpot = false;
+      WsfWeapon jammer;
+      Map<string, bool> requiredTypes = Map<string, bool>();
+      string jammerType = "";
+      double freq = TRACK.SignalFrequency(aSignalIndex);
+      requiredTypes = JammerTypes(freq);
+      for (int i=0; i < PLATFORM.WeaponCount(); i = i + 1)
+      {
+         jammer = PLATFORM.WeaponEntry(i);
+         jammerType = jammer.Type();
+         if (requiredTypes.Exists(jammerType))
+         {
+            if(PLATFORM.WithinFieldOfView(TRACK, jammer.Name()))
+            {
+               # check to see if any maximum spots have been allocated
+               if ((jammer.QuantityRemaining() > 0) || (jammer.MaximumRequestCount() == 1))
+               {
+                  string jamStr = write_str(mJamTaskStr, aSignalIndex);
+                  double pulsewidth = TRACK.SignalPW(aSignalIndex);
+                  if (StartJamming(TRACK,
+                                   jamStr,
+                                   jammer,
+                                   freq,
+                                   Bandwidth(aSignalIndex, pulsewidth),
+                                   TechniqueType(aSignalIndex)))
+                  {
+                     writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", jammer.Name(), " started jamming ",
+                               TRACK.TargetName(), ":", TRACK.SignalEmitterType(aSignalIndex),
+                               ", task=", jamStr, " freq=", freq, " BW=", Bandwidth(aSignalIndex,pulsewidth),
+                               " Technique=", TechniqueType(aSignalIndex));
+                     addedSpot = true;
+                     break;  # only allow one weapon per assignment for now, script needs work to do more than one
+                  }
+               }
+            }
+         }
+      }
+      return addedSpot;
+   end_script
+
+   # Script to start jamming a track
+   script bool StartJammingTrack()
+      bool startedJamming = false;
+      int signalCount = TRACK.SignalCount();
+      mSignalCountMap[TRACK.TrackId()] = signalCount;  // Update the signal count map
+      for (int signalIndex = 0; signalIndex  < signalCount; signalIndex = signalIndex  + 1)
+      {
+         if (AddSpot(signalIndex))
+         {
+            startedJamming = true;
+         }
+      }
+      return startedJamming;
+   end_script
+
+   # Script to update jamming assignments for a track
+   script void UpdateJammingTrack()
+      string reason = "UNKNOWN";
+      int curSignalCount = TRACK.SignalCount();
+      int prevSignalCount = mSignalCountMap[TRACK.TrackId()];
+      int loopSignalCount = MATH.Max(curSignalCount, prevSignalCount); # use the max to add/remove spots
+      for (int signalIndex = 0; signalIndex  < loopSignalCount; signalIndex = signalIndex  + 1)
+      {
+         bool addSpot = false;
+
+         string jamStr = write_str(mJamTaskStr, signalIndex);
+
+         WsfTaskList taskList = AssignedTaskList(TRACK.TrackId(), jamStr);
+         if (taskList.Count() == 0)
+         {
+            addSpot = true;
+            reason = "frequency added";
+         }
+         else if (taskList.Count() == 1)
+         {
+            WsfTask task = taskList.Entry(0);
+            bool needToStopJamming = true;
+            if (signalIndex >= curSignalCount)
+            {
+               reason = write_str("signal_", signalIndex, "_invalid");
+            }
+            else if (PLATFORM.WithinFieldOfView(TRACK, task.ResourceName()))
+            {
+               if (task.ResourceFrequency() == TRACK.SignalFrequency(signalIndex))
+               {
+                  needToStopJamming = false;
+               }
+
+               if (needToStopJamming)
+               {
+                  reason = "frequency change";
+               }
+            }
+            else
+            {
+              reason = "FOV limits";
+            }
+
+            if (needToStopJamming)
+            {
+               writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", task.ResourceName(), " stopped jamming ",
+                         TRACK.TargetName(), ":", TRACK.SignalEmitterType(signalIndex),
+                         ", task=", task.TaskType()," freq=", task.ResourceFrequency(),
+                         " due to ", reason);
+               if (CancelTask(task.TrackId(), task.TaskType(), task.ResourceName()))
+               {
+                  addSpot = true;
+               }
+            }
+         }
+         else
+         {
+            # script setup for single jamming task for now, needs work for multiples?
+            writeln("*****WARNING: More than one task found in.", PLATFORM.Name(), " jamming script.");
+         }
+
+         if (addSpot)
+         {
+             AddSpot(signalIndex);
+         }
+      }
+      mSignalCountMap[TRACK.TrackId()] = curSignalCount;
+   end_script
+
+   # script to stop jamming against the current track
+   script void StopJammingTrack(string aReasonStr)
+      WsfTaskList taskList = AssignedTaskList(TRACK.TrackId(), "");
+      foreach(WsfTask task in taskList)
+      {
+         if (task.ResourceIsJammer() && task.TaskType().StartsWith(mJamTaskStr))
+         {
+            writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), ":", task.ResourceName(), " stopped jamming ",
+                      TRACK.TargetName(), ", task=", task.TaskType()," freq=", task.ResourceFrequency(),
+                      " due to ", aReasonStr);
+            if (! CancelTask(task.TrackId(), task.TaskType(), task.ResourceName()))
+            {
+               writeln_d("FAILED");
+            }
+         }
+      }
+   end_script
+
+   # script to determine if platform is still jamming current track
+   script bool StoppedJammingTrack()
+      bool stoppedJammingTrack = true;
+      WsfTaskList taskList = AssignedTaskList(TRACK.TrackId(),"");
+      foreach(WsfTask task in taskList)
+      {
+         if (task.ResourceIsJammer() && task.TaskType().StartsWith(mJamTaskStr))
+         {
+           stoppedJammingTrack = false;
+         }
+      }
+
+      if (stoppedJammingTrack)
+      {
+         writeln_d("T=", TIME_NOW, " ", PLATFORM.Name(), " stopped jamming track ",
+                   TRACK.TargetName(), " due to all jamming assignments being stopped");
+         mSignalCountMap.Erase(TRACK.TrackId());
+      }
+      return stoppedJammingTrack;
+   end_script
+
+   # -------------------------------------------------------------------------
+
+   evaluation_interval DETECTED 1.0 sec
+   state DETECTED
+      next_state CAN_JAM
+         return ((TRACK.TimeSinceUpdated() < mTrackUpdateStaleTime) && AllowTrack());
+      end_next_state
+   end_state
+
+   evaluation_interval CAN_JAM 1.0 sec
+   state CAN_JAM
+      next_state DETECTED
+         return (TRACK.TimeSinceUpdated() >= mTrackUpdateStaleTime);
+      end_next_state
+
+      next_state IS_JAMMING
+         return StartJammingTrack();
+      end_next_state
+   end_state
+
+   evaluation_interval IS_JAMMING 1.0 sec
+   state IS_JAMMING
+      next_state CAN_JAM
+         if (TRACK.TimeSinceUpdated() < mTrackUpdateStaleTime)
+         {
+            UpdateJammingTrack();
+         }
+         else
+         {
+            StopJammingTrack("STALE_TRACK");
+         }
+         return StoppedJammingTrack();
+      end_next_state
+   end_state
+end_processor
+
+# -------------------------------------------------------------------------
+
+platform_type SOJ WSF_PLATFORM
+  icon weasel
+
+  infrared_signature FIGHTER_INFRARED_SIG
+  optical_signature  FIGHTER_OPTICAL_SIG
+  radar_signature    FIGHTER_RADAR_SIG
+
+  sensor esm UCAV_ESM
+     on
+     internal_link data_mgr
+     ignore_same_side
+  end_sensor
+
+  mover WSF_AIR_MOVER
+    default_radial_acceleration 2.0 g
+    at_end_of_path remove
+  end_mover
+
+  weapon fwd_vhf_jammer SOJ_VHF_JAMMER
+     off
+     ignore_same_side
+  end_weapon
+
+  weapon aft_vhf_jammer SOJ_VHF_JAMMER
+     off
+     yaw 180.0 deg
+     ignore_same_side
+  end_weapon
+
+  weapon fwd_sband_jammer SOJ_SBAND_JAMMER
+     off
+     ignore_same_side
+  end_weapon
+
+  weapon aft_sband_jammer SOJ_SBAND_JAMMER
+     off
+     yaw 180.0 deg
+     ignore_same_side
+  end_weapon
+
+  weapon fwd_xband_jammer SOJ_XBAND_JAMMER
+     off
+     ignore_same_side
+  end_weapon
+
+  weapon aft_xband_jammer SOJ_XBAND_JAMMER
+     off
+     yaw 180.0 deg
+     ignore_same_side
+  end_weapon
+
+  processor data_mgr WSF_TRACK_PROCESSOR
+     purge_interval   60.0 sec
+  end_processor
+
+  processor soj_task_mgr SOJ_TASK_MGR
+  end_processor
+end_platform_type
+
+route soj_orbit
+   navigation
+      label start
+         offset  20   0 km speed 450 kts altitude 35000 ft msl
+            radial_acceleration 2 g
+         offset  20   5 km speed 450 kts altitude 35000 ft msl
+            radial_acceleration 2 g
+         offset  0    5 km speed 450 kts altitude 35000 ft msl
+            radial_acceleration 2 g
+         offset  0    0 km speed 450 kts altitude 35000 ft msl
+            radial_acceleration 2 g
+      goto start
+   end_navigation
+end_route
+

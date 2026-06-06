@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Direct Prompt and RAG baselines for benchmark_v2 Type A."""
+"""Direct Prompt and RAG baselines for benchmark_extended Type A."""
 import argparse, json, sys
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -42,7 +42,7 @@ def _load_rag_corpus():
     refs = {}     # name -> text (reference docs)
 
     # Load demo scripts from both benchmark dirs for maximum coverage
-    for bench_dir in ["benchmark_v1", "benchmark_v2"]:
+    for bench_dir in ["benchmark", "benchmark_extended"]:
         demo_root = ROOT / "benchmarks" / bench_dir / "demo_sources"
         if demo_root.exists():
             for path in demo_root.rglob("*.txt"):
@@ -161,7 +161,7 @@ def run_one(task: dict, client: LLMClient, mode: str, out_dir: Path) -> dict:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["direct", "rag"], required=True)
-    parser.add_argument("--benchmark", default="benchmarks/benchmark_v2/type_a_instruction_to_script.jsonl")
+    parser.add_argument("--benchmark", default="benchmarks/benchmark_extended/type_a_instruction_to_script.jsonl")
     parser.add_argument("--model", default="deepseek-v4-flash")
     parser.add_argument("--max-workers", type=int, default=27)
     args = parser.parse_args()

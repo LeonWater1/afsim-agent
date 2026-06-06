@@ -1,0 +1,327 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# Simple barrage jammer example.
+#
+# BARRAGE_JAMMER uses a wide bandwidth to jamm the EW_RADAR
+#
+# The power is spread across the bandwidth thus reducing the effectiveness
+# on any one radar but capable of jamming more radars.
+#
+
+# ****************************************************************************
+# Define the system types (movers, sensors, weapons, etc.)
+# ****************************************************************************
+
+define_path_variable CASE esm_detect_jammer
+log_file output/$(CASE).log
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 10 m^2
+end_radar_signature
+
+radar_signature WIDE_BODY_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+#radar_signature GROUND_SITE_RADAR_SIGNATURE
+#  constant 10 m^2
+#end_radar_signature
+
+# ****************************************************************************
+#                       Barrage Jammer
+
+antenna_pattern BARRAGE_JAMMER_ANTENNA
+  circular_pattern
+     peak_gain 10 dB
+     beamwidth 10 deg
+  end_circular_pattern
+end_antenna_pattern
+
+weapon BARRAGE_JAMMER WSF_RF_JAMMER
+   transmitter
+      power           100 w
+      frequency       900 mhz
+      bandwidth        10 mhz
+      antenna_pattern BARRAGE_JAMMER_ANTENNA
+   end_transmitter
+end_weapon
+
+# ****************************************************************************
+#                     Early Warning Radar
+
+antenna_pattern EW_RADAR_ANTENNA
+  rectangular_pattern
+     peak_gain           35 dB
+     minimum_gain       -20 dB
+     azimuth_beamwidth   10 deg
+     elevation_beamwidth 45 deg
+  end_rectangular_pattern
+end_antenna_pattern
+
+# A simple EW radar (this somewhat corresponds to the EW/GCI radar defined
+# in the Suppressor Obruty demo)
+
+sensor EW_RADAR WSF_RADAR_SENSOR
+
+   frame_time                1  sec
+
+   # Specify the location and orientation of the sensor on the platform.
+   location                  0.0 0.0 -30 m
+
+   # The sensor sweeps only in azimuth
+   scan_mode                 azimuth
+   azimuth_scan_limits       -180 deg 180 deg
+
+   # The field of view, minimum_range and maximum_range are not required.
+   # They are simply used for quick culling and should be generous.
+   # (i.e. the field_of_view limits should be probably be larger than the
+   # corresponding slew limit because the beam can probably detect things
+   # outside the slew limit).
+   elevation_field_of_view  -2.5 deg 42.5 deg
+
+   minimum_range        0 nm
+   maximum_range      400 km  # really 225 km
+
+   one_m2_detect_range 225 km
+
+   transmitter
+      power           750 kw
+      frequency       900 mhz
+      bandwidth       0.1 mhz
+      pulse_width                  10  usec
+      pulse_repetition_interval    750 usec // max PRI range of 225 km
+      antenna_pattern EW_RADAR_ANTENNA
+      antenna_tilt     10 deg
+   end_transmitter
+   receiver
+      antenna_pattern EW_RADAR_ANTENNA
+      antenna_tilt     10 deg
+      frequency       900 mhz
+      bandwidth         1 mhz
+   end_receiver
+
+   hits_to_establish_track   3 5   # 3 of last 5 scans to establish track
+   hits_to_maintain_track    1 4   # 1 of last 4 scans to maintain  track
+
+   reports_location
+   reports_velocity
+   reports_signal_to_noise
+   reports_range
+   reports_bearing
+   reports_elevation
+end_sensor
+
+# ****************************************************************************
+#                       ESM Detector
+
+antenna_pattern ESM_ANTENNA
+   constant 0 db
+end_antenna_pattern
+
+sensor ESM_SENSOR WSF_ESM_SENSOR
+   frame_time              4 sec
+
+   slew_mode               fixed
+
+   maximum_range           200 km
+
+   receiver
+      antenna_pattern      ESM_ANTENNA
+      detection_threshold  5 db
+      noise_power          -180 dbw
+      internal_loss        0 db
+   end_receiver
+
+   frequency_band          0.1 ghz  20 ghz
+
+   reports_location
+   reports_type
+   reports_frequency
+end_sensor
+
+# ****************************************************************************
+# Define the platform types
+# ****************************************************************************
+
+platform_type JAMMER_PLATFORM WSF_PLATFORM
+   icon EA-6B
+   mover WSF_AIR_MOVER end_mover
+   radar_signature WIDE_BODY_SIGNATURE
+
+   weapon jammer BARRAGE_JAMMER
+      pitch -10 deg                  // Aim jammer slightly toward the ground
+   end_weapon
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type EW_RADAR_SITE WSF_PLATFORM
+   icon Ground_Radar
+
+   mover WSF_GROUND_MOVER end_mover
+
+   sensor ew_radar EW_RADAR
+      on
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type STRIKER_PLATFORM WSF_PLATFORM
+   icon F-18E
+   side blue
+   mover WSF_AIR_MOVER end_mover
+   radar_signature FIGHTER_RADAR_SIGNATURE
+end_platform_type
+
+platform_type ESM_SITE WSF_PLATFORM
+   icon Ground_Radar
+
+   mover WSF_GROUND_MOVER end_mover
+
+   sensor esm ESM_SENSOR
+      on
+      processor track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+# ****************************************************************************
+#                        Define the platform instances
+# ****************************************************************************
+
+platform jammer JAMMER_PLATFORM
+   side blue
+   route
+      position 37:00:00n 114:30:00w
+      altitude 35000 ft
+      speed      450 kts
+      heading    270 deg
+   end_route
+
+   weapon jammer
+      on
+   end_weapon
+end_platform
+
+platform ew-radar-site EW_RADAR_SITE
+   side red
+
+   route
+      position 37:00:00n 116:00:00w
+      altitude 0.0 ft agl
+      heading   90 deg
+    end_route
+
+   sensor ew_radar
+   end_sensor
+end_platform
+
+platform esm-radar-site ESM_SITE
+   side red
+
+   route
+      position 37:01:00n 116:00:00w
+      altitude 0.0 ft agl
+      heading   90 deg
+    end_route
+
+   sensor esm
+   end_sensor
+end_platform
+
+platform striker-1 STRIKER_PLATFORM
+   side blue
+
+   route
+      position 36:27:36n 115:15:54w
+      altitude 35000 ft
+      speed     450 kts
+      heading     0 deg
+   end_route
+end_platform
+
+platform striker-2 STRIKER_PLATFORM
+   side blue
+
+   route
+      position 36:27:30n 115:04:18w
+      altitude 35000 ft
+      speed     450 kts
+      heading     0 deg
+   end_route
+end_platform
+
+event_output
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   #enable SENSOR_TRACK_INITIATED
+   #enable SENSOR_TRACK_UPDATED
+   #enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+  file output/$(CASE).evt
+end_event_output
+
+# Specify parameters for a dis_interface record object
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+terrain
+   #load_cme_terrain
+end_terrain
+
+end_time 480 sec

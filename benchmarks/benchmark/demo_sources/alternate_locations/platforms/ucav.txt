@@ -1,0 +1,55 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once weapons/agm/blue_gps_bomb_1.txt
+include_once weapons/agm/blue_glide_bomb_1.txt
+include_once signatures/ucav_infrared_sig.txt
+include_once signatures/ucav_optical_sig.txt
+include_once signatures/ucav_radar_sig.txt
+include_once processors/ucav_weapon_release.txt
+
+platform_type UCAV WSF_PLATFORM 
+   icon UCAV
+   
+   mover WSF_AIR_MOVER 
+      maximum_radial_acceleration 1.5 g
+      at_end_of_path remove
+   end_mover
+   
+   weapon blue_gps_bomb_1 BLUE_GPS_BOMB_1 
+      quantity 2
+   end_weapon
+   
+   weapon blue_glide_bomb_1 BLUE_GLIDE_BOMB_1 
+      quantity 6
+   end_weapon
+   
+   processor fire-em UCAV_WEAPON_RELEASE 
+   end_processor
+   
+   # routes are offsets from the chosen start position
+   route
+      offset 0 0 nm altitude 35000 ft
+      speed 480 kts
+      offset 133 0 nm altitude 35000.00 ft
+      offset 11 15 nm altitude 35000.00 ft
+      offset 0 15 nm altitude 35000.00 ft
+      offset -11 15 nm altitude 35000.00 ft
+      offset -133 0 nm altitude 35000.00 ft
+   end_route
+   
+   # enables platform to move "instantaneously" to full-speed
+   execute at_time 1 s absolute 
+      PLATFORM.GoToSpeed(247,247,true);
+   end_execute
+   
+   radar_signature UCAV_RADAR_SIG
+   infrared_signature UCAV_INFRARED_SIG
+   optical_signature UCAV_OPTICAL_SIG
+end_platform_type

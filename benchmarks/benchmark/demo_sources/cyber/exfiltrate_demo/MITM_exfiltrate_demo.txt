@@ -1,0 +1,85 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+log_file output/cyber_script_effect_demo.log
+
+include_once setup.txt
+
+include_once scenarios/iads_laydown.txt
+
+radar_signature basic_plane WSF_RADAR_SIGNATURE 
+   constant 10 m^2
+end_radar_signature
+
+platform red_returning WSF_PLATFORM
+   icon fighter
+   side red
+   radar_signature basic_plane
+
+   add mover WSF_AIR_MOVER
+      route 
+         position 34:35:01.08n 117:02:39.89w altitude 35000 ft
+            speed 460 kts
+         position 38:26:31.955n 117:12:26.494w
+            altitude 35000 ft 
+      end_route
+   end_mover
+end_platform
+
+cyber_effect EXFILTRATE WSF_CYBER_MAN_IN_THE_MIDDLE_EFFECT 
+   default 
+      exfiltrate true
+      all
+   end_default
+end_cyber_effect
+
+cyber_attack EXFILTRATE WSF_CYBER_ATTACK
+   effect EXFILTRATE 
+end_cyber_attack
+
+platform blue_cyber_awacs WSF_PLATFORM
+   icon awacs
+   side blue
+   
+   radar_signature basic_plane
+   
+   add mover WSF_AIR_MOVER
+      route 
+         label start
+         position 38:04:17.28n 110:13:06.09w altitude 35000 ft
+            speed 460 kts
+         position 38:32:27n 111:33:41w
+            altitude 35000 ft
+         position 39:35:42n 110:28:34w
+         position 38:12:12n 110:14:21w 
+         goto start
+      end_route
+   end_mover
+   
+   add processor data_proc WSF_TRACK_PROCESSOR 
+   end_processor
+   
+   add comm exfiltrate_comm WSF_COMM_RCVR
+      internal_link data_proc
+   end_comm
+   
+   execute at_time 1 s absolute
+      PLATFORM.CyberAttack(WsfSimulation.FindPlatform("10_iads_cmdr"), "EXFILTRATE");
+   end_execute
+end_platform
+
+event_pipe 
+   file output/mitm_exfiltrate.aer
+   use_preset full
+#disable DRAW
+end_event_pipe
+
+end_time 1 hour
+

@@ -1,0 +1,91 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# 160 mm rocket as used by the LAR-160.
+# source: http://www.ffi.no/no/Rapporter/09-00179.pdf p.103
+
+include_once ./fires_base_types.txt
+
+launch_computer FIRES_160MM_ROCKET_LAUNCH_COMPUTER WSF_FIRES_LAUNCH_COMPUTER
+  fires_elevation_angle_table FIRES_160MM_ROCKET
+     12000 5.6 17.4
+     13000 6.3 19.7
+     14000 7.3 22.3
+     15000 8.3 25.2
+     16000 9.5 28.3
+     17000 10.8 31.4
+     18000 12.2 34.6
+     19000 13.8 38.1
+     20000 15.5 41.7
+     21000 17.3 45.4
+     22000 19.2 49.2
+     23000 21.2 53.2
+     24000 23.3 57.3
+     25000 25.6 61.8
+     26000 27.9 66.4
+     27000 30.3 71.2
+     28000 32.9 76.4
+     29000 35.6 82.0
+     30000 38.6 88.2
+     31000 41.5 94.1
+     32000 44.6 100.2
+     33000 47.9 106.5
+     34200 55.6 120.7
+  end_fires_elevation_angle_table
+end_launch_computer
+
+weapon_effects FIRES_160MM_ROCKET_EFFECTS WSF_GRADUATED_LETHALITY
+  radius_and_pk  250.0 m 0.50
+  radius_and_pk   65.0 m 0.90
+  radius_and_pk   40.0 m 0.99
+  allow_incidental_damage
+end_weapon_effects
+
+weapon FIRES_160MM_ROCKET WSF_IMPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_160MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_160MM_ROCKET
+   weapon_effects FIRES_160MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_160MM_ROCKET WSF_PLATFORM
+   side red
+   category RAM
+   icon SA-10_Missile
+   mover WSF_FIRES_MOVER
+      #debug enabled
+   end_mover
+end_platform_type
+
+weapon FIRES_160MM_ROCKET_EXPLICIT WSF_EXPLICIT_WEAPON
+   quantity 1000
+   salvo_interval 0.5 seconds
+   launch_computer
+      FIRES_160MM_ROCKET_LAUNCH_COMPUTER
+   end_launch_computer
+   launched_platform_type FIRES_160MM_ROCKET
+   weapon_effects FIRES_160MM_ROCKET_EFFECTS
+end_weapon
+
+platform_type FIRES_160MM_ROCKET_EXPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_160mm_rocket FIRES_160MM_ROCKET_EXPLICIT
+   end_weapon
+end_platform_type
+
+platform_type FIRES_160MM_ROCKET_IMPLICIT_LAUNCHER FIRES_LAUNCHER
+   side red
+   icon mil_SS-Launcher-LR
+   weapon fires_160mm_rocket FIRES_160MM_ROCKET
+   end_weapon
+end_platform_type
+

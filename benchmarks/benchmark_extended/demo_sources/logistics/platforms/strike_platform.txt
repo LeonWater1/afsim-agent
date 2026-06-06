@@ -1,0 +1,131 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# This base class is specialized, appropriate only for strike platforms.  The SPs
+# are subject to engine departure reliability issues, and must be repaired and fueled
+# before takeoff.  See the strike_controller file for more details.
+
+include_once ./logistics_platform.txt
+include_once processors/strike_controller.txt
+
+platform_type STRIKE_PLATFORM LOGISTICS_PLATFORM
+
+   icon F-18
+
+   script_variables
+      WsfProcessor strikeController;
+   end_script_variables
+
+   edit processor exchanger
+
+      edit container fuel_container
+         commodity JP-8_FUEL
+            maximum_mass_quantity 6200.0 kg
+            maximum_mass_rate       12.0 kg/sec # fuel in 8.6 min
+         end_commodity
+         initial_mass_quantity 6200.0 kg # FULL (may edit later)
+      end_container
+
+      edit transactor fuel_requesting_transactor
+          #debug
+          hook_to_fuel true # tie this to fuel quantity!
+          time_out_clock_interval  3.0 sec
+      end_transactor
+
+      edit container good_engine_container
+         service ENGINE_REPAIR
+            maximum_quantity 2.0
+            service_interval 2 sec # Rediculously fast..., but will be constrained by provider.
+         end_service
+         initial_quantity 2.0
+      end_container
+
+      edit transactor repair_requesting_transactor
+         #debug
+         container_name good_engine_container
+         is_receiver
+         proximity_limit         300 m     # If the transacting platforms are more than this distance apart,
+                                           # the transaction will not be allowed to take place.
+         time_out_clock_interval  3.0 sec
+      end_transactor
+
+   end_processor
+
+   processor strike_controller STRIKE_CONTROLLER
+   end_processor
+
+   fuel WSF_FUEL
+      maximum_quantity 6200.0 kg
+      initial_quantity 6200.0 kg
+      consumption_rate 100 kg/hr
+   end_fuel
+
+   mover WSF_AIR_MOVER
+      maximum_speed 200 kts
+      minimum_speed  80 kts
+      maximum_linear_acceleration 0.5 g
+      maximum_radial_acceleration 0.5 g
+      update_interval 5 sec
+   end_mover
+
+   script bool SP_Init()
+
+      bool success = LP_Init();
+
+      WsfProcessor p2 = PLATFORM.Processor("strike_controller");
+      if (p2.IsValid())
+      {
+         Array<Object> p2args = Array<string>();
+         p2args.PushBack(fuelContainer);
+         p2args.PushBack(repairContainer);
+         p2args.PushBack(fuelRequestTransactor);
+         p2args.PushBack(repairRequestTransactor);
+         p2args.PushBack(runSilent);
+
+         bool rcOk = (bool)p2.Execute("SC_Init", p2args);
+
+         if (! rcOk)
+         {
+            # Redundant Say("SC_Init() FAILED.");
+            success = false;
+         }
+      }
+      else
+      {
+         Say("Processor 'strike_controller' not found.");
+         success = false;
+      }
+
+      if (success)
+      {
+         Say("SP_Init() succeeded.");
+         isInitialized = true;
+      }
+      else
+      {
+         Say("SP_Init() FAILED.");
+      }
+      return success;
+
+   end_script
+
+   on_initialize2
+
+      bool success = SP_Init();
+      if (success)
+      {
+         Say("STRIKE_PLATFORM Initialize() succeeded.");
+      }
+      else
+      {
+         Say("STRIKE_PLATFORM Initialize() FAILED.");
+      }
+
+   end_on_initialize2
+
+end_platform_type

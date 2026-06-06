@@ -1,0 +1,382 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# ------------------------------------------------------------------------------
+#                           Jamming Scenario
+#
+#     Initial Conditions; Time T0:
+#     -  Blue Surveillance is in constant contact with Blue Fighters.
+#     -  Blue Fighters do not have radars turned on or are facing forward only.
+#     -  Red Jammer is OFF.
+#     -  Blue Surveillance detects Red Fighters and
+#        communicates situational awareness to Blue Fighters.
+#     Observations at Time T0:
+#     -  Log file states that Blue Fighters receive Red Fighter location
+#        from Blue Surveillance.
+#
+#     Time T1:
+#     -  Red Jammer is turned ON.
+#     -  Blue Surveillance cannot communicate
+#        location of Red Fighters to Blue Fighters.
+#     Observations at Time T1:
+#     -  Log file states that Blue Fighters are not
+#        receiving off-board communications.
+#
+#     Platforms
+#     -  Blue Surveillance a/c
+#           fixed altitude and moves northward at fixed speed
+#     -  Blue Fighters are at same altitude as Blue Surveillance and
+#           moves northward at same speed as Blue Surveillance
+#
+#     -  Red Jammer a/c
+#           same altitude as Blue Surveillance and matches speed
+#     -  Red Fighters are at same altitude as Blue Fighters and match speed
+#
+# ------------------------------------------------------------------------------
+#
+define_path_variable  CASE comm_jamming
+log_file output/$(CASE).log
+
+//-----------------------------------------------------------------
+// Setup the event_pipe
+//-----------------------------------------------------------------
+event_pipe
+   file output/$(CASE).aer
+   use_preset full
+end_event_pipe
+
+//-----------------------------------------------------------------
+// Setup the scripting interface
+//-----------------------------------------------------------------
+script_interface
+   debug
+end_script_interface
+
+//-----------------------------------------------------------------
+// Comm Devices
+//-----------------------------------------------------------------
+electronic_warfare RADIO_EP WSF_ELECTRONIC_PROTECT
+   technique processing_gain WSF_EP_TECHNIQUE
+      mitigated_techniques
+         noise_jamming
+      end_mitigated_techniques
+      effect proc_gain WSF_POWER_EFFECT
+         signal_power_gain 3 db
+      end_effect
+   end_technique
+end_electronic_warfare
+
+antenna_pattern RADIO_ANTENNA_PATTERN
+   uniform_pattern
+   peak_gain 10 dB
+end_uniform_pattern
+end_antenna_pattern
+
+comm RADIO WSF_RADIO_TRANSCEIVER
+   //debug
+   maximum_range 100 nm
+   transmit_mode continuous               // default: intermittent
+   transmitter
+      power 100 w
+      antenna_pattern RADIO_ANTENNA_PATTERN
+      frequency 2.4 GHz
+      bandwidth 5.0 MHz
+   end_transmitter
+   receiver
+      antenna_pattern RADIO_ANTENNA_PATTERN
+      frequency 2.4 GHz
+      bandwidth 1 MHz
+      electronic_protect RADIO_EP end_electronic_protect
+   end_receiver
+
+   jamming_perception_threshold 3.0 db
+   jamming_perception_timeout   60 sec
+end_comm
+
+//-----------------------------------------------------------------
+// BLUE Platforms
+//-----------------------------------------------------------------
+platform_type SURVEILLANCE-TYPE WSF_PLATFORM
+
+   // Define the nodes's communication device
+   comm radio RADIO
+      //debug
+   end_comm
+
+   processor track-proc WSF_TRACK_PROCESSOR
+      report_to subordinates via radio
+   end_processor
+
+   // Add sensor that will transmit messages
+   sensor my-sensor WSF_GEOMETRIC_SENSOR
+      on
+      ignore_same_side
+      internal_link track-proc
+      frame_time 5 sec
+      hits_to_establish_track 1 1
+      hits_to_maintain_track 1 1
+
+      reports_location
+      //reports_signal_to_noise
+   end_sensor
+
+   // Define the mover
+   mover WSF_AIR_MOVER
+      default_linear_acceleration 1.0 g
+      default_radial_acceleration 1.0 g
+      default_climb_rate 200 fps
+   end_mover
+end_platform_type
+
+platform blue-surveillance SURVEILLANCE-TYPE
+   icon AWACS
+   side blue
+
+   commander SELF                            // SELF is reserved name
+
+   // Set up route (all other aircraft will be offset from this route)
+   route
+      position 25:00:00n 54:00:00e altitude 20000 ft speed 400 kts
+      position 32:00:00n 54:00:00e altitude 20000 ft speed 400 kts
+   end_route
+end_platform
+
+// --- Define BLUE Fighter type
+platform_type BLUE-FIGHTER WSF_PLATFORM
+   icon F-18E
+   side blue
+
+   commander blue-surveillance
+
+   // Define the mover
+   mover WSF_AIR_MOVER
+      default_linear_acceleration 1.0 g
+      default_radial_acceleration 1.0 g
+      default_climb_rate 200 fps
+   end_mover
+
+   // Define the node's communication device
+   comm radio RADIO
+      //debug
+      internal_link track-proc
+   end_comm
+   
+   processor track-proc WSF_TRACK_PROCESSOR
+      purge_interval 60 sec
+    
+      on_message 
+         type WSF_TRACK_MESSAGE
+            script
+               WsfTrackMessage trackMsg = (WsfTrackMessage)MESSAGE;
+               writeln("T=", TIME_NOW, " Received track: ", trackMsg.Track().TrackId().ToString());
+            end_script
+            default
+               script
+                  writeln("T=", TIME_NOW, " Received other message");
+         end_script
+      end_on_message
+   end_processor
+end_platform_type
+
+platform blue-fighter-1 BLUE-FIGHTER
+   // --- Add Offset Mover
+   delete mover
+   add mover WSF_OFFSET_MOVER
+      update_interval 1.5 sec
+      update_time_tolerance .25 sec
+      attachment_type rigid
+      reference_platform blue-surveillance
+      offset_from_reference -450 m -900 m 0 m
+      orphan_action extrapolate
+   end_mover
+end_platform
+
+platform blue-fighter-2 BLUE-FIGHTER
+   delete mover
+   // --- Add Offset Mover
+   add mover WSF_OFFSET_MOVER
+      update_interval 1.5 sec
+      update_time_tolerance .25 sec
+      attachment_type rigid
+      reference_platform blue-surveillance
+      offset_from_reference -450 m 950 m 0 m
+      orphan_action extrapolate
+   end_mover
+end_platform
+
+//-----------------------------------------------------------------
+// Jammer
+//-----------------------------------------------------------------
+
+electronic_warfare JAM_EA WSF_ELECTRONIC_ATTACK
+   technique noise_jamming WSF_EA_TECHNIQUE
+      mitigation_class noise_jamming
+      effect noise_effect WSF_POWER_EFFECT
+         jamming_delta_gain 0 dB
+      end_effect
+   end_technique
+end_electronic_warfare
+
+antenna_pattern SPOT_JAMMER_ANTENNA
+  uniform_pattern
+     peak_gain 10 dB
+  end_uniform_pattern
+end_antenna_pattern
+
+weapon SPOT_JAMMER WSF_RF_JAMMER
+   #ignore_same_side
+   transmitter
+      power           1000 w
+      frequency       2.4 GHz
+      bandwidth         1 mhz
+      antenna_pattern SPOT_JAMMER_ANTENNA
+      electronic_attack JAM_EA end_electronic_attack
+   end_transmitter
+end_weapon
+
+//-----------------------------------------------------------------
+// RED Platforms
+//-----------------------------------------------------------------
+
+platform_type JAMMER-TYPE WSF_PLATFORM
+   // --- attach jammer
+   weapon jammer SPOT_JAMMER
+   //debug
+   off
+   end_weapon
+end_platform_type
+
+platform red-jammer JAMMER-TYPE
+   icon EA-6B
+   side red
+
+   // --- Add Offset Mover
+   add mover WSF_OFFSET_MOVER
+      update_interval 1.5 sec
+      update_time_tolerance .25 sec
+      attachment_type rigid
+      reference_platform blue-surveillance
+      offset_from_reference -3200 m -1000 m 0 m    // about 2 mi back
+      orphan_action extrapolate
+   end_mover
+
+   execute at_time 1000.0 sec absolute
+      WsfWeapon jammer = PLATFORM.Weapon("jammer");
+      // Any of the jamming routines can be used at this point
+      jammer.StartJamming(2400000000., 1000000., "noise_jamming");
+      #jammer.SetEA_DeltaGainTechnique("power_adjust", true, "delta_power", -3.0, "", "SENSOR", 0.0, 0.0);
+   end_execute
+end_platform
+
+// --- Define RED Fighter type
+platform_type RED-FIGHTER WSF_PLATFORM
+   icon MiG-25
+   side red
+end_platform_type
+
+platform red-fighter-1 RED-FIGHTER
+   // --- Add Offset Mover
+   add mover WSF_OFFSET_MOVER
+      update_interval 1.5 sec
+      update_time_tolerance .25 sec
+      attachment_type rigid
+      reference_platform blue-surveillance
+      offset_from_reference -6500 m -500 m 0 m    // about 4 mi back
+      orphan_action extrapolate
+   end_mover
+end_platform
+
+platform red-fighter-2 RED-FIGHTER
+   // --- Add Offset Mover
+   add mover WSF_OFFSET_MOVER
+      update_interval 1.5 sec
+      update_time_tolerance .25 sec
+      attachment_type rigid
+      reference_platform blue-surveillance
+      offset_from_reference -6550 m 550 m 0 m     // about 4 mi back
+      orphan_action extrapolate
+   end_mover
+end_platform
+
+//-----------------------------------------------------------------
+// Event Output
+//-----------------------------------------------------------------
+event_output
+   enable COMM_TURNED_OFF
+   enable COMM_TURNED_ON
+   enable JAMMING_ATTEMPT
+   enable JAMMING_REQUEST_CANCELED
+   enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   enable MESSAGE_DELIVERY_ATTEMPT
+   enable MESSAGE_DISCARDED
+   enable MESSAGE_UPDATED
+   enable MESSAGE_QUEUED
+   enable MESSAGE_RECEIVED
+   enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   #enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   #enable SENSOR_TRACK_INITIATED
+   #enable SENSOR_TRACK_UPDATED
+   #enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+   file output/$(CASE)_2.evt
+end_event_output
+
+//-----------------------------------------------------------------
+// End of Input File
+//-----------------------------------------------------------------
+end_time 120 min
+
+
+script void MessageReceived(WsfComm aXmtr, WsfComm aRcvr, WsfMessage aMsg, WsfCommInteraction aResult)
+
+   if (aRcvr.JammingPerceived())
+    {
+      writeln("T=", TIME_NOW, " Message Received for Comm:", aRcvr.Name());
+      writeln("   Jamming Perceived");
+   }
+   if (aXmtr.JammingPerceived())
+   {
+      writeln("T=", TIME_NOW, " Message Transmitted for Comm:", aXmtr.Name());
+      writeln("   Jamming Perceived");
+   }
+end_script
+
+observer
+   enable MESSAGE_RECEIVED MessageReceived
+end_observer

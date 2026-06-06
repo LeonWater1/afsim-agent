@@ -1,0 +1,22 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# New file created by AFSIM Wizard
+file_path .
+
+include_once platforms/common.txt
+
+include_once platforms/target.txt
+include_once platforms/bomber.txt
+include_once platforms/uav.txt
+include_once platforms/cyber_command_post.txt
+include_once platforms/cyber_outpost.txt
+include_once platforms/ground_radar.txt
+include_once platforms/spotter.txt
+include_once platforms/sr_sam_telar.txt

@@ -1,0 +1,19 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# * * ************************************** * *
+# *   ****** Demonstration input file ******   *
+# *   ******      UNCLASSIFIED        ******   *
+# * * ************************************** * *
+
+include event_output.txt
+
+# Options for logging level: "off", "fatal", "error", "warn", "info", "debug", "trace"
+script_variables
+   setup_bm_logging (">> [%Severity%] %Message%", "trace");
+end_script_variables

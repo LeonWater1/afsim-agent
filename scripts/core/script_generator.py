@@ -156,9 +156,9 @@ def load_task_reference_script(task: dict[str, Any]) -> str:
     if not source_hint:
         return ""
 
-    # Try benchmark_v2 path first, then project root (benchmark_v1 compat)
+    # Try benchmark_extended path first, then project root (benchmark compat)
     candidates = [
-        ROOT / "benchmarks" / "benchmark_v2" / source_hint,
+        ROOT / "benchmarks" / "benchmark_extended" / source_hint,
         ROOT / source_hint,
     ]
     for reference_path in candidates:

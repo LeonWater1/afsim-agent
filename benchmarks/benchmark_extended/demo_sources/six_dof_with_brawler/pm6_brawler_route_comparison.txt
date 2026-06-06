@@ -1,0 +1,93 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+#
+# This demo contains a Brawler mover and a PM6DOF mover converted from that
+# Brawler mover. It is a simple flyout of the two vehicles responding to
+# heading/speed/altitude commands, and serves to illustrate how the two movers
+# may differ in navigation when using the same aerodynamic and propulsion
+# properties.
+#
+# ****************************************************************************
+
+conditional_section
+   conditionals
+      feature_present brawler
+   end_conditionals
+
+define_path_variable CASE pm_brawler_route_comparison
+
+include std_setup.txt
+
+end_time 10 min
+
+include_once platforms/lte_fighter.txt
+
+platform_type ROUTE_TEST_PM6 BLUE_FIGHTER_PM6
+   update_interval 0.01 sec
+   side light_blue 
+   heading 90 deg
+   
+   route
+      position 00:05:00.00n  01:10:00.00w  altitude 30000 ft msl speed 900 ft/s
+      position 00:00:36.035n 01:47:21.156e altitude 30000 ft msl speed 900 ft/s
+   end_route
+   
+   execute at_time 15 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(60.0, 350.0, 8000.0, 0.0, 0.0);
+   end_execute
+   execute at_time 75 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(180.0, 250.0, 5000.0, 0.0, 0.0);
+   end_execute
+   execute at_time 135 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(180.0, 250.0, 7000.0, 0.0, 0.0);
+   end_execute
+   execute at_time 195 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(15.0, 250.0, 7000.0, 0.0, 0.0);
+   end_execute
+   execute at_time 255 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(105.0, 250.0, 10000.0, 0.0, 0.0);
+   end_execute
+   
+end_platform_type
+
+platform_type ROUTE_TEST_BM BLUE_FIGHTER
+   update_interval 0.01 sec
+   side blue
+   heading 90 deg
+   altitude 30000 ft msl
+   position 00:05:00.00n  01:10:00.00w 
+   
+   route
+      position 00:05:00.00n  01:10:00.00w  altitude 30000 ft msl speed 900 ft/s
+      position 00:00:36.035n 01:47:21.156e altitude 30000 ft msl speed 900 ft/s
+   end_route
+
+   execute at_time 15 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(60.0, 350.0, 8000.0, 1.25, 200.0);
+   end_execute
+   execute at_time 75 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(180.0, 250.0, 5000.0, 4.0, 200.0);
+   end_execute
+   execute at_time 135 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(180.0, 250.0, 7000.0, 3.0, 200.0);
+   end_execute
+   execute at_time 195 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(15.0, 250.0, 7000.0, 4.0, 200.0);
+   end_execute
+   execute at_time 255 sec absolute
+      PLATFORM.FlyHeadingSpeedAltitude(105.0, 250.0, 10000.0, 3.0, 200.0);
+   end_execute
+   
+end_platform_type
+
+platform test_PM6 ROUTE_TEST_PM6 end_platform
+
+platform test_BM ROUTE_TEST_BM end_platform
+
+end_conditional_section

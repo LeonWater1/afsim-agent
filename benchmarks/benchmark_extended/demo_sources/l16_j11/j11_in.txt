@@ -1,0 +1,77 @@
+# ****************************************************************************
+# CUI//REL TO USA ONLY
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+###############################################################################
+# Weapon Server
+###############################################################################
+
+define_path_variable CASE j11_in
+log_file output/$(CASE).log
+
+file_path .
+
+# --------------------------------------------------------------
+# DIS
+# --------------------------------------------------------------
+include ./dis_network.txt
+
+dis_interface
+   application 3
+
+   entity_type   FIGHTER           1:2:225:1:9:10:0
+   entity_type   WEAPON_FIGHTER    1:2:225:1:9:10:1
+   munition_type NE_SR_A2A_IR      2:1:225:1:1:6:0   // Network-enabled
+
+   log_created_entities
+
+end_dis_interface
+
+# --------------------------------------------------------------
+# Event Output
+# --------------------------------------------------------------
+event_output
+   file output/$(CASE).evt
+   time_format h:m:s.1
+   lat_lon_format d:m:s.2
+   print_track_in_message true
+
+   disable TEAM_NAME_DEFINITION
+
+   enable MESSAGE_RECEIVED
+   enable MESSAGE_TRANSMITTED
+   enable PLATFORM_ADDED
+   enable WEAPON_FIRED
+   enable WEAPON_HIT
+   enable WEAPON_MISSED
+   enable WEAPON_TERMINATED
+   enable WEAPON_TURNED_OFF
+   enable WEAPON_TURNED_ON
+end_event_output
+
+# --------------------------------------------------------------
+# Scenario
+# --------------------------------------------------------------
+include platforms.txt
+
+link16_interface
+#   debug true
+   j11
+      allow_any_comm
+#      wift_interval 1 s
+#      print_messages
+   end_j11
+end_link16_interface
+
+end_time  40 sec
+realtime
+
+wsf_weapon_server
+#   debug
+   port 3456
+end_wsf_weapon_server

@@ -1,0 +1,51 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# The orbiter platform.
+platform orbiter WSF_PLATFORM
+   side blue
+   icon cubesat
+   
+   # WSF_INTEGRATING_SPACE_MOVER's require a mass to be specified,
+   # either via a maneuvering model, or directly as is done here.
+   empty_mass 20.0 kg
+   
+   add mover WSF_INTEGRATING_SPACE_MOVER
+      # This initial state is given directly as the ECI kinematics.
+      # This will start the platform in the vicinity of the Moon,
+      # and in orbit around it. Please see ../lunar_orbiter.txt for
+      # instructions on how to modify the included file.
+      initial_state
+         include ../elements/orbiter.txt
+      end_initial_state
+      
+      # The integrator specifies how the dynamics are used to
+      # update the kinematics of the platform.
+      integrator prince_dormand_78
+         tolerance 1.0e-11
+         error_criterion L_2
+         max_step_size 3600.0
+      end_integrator
+      
+      # The dynamics specifies what forces act on the platform
+      # during the integration. The total force is a sum of a
+      # number of individual terms.
+      dynamics
+         # The Earth monopole term supplies the point mass effect
+         # of the Earth.
+         term earth_monopole
+         end_term
+      
+         # The moon monopole term supplies the point mass effect
+         # of the Moon.
+         term moon_monopole
+         end_term
+      end_dynamics
+   end_mover
+end_platform

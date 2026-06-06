@@ -1,0 +1,319 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# False Target jamming example 1
+#  with pulse density based false targets
+#  and an early warning radar with sidelobe blanking
+#
+
+define_path_variable CASE closely_spaced_targets_ttr
+log_file output/$(CASE).log
+
+# ****************************************************************************
+# Define the system types (movers, sensors, weapons, etc.)
+# ****************************************************************************
+
+radar_signature FIGHTER_RADAR_SIGNATURE
+   constant 10 m^2
+end_radar_signature
+
+radar_signature WIDE_BODY_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+# ****************************************************************************
+#                     Target Tracking Radar
+# ****************************************************************************
+
+antenna_pattern TTR_RADAR_ANTENNA
+  sine_pattern
+    peak_gain            35 dB
+    minimum_gain         -10.0 db
+    azimuth_beamwidth    1 deg
+    elevation_beamwidth  1 deg
+  end_sine_pattern
+end_antenna_pattern
+
+sensor TTR_RADAR WSF_RADAR_SENSOR
+   debug_tracker
+   debug_scheduler
+
+   selection_mode                 multiple
+
+   slew_mode                      azimuth_and_elevation
+   azimuth_slew_limits            -180 deg 180 deg
+   elevation_slew_limits          0.0 deg 80.0 deg
+
+   mode_template
+      one_m2_detect_range            35.0 nm
+
+      antenna_height                 4.0 m
+
+      false_target_screener SCREENER WSF_FT_SCREENER
+         #debug
+         track_capacity     1000
+         plot_capacity      1000
+         transfer_capacity  1000
+         request_based_tracking true
+         #only_screen_false_target_track_requests true
+      end_false_target_screener
+
+      transmitter
+         antenna_pattern             TTR_RADAR_ANTENNA
+         power                       1000.0 kw
+         frequency                   9500 mhz
+         internal_loss               2 db
+         pulse_repetition_interval   225 usec
+         pulse_width                  25 usec
+      end_transmitter
+
+      receiver
+         antenna_pattern             TTR_RADAR_ANTENNA
+         bandwidth                   500.0 khz
+         noise_power                 -160 dBw  # will be calibrated for 1 m^2
+         internal_loss               7 dB
+      end_receiver
+
+      probability_of_false_alarm     1.0e-6
+      required_pd                    0.5
+      swerling_case                  1
+
+      reports_range
+      reports_bearing
+      reports_elevation
+      reports_velocity
+   end_mode_template
+
+   mode ACQUIRE
+      maximum_request_count          1
+
+      scan_mode                      azimuth_and_elevation
+      azimuth_scan_limits            -5 deg 5 deg
+      elevation_scan_limits          -5 deg 5 deg
+
+      frame_time                     2.0 sec
+
+      hits_to_establish_track        3 5
+      hits_to_maintain_track         1 3
+
+      track_quality                  0.8   // near 'weapons' grade
+   end_mode
+
+   mode TRACK
+      scan_mode                      azimuth_and_elevation
+      azimuth_scan_limits            -.1 deg .1 deg
+      elevation_scan_limits          -.1 deg .1 deg
+
+      maximum_request_count          6
+
+      frame_time                     1.0 sec
+
+      hits_to_establish_track        3 5
+      hits_to_maintain_track         1 3
+
+      track_quality                  1.0   // 'weapons' grade
+
+      #transmitter
+      #   frequency                   9800 mhz
+      #end_transmitter
+
+	   search_while_track
+
+      close_target_detection
+         #debug
+         acquire_deltas
+            azimuth_delta       0.2 deg
+            elevation_delta     0.2 deg
+            range_delta         5 m
+         end_acquire_deltas
+
+         reacquire_deltas
+            azimuth_delta       0.25 deg
+            elevation_delta     0.25 deg
+            range_delta         1000 m
+         end_reacquire_deltas
+      end_close_target_detection
+   end_mode
+end_sensor
+
+# ****************************************************************************
+# Define the platform types
+# ****************************************************************************
+
+platform_type TTR_RADAR WSF_PLATFORM
+   icon Ground_Radar
+
+   # ---------------------------------------------
+   # Draw track to false targets and real targets
+   # ---------------------------------------------
+   script_variables
+      # Create a WsfDraw object.
+      WsfDraw draw = WsfDraw();
+   end_script_variables
+
+   execute at_interval_of 1.0 s
+      foreach (WsfTrack track in MasterTrackList())
+      {
+         WsfSensor sensor = PLATFORM.Sensor("ttr_radar");
+         if (!sensor.HaveRequestFor(track.TrackId()))
+         {
+            if (track.Target().Name() == "striker-1")
+            {
+               track.SetLocation(track.Target().Location());
+               sensor.TurnOn();
+               sensor.StartTracking(track, "TRACK");
+            }
+         }
+
+         if (track.IsValid())
+         {
+            writeln(track.LocationAtTime(TIME_NOW));
+            sensor.CueToPoint(track.LocationAtTime(TIME_NOW));
+            # use the track ID as a unique draw ID
+            # a track icon and a line to the track icon
+            # is drawn at each track update
+            string trackId = track.TrackId().ToString();
+            draw.SetId(trackId);
+            draw.SetDuration(1.0); # this is faster than calling erase every time
+
+            draw.SetColor(0,0,1);
+            draw.BeginIcons(track.Heading(), "Wedge");
+            draw.Vertex(track.CurrentLocation());
+            draw.End();
+
+            # Draw a line to the track
+            draw.SetLineStyle("dashed");
+            draw.BeginLines();
+            draw.Vertex(PLATFORM);
+            draw.Vertex(track.CurrentLocation());
+            draw.End();
+         }
+      }
+   end_execute
+   # ---------------------------------------
+
+   sensor ttr_radar TTR_RADAR
+      processor track_manager
+      internal_link track_manager
+      ignore_same_side
+   end_sensor
+
+   processor track_manager WSF_TRACK_PROCESSOR
+   end_processor
+end_platform_type
+
+platform_type STRIKER_PLATFORM WSF_PLATFORM
+   icon F-18E
+   side blue
+   mover WSF_AIR_MOVER end_mover
+   radar_signature FIGHTER_RADAR_SIGNATURE
+end_platform_type
+
+# ****************************************************************************
+#                        Define the platform instances
+# ****************************************************************************
+
+platform striker-1 STRIKER_PLATFORM
+   side blue
+
+   route
+      position 37:00:36.00n 114:51:14.400w
+      altitude 35000 ft
+      speed     450 kts
+      heading   270 deg
+      position 36:56:48.84n 115:43:20w
+   end_route
+end_platform
+
+platform striker-2 STRIKER_PLATFORM
+   side blue
+
+   route
+      position 36:56:48.84n 114:51:14.400w
+      altitude 35000 ft
+      speed     450 kts
+      heading   270 deg
+      position 37:00:36.00n 115:43:20w
+   end_route
+end_platform
+
+platform ew_radar TTR_RADAR
+   side red
+
+   position 37:00:00n 116:00:00w
+   altitude 0.0 ft agl
+   heading   90 deg
+
+   sensor ttr_radar
+   end_sensor
+
+   track
+      platform striker-1
+   end_track
+end_platform
+
+event_output
+   #enable COMM_TURNED_OFF
+   #enable COMM_TURNED_ON
+   #enable JAMMING_ATTEMPT
+   #enable JAMMING_REQUEST_CANCELED
+   #enable JAMMING_REQUEST_INITIATED
+   #enable JAMMING_REQUEST_UPDATED
+   #enable LOCAL_TRACK_CORRELATION
+   #enable LOCAL_TRACK_DECORRELATION
+   #enable LOCAL_TRACK_INITIATED
+   #enable LOCAL_TRACK_UPDATED
+   #enable LOCAL_TRACK_DROPPED
+   #enable MESSAGE_DISCARDED
+   #enable MESSAGE_UPDATED
+   #enable MESSAGE_QUEUED
+   #enable MESSAGE_RECEIVED
+   #enable MESSAGE_TRANSMITTED
+   #enable OPERATING_LEVEL_CHANGED
+   #enable PLATFORM_ADDED
+   #enable PLATFORM_DELETED
+   #enable PLATFORM_BROKEN
+   #enable PROCESSOR_TURNED_OFF
+   #enable PROCESSOR_TURNED_ON
+   #enable SENSOR_DETECTION_ATTEMPT
+   #enable SENSOR_MODE_ACTIVATED
+   #enable SENSOR_MODE_DEACTIVATED
+   #enable SENSOR_REQUEST_CANCELED
+   #enable SENSOR_REQUEST_INITIATED
+   #enable SENSOR_REQUEST_UPDATED
+   enable SENSOR_TRACK_INITIATED
+   enable SENSOR_TRACK_UPDATED
+   enable SENSOR_TRACK_DROPPED
+   #enable SENSOR_TURNED_ON
+   #enable SENSOR_TURNED_OFF
+   #enable TASK_ASSIGNED
+   #enable TASK_CANCELED
+   #enable TASK_COMPLETED
+   #enable WEAPON_FIRE_ABORTED
+   #enable WEAPON_FIRE_REQUESTED
+   #enable WEAPON_FIRED
+   #enable WEAPON_HIT
+   #enable WEAPON_MISSED
+   #enable WEAPON_RELOAD_STARTED
+   #enable WEAPON_RELOAD_ENDED
+   #enable WEAPON_TERMINATED
+   #enable WEAPON_TURNED_OFF
+   #enable WEAPON_TURNED_ON
+  file output/$(CASE).evt
+end_event_output
+
+# ****************************************************************************
+#                        Define the interfaces
+# ****************************************************************************
+
+# Specify parameters for a replay file
+event_pipe
+   file output/$(CASE).aer
+end_event_pipe
+
+end_time 480 sec

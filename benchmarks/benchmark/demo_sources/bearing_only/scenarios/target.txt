@@ -1,0 +1,17 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+# New file created by Wizard
+
+platform target1 AIR_TARGET
+   heading 138 deg
+   route
+     position 49n 128:30:24.58w altitude 10000.00 ft speed 400 kts
+     position 48:17:41.35n 125:13:28.56w
+   end_route
+end_platform
