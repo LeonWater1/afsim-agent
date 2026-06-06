@@ -1,8 +1,0 @@
-{
-  "script": "BV1-021_execution_repair",
-  "syntax_correct": true,
-  "static_pass": true,
-  "primary_error": "",
-  "static_error_ids": [],
-  "findings": []
-}

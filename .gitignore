@@ -14,18 +14,22 @@ __pycache__/
 .vscode/
 .idea/
 
-# Experiment output directories
-afsim_agent_output/
-afsim_agent_output_bv1_fair/
-afsim_agent_output_bv2/
-baseline_direct_extended/
-baseline_rag_extended/
-baseline_direct_fair/
-baseline_rag_fair/
+# Experiment output directories (not part of the workflow)
+afsim_agent_*/
+baseline_*/
 
-# Fair evaluation output
-afsim_agent_output_bv1_fair_20260606/
+# Benchmark data and demo sources (not part of the workflow)
+benchmarks/
+
+# Legacy code
+archive/
+
+# Generation artifacts
+layered_generation_artifacts/
 
 # Claude
 .claude/
 
+# Test/scratch files
+test_*.txt
+mission.log

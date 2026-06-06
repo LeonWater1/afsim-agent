@@ -1,7 +1,0 @@
-platform observer_unit PT_OBSERVER_UNIT
-   side blue
-   position observer_site
-
-   comm group_network WSF_COMM_TRANSCEIVER
-   end_comm
-end_platform

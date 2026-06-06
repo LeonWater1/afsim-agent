@@ -1,6 +1,0 @@
-// acoustic_simple_demo
-side blue
-side red
-location blue_start position 30.0n 150.0e
-location red_contact position 30.5n 150.5e
-end_time 120 sec

@@ -1,6 +1,0 @@
-// brawler_1v1
-side blue
-side red
-location blue_spawn position 34.00n 128.00e
-location red_spawn position 36.00n 128.50e
-end_time 300 sec

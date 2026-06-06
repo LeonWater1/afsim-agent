@@ -1,4 +1,0 @@
-platform relay_unit PT_RELAY_UNIT
-   side blue
-   position 30.0n 100.0e
-end_platform

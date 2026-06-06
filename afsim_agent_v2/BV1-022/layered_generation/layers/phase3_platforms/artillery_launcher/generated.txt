@@ -1,5 +1,0 @@
-platform artillery_launcher red type PT_ARTILLERY_LAUNCHER position 51.53n 0.44e
-  add weapon artillery_155mm
-  add processor sub_task_proc
-  add comm fires_comm
-end_platform

@@ -1,8 +1,0 @@
-platform mortar_launcher PT_MORTAR_LAUNCHER
-  side red
-  position 51.49n 0.37e
-  altitude 0 m agl
-  component mortar_120mm
-  component sub_task_proc
-  component fires_comm
-end_platform

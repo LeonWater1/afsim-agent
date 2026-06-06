@@ -1,9 +1,0 @@
-platform rocket_launcher PT_ROCKET_LAUNCHER
-   side red
-   position 51.50n 0.27e
-   components
-      rocket_122mm
-      sub_task_proc
-      fires_comm
-   end_components
-end_platform
